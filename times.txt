@@ -1,0 +1,33 @@
+$(: !592 ) time make fasttests
+
+Fastests
+python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+......................................................
+----------------------------------------------------------------------
+Ran 54 tests in 25.894s
+
+OK
+
+real	0m28.499s
+user	0m59.897s
+sys	2m7.663s
+(qmcpy) # Exit:0 2025-06-28 16:18:48  [r2q2@Reformer#[:~/Projects/QMCSoftware]
+$(: !593 ) time python -m pytest -q test/fasttests/  
+......................................................                                                                      [100%]
+======================================================== warnings summary =========================================================
+test/fasttests/test_discrete_distribs.py::TestDigitalNetB2::test_gen_samples
+  /Users/r2q2/Projects/QMCSoftware/qmcpy/discrete_distribution/digital_net_b2/digital_net_b2.py:389
+  	ParameterWarning: Non-randomized DigitalNetB2 sequence includes the origin
+
+test/fasttests/test_stopping_criteria.py::TestCubMCCLT::test_n_max_single_level
+  /opt/homebrew/Caskroom/miniconda/base/envs/qmcpy/lib/python3.9/site-packages/gpytorch/lazy/__init__.py:69
+  	DeprecationWarning: GPyTorch will be replacing all LazyTensor functionality with the linear operator package. Replace all references to gpytorch.lazy.*LazyTensor with linear_operator.operators.*LinearOperator.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+54 passed, 2 warnings in 27.06s
+
+real	0m28.053s
+user	0m51.176s
+sys	2m18.915s
+(qmcpy) # Exit:0 2025-06-28 16:20:21  [r2q2@Reformer#[:~/Projects/QMCSoftware]
+$(: !594 ) 

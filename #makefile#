@@ -155,6 +155,7 @@ gen_doc:
 
 fasttest_parallel:
 	python -m pytest -q -W ignore::Warning -n auto --cov=. --cov-append test/fasttests/
-
+	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 longtest_parallel:
 	python -m pytest -q -W ignore::Warning -n auto --cov=. --cov-append test/longtests/ 1>/dev/null
+	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
