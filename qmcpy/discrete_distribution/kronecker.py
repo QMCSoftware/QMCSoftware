@@ -15,7 +15,7 @@ PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41,
 RICHTMYER = sqrt(PRIMES) % 1
 
 class Kronecker(LD):
-    def __init__(self, dimension=1, replications=1, randomize=False, alpha = 0, delta = 0, seed_alpha=None, seed = None, d_max=None, m_max=None):
+    def __init__(self, dimension = 1, alpha = 0, delta = 0, replications = 1, randomize = False, seed_alpha = None, seed = None, d_max = None, m_max = None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.d = dimension
@@ -24,7 +24,7 @@ class Kronecker(LD):
         self.dimension = dimension
         self.low_discrepancy = True
         self.d_max = dimension
-        self.m_max = int(1e10)
+        self.m_max = 2 ** 21
         
         if type(alpha) == str and alpha.lower() == 'richtmyer':
                 if dimension <= len(PRIMES):
@@ -37,30 +37,36 @@ class Kronecker(LD):
             else:
                 self.alpha = alpha
 
-        if sum(delta) == 0 and seed == None:
+        super(Kronecker,self).__init__(dimension,seed)
+
+        if self.randomize:
+            self.delta = random.rand(self.replications, self.dimension)
+        elif sum(delta) == 0 and seed == None:
             self.delta = zeros(dimension)
         elif sum(delta) == 0 and seed != None:
             self.delta = random.rand(dimension)
         elif sum(delta) != 0:
             self.delta = delta
-            
-        super(Kronecker,self).__init__(dimension,seed)
+        else:
+            self.delta = 0
 
 
     def gen_samples(self, n=None, n_min=0, n_max=0):
+        # returns replications x (n_max-n_min) x d (dimension) array of samples
         if n is None:
             n = n_max - n_min
 
         i = arange(n).reshape((n, 1))
 
-        if self.randomize:
-            # different for each component
-            delta = random.rand(1, self.dimension)
-        else:
-            delta = self.delta
+        if self.replications == 1:
+            return ((i * self.alpha) + self.delta) % 1
+        
+        samples = empty(shape=(self.replications, n, self.dimension))
+        for r in range(self.replications):
+            samples[r] = ((i * self.alpha) + self.delta[r]) % 1
 
-        return ((i * self.alpha) + delta) % 1
-    
+        return samples
+
 
     def periodic_discrepancy(self, n, k_tilde=None, gamma=None):
         """
@@ -90,10 +96,10 @@ class Kronecker(LD):
 
     # calculates the weighted sum of square discrepancy
     def wssd_discrepancy(self, n, weights, k_tilde, gamma, int_k_tilde):
-        discrepancies = self._square_periodic_discrepancies(n, weights, k_tilde, gamma, int_k_tilde)
-        return cumsum(weights * discrepancies)
+        discrepancies = self._square_periodic_discrepancies(n, (k_tilde, int_k_tilde), gamma)
+        return sum(weights * discrepancies)
     
-
+    
     def _square_periodic_discrepancies(self, n, k_tilde, gamma):
         n_array = arange(1, n + 1)
         k_tilde_terms = k_tilde[0](self.gen_samples(n=n), gamma)

@@ -36,7 +36,7 @@ def alpha_search(dimension, n_alpha, n, sample_wt=None, coord_wt=None, seed=None
         previous_k_tilde = best_k_tilde
         wssd = best_wssd
 
-    return best_alpha, wssd
+    return best_alpha, wssd, previous_k_tilde
 
 
 def square_discrepancy(k_tilde_terms, n_array, n):
@@ -76,17 +76,19 @@ def plot_discrepancy(dimension, alpha, n = 1e6, gamma = None, trend = True, titl
 
 
 if __name__ == '__main__':
-    dim = 13
-    n_al = int(1e4)
-    sample_number = int(1e6)
+    np.set_printoptions(18)
+    dim = 50
+    n_al = int(1e5)
+    sample_number = int(2 ** 17)
     sample_weights = np.arange(1, sample_number + 1)
     coord_weights = 1 / (np.arange(1, dim + 1) ** 2)
-    alpha, wssd = alpha_search(dimension = dim,
+    alpha, wssd, k_tilde = alpha_search(dimension = dim,
                  n_alpha = n_al,
                  n = sample_number,
                  sample_wt = sample_weights,
                  coord_wt = coord_weights)
 
-    print(repr(alpha))
+    np.savetxt('d50_n2^17_1e5alpha', alpha)
+    print(k_tilde)
     print(wssd)
-    plot_discrepancy(dim, alpha, gamma = coord_weights)
+    plot_discrepancy(dim, alpha, gamma = coord_weights, title='50 dimensions')
