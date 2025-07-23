@@ -116,6 +116,7 @@ class Kronecker(LD):
     def _spawn(self, child_seed, dimension):
         return Kronecker(
                 dimension=dimension,
+                alpha = self.alpha,
                 randomize=self.randomize,
                 seed=child_seed,
                 d_max=self.d_max,
