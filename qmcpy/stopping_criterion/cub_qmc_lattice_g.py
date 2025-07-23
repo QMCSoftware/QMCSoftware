@@ -4,7 +4,8 @@ from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
 from ..integrand.genz import Genz
 from ..integrand.sensitivity_indices import SensitivityIndices
-from ..util import fftbr,omega_fftbr,ParameterError
+from ..fast_transform import fftbr,omega_fftbr
+from ..util import ParameterError
 import numpy as np
 
 
@@ -44,7 +45,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
         
@@ -81,7 +82,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         11
         >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
@@ -133,7 +134,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             replications    1
             randomize       SHIFT
             gen_vec_source  kuo.lattice-33002-1024-1048576.9125.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
     
@@ -196,5 +197,5 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             allowed_distribs = [Lattice],
             cast_complex = True,
             error_fun = error_fun)
-        if self.discrete_distrib.order!='NATURAL':
-            raise ParameterError("CubLattice_g requires Lattice with 'NATURAL' order")
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubLattice_g requires Lattice with 'RADICAL INVERSE' order")

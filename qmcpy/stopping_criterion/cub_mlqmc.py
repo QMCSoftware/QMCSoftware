@@ -22,12 +22,12 @@ class CubMLQMC(AbstractCubMLQMC):
         >>> data
         Data (Data)
             solution        1.784
-            n_total         2097152
+            n_total         2359296
             levels          2^(2)
-            n_level         [32768 16384  8192  8192]
+            n_level         [32768 16384 16384  8192]
             mean_level      [1.718 0.051 0.012 0.003]
-            var_level       [4.607e-08 5.753e-08 3.305e-07 1.557e-07]
-            bias_estimate   2.66e-04
+            var_level       [7.119e-08 1.409e-07 9.668e-08 1.852e-07]
+            bias_estimate   2.99e-04
             time_integrate  ...
         CubMLQMC (AbstractStoppingCriterion)
             rmse_tol        0.001
@@ -52,9 +52,9 @@ class CubMLQMC(AbstractCubMLQMC):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               1
             replications    2^(5)
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)

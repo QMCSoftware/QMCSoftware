@@ -13,7 +13,7 @@ class Sin1d(AbstractIntegrand):
         >>> integrand = Sin1d(DigitalNetB2(1,seed=7),k=1)
         >>> y = integrand(2**10)
         >>> print("%.4e"%y.mean())
-        -7.3344e-08
+        -1.3582e-10
         >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     0
@@ -29,7 +29,7 @@ class Sin1d(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4e"%muhats.mean())
-        5.8311e-04
+        7.0800e-04
     """
     def __init__(self, sampler, k=1):
         r"""

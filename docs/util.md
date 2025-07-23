@@ -1,66 +1,38 @@
 # Utilities
 
-## Fast Transforms (`numpy`)
+### `plot_proj` 
 
-### `fwht`
-
-::: qmcpy.util.kernel_methods.ft_qmctoolscl.fwht
-
-### `fftbr`
-
-::: qmcpy.util.kernel_methods.ft_qmctoolscl.fftbr
-
-### `ifftbr`
-
-::: qmcpy.util.kernel_methods.ft_qmctoolscl.ifftbr
-
-### `omega_fwht`
-
-::: qmcpy.util.kernel_methods.ft_qmctoolscl.omega_fwht
-
-### `omega_fftbr`
-
-::: qmcpy.util.kernel_methods.ft_qmctoolscl.omega_fftbr
-
-## Fast Transforms (`torch`)
-
-### `fwht_torch`
-
-::: qmcpy.util.kernel_methods.ft_pytorch.fwht_torch
-
-### `fftbr_torch`
-
-::: qmcpy.util.kernel_methods.ft_pytorch.fftbr_torch
-
-### `ifftbr_torch`
-
-::: qmcpy.util.kernel_methods.ft_pytorch.ifftbr_torch
-
-### `omega_fwht`
-
-::: qmcpy.util.kernel_methods.ft_pytorch.omega_fwht_torch
-
-### `omega_fftbr_torch`
-
-::: qmcpy.util.kernel_methods.ft_pytorch.omega_fftbr_torch
-
-## (Digitally) Shift Invariant Ops
-
-### `bernoulli_poly`
-
-::: qmcpy.util.kernel_methods.shift_invar_ops.bernoulli_poly
-
-### `weighted_walsh_funcs`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.weighted_walsh_funcs
-
-### `k4sumterm`
-
-::: qmcpy.util.kernel_methods.dig_shift_invar_ops.k4sumterm
-
-## Misc
+::: qmcpy.util.plot_functions.plot_proj
 
 ### `mlmc_test`
 
 ::: qmcpy.util.mlmc_test.mlmc_test
+
+## Shift Invariant Ops 
+
+### `util.bernoulli_poly`
+
+::: qmcpy.util.shift_invar_ops.bernoulli_poly
+
+## Digitally Shift Invariant Ops
+
+### `util.weighted_walsh_funcs`
+
+::: qmcpy.util.dig_shift_invar_ops.weighted_walsh_funcs
+
+### `util.k4sumterm`
+
+::: qmcpy.util.dig_shift_invar_ops.k4sumterm
+
+### `util.to_float`
+
+::: qmcpy.util.dig_shift_invar_ops.to_float
+
+### `util.to_bin`
+
+::: qmcpy.util.dig_shift_invar_ops.to_bin
+
+### `util.bin_from_numpy_to_torch`
+
+::: qmcpy.util.dig_shift_invar_ops.bin_from_numpy_to_torch
 

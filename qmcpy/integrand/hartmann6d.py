@@ -11,7 +11,7 @@ class Hartmann6d(AbstractIntegrand):
         >>> integrand = Hartmann6d(DigitalNetB2(6,seed=7))
         >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
-        -0.2550
+        -0.2644
         >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     0
@@ -27,7 +27,7 @@ class Hartmann6d(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        -0.2556
+        -0.2599
     """
     
     def __init__(self, sampler):

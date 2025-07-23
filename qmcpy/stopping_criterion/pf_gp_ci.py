@@ -107,9 +107,9 @@ class PFGPCI(AbstractStoppingCriterion):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -126,7 +126,7 @@ class PFGPCI(AbstractStoppingCriterion):
                 ci_high: [1.98e-01   1.95e-01   1.80e-01   1.80e-01  ]
               solutions: [1.42e-01   1.55e-01   1.50e-01   1.58e-01  ]
           solutions_ref: [1.62e-01   1.62e-01   1.62e-01   1.62e-01  ]
-              error_ref: [2.00e-02   6.93e-03   1.27e-02   4.43e-03  ]
+              error_ref: [2.01e-02   7.02e-03   1.28e-02   4.52e-03  ]
                   in_ci: [True       True       True       True      ]
     
     **References:**

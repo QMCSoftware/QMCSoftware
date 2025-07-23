@@ -15,7 +15,7 @@ class Keister(AbstractIntegrand):
         >>> integrand = Keister(DigitalNetB2(2,seed=7))
         >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
-        1.8067
+        1.8080
         >>> integrand.true_measure
         Gaussian (AbstractTrueMeasure)
             mean            0
@@ -32,7 +32,7 @@ class Keister(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        1.8093
+        1.8024
 
     **References:**
 

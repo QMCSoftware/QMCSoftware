@@ -13,7 +13,7 @@ class Multimodal2d(AbstractIntegrand):
         >>> integrand = Multimodal2d(DigitalNetB2(2,seed=7))
         >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
-        -0.7375
+        -0.7365
         >>> integrand.true_measure
         Uniform (AbstractTrueMeasure)
             lower_bound     [-4 -3]
@@ -29,7 +29,7 @@ class Multimodal2d(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        -0.7427
+        -0.7366
     """
     def __init__(self, sampler):
         r"""

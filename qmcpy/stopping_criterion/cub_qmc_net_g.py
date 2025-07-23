@@ -1,5 +1,6 @@
 from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
-from ..util import fwht,omega_fwht,ParameterError
+from ..fast_transform import fwht,omega_fwht
+from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
@@ -18,13 +19,13 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> sc = CubQMCNetG(k,abs_tol=1e-3,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
-        array(1.38038574)
+        array(1.38046669)
         >>> data
         Data (Data)
             solution        1.380
             comb_bound_low  1.380
             comb_bound_high 1.381
-            comb_bound_diff 0.001
+            comb_bound_diff 6.72e-04
             comb_flags      1
             n_total         2^(11)
             n               2^(11)
@@ -42,9 +43,9 @@ class CubQMCNetG(AbstractCubQMCLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               1
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -57,13 +58,13 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.18965698, 0.96061461])
+        array([1.19003352, 0.96068403])
         >>> data
         Data (Data)
             solution        [1.19  0.961]
             comb_bound_low  [1.189 0.96 ]
-            comb_bound_high [1.19  0.961]
-            comb_bound_diff [0.001 0.001]
+            comb_bound_high [1.191 0.962]
+            comb_bound_diff [0.001 0.002]
             comb_flags      [ True  True]
             n_total         2^(14)
             n               [16384  1024]
@@ -81,9 +82,9 @@ class CubQMCNetG(AbstractCubQMCLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -135,9 +136,9 @@ class CubQMCNetG(AbstractCubQMCLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -170,14 +171,14 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> solution
         array([1.91666667, 3.        , 4.08333333])
         >>> data.n
-        array([4096, 8192, 8192])
+        array([ 8192,  8192, 16384])
         >>> assert (np.abs(true_value-solution)<abs_tol).all()
         >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_cv_coeffs=True)
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.91666667, 3.        , 4.08333333])
         >>> data.n
-        array([ 8192, 16384, 16384])
+        array([16384, 16384, 16384])
         >>> assert (np.abs(true_value-solution)<abs_tol).all()
 
     **References:**
@@ -241,5 +242,5 @@ class CubQMCNetG(AbstractCubQMCLDG):
             allowed_distribs = [DigitalNetB2],
             cast_complex = False,
             error_fun = error_fun)
-        if self.discrete_distrib.order!='NATURAL':
-            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")

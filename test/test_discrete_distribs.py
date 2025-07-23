@@ -31,7 +31,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             dds = [
                 Lattice(d,order='natural'),
                 Lattice(d,order='linear'),
-                DigitalNetB2(d,randomize='LMS_DS',order="NATURAL"),
+                DigitalNetB2(d,randomize='LMS_DS',order="RADICAL INVERSE"),
                 DigitalNetB2(d,randomize='DS'),
                 DigitalNetB2(d,order="GRAY"),
                 Halton(d,randomize='QRNG'),
@@ -114,9 +114,9 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        dn123 = DigitalNetB2(dimension=4,order="NATURAL",randomize=False)
+        dn123 = DigitalNetB2(dimension=4,order="RADICAL INVERSE",randomize=False)
         x0123 = dn123.gen_samples(8,warn=False)
-        dn13 = DigitalNetB2(dimension=[1,3],order="NATURAL",randomize=False)
+        dn13 = DigitalNetB2(dimension=[1,3],order="RADICAL INVERSE",randomize=False)
         x13 = dn13.gen_samples(n_min=4,n_max=8,warn=False)
         self.assertTrue((x0123[4:8,[1,3]]==x13).all())
         dn123 = DigitalNetB2(dimension=4,order="GRAY",randomize=False)
@@ -136,7 +136,7 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
     def test_natural_ordering(self):
-        dnb2 = DigitalNetB2(2,randomize=False,order="NATURAL")
+        dnb2 = DigitalNetB2(2,randomize=False,order="RADICAL INVERSE")
         x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
         x_true = np.array([
             [ 0.125,  0.625],

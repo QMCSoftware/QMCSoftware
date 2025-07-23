@@ -1,5 +1,5 @@
 import numpy as np 
-from typing import Union
+
 
 class Polynomial():
     """
@@ -52,7 +52,6 @@ def bernoulli_poly(n, x):
     $n^\text{th}$ Bernoulli polynomial
 
     Examples:
-        
         >>> x = np.arange(6).reshape((2,3))/6
         >>> available_n = list(BERNOULLIPOLYSDICT.keys())
         >>> available_n

@@ -17,7 +17,7 @@ class CustomFun(AbstractIntegrand):
         ...     g = lambda t: t[...,0]**2*t[...,1])
         >>> y = integrand(2**10)
         >>> print("%.4f"%y.mean())
-        3.9897
+        3.9991
 
         With independent replications
 
@@ -31,7 +31,7 @@ class CustomFun(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4f"%muhats.mean())
-        3.9837
+        3.9330
 
         Next we will implement the multi-output function 
 
@@ -56,7 +56,7 @@ class CustomFun(AbstractIntegrand):
         (4, 1024)
         >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
         ...     y.mean(-1)
-        array([1.45e-07, -1.18e-06, -3.03e-06, -4.18e-09])
+        array([8.18e-04, 1.92e-06, -2.26e-10, 5.05e-07])
 
         Stopping criterion which supporting vectorized outputs may pass in Boolean `compute_flags` with `dimension_indv` shape indicating which output need to evaluated, 
             i.e. where `compute_flags` is `False` we do not need to evaluate the integrand. We have not used this in inexpensive example above. 
@@ -78,7 +78,7 @@ class CustomFun(AbstractIntegrand):
         (4, 16)
         >>> with np.printoptions(formatter={"float": lambda x: "%.2e"%x}):
         ...     muhats.mean(-1)
-        array([4.45e-04, 4.86e-03, -1.49e-04, -7.64e-04])
+        array([3.83e-03, -6.78e-03, -1.56e-03, -5.65e-04])
 
     """
 

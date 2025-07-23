@@ -1,7 +1,8 @@
 from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import DigitalNetB2
 from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
-from ..util import fwht,omega_fwht,MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
+from ..fast_transform import fwht,omega_fwht
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
 import ctypes
 import numpy as np
 from time import time
@@ -19,10 +20,10 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
-            solution        1.808
-            comb_bound_low  1.804
-            comb_bound_high 1.812
-            comb_bound_diff 0.008
+            solution        1.809
+            comb_bound_low  1.807
+            comb_bound_high 1.810
+            comb_bound_diff 0.003
             comb_flags      1
             n_total         2^(10)
             n               2^(10)
@@ -41,9 +42,9 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -56,16 +57,16 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         >>> sc = CubQMCBayesNetG(f,abs_tol=abs_tol,rel_tol=0)
         >>> solution,data = sc.integrate()
         >>> solution
-        array([1.18640441, 0.96079745])
+        array([1.18750491, 0.96076395])
         >>> data
         Data (Data)
-            solution        [1.186 0.961]
-            comb_bound_low  [1.184 0.959]
-            comb_bound_high [1.188 0.962]
-            comb_bound_diff [0.004 0.003]
+            solution        [1.188 0.961]
+            comb_bound_low  [1.18 0.96]
+            comb_bound_high [1.195 0.962]
+            comb_bound_diff [0.014 0.002]
             comb_flags      [ True  True]
-            n_total         2^(10)
-            n               [1024  256]
+            n_total         2^(11)
+            n               [2048  256]
             time_integrate  ...
         CubQMCBayesNetG (AbstractStoppingCriterion)
             abs_tol         0.010
@@ -81,9 +82,9 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -101,14 +102,14 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         >>> solution,data = sc.integrate()
         >>> data
         Data (Data)
-            solution        [[0.021 0.179 0.625]
-                             [0.036 0.302 0.742]]
-            comb_bound_low  [[0.016 0.163 0.594]
-                             [0.034 0.29  0.711]]
-            comb_bound_high [[0.026 0.196 0.657]
-                             [0.037 0.315 0.773]]
-            comb_bound_diff [[0.01  0.033 0.063]
-                             [0.003 0.025 0.062]]
+            solution        [[0.009 0.194 0.657]
+                             [0.036 0.312 0.783]]
+            comb_bound_low  [[0.007 0.178 0.636]
+                             [0.033 0.297 0.762]]
+            comb_bound_high [[0.012 0.209 0.679]
+                             [0.038 0.327 0.804]]
+            comb_bound_diff [[0.005 0.031 0.043]
+                             [0.004 0.03  0.042]]
             comb_flags      [[ True  True  True]
                              [ True  True  True]]
             n_total         2^(8)
@@ -136,14 +137,14 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
             entropy         7
-
+        
     **References:**
 
     1.  Jagadeeswaran, Rathinavel, and Fred J. Hickernell.  
@@ -210,8 +211,8 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1:
         self._xfullundtype = np.uint64
-        if self.discrete_distrib.order!='NATURAL':
-            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'NATURAL' order")
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")
 
 
     # Digitally shift invariant kernel

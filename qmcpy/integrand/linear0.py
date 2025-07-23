@@ -13,7 +13,7 @@ class Linear0(AbstractIntegrand):
         >>> integrand = Linear0(DigitalNetB2(100,seed=7))
         >>> y = integrand(2**10)
         >>> print("%.4e"%y.mean())
-        3.0517e-05
+        6.0560e-05
 
         With independent replications
 
@@ -25,7 +25,7 @@ class Linear0(AbstractIntegrand):
         >>> muhats.shape 
         (16,)
         >>> print("%.4e"%muhats.mean())
-        3.2529e-04
+        -9.8203e-05
     """
 
     def __init__(self, sampler):

@@ -1,30 +1,34 @@
 doctests_minimal:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
-		--ignore qmcpy/util/kernel_methods/ft_pytorch.py \
+		--ignore qmcpy/fast_transform/ft_pytorch.py \
 		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
-		--ignore qmcpy/util/kernel_methods/dig_shift_invar_ops.py \
+		--ignore qmcpy/kernel/ \
+		--ignore qmcpy/util/dig_shift_invar_ops.py \
+		--ignore qmcpy/util/shift_invar_ops.py \
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
-		--ignore qmcpy/integrand/hartmann6d.py
+		--ignore qmcpy/integrand/hartmann6d.py \
 
 doctests_torch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/util/kernel_methods/ft_pytorch.py \
-		--doctest-modules qmcpy/util/kernel_methods/dig_shift_invar_ops.py
+		--doctest-modules qmcpy/fast_transform/ft_pytorch.py \
+		--doctest-modules qmcpy/kernel/*.py \
+		--doctest-modules qmcpy/util/dig_shift_invar_ops.py \
+		--doctest-modules qmcpy/util/shift_invar_ops.py \
 
 doctests_gpytorch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py
+		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py \
 
 doctests_botorch:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/integrand/hartmann6d.py
+		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
 doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	@docker --version
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
-		--doctest-modules qmcpy/integrand/umbridge_wrapper.py
+		--doctest-modules qmcpy/integrand/umbridge_wrapper.py \
 
 doctests_markdown:
 	@phmutest docs/*.md --replmode --log -c

@@ -26,8 +26,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
             levels          2^(2)
             n_level         [65536 32768 32768 16384]
             mean_level      [1.718 0.051 0.012 0.003]
-            var_level       [6.589e-09 2.091e-08 1.701e-08 7.554e-08]
-            bias_estimate   2.55e-04
+            var_level       [1.169e-08 2.569e-08 1.850e-08 5.209e-08]
+            bias_estimate   2.78e-04
             time_integrate  ...
         CubMLQMCCont (AbstractStoppingCriterion)
             rmse_tol        3.88e-04
@@ -58,9 +58,9 @@ class CubMLQMCCont(AbstractCubMLQMC):
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               1
             replications    2^(5)
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)

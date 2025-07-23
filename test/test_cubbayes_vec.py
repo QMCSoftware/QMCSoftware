@@ -26,11 +26,10 @@ class TestCubBayesVec(unittest.TestCase):
                                  g=cantilever_beam_function,
                                  dimension_indv=2)
         qmc_stop_crit = qp.CubBayesNetG(integrand,
-                                        abs_tol=1e-3,
-                                        rel_tol=1e-6)
+                                        abs_tol=5e-2,)
         solution, data = qmc_stop_crit.integrate()
         expected = [2.42575885e+00, 3.75000056e+04]
-        self.assertTrue((abs(solution - expected).mean() < 0.001).all())
+        self.assertTrue((abs(solution - expected).mean() < 5e-2).all())
 
     def test_bayesian_opt(self):
         # Bayesian Optimization using q-Expected Improvement

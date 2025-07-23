@@ -26,19 +26,19 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
     Examples:
         >>> discrete_distrib = DigitalNetB2(2,seed=7)
         >>> discrete_distrib(4)
-        array([[0.84429662, 0.72162356],
-               [0.1020178 , 0.08593631],
-               [0.6019625 , 0.27339078],
-               [0.34430233, 0.90916911]])
+        array([[0.72162356, 0.914955  ],
+               [0.16345554, 0.42964856],
+               [0.98676255, 0.03436384],
+               [0.42956655, 0.55876342]])
         >>> discrete_distrib(1) # first point in the sequence
-        array([[0.84429662, 0.72162356]])
+        array([[0.72162356, 0.914955  ]])
         >>> discrete_distrib
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)
             replications    1
-            randomize       LMS_DS
+            randomize       LMS DS
             gen_mats_source joe_kuo.6.21201.txt
-            order           NATURAL
+            order           RADICAL INVERSE
             t               63
             alpha           1
             n_limit         2^(32)
@@ -50,22 +50,22 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         >>> x.shape
         (2, 4, 3)
         >>> x
-        array([[[0.47687816, 0.88660568, 0.87000753],
-                [0.71221591, 0.31703292, 0.32253034],
-                [0.18809137, 0.0626922 , 0.09592865],
-                [0.98586502, 0.64009274, 0.58067792]],
+        array([[[0.24653277, 0.1821862 , 0.74732591],
+                [0.68152903, 0.66169442, 0.42891961],
+                [0.48139855, 0.79818233, 0.08201287],
+                [0.91541325, 0.29520621, 0.77495809]],
         <BLANKLINE>
-               [[0.24653277, 0.1821862 , 0.74732591],
-                [0.85333655, 0.52953251, 0.15818487],
-                [0.47750995, 0.90831912, 0.42649986],
-                [0.62241467, 0.25651801, 0.97657906]]])
+               [[0.44876891, 0.85899604, 0.50549679],
+                [0.53635924, 0.04353443, 0.33564946],
+                [0.23214143, 0.29281506, 0.06841036],
+                [0.75295715, 0.60241448, 0.76962976]]])
 
         Different orderings (avoid warnings that the first point is the origin)
 
         >>> DigitalNetB2(dimension=2,randomize=False,order="GRAY")(n_min=2,n_max=4,warn=False)
         array([[0.75, 0.25],
                [0.25, 0.75]])
-        >>> DigitalNetB2(dimension=2,randomize=False,order="NATURAL")(n_min=2,n_max=4,warn=False)
+        >>> DigitalNetB2(dimension=2,randomize=False,order="RADICAL INVERSE")(n_min=2,n_max=4,warn=False)
         array([[0.25, 0.75],
                [0.75, 0.25]])
         
@@ -83,24 +83,24 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         
         All randomizations 
 
-        >>> DigitalNetB2(dimension=3,randomize='LMS_DS',seed=5)(8)
-        array([[4.42642214e-01, 6.86933174e-01, 6.93464013e-01],
-               [9.45171550e-01, 4.46137011e-01, 2.00191886e-01],
-               [2.48950322e-01, 8.83791037e-02, 3.52266650e-01],
-               [7.46535684e-01, 7.94140908e-01, 8.46057454e-01],
-               [3.08394915e-01, 3.05848350e-01, 9.45654253e-01],
-               [8.05988022e-01, 5.76671664e-01, 4.40177478e-01],
-               [3.78447987e-04, 9.65679803e-01, 1.00564692e-01],
-               [5.02915291e-01, 1.67390371e-01, 6.05583580e-01]])
+        >>> DigitalNetB2(dimension=3,randomize='LMS DS',seed=5)(8)
+        array([[0.69346401, 0.20118185, 0.64779396],
+               [0.43998032, 0.90102467, 0.0936172 ],
+               [0.86663563, 0.60910036, 0.26043276],
+               [0.11327376, 0.30772653, 0.93959283],
+               [0.62102883, 0.79169756, 0.77051637],
+               [0.37451038, 0.1231324 , 0.46634012],
+               [0.94785596, 0.38577413, 0.13377215],
+               [0.20121617, 0.71843325, 0.56293458]])
         >>> DigitalNetB2(dimension=3,randomize='LMS',seed=5)(8,warn=False)
         array([[0.        , 0.        , 0.        ],
-               [0.50255985, 0.86689489, 0.51063711],
-               [0.30826124, 0.72453078, 0.92054737],
-               [0.80587711, 0.39291452, 0.41042919],
-               [0.24859572, 0.8812071 , 0.26392735],
-               [0.74615831, 0.23623819, 0.75454159],
-               [0.44253238, 0.34735206, 0.65710831],
-               [0.9450387 , 0.51954284, 0.16603643]])
+               [0.75446077, 0.83265937, 0.69584079],
+               [0.42329494, 0.65793842, 0.90427279],
+               [0.67763292, 0.48937304, 0.33344964],
+               [0.18550714, 0.97332905, 0.3772791 ],
+               [0.93104851, 0.17195496, 0.82311652],
+               [0.26221346, 0.31742386, 0.53093284],
+               [0.50787715, 0.5172669 , 0.2101083 ]])
         >>> DigitalNetB2(dimension=3,randomize='DS',seed=5)(8)
         array([[0.68383949, 0.04047995, 0.42903182],
                [0.18383949, 0.54047995, 0.92903182],
@@ -131,26 +131,26 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
 
         Higher order nets with randomizations and replications 
                        
-        >>> DigitalNetB2(dimension=3,randomize='LMS_DS',seed=7,replications=2,alpha=2)(4,warn=False)
-        array([[[0.74524716, 0.28314067, 0.39397538],
-                [0.34665532, 0.60613119, 0.62928172],
-                [0.79232263, 0.66555738, 0.34008646],
-                [0.17436626, 0.47341099, 0.57343952]],
+        >>> DigitalNetB2(dimension=3,randomize='LMS DS',seed=7,replications=2,alpha=2)(4,warn=False)
+        array([[[0.42955149, 0.89149058, 0.43867111],
+                [0.68701828, 0.07601148, 0.51312447],
+                [0.10088033, 0.16293661, 0.25144138],
+                [0.85846252, 0.87103178, 0.70041789]],
         <BLANKLINE>
-               [[0.37283978, 0.70077021, 0.43154693],
-                [0.52417079, 0.41933277, 0.52838852],
-                [0.20312895, 0.3174238 , 0.32985248],
-                [0.92679034, 0.53708498, 0.73944962]]])
+               [[0.27151905, 0.42406763, 0.21917369],
+                [0.55035224, 0.67864387, 0.90033876],
+                [0.19356758, 0.57589964, 0.00347701],
+                [0.97235125, 0.32168581, 0.86920948]]])
         >>> DigitalNetB2(dimension=3,randomize='LMS',seed=7,replications=2,alpha=2)(4,warn=False)
         array([[[0.        , 0.        , 0.        ],
-                [0.90025161, 0.82544719, 0.77250727],
-                [0.45356962, 0.88321111, 0.20246064],
-                [0.57195668, 0.19254482, 0.96129589]],
+                [0.75817062, 0.96603053, 0.94947625],
+                [0.45367986, 0.80295638, 0.18778553],
+                [0.71171791, 0.2295424 , 0.76175441]],
         <BLANKLINE>
                [[0.        , 0.        , 0.        ],
-                [0.84866929, 0.84467753, 0.91109683],
-                [0.41971107, 0.88340775, 0.22669854],
-                [0.69604949, 0.22698664, 0.82503212]]])
+                [0.78664636, 0.75470215, 0.86876474],
+                [0.45336727, 0.99953621, 0.22253579],
+                [0.73996397, 0.24544824, 0.9008679 ]]])
         >>> DigitalNetB2(dimension=3,randomize='DS',seed=7,replications=2,alpha=2)(4)
         array([[[0.04386058, 0.58727432, 0.3691824 ],
                 [0.79386058, 0.33727432, 0.6191824 ],
@@ -216,9 +216,9 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                  dimension = 1,
                  replications = None,
                  seed = None,
-                 randomize = 'LMS_DS',
+                 randomize = 'LMS DS',
                  generating_matrices = "joe_kuo.6.21201.txt",
-                 order = 'NATURAL',
+                 order = 'RADICAL INVERSE',
                  t = 63,
                  alpha = 1,
                  msb = None,
@@ -238,7 +238,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are
                 
-                - `'LMS_DS'`: Linear matrix scramble with digital shift.
+                - `'LMS DS'`: Linear matrix scramble with digital shift.
                 - `'LMS'`: Linear matrix scramble only.
                 - `'DS'`: Digital shift only.
                 - `'NUS'`: Nested uniform scrambling. Also known as Owen scrambling. 
@@ -249,7 +249,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 - A `str` should be the name (or path) of a file from the LDData repo at [https://github.com/QMCSoftware/LDData/tree/main/dnet](https://github.com/QMCSoftware/LDData/tree/main/dnet).
                 - An `np.ndarray` of integers with shape $(d,m_\mathrm{max})$ or $(r,d,m_\mathrm{max})$ where $d$ is the number of dimensions, $r$ is the number of replications, and $2^{m_\mathrm{max}}$ is the maximum number of supported points. Setting `msb=False` will flip the bits of ints in the generating matrices.
             
-            order (str): `'NATURAL'`, or `'GRAY'` ordering. See the doctest example above.
+            order (str): `'RADICAL INVERSE'`, or `'GRAY'` ordering. See the doctest example above.
             t (int): Number of bits in integer represetation of points *after* randomization. The number of bits in the generating matrices is inferred based on the largest value.
             alpha (int): Interlacing factor for higher order nets.  
                 When `alpha`>1, interlacing is performed regardless of the generating matrices,  
@@ -259,8 +259,8 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             _verbose (bool): If `True`, print linear matrix scrambling matrices. 
         """
         if graycode is not None:
-            order = 'GRAY' if graycode else 'NATURAL'
-            warnings.warn("graycode argument deprecated, set order='GRAY' or order='NATURAL' instead. Using order='%s'"%order,ParameterWarning)
+            order = 'GRAY' if graycode else 'RADICAL INVERSE'
+            warnings.warn("graycode argument deprecated, set order='GRAY' or order='RADICAL INVERSE' instead. Using order='%s'"%order,ParameterWarning)
         if t_lms is not None:
             t = t_lms
             warnings.warn("t_lms argument deprecated. Set t instead. Using t = %d"%t,ParameterWarning)
@@ -272,9 +272,13 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         self.input_msb = deepcopy(msb)
         if isinstance(generating_matrices,str) and generating_matrices=="joe_kuo.6.21201.txt":
             self.gen_mats_source = generating_matrices
-            gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.21201.npy')[None,:]
+            if np.isscalar(dimension) and dimension<=1024 and alpha==1:
+                gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.1024.npy')[None,:]
+                d_limit = 1024
+            else:
+                gen_mats = np.load(dirname(abspath(__file__))+'/generating_matrices/joe_kuo.6.21201.npy')[None,:]
+                d_limit = 21201
             msb = True
-            d_limit = 21201
             n_limit = 4294967296
             self._t_curr = 32
             compat_shift = self._t_curr-t if self._t_curr>=t else 0
@@ -327,8 +331,10 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         self.m_max = int(gen_mats.shape[-1])
         if isinstance(generating_matrices,np.ndarray) and msb:
             qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self._t_curr),int(gen_mats.shape[0])),gen_mats,gen_mats,backend="c")
-        self.order = str(order).upper()
-        assert self.order in ['NATURAL','GRAY']
+        self.order = str(order).upper().strip().replace("_"," ")
+        if self.order=="GRAY CODE": self.order = "GRAY"
+        if self.order=="NATURAL": self.order = "RADICAL INVERSE"
+        assert self.order in ['RADICAL INVERSE','GRAY']
         assert isinstance(t,int) and t>0
         assert self._t_curr<=t<=64, "t must no more than 64 and no less than %d (the number of bits used to represent the generating matrices)"%(self._t_curr)
         assert isinstance(alpha,int) and alpha>0
@@ -338,12 +344,12 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             if self.m_max!=self._t_curr:
                 warnings.warn("Digital interlacing is often performed on matrices with the number of columns (m_max = %d) equal to the number of bits in each int (%d), but this is not the case. Ensure you are NOT setting alpha>1 when generating matrices are already interlaced."%(self.m_max,self._t_curr),ParameterWarning)
         self._verbose = _verbose
-        self.randomize = str(randomize).upper()
-        if self.randomize=="TRUE": self.randomize = "LMS_DS"
+        self.randomize = str(randomize).upper().strip().replace("_"," ")
+        if self.randomize=="TRUE": self.randomize = "LMS DS"
         if self.randomize=="OWEN": self.randomize = "NUS"
         if self.randomize=="NONE": self.randomize = "FALSE"
         if self.randomize=="NO": self.randomize = "FALSE"
-        assert self.randomize in ["LMS_DS","LMS","DS","NUS","FALSE"]
+        assert self.randomize in ["LMS DS","LMS","DS","NUS","FALSE"]
         self.dtalpha = self.alpha*self.d
         if self.randomize=="FALSE":
             if self.alpha==1:
@@ -368,7 +374,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 self._t_curr = t_alpha
                 self.t = t
             self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t,(self.replications,self.d))
-        elif self.randomize in ["LMS","LMS_DS"]:
+        elif self.randomize in ["LMS","LMS DS"]:
             if self.alpha==1:
                 gen_mat_lms = np.empty((self.replications,self.d,self.m_max),dtype=np.uint64)
                 S = qmctoolscl.dnb2_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(t),np.uint64(self._verbose))
@@ -385,7 +391,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 self.gen_mats = gen_mat_lms_ho
                 self._t_curr = t
                 self.t = self._t_curr
-            if self.randomize=="LMS_DS":
+            if self.randomize=="LMS DS":
                 self.rshift = qmctoolscl.random_tbit_uint64s(self.rng,self.t,(self.replications,self.d))
         elif self.randomize=="NUS":
             if alpha==1:
@@ -421,7 +427,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         xb = np.empty((r_x,n,d),dtype=np.uint64)
         if self.order=="GRAY":
             qmctoolscl.dnb2_gen_gray(r_x,n,d,n_start,mmax,self.gen_mats,xb,backend="c")
-        elif self.order=="NATURAL": 
+        elif self.order=="RADICAL INVERSE": 
             assert (n_min==0 or np.log2(n_min)%1==0) and (n_max==0 or np.log2(n_max)%1==0), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
             qmctoolscl.dnb2_gen_natural(r_x,n,d,n_start,mmax,self.gen_mats,xb,backend="c")
         else:

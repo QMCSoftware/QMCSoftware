@@ -154,9 +154,9 @@ class IntegrationExampleTest(unittest.TestCase):
         self.assertTrue(abs(solution-true_value) < abs_tol)
 
     def test_european_put_bayes_lattice(self):
-        abs_tol = 5e-2
+        abs_tol = 1e-2
         integrand = FinancialOption(
-            sampler = Lattice(dimension=16, order='NATURAL'),
+            sampler = Lattice(dimension=16, order='RADICAL INVERSE'),
             option = "EUROPEAN",
             volatility = .5,
             start_price = 10,

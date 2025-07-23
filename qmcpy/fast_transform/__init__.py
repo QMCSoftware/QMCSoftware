@@ -1,6 +1,4 @@
-from .ft_qmctoolscl import fftbr,ifftbr,fwht,omega_fftbr,omega_fwht
-from .shift_invar_ops import bernoulli_poly
-from .dig_shift_invar_ops import weighted_walsh_funcs
+from .ft import fftbr,ifftbr,fwht,omega_fftbr,omega_fwht
 try:
     import torch 
     from .ft_pytorch import (
@@ -21,4 +19,3 @@ except ImportError:
         raise Exception("omega_fftbr_torch requires torch but no installation found") 
     def omega_fwht_torch(*args, **kwargs):
         raise Exception("omega_fwht_torch requires torch but no installation found") 
-
