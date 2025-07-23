@@ -235,7 +235,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
 
     def density_estimation(self, plot_estimation_flag=False):
         approx_solution, data = self.integrate()
-        g = data.datum[0].y_val
+        g = data.yfull
         if g.ndim != 1:
             raise ValueError("The KDE only works for single-variate data.")
         a = min(g)
