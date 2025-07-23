@@ -3,7 +3,8 @@ from torch import nn
 from torch_cluster import radius_graph
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from torch_geometric.nn import MessagePassing, InstanceNorm
-from .utils import L2discrepancy, L2center, L2ext, L2per, L2sym
+from .utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted, L2ext_weighted, L2ags_weighted, L2mix_weighted
+# from utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted, L2ext_weighted, L2ags_weighted, L2mix_weighted
 
 
 class MPNN_layer(MessagePassing):
@@ -43,7 +44,7 @@ class MPNN_layer(MessagePassing):
 
 
 class MPMC_net(nn.Module):
-    def __init__(self, dim, nhid, nlayers, nsamples, nbatch, radius, loss_fn, dim_emphasize, n_projections):
+    def __init__(self, dim, nhid, nlayers, nsamples, nbatch, radius, loss_fn, weights, n_projections):
         super(MPMC_net, self).__init__()
         self.enc = nn.Linear(dim,nhid)
         self.convs = nn.ModuleList()
@@ -56,51 +57,23 @@ class MPMC_net(nn.Module):
         self.nsamples = nsamples
         self.dim = dim
         self.n_projections = n_projections
-        self.dim_emphasize = torch.tensor(dim_emphasize).long() 
 
         ## random input points for transformation:
         self.x = torch.rand(nsamples * nbatch, dim).to(device)
+        
+        self.weights = weights
+
         batch = torch.arange(nbatch).unsqueeze(-1).to(device)
         batch = batch.repeat(1, nsamples).flatten()
         self.batch = batch
         self.edge_index = radius_graph(self.x, r=radius, loop=True, batch=batch).to(device)
 
-        if loss_fn == 'L2dis':
-            self.loss_fn = L2discrepancy
-        elif loss_fn == 'L2cen':
-            self.loss_fn = L2center
-        elif loss_fn == 'L2ext':
-            self.loss_fn = L2ext
-        elif loss_fn == 'L2per':
-            self.loss_fn = L2per
-        elif loss_fn == 'L2sym':
-            self.loss_fn = L2sym
-        elif loss_fn == 'approx_hickernell':
-            if dim_emphasize != None:
-                assert torch.max(self.dim_emphasize) <= dim
-                self.loss_fn = self.approx_hickernell
+        all_losses = {'L2dis', 'L2ctr', 'L2ext', 'L2per', 'L2sym', 'L2ags', 'L2mix', 'L2dis_weighted', 
+                      'L2ctr_weighted', 'L2ext_weighted', 'L2per_weighted', 'L2sym_weighted', 'L2ags_weighted', 'L2mix_weighted'}
+        if loss_fn in all_losses:
+            self.loss_fn = globals()[loss_fn]
         else:
             raise ValueError(f"Loss function DNE: {loss_fn}")
-
-    def approx_hickernell(self, X):
-        X = X.view(self.nbatch, self.nsamples, self.dim)
-        disc_projections = torch.zeros(self.nbatch).to(device)
-
-        for i in range(self.n_projections):
-            ## sample among non-emphasized dimensionality
-            mask = torch.ones(self.dim, dtype=bool)
-            mask[self.dim_emphasize - 1] = False
-            remaining_dims = torch.arange(1, self.dim + 1)[mask]
-            projection_dim = remaining_dims[torch.randint(low=0, high=remaining_dims.size(0), size=(1,))].item()
-            projection_indices = torch.randperm(self.dim)[:projection_dim]
-            disc_projections += self.L2discrepancy(X[:, :, projection_indices])
-            ## sample among emphasized dimensionality
-            remaining_dims = torch.arange(1, self.dim + 1)[self.dim_emphasize - 1]
-            projection_dim = remaining_dims[torch.randint(low=0, high=remaining_dims.size(0), size=(1,))].item()
-            projection_indices = torch.randperm(self.dim)[:projection_dim]
-            disc_projections += self.L2discrepancy(X[:, :, projection_indices])
-
-        return disc_projections
     
     def forward(self):
         X = self.x
@@ -111,15 +84,8 @@ class MPMC_net(nn.Module):
             X = self.convs[i](X,edge_index,self.batch)
         X = torch.sigmoid(self.dec(X))  ## clamping with sigmoid needed so that warnock's formula is well-defined
         X = X.view(self.nbatch, self.nsamples, self.dim)
-        loss = torch.mean(self.loss_fn(X))
+        if (self.weights == None):
+            loss = torch.mean(self.loss_fn(X))
+        else:
+            loss = torch.mean(self.loss_fn(X, self.weights))
         return loss, X
-
-
-
-        
-        
-    
-    
-    
-
-    

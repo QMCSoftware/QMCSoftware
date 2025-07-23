@@ -1,21 +1,25 @@
 from types import SimpleNamespace
-from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution as LD
+from qmcpy.discrete_distribution._discrete_distribution import LD
 from qmcpy.util import ParameterError
-from .utils import L2discrepancy, L2center, L2ext, L2per, L2sym, hickernell_all_emphasized
+from .utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2ags_weighted, L2mix_weighted
+# from utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2ags_weighted, L2mix_weighted
+# from models import *
 from .models import *
 from tqdm import tqdm 
 import torch
 import numpy as np
 import torch.optim as optim
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+import warnings
+from os.path import dirname, abspath, isfile
+from pathlib import Path
 
 
 class MPMC(LD): 
-    def __init__(self, randomize = None, seed = None, dimension = 2,
+    def __init__(self, randomize = 'shift', seed = None, dimension = 2,
                   replications = 1, d_max = None, lr = 0.001, nlayers = 3, weight_decay = 1e-6, nhid = 32,
-            epochs = 2000, start_reduce = 1000, radius = 0.35,
-            loss_fn = 'L2dis', dim_emphasize = [1], n_projections = 15):
+                  epochs = 2000, start_reduce = 1000, radius = 0.35, nbatch = 1,
+                  loss_fn = 'L2dis', weights = None, n_projections = 15):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -30,7 +34,7 @@ class MPMC(LD):
 
             d_max (int): max dimension
 
-            dim_emph (list or array??): emphasized dimensions for approx_hickernell 
+            weights (list or array??): array of weights for weighted discrepancies
             
             replications (int): number of IID randomizations of a pointset
         """
@@ -40,6 +44,7 @@ class MPMC(LD):
         #what to include in this 
         self.parameters = ['dim', 'randomize', 'loss_fn', 'epochs', 'lr', 'nhid']
         self.dim = dimension
+        self.nbatch = nbatch
         self.lr = lr
         self.nlayers = nlayers
         self.weight_decay = weight_decay
@@ -48,9 +53,22 @@ class MPMC(LD):
         self.start_reduce = start_reduce
         self.radius = radius
         self.loss_fn = loss_fn
-        self.dim_emphasize = dim_emphasize
+        self.weights = weights
+        if weights != None:
+            self.weights = torch.tensor(weights, device=device, dtype = torch.float32).long() 
         self.n_projections = n_projections
         self.d_max = dimension
+        self.n_projections = n_projections
+
+        if ((self.loss_fn[-8:] == 'weighted') & (self.weights == None)):
+            raise ValueError(f"Must specify weights for weighted loss function")
+
+        if ((self.weights == None) & (self.d_max > 5)):
+            warnings.warn("Weights are recommended for dimension 5 and above")
+
+        if ((self.weights != None ) & (self.loss_fn[-8:] != 'weighted')):
+            print("Since you included weights, you will be using the weighted version of this discrepancy. Set weights = None if you want the unweighted discrepancy.")
+            self.loss_fn = self.loss_fn + "_weighted"
 
         super(MPMC, self).__init__(dimension, seed)
         
@@ -80,7 +98,7 @@ class MPMC(LD):
         if (n == None ):
             raise ValueError("Must provide n number of points to generate")
         
-        print(f"\nGenerating {n} samples with MPMC...")
+        # print(f"\nGenerating {n} samples with MPMC...")
 
         model_params = {
                     'lr': self.lr,                      # learning rate
@@ -94,22 +112,29 @@ class MPMC(LD):
                     'nsamples': n,         # number of samples in each point set
                     'dim': self.dim,                   # dimensionality of the points
                     'loss_fn': self.loss_fn,           # loss function to use
-                    'dim_emphasize': self.dim_emphasize, # emphasized dimensionalities for projections
-                    'n_projections': self.n_projections  # number of projections (for approx_hickernell)
+                    'weights': self.weights, # emphasized dimensionalities for projections
+                    'n_projections': self.n_projections  # list of weights
                     }
 
         #generate points  
         d = self.dim
         r = self.replications
         x = np.empty([r, n, d])
-        #if points are already generated: 
-        if n in [16, 32, 64, 128, 256]:
-            #x = filename smth smth 
-            print("x = points already trained")
+
+        #in case pathlib not allowed, this uses everything lattice uses. 
+        # repos = np.lib.npyio.DataSource()
+        # none_folder = f"{self.lr}_{self.nlayers}_{self.weight_decay}_{self.replications}_{self.epochs}_{self.start_reduce}_{self.radius}_{self.weights}_{self.n_projections}.npy"        
+        # link = f"https://github.com/QMCSoftware/QMCSoftware/raw/refs/heads/mpmc_choi/qmcpy/discrete_distribution/mpmc/pretrained/dim_{self.dim}/nsamples_{n}/nhid_{self.nhid}/Lf{self.loss_fn}.npy"
+        # if (repos.exists(link)):
+        #     print("x = points already trained")
+        #     x = np.load(dirname(abspath(__file__)) + f'/pretrained/dim_{self.dim}/nsamples_{n}/nhid_{self.nhid}/Lf{self.loss_fn}.npy')
+
+        local_path = Path(dirname(abspath(__file__)) + f'/pretrained/dim_{self.dim}/nsamples_{n}/nhid_{self.nhid}/Lf{self.loss_fn}.npy')
+        if (local_path.exists()):
+            # print("x = points already trained")
+            x = np.load(local_path)
         else:
             x = self.train(SimpleNamespace(**model_params))
-
-
         #randomize
         if self.randomize == "FALSE":
             assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
@@ -117,11 +142,8 @@ class MPMC(LD):
             return x 
         elif self.randomize == "SHIFT":
             xr = np.empty([r,n,d])
-            #randomize smth smth 
-            #in lattice, qmctools used for randomizeshift and point generation order 
-            xr = (x[:, :, np.newaxis] + self.shift) % 1
+            xr = (x + self.shift) % 1
             if r==1: xr=xr[0]
-            #return both shifted and unshifted if user wants unrandomized, else just randomized
             return (xr, x) if return_unrandomized else xr 
         else: 
             raise ParameterError("incorrect randomize parsing in lattice gen_samples")
@@ -138,7 +160,7 @@ class MPMC(LD):
             out += f"    {p:<15} {str(p_val)}\n"
         return out
     
-    #creates new but similar object 
+
     def _spawn(self, child_seed, dimension): 
         """ 
         assign parameters 
@@ -153,11 +175,10 @@ class MPMC(LD):
     #returns an NP array of points (trained)
     def train(self, args):
         model = MPMC_net(dim = args.dim, nhid = args.nhid, nlayers = args.nlayers, nsamples = args.nsamples, nbatch = args.nbatch,
-                        radius = args.radius, loss_fn = args.loss_fn, dim_emphasize = args.dim_emphasize, n_projections = args.n_projections).to(device)
+                        radius = args.radius, loss_fn = args.loss_fn, weights = args.weights, n_projections = args.n_projections).to(device)
         optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         best_loss = 10000.
         patience = 0
-        #set of points to return later 
         end_result = None
 
         ## could be tuned for better performance
@@ -165,42 +186,27 @@ class MPMC(LD):
         reduce_point = 10
 
         for epoch in tqdm(range(args.epochs), desc = f"Training: N={args.nsamples}, nhid={args.nhid}, loss={args.loss_fn}"):
-            if (epoch % 5000 == 0):
-                print(f"epoch: {epoch}")
 
             model.train()
             optimizer.zero_grad()
             loss, X = model()
             loss.backward()
+            # print(f"YOYOYO {X.clone()[:5]}")
             optimizer.step()
 
             if epoch % 100 ==0:
                 y = X.clone()
-                if args.loss_fn == 'L2dis':
-                    batched_discrepancies = L2discrepancy(y.detach())
-                elif args.loss_fn == 'L2cen':
-                    batched_discrepancies = L2center(y.detach())
-                elif args.loss_fn == 'L2ext':
-                    batched_discrepancies = L2ext(y.detach())
-                elif args.loss_fn == 'L2per':
-                    batched_discrepancies = L2per(y.detach())
-                elif args.loss_fn == 'L2sym':
-                    batched_discrepancies = L2sym(y.detach())
-                elif args.loss_fn == 'approx_hickernell':
-                    ## compute sum over all projections with emphasized dimensionality:
-                    batched_discrepancies = hickernell_all_emphasized(y.detach(),args.dim_emphasize)
-                else:
-                    print('Loss function not implemented')
+
+                if args.loss_fn[-8:] == 'weighted':
+                    batched_discrepancies = globals()[args.loss_fn](y.detach(), args.weights)
+                else: 
+                    batched_discrepancies = globals()[args.loss_fn](y.detach())
                 min_discrepancy, mean_discrepancy = torch.min(batched_discrepancies).item(), torch.mean(batched_discrepancies).item()
 
-                #
                 if min_discrepancy < best_loss:
                     best_loss = min_discrepancy
-
-                    ## save MPMC points:
                     y = y.detach().cpu().numpy()
-                    #y (from X) has batch x nsamples x dim dimension 
-                    endresult = y
+                    end_result = y
 
                 if (min_discrepancy > best_loss and (epoch + 1) >= args.start_reduce):
                     patience += 1
@@ -214,7 +220,7 @@ class MPMC(LD):
                 if (args.lr < 1e-6):
                     break
             
-        return endresult
+        return end_result
     
     
 
@@ -223,10 +229,15 @@ class MPMC(LD):
 
 if __name__ == '__main__':
     print("\n Running MPMC example \n")
-    mpmc_gen = MPMC(dimension=2, loss_fn='L2dis', epochs=500, nhid=6, randomize = 'shift', seed = 8)
-    points = mpmc_gen.gen_samples(n = 50)
+    # wpoints = MPMC(dimension = 8, epochs = 500, weights = [1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128], loss_fn = 'L2sym')
 
+    print("\nHere is an example with a pretrained point set: \n")
+    w = [0]*52
+    w[0:3] = [1,1,1]
+    wpoints = MPMC(dimension = 52, loss_fn = 'L2sym', weights = w)
+ 
+    w = wpoints.gen_samples (n = 16)
     print("\n--- Generation Complete ---")
-    print(f"Shape of generated points: {points.shape}")
-    print("First 5 points:\n", points[:5])
-    print(mpmc_gen)
+    print(f"Shape of generated points: {w.shape}")
+    print("First 5 points:\n", w[:5])
+    print(wpoints)
