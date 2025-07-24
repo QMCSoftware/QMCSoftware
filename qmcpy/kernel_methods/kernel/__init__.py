@@ -1,2 +1,0 @@
-from .kernel_prod_autograd import KernelGaussian
-from .kernel_special import KernelShiftInvar,KernelDigShiftInvar

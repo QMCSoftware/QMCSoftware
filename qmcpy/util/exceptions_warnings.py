@@ -1,11 +1,10 @@
-""" Exceptions and Warnings thrown by qmcpy """
 import warnings 
 
-def custom_formatwarning(msg, *args, **kwargs):
-    # ignore everything except the message
-    return '%s:%d\n\t%s: %s\n'%(args[1],args[2],args[0].__name__,str(msg))
+# def custom_formatwarning(msg, *args, **kwargs):
+#     # ignore everything except the message
+#     return '%s:%d\n\t%s: %s\n'%(args[1],args[2],args[0].__name__,str(msg))
 
-warnings.formatwarning = custom_formatwarning
+# warnings.formatwarning = custom_formatwarning
 
 class DimensionError(Exception):
     """
@@ -22,13 +21,6 @@ class DistributionCompatibilityError(Exception):
 class NotYetImplemented(Exception):
     """
     Class for raising error when a component has been implemented yet
-    """
-
-
-class TransformError(Exception):
-    """
-    Class for raising error about transforming function to accommodate \
-    distribution
     """
 
 

@@ -24,7 +24,7 @@ BibTex citations are available [here](./cite_qmcpy.bib).
 
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: an integrand, a discrete distribution, summary output data, and stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications. 
 
-<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
+<img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/assets/logos/qmcpy_logo.png?raw=true" alt="QMCPy logo" height=200px width=200px/>
 
 [Homepage](https://qmcsoftware.github.io/QMCSoftware/) ~ [Article](https://arxiv.org/abs/2102.07833) ~ [GitHub](https://github.com/QMCSoftware/QMCSoftware) ~ [Read the Docs](https://qmcpy.readthedocs.io/en/latest/) ~ [PyPI](https://pypi.org/project/qmcpy/) ~ [Blogs](http://qmcpy.wordpress.com/) ~ [Contributing](https://github.com/QMCSoftware/QMCSoftware/blob/master/CONTRIBUTING.md) ~ [Issues](https://github.com/QMCSoftware/QMCSoftware/issues)
 
@@ -191,12 +191,16 @@ For a more detail introduction refer to [this video](https://www.youtube.com/wat
 
 - **[Illinois Tech](https://www.iit.edu)**
 
-  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/assets/logos/illinois-institute-of-technology-vector-logo.jpg?raw=true" width="300" height="150">
 
 - **[Kamakura Corporation](http://www.kamakuraco.com), acquired by [SAS Institute Inc.](https://www.sas.com) in June 2022**
 
-  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/assets/logos/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 
 - **[SigOpt, Inc.](https://sigopt.com)**
 
+<<<<<<< HEAD
   <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/sphinx/logo/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
+=======
+  <img src="https://github.com/QMCSoftware/QMCSoftware/blob/master/docs/assets/logos/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
+>>>>>>> 29e737d328af14af2ef61bb435db42f293daf824
