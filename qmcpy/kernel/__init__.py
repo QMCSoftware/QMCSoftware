@@ -8,3 +8,4 @@ from .common_kernels import (
 )
 from .shift_invar_kernel import KernelShiftInvar
 from .dig_shift_invar_kernel import KernelDigShiftInvar
+from .multitask_kernel import KernelMultiTask

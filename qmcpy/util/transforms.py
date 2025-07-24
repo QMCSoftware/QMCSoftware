@@ -5,9 +5,9 @@ from .torch_numpy_ops import get_npt
 
 EPS64 = np.finfo(np.float64).eps
     
-def insert_batch_dims(param, ndims):
+def insert_batch_dims(param, ndims, k):
     ones = [1]*ndims
-    return param.reshape(list(param.shape[:-1])+ones+[int(param.shape[-1])])
+    return param.reshape(list(param.shape[:k])+ones+list(param.shape[k:]))
 
 def tf_exp(x):
     npt = get_npt(x)
@@ -56,7 +56,7 @@ def tf_explinear_eps_inv(x):
 def tf_identity(x):
     return x 
 
-def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param, endsize_ops, constraints, shape_batch, torchify, npt, nptkwargs):
+def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param, endsize_ops, constraints, torchify, npt, nptkwargs):
     if np.isscalar(param):
         param = param*npt.ones(shape_param,**nptkwargs)
     else:
@@ -68,7 +68,6 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
             assert isinstance(param,npt.ndarray), "%s must be a scalar or np.ndarray"%pname
     shape_param = list(param.shape)
     assert len(shape_param)>=1, "invalid shape_%s = %s"%(pname,str(shape_param))
-    assert shape_param==(shape_batch+[shape_param[-1]])[-len(shape_param):], "incompatible shape_%s=%s and shape_batch=%s"%(pname,shape_param,shape_batch)
     assert len(tfs_param)==2, "tfs_scale should be a tuple of length 2"
     assert callable(tfs_param[0]), "tfs_scale[0] should be a callable e.g. torch.log"
     assert callable(tfs_param[1]), "tfs_scale[1] should be a callable e.g. torch.exp"

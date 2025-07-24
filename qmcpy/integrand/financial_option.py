@@ -38,7 +38,7 @@ class FinancialOption(AbstractIntegrand):
 
     # Asian Options
 
-    An asian option considers the average value of an asset path across time. We use the trapazoidal rule to approximate either the *arithmetic mean* by 
+    An asian option considers the average value of an asset path across time. We use the trapezoidal rule to approximate either the *arithmetic mean* by 
 
     $$A(\boldsymbol{S}) = \frac{1}{d}\left[\frac{1}{2} S_0 + \sum_{j=1}^{d-1} S_j + \frac{1}{2} S_{-1}\right]$$ 
     

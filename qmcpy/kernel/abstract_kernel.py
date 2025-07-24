@@ -15,16 +15,11 @@ class AbstractKernel(object):
             instance = super().__new__(cls)
         return instance
 
-    def __init__(self, d, shape_batch, torchify, device):
+    def __init__(self, d, torchify, device):
         super().__init__()
         # dimension 
         assert d%1==0 and d>0, "dimension d must be a positive int"
         self.d = d
-        # shape_batch 
-        if isinstance(shape_batch,int): shape_batch = [shape_batch]
-        assert isinstance(shape_batch,(list,tuple))
-        self.shape_batch = list(shape_batch)
-        self.ndim_batch = len(self.shape_batch)
         # torchify
         self.torchify = torchify 
         if self.torchify: 
@@ -42,8 +37,15 @@ class AbstractKernel(object):
             self.nptkwargs = {}
         self.batch_params = {}
     
+    @property 
+    def nbdim(self):
+        empty = self.npt.empty((0,self.d),**self.nptkwargs)
+        v = self.__call__(empty,empty)
+        nbdim = v.ndim-1
+        return nbdim
+    
     def get_batch_params(self, ndim):
-        return {pname: insert_batch_dims(batch_param,ndim) for pname,batch_param in self.batch_params.items()}
+        return {pname: insert_batch_dims(batch_param,ndim,-1) for pname,batch_param in self.batch_params.items()}
     
     def __call__(self, x0, x1, beta0=None, beta1=None):
         r"""
@@ -78,7 +80,7 @@ class AbstractKernel(object):
         assert beta1.shape==(self.d,), "expected beta1.shape=(%d,) but got beta1.shape=%s"%(self.d,str(tuple(beta1.shape)))
         assert (beta0%1==0).all() and (beta0>=0).all(), "require int beta0 >= 0"
         assert (beta1%1==0).all() and (beta1>=0).all(), "require int beta1 >= 0"
-        batch_params = self.get_batch_params(max(len(x0.shape)-1,len(x1.shape)-1))
+        batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
         if not self.AUTOGRADKERNEL:
             k = self.parsed___call__(x0,x1,beta0,beta1,batch_params)
         else:
@@ -129,7 +131,7 @@ class AbstractKernel(object):
         else: # self.npt==torch
             assert isinstance(x,self.npt.Tensor)
         assert x.shape[-1]==self.d, "the size of the last dimension of x must equal d=%d, got x.shape=%s"%(self.d,str(tuple(x.shape)))
-        batch_params = self.get_batch_params(len(x.shape)-1)
+        batch_params = self.get_batch_params(x.ndim-1)
         return self.parsed_single_integral_01d(x,batch_params)
     
     def parsed_single_integral_01d(self, x):
@@ -163,7 +165,6 @@ class AbstractKernel(object):
             tfs_param = tfs_param,
             endsize_ops = endsize_ops,
             constraints = constraints,
-            shape_batch = self.shape_batch,
             torchify = self.torchify,
             npt = self.npt, 
             nptkwargs = self.nptkwargs)
@@ -174,7 +175,6 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             d, 
             scale = 1., 
             lengthscales = 1.,
-            shape_batch = [],
             shape_scale = [1],
             shape_lengthscales = None, 
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
@@ -189,7 +189,6 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             d (int): Dimension. 
             scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
             lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
-            shape_batch (list): Shape of the batch output.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
@@ -199,7 +198,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             device (torch.device): If `torchify`, put things onto this device.
         """
-        super().__init__(d=d,shape_batch=shape_batch,torchify=torchify,device=device)
+        super().__init__(d=d,torchify=torchify,device=device)
         self.raw_scale,self.tf_scale = self.parse_assign_param(
             pname = "scale",
             param = scale, 

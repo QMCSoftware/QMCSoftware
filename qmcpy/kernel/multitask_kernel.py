@@ -84,24 +84,24 @@ class KernelMultiTask(AbstractKernel):
         >>> kmt(x[0],x[0],task[1],task[1]).item()
         3.0
         >>> kmt(x[0],x[0],task,task)
-        array([2., 3., 4.])
+        tensor([2., 3., 4.], dtype=torch.float64, grad_fn=<SelectBackward0>)
         >>> kmt(x[0],x[0],task[:,None],task[None,:]).shape
-        (3, 3)
+        torch.Size([3, 3])
         >>> kmt(x,x,task[1],task[1])
-        array([3., 3., 3., 3.])
+        tensor([3., 3., 3., 3.], dtype=torch.float64, grad_fn=<SelectBackward0>)
         >>> kmt(x[:3],x[:3],task,task)
-        array([2., 3., 4.])
+        tensor([2., 3., 4.], dtype=torch.float64, grad_fn=<SelectBackward0>)
         >>> kmt(x,x,task[:,None],task[:,None]).shape
-        (3, 4)
+        torch.Size([3, 4])
         >>> v = kmt(x[:3,None,:],x[None,:3,:],task,task)
         >>> v.shape
-        (3, 3)
+        torch.Size([3, 3])
         >>> torch.allclose(v,kmt.base_kernel(x[:3,None,:],x[None,:3,:])*kmt.taskmat[task,task])
         True
         >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None],task[:,None,None]).shape
-        (3, 4, 4)
+        torch.Size([3, 4, 4])
         >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None,None],task[None,:,None,None]).shape
-        (3, 3, 4, 4)
+        torch.Size([3, 3, 4, 4])
 
         Batched inference
 
@@ -114,28 +114,32 @@ class KernelMultiTask(AbstractKernel):
         >>> x = torch.from_numpy(np.random.rand(8,10))
         >>> task = torch.arange(4) 
         >>> kmt(x[0],x[0],task[0],task[0]).shape
-        (6, 3, 5)
+        torch.Size([6, 3, 5])
         >>> kmt(x[0],x[0],task,task).shape
-        (6, 3, 5, 4)
+        torch.Size([6, 3, 5, 4])
         >>> kmt(x,x,task[0],task[0]).shape
-        (6, 3, 5, 8)
+        torch.Size([6, 3, 5, 8])
         >>> v = kmt(x[:4,None,:],x[None,:4,:],task,task)
         >>> v.shape
-        (6, 3, 5, 4, 4)
+        torch.Size([6, 3, 5, 4, 4])
         >>> kmat_x = kmt.base_kernel(x[:4,None,:],x[None,:4,:])
         >>> kmat_x.shape
-        (3, 5, 4, 4)
+        torch.Size([3, 5, 4, 4])
         >>> kmat_tasks = kmt.taskmat[...,task,task]
         >>> kmat_tasks.shape
-        (6, 3, 5, 4)
+        torch.Size([6, 3, 5, 4])
         >>> torch.allclose(v,kmat_tasks[...,None,:]*kmat_x)
         True
         >>> torch.allclose(v,kmat_tasks[...,:,None]*kmat_x)
         False
         >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None,None],task[None,:,None,None]).shape
-        (6, 3, 5, 4, 4, 8, 8)
+        torch.Size([6, 3, 5, 4, 4, 8, 8])
         >>> kmt(x[:,None,None,None,:],x[None,:,None,None,:],task[:,None],task[None,:]).shape
-        (6, 3, 5, 8, 8, 4, 4)
+        torch.Size([6, 3, 5, 8, 8, 4, 4])
+        >>> kmt.factor.dtype
+        torch.float32
+        >>> kmt.diag.dtype
+        torch.float64
     """
 
     def __init__(self,

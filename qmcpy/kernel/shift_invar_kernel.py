@@ -90,7 +90,6 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             scale = 1., 
             lengthscales = 1.,
             alpha = 2,
-            shape_batch = [],
             shape_scale = [1],
             shape_lengthscales = None, 
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
@@ -106,7 +105,6 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
             lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
             alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
-            shape_batch (list): Shape of the batch output.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
@@ -120,7 +118,6 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             d = d, 
             scale = scale, 
             lengthscales = lengthscales,
-            shape_batch = shape_batch,
             shape_scale = shape_scale,
             shape_lengthscales = shape_lengthscales, 
             tfs_scale = tfs_scale,
