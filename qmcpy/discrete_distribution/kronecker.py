@@ -15,7 +15,7 @@ PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41,
 RICHTMYER = sqrt(PRIMES) % 1
 
 class Kronecker(LD):
-    def __init__(self, dimension = 1, alpha = 0, delta = 0, replications = 1, randomize = False, seed_alpha = None, seed = None, d_max = None, m_max = None):
+    def __init__(self, dimension = 1, alpha = 0, delta = 0, replications = 1, randomize = False, seed = None, m_max = 2 ** 21, d_max = None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.d = dimension
@@ -24,7 +24,7 @@ class Kronecker(LD):
         self.dimension = dimension
         self.low_discrepancy = True
         self.d_max = dimension
-        self.m_max = 2 ** 21
+        self.m_max = m_max
         
         if type(alpha) == str and alpha.lower() == 'richtmyer':
                 if dimension <= len(PRIMES):
@@ -59,8 +59,9 @@ class Kronecker(LD):
         i = arange(n).reshape((n, 1))
 
         if self.replications == 1:
-            return ((i * self.alpha) + self.delta) % 1
-        
+            points = (i * self.alpha) + self.delta
+            return subtract(points, floor(points), out = points)
+
         samples = empty(shape=(self.replications, n, self.dimension))
         for r in range(self.replications):
             samples[r] = ((i * self.alpha) + self.delta[r]) % 1
@@ -95,8 +96,14 @@ class Kronecker(LD):
         
 
     # calculates the weighted sum of square discrepancy
-    def wssd_discrepancy(self, n, weights, k_tilde, gamma, int_k_tilde):
-        discrepancies = self._square_periodic_discrepancies(n, (k_tilde, int_k_tilde), gamma)
+    def wssd_discrepancy(self, n, weights, k_tilde = None, gamma = None):
+        if gamma is None:
+            gamma = ones(self.dimension)
+
+        if k_tilde is None:
+            k_tilde = (lambda x, gamma: prod(1 + (x * (x - 1) + 1/6) * gamma, axis=1), 1)
+
+        discrepancies = self._square_periodic_discrepancies(n, k_tilde, gamma)
         return sum(weights * discrepancies)
     
     
