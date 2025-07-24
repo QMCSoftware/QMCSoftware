@@ -1,7 +1,7 @@
 import warnings
 from ._discrete_distribution import LD
 from ..util import ParameterError,ParameterWarning
-import qmctoolscl
+#import qmctoolscl
 from numpy import *
 from .c_lib import c_lib
 import ctypes
