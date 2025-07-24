@@ -13,7 +13,6 @@ class Halton(LD):
     Quasi-Random Halton nets.
     
     >>> halton = Halton(2,randomize="LMS_PERM",seed=7)
-    >>> halton.gen_samples(4)halton = Halton(2,randomize="LMS_PERM",seed=7)
     >>> halton.gen_samples(4)
     array([[0.2143238 , 0.1243237 ],
            [0.8861583 , 0.5235922 ],
