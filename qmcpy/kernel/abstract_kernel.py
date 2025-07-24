@@ -15,7 +15,7 @@ class AbstractKernel(object):
             instance = super().__new__(cls)
         return instance
 
-    def __init__(self, d, torchify, device):
+    def __init__(self, d, torchify, device, compile_call, comiple_call_kwargs):
         super().__init__()
         # dimension 
         assert d%1==0 and d>0, "dimension d must be a positive int"
@@ -36,6 +36,12 @@ class AbstractKernel(object):
             self.device = None
             self.nptkwargs = {}
         self.batch_params = {}
+        if compile_call:
+            assert self.torchify, "compile_call requires torchify is True"
+            import torch
+            self.compiled_parsed___call__ = torch.compile(self.parsed___call__,**comiple_call_kwargs)
+        else:
+            self.compiled_parsed___call__ = self.parsed___call__
     
     @property 
     def nbdim(self):
@@ -82,10 +88,10 @@ class AbstractKernel(object):
         assert (beta1%1==0).all() and (beta1>=0).all(), "require int beta1 >= 0"
         batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
         if not self.AUTOGRADKERNEL:
-            k = self.parsed___call__(x0,x1,beta0,beta1,batch_params)
+            k = self.compiled_parsed___call__(x0,x1,beta0,beta1,batch_params)
         else:
             if (beta0==0).all() and (beta1==0).all():
-                k = self.parsed___call__(x0,x1,batch_params)
+                k = self.compiled_parsed___call__(x0,x1,batch_params)
             else: # requires autograd, so self.npt=torch
                 assert self.torchify, "autograd requires torchify=True"
                 if (beta0>0).any():
@@ -102,7 +108,7 @@ class AbstractKernel(object):
                     x1g = self.npt.stack(x1gs,dim=-1)
                 else:
                     x1g = x1
-                k = self.parsed___call__(x0g,x1g,batch_params)
+                k = self.compiled_parsed___call__(x0g,x1g,batch_params)
                 for j0 in range(self.d):
                     for _ in range(beta0[j0]):
                         k = self.npt.autograd.grad(k,x0gs[j0],grad_outputs=self.npt.ones_like(k,requires_grad=True),create_graph=True)[0]
@@ -173,16 +179,18 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
 
     def __init__(self,
             d, 
-            scale = 1., 
+            scale = 1.,
             lengthscales = 1.,
             shape_scale = [1],
-            shape_lengthscales = None, 
+            shape_lengthscales = None,
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
             tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
-            torchify = False, 
+            torchify = False,
             requires_grad_scale = True, 
             requires_grad_lengthscales = True, 
             device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
             ):
         r"""
         Args:
@@ -197,8 +205,10 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
-        super().__init__(d=d,torchify=torchify,device=device)
+        super().__init__(d=d,torchify=torchify,device=device,compile_call=compile_call,comiple_call_kwargs=comiple_call_kwargs)
         self.raw_scale,self.tf_scale = self.parse_assign_param(
             pname = "scale",
             param = scale, 

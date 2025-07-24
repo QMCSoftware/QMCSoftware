@@ -169,7 +169,12 @@ class KernelMultiTask(AbstractKernel):
             requires_grad_diag (bool): If `True` and `torchify`, set `requires_grad=True` for `diag`.
         """
         assert isinstance(base_kernel,AbstractKernel)
-        super().__init__(d=base_kernel.d,torchify=base_kernel.torchify,device=base_kernel.device)
+        super().__init__(
+            d = base_kernel.d,
+            torchify = base_kernel.torchify,
+            device = base_kernel.device,
+            compile_call = False,
+            comiple_call_kwargs = {})
         self.base_kernel = base_kernel
         self.AUTOGRADKERNEL = base_kernel.AUTOGRADKERNEL 
         assert np.isscalar(num_tasks) and num_tasks%1==0 and num_tasks>1

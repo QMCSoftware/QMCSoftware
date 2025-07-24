@@ -297,6 +297,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = True, 
             requires_grad_alpha = True, 
             device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
             ):
         r"""
         Args:
@@ -315,6 +317,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
             device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
         super().__init__(
             d = d, 
@@ -328,6 +332,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_scale = requires_grad_scale, 
             requires_grad_lengthscales = requires_grad_lengthscales, 
             device = device,
+            compile_call = compile_call,
+            comiple_call_kwargs = comiple_call_kwargs,
         )
         self.raw_alpha,self.tf_alpha = self.parse_assign_param(
             pname = "alpha",

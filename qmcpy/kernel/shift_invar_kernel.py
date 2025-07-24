@@ -98,6 +98,8 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             requires_grad_scale = True, 
             requires_grad_lengthscales = True, 
             device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
             ):
         r"""
         Args:
@@ -113,6 +115,8 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
         super().__init__(
             d = d, 
@@ -126,6 +130,8 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
             requires_grad_scale = requires_grad_scale, 
             requires_grad_lengthscales = requires_grad_lengthscales, 
             device = device,
+            compile_call = compile_call,
+            comiple_call_kwargs = comiple_call_kwargs,
         )
         self.raw_alpha,self.tf_alpha = self.parse_assign_param(
             pname = "alpha",
