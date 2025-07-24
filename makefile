@@ -56,22 +56,24 @@ mkdocserve: # mkdocs only looks for content in the docs/ folder, so we have to c
 uml:
 	# UML Diagrams
 	#	Discrete Distributions
-	@pyreverse -k qmcpy/discrete_distribution/ -o svg 1>/dev/null && mv classes.svg docs/umls/discrete_distribution_overview.svg
-	#	True Measure Overview
-	@pyreverse -k qmcpy/true_measure/ -o svg 1>/dev/null && mv classes.svg docs/umls/true_measure_overview.svg
-	#	Integrand Overview
-	@pyreverse -k qmcpy/integrand/ -o svg 1>/dev/null && mv classes.svg docs/umls/integrand_overview.svg
-	#	Stopping Criterion Overview
-	@pyreverse -k qmcpy/stopping_criterion/ -o svg 1>/dev/null && mv classes.svg docs/umls/stopping_criterion_overview.svg
+	@pyreverse -k qmcpy/discrete_distribution/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/discrete_distribution_overview.svg
 	#	Discrete Distribution Specific
-	@pyreverse qmcpy/discrete_distribution/ -o svg 1>/dev/null && mv classes.svg docs/umls/discrete_distribution_specific.svg
+	@pyreverse qmcpy/discrete_distribution/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/discrete_distribution_specific.svg
+	#	True Measure Overview
+	@pyreverse -k qmcpy/true_measure/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/true_measure_overview.svg
 	#	True Measure Specific
-	@pyreverse qmcpy/true_measure/ -o svg 1>/dev/null && mv classes.svg docs/umls/true_measure_specific.svg
+	@pyreverse qmcpy/true_measure/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/true_measure_specific.svg
+	#	Integrand Overview
+	@pyreverse -k qmcpy/integrand/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/integrand_overview.svg
 	#	Integrand Specific
-	@pyreverse qmcpy/integrand/ -o svg 1>/dev/null && mv classes.svg docs/umls/integrand_specific.svg
+	@pyreverse qmcpy/integrand/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/integrand_specific.svg
+	#	Stopping Criterion Overview
+	@pyreverse -k qmcpy/stopping_criterion/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/stopping_criterion_overview.svg
 	#	Stopping Criterion Specific
-	@pyreverse qmcpy/stopping_criterion/ -o svg 1>/dev/null && mv classes.svg docs/umls/stopping_criterion_specific.svg
-	#	Util
-	@pyreverse -k qmcpy/util/ -o svg 1>/dev/null && mv classes.svg docs/umls/util_uml.svg
-
+	@pyreverse qmcpy/stopping_criterion/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/stopping_criterion_specific.svg
+	#	Kernel Overview
+	@pyreverse -k qmcpy/kernel/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/kernel_overview.svg
+	#	Kernel Specific
+	@pyreverse qmcpy/kernel/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/kernel_specific.svg
+	
 doc: uml mkdocserve

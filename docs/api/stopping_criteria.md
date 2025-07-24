@@ -1,5 +1,9 @@
 # Stopping Criteria
 
+## UML Overview
+
+![](./umls/stopping_criterion_overview.svg)
+
 ## `AbstractStoppingCriterion`
 
 ::: qmcpy.stopping_criterion.abstract_stopping_criterion.AbstractStoppingCriterion
@@ -65,3 +69,7 @@
 ### `PFGPCI`
 
 ::: qmcpy.stopping_criterion.pf_gp_ci.PFGPCI
+
+## UML Specific
+
+![](./umls/stopping_criterion_specific.svg)

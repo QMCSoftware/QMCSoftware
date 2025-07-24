@@ -1,6 +1,8 @@
 # Discrete Distributions
 
-Generators of sequences $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$.
+## UML Overview
+
+![](./umls/discrete_distribution_overview.svg)
 
 ## `AbstractDiscreteDistribution`
 
@@ -21,3 +23,7 @@ Generators of sequences $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$.
 ## `IIDStdUniform`
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
+
+## UML Specific
+
+![](./umls/discrete_distribution_specific.svg)

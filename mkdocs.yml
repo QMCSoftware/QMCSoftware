@@ -2,13 +2,13 @@ site_name: "QMCPy"
 nav:
   - Quasi Monte Carlo Software: index.md
   - API:
-    - Discrete Distributions: discrete_distributions.md
-    - True Measures: true_measures.md
-    - Integrands: integrands.md
-    - Stopping Criteria: stopping_criteria.md
-    - Kernels: kernels.md
-    - Fast Transforms: fast_transforms.md
-    - Util: util.md
+    - Discrete Distributions: api/discrete_distributions.md
+    - True Measures: api/true_measures.md
+    - Integrands: api/integrands.md
+    - Stopping Criteria: api/stopping_criteria.md
+    - Kernels: api/kernels.md
+    - Fast Transforms: api/fast_transforms.md
+    - Util: api/util.md
   - Demos:
     - Getting Started:
       - Introduction: demos/qmcpy_intro.ipynb
@@ -99,6 +99,22 @@ plugins:
             docstring_options:
               ignore_init_summary: false
             merge_init_into_class: true
+  - glightbox:
+       touchNavigation: true
+       loop: false
+       effect: zoom
+       slide_effect: zoom
+       width: 100%
+       height: auto
+       zoomable: true
+       draggable: false
+       skip_classes:
+         - custom-skip-class-name
+       auto_caption: false
+       caption_position: bottom
+       background: white
+       shadow: true
+       manual: false
   - print-site # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
   
 theme:
