@@ -1,3 +1,5 @@
+from ..kernel_methods.discrepancy import discrepancy
+
 from .util import (
     bernoulli_poly,
     weighted_walsh_funcs)
