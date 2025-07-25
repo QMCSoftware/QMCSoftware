@@ -7,7 +7,7 @@ from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_id
 class AbstractKernel(object):
 
     def __new__(cls, *args, **kwargs):
-        if "torchify" in kwargs and kwargs["torchify"]:
+        if ("torchify" in kwargs and kwargs["torchify"]) or ("base_kernel" in kwargs and kwargs["base_kernel"].torchify):
             import torch 
             x = type(cls.__name__,(cls,torch.nn.Module),{})
             instance = super().__new__(x)
@@ -173,7 +173,6 @@ class AbstractKernel(object):
     def parsed_single_integral_01d(self, x):
         raise MethodImplementationError(self, 'parsed_single_integral_01d')
     
-    @property
     def double_integral_01d(self):
         r"""
         Evaluate the integral of the kernel over the unit cube

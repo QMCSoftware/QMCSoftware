@@ -1,9 +1,35 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
+from ..discrete_distribution import DigitalNetB2
 from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,tf_identity
 from ..util import ParameterError
 import numpy as np 
+import scipy.stats
+import scipy.special
 
-class KernelGaussian(AbstractKernelScaleLengthscales):
+
+class AbstractKernelGaussianSE(AbstractKernelScaleLengthscales):
+
+    def parsed_single_integral_01d(self, x, batch_params):
+        s = batch_params["scale"][...,0]
+        l = batch_params["lengthscales"]
+        nls = l.shape[-1]
+        norm_class = self.npt.distributions.Normal if self.torchify else scipy.stats.norm
+        norm = norm_class(x,l)
+        lb = self.nptarray([0],**self.nptkwargs)
+        ub = self.nptarray([1],**self.nptkwargs)
+        kint = s*self.npt.prod(np.sqrt(2*np.pi)*l*(norm.cdf(ub)-norm.cdf(lb)),-1)
+        return kint
+    
+    def double_integral_01d(self):
+        erf = self.npt.erf if self.torchify else scipy.special.erf
+        s = self.scale[...,0]
+        l = self.lengthscales
+        nls = l.shape[-1]
+        kintint = s*self.npt.prod(2*(-1+self.npt.exp(-1/(2*l**2)))*l**2+np.sqrt(2*np.pi)*l*erf(1/(np.sqrt(2)*l)),-1)**(self.d/nls)
+        return kintint
+
+
+class KernelGaussian(AbstractKernelGaussianSE):
     
     r"""
     Gaussian / Squared Exponential kernel implemented using the product of exponentials. 
@@ -47,6 +73,50 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         (4, 3, 6, 6, 5, 5)
 
+        Integrals 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 2,
+        ...     scale = rng.uniform(low=0,high=1,size=(3,1,)),
+        ...     lengthscales = rng.uniform(low=0,high=1,size=(1,2)))
+        >>> kintint = kernel.double_integral_01d()
+        >>> kintint
+        array([0.50079567, 0.11125229, 0.34760005])
+        >>> x_qmc_4d = DigitalNetB2(4,seed=7)(2**16)
+        >>> kintint_qmc = kernel(x_qmc_4d[:,:2],x_qmc_4d[:,2:]).mean(1)
+        >>> kintint_qmc
+        array([0.5007959 , 0.11125234, 0.34760021])
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     np.abs(kintint-kintint_qmc)
+        array([2.3e-07, 5.1e-08, 1.6e-07])
+        >>> x = rng.uniform(low=0,high=1,size=(4,2))
+        >>> kint = kernel.single_integral_01d(x)
+        >>> kint
+        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
+               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
+               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        >>> x_qmc_2d = DigitalNetB2(2,seed=7)(2**16)
+        >>> kint_qmc = kernel(x[:,None,:],x_qmc_2d).mean(-1)
+        >>> kint_qmc
+        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
+               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
+               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     np.abs(kint-kint_qmc)
+        array([[2.2e-13, 4.0e-13, 4.2e-12, 3.9e-12],
+               [4.8e-14, 8.9e-14, 9.4e-13, 8.8e-13],
+               [1.5e-13, 2.8e-13, 2.9e-12, 2.7e-12]])
+        >>> k_1l = KernelGaussian(d=2,lengthscales=[.5])
+        >>> k_2l = KernelGaussian(d=2,lengthscales=[.5,.5])
+        >>> k_2l.double_integral_01d()
+        0.5836282427162017
+        >>> k_1l.double_integral_01d()
+        0.5836282427162017
+        >>> k_1l.single_integral_01d(x)
+        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+        >>> k_2l.single_integral_01d(x)
+        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+                
         PyTorch
 
         >>> import torch
@@ -88,6 +158,53 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         torch.Size([4, 3, 6, 6, 5, 5])
 
+        Integrals 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 2,
+        ...     torchify = True,
+        ...     scale = torch.from_numpy(rng.uniform(low=0,high=1,size=(3,1,))),
+        ...     lengthscales = torch.from_numpy(rng.uniform(low=0,high=1,size=(1,2))),
+        ...     requires_grad_scale = False, 
+        ...     requires_grad_lengthscales = False)
+        >>> kintint = kernel.double_integral_01d()
+        >>> kintint
+        array([0.50079567, 0.11125229, 0.34760005])
+        >>> x_qmc_4d = torch.from_numpy(DigitalNetB2(4,seed=7)(2**16))
+        >>> kintint_qmc = kernel(x_qmc_4d[:,:2],x_qmc_4d[:,2:]).mean(1)
+        >>> kintint_qmc
+        array([0.5007959 , 0.11125234, 0.34760021])
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     torch.abs(kintint-kintint_qmc).numpy()
+        array([2.3e-07, 5.1e-08, 1.6e-07])
+        >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
+        >>> kint = kernel.single_integral_01d(x)
+        >>> kint
+        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
+               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
+               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        >>> x_qmc_2d = torch.from_numpy(DigitalNetB2(2,seed=7)(2**16))
+        >>> kint_qmc = kernel(x[:,None,:],x_qmc_2d).mean(-1)
+        >>> kint_qmc
+        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
+               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
+               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     torch.abs(kint-kint_qmc).numpy()
+        array([[2.2e-13, 4.0e-13, 4.2e-12, 3.9e-12],
+               [4.8e-14, 8.9e-14, 9.4e-13, 8.8e-13],
+               [1.5e-13, 2.8e-13, 2.9e-12, 2.7e-12]])
+        >>> k_1l = KernelGaussian(d=2,lengthscales=[.5],torchify=True)
+        >>> k_2l = KernelGaussian(d=2,lengthscales=[.5,.5],torchify=True)
+        >>> k_2l.double_integral_01d()
+        0.5836282427162017
+        >>> k_1l.double_integral_01d()
+        0.5836282427162017
+        >>> k_1l.single_integral_01d(x)
+        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+        >>> k_2l.single_integral_01d(x)
+        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+        
         Derivatives 
 
         >>> kernel = KernelGaussian(
@@ -130,6 +247,7 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         tensor([ 23.1060,  13.9306, -10.4810,   1.5511], dtype=torch.float64)
         >>> torch.allclose(y,yhat)
         True
+
     """
 
     AUTOGRADKERNEL = True 
@@ -140,7 +258,7 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         k = scale*self.npt.exp(-((x0-x1)/(np.sqrt(2)*lengthscales))**2).prod(-1)
         return k
     
-class KernelSquaredExponential(AbstractKernelScaleLengthscales):
+class KernelSquaredExponential(AbstractKernelGaussianSE):
     
     r"""
     Gaussian / Squared Exponential kernel implemented using the pairwise distance function.  

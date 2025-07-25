@@ -11,6 +11,8 @@ from .kernel import (
     KernelMatern52,
     KernelShiftInvar,
     KernelDigShiftInvar,
+    KernelSI,
+    KernelDSI,
     KernelMultiTask,
 )
 from .fast_transform import (

@@ -177,9 +177,9 @@ class KernelMultiTask(AbstractKernel):
             comiple_call_kwargs = {})
         self.base_kernel = base_kernel
         self.AUTOGRADKERNEL = base_kernel.AUTOGRADKERNEL 
-        assert np.isscalar(num_tasks) and num_tasks%1==0 and num_tasks>1
+        assert np.isscalar(num_tasks) and num_tasks%1==0
         self.num_tasks = num_tasks
-        assert np.isscalar(rank_factor) and rank_factor%1==0 and 1<=rank_factor<=self.num_tasks
+        assert np.isscalar(rank_factor) and rank_factor%1==0 and 0<=rank_factor<=self.num_tasks
         self.raw_factor,self.tf_factor = self.parse_assign_param(
             pname = "factor",
             param = factor,
