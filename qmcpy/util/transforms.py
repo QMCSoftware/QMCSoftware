@@ -3,7 +3,7 @@ import scipy.special
 from . import ParameterError
 from .torch_numpy_ops import get_npt
 
-EPS64 = np.finfo(np.float64).eps
+EPS64 = float(np.finfo(np.float64).eps)
     
 def insert_batch_dims(param, ndims, k):
     ones = [1]*ndims

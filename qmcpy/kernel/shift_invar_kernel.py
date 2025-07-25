@@ -160,22 +160,23 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         return self.scale[...,0]
     
     def get_per_dim_components(self, x0, x1, beta0, beta1):
+        p = len(beta0)
         betasum = beta0+beta1
         order = 2*self.alpha-betasum
         assert (2<=order).all(), "order must all be at least 2, but got order = %s"%str(order)
         coeffs = (-1)**(self.alpha+beta1+1)*self.npt.exp(2*self.alpha*np.log(2*np.pi)-self.lgamma(order+1))
         delta = (x0-x1)%1
-        kperdim = coeffs*self.npt.concatenate([bernoulli_poly(int(order[j].item()),delta[...,j,None]) for j in range(self.d)],-1)
+        kperdim = coeffs*self.npt.stack([self.npt.concatenate([bernoulli_poly(int(order[l,j].item()),delta[...,j,None]) for j in range(self.d)],-1) for l in range(p)],-2)
         return kperdim
         
-    def combine_per_dim_components(self, kperdim, batch_params):
+    def combine_per_dim_components(self, kperdim, beta0, beta1, c, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
-        k = scale*(1+lengthscales*kperdim).prod(-1)
+        ind = 1.*((beta0+beta1)==0)
+        k = scale*((ind+lengthscales*kperdim).prod(-1)*c).sum(-1)
         return k
     
-    def parsed___call__(self, x0, x1, beta0, beta1, batch_params):
+    def parsed___call__(self, x0, x1, beta0, beta1, c, batch_params):
         kperdim = self.get_per_dim_components(x0,x1,beta0,beta1)
-        k = self.combine_per_dim_components(kperdim,batch_params)
+        k = self.combine_per_dim_components(kperdim,beta0,beta1,c,batch_params)
         return k
-    

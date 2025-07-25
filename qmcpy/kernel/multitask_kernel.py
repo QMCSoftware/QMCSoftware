@@ -216,24 +216,25 @@ class KernelMultiTask(AbstractKernel):
         taskmat = self.npt.einsum("...ij,...kj->...ik",factor,factor)+diag[...,None]*self.eye_num_tasks
         return taskmat
     
-    def __call__(self, x0, x1, task0, task1, beta0=None, beta1=None):
+    def __call__(self, x0, x1, task0, task1, beta0=None, beta1=None, c=None):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
-        $$\partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_0} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_1} K((\boldsymbol{x}_0,i_0),(\boldsymbol{x}_1,i_1)).$$
+        $$\sum_{\ell=1}^p c_\ell \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell,0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell,1}} K((\boldsymbol{x}_0,i_0),(\boldsymbol{x}_1,i_1)).$$
         
         Args:
             x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel.
             x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel. 
             task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$. 
             task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
-            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
-            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
-        
+            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
+            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
+            c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
+
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Kernel evaluations with batched shape, see the doctests for examples. 
         """
-        kmat_x = self.base_kernel.__call__(x0,x1,beta0,beta1)[...,None]
+        kmat_x = self.base_kernel.__call__(x0,x1,beta0,beta1,c)[...,None]
         nnbdim_x = kmat_x.ndim-self.nbdim_base-1
         kmat_tasks = self.taskmat
         nbdim = kmat_tasks.ndim-2
