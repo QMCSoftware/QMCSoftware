@@ -19,26 +19,26 @@ class KernelMultiTask(AbstractKernel):
         >>> kmt = KernelMultiTask(KernelGaussian(d=2),num_tasks=3,diag=[1,2,3])
         >>> x = np.random.rand(4,2) 
         >>> task = np.arange(3) 
-        >>> kmt(x[0],x[0],task[1],task[1]).item()
+        >>> kmt(task[1],task[1],x[0],x[0]).item()
         3.0
-        >>> kmt(x[0],x[0],task,task)
+        >>> kmt(task,task,x[0],x[0])
         array([2., 3., 4.])
-        >>> kmt(x[0],x[0],task[:,None],task[None,:]).shape
+        >>> kmt(task[:,None],task[None,:],x[0],x[0]).shape
         (3, 3)
-        >>> kmt(x,x,task[1],task[1])
+        >>> kmt(task[1],task[1],x,x,)
         array([3., 3., 3., 3.])
-        >>> kmt(x[:3],x[:3],task,task)
+        >>> kmt(task,task,x[:3],x[:3])
         array([2., 3., 4.])
-        >>> kmt(x,x,task[:,None],task[:,None]).shape
+        >>> kmt(task[:,None],task[:,None],x,x).shape
         (3, 4)
-        >>> v = kmt(x[:3,None,:],x[None,:3,:],task,task)
+        >>> v = kmt(task,task,x[:3,None,:],x[None,:3,:])
         >>> v.shape
         (3, 3)
         >>> np.allclose(v,kmt.base_kernel(x[:3,None,:],x[None,:3,:])*kmt.taskmat[task,task])
         True
-        >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None],task[:,None,None]).shape
+        >>> kmt(task[:,None,None],task[:,None,None],x[:,None,:],x[None,:,:]).shape
         (3, 4, 4)
-        >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None,None],task[None,:,None,None]).shape
+        >>> kmt(task[:,None,None,None],task[None,:,None,None],x[:,None,:],x[None,:,:]).shape
         (3, 3, 4, 4)
 
         Batched inference
@@ -51,13 +51,13 @@ class KernelMultiTask(AbstractKernel):
         ...     diag = rng.uniform(low=0,high=1,size=(3,5,4)))
         >>> x = np.random.rand(8,10)
         >>> task = np.arange(4) 
-        >>> kmt(x[0],x[0],task[0],task[0]).shape
+        >>> kmt(task[0],task[0],x[0],x[0]).shape
         (6, 3, 5)
-        >>> kmt(x[0],x[0],task,task).shape
+        >>> kmt(task,task,x[0],x[0]).shape
         (6, 3, 5, 4)
-        >>> kmt(x,x,task[0],task[0]).shape
+        >>> kmt(task[0],task[0],x,x).shape
         (6, 3, 5, 8)
-        >>> v = kmt(x[:4,None,:],x[None,:4,:],task,task)
+        >>> v = kmt(task,task,x[:4,None,:],x[None,:4,:])
         >>> v.shape
         (6, 3, 5, 4, 4)
         >>> kmat_x = kmt.base_kernel(x[:4,None,:],x[None,:4,:])
@@ -70,10 +70,36 @@ class KernelMultiTask(AbstractKernel):
         True
         >>> np.allclose(v,kmat_tasks[...,:,None]*kmat_x)
         False
-        >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None,None],task[None,:,None,None]).shape
+        >>> kmt(task[:,None,None,None],task[None,:,None,None],x[:,None,:],x[None,:,:]).shape
         (6, 3, 5, 4, 4, 8, 8)
-        >>> kmt(x[:,None,None,None,:],x[None,:,None,None,:],task[:,None],task[None,:]).shape
+        >>> kmt(task[:,None],task[None,:],x[:,None,None,None,:],x[None,:,None,None,:]).shape
         (6, 3, 5, 8, 8, 4, 4)
+
+        Integrals 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 2,
+        ...     scale = rng.uniform(low=0,high=1,size=(3,1)),
+        ...     lengthscales = rng.uniform(low=0,high=1,size=(1,2)))
+        >>> kmt = KernelMultiTask(
+        ...     base_kernel=kernel,
+        ...     num_tasks=5,
+        ...     diag = rng.uniform(low=0,high=1,size=(6,3,5)),
+        ...     factor = rng.uniform(low=0,high=1,size=(3,5,2)))
+        >>> task = np.arange(5) 
+        >>> kmt.double_integral_01d(task0=task[0],task1=task[1]).shape
+        (6, 3)
+        >>> kmt.double_integral_01d(task0=task,task1=task).shape
+        (6, 3, 5)
+        >>> kmt.double_integral_01d(task0=task[:,None],task1=task[None,:]).shape
+        (6, 3, 5, 5)
+        >>> x = rng.uniform(low=0,high=1,size=(7,4,2))
+        >>> kmt.single_integral_01d(task0=task[0],task1=task[1],x=x).shape
+        (6, 3, 7, 4)
+        >>> kmt.single_integral_01d(task0=task[:,None,None],task1=task[:,None,None],x=x).shape
+        (6, 3, 5, 7, 4)
+        >>> kmt.single_integral_01d(task0=task[:,None,None,None],task1=task[None,:,None,None],x=x).shape
+        (6, 3, 5, 5, 7, 4)
 
         PyTorch
         
@@ -81,26 +107,26 @@ class KernelMultiTask(AbstractKernel):
         >>> kmt = KernelMultiTask(KernelGaussian(d=2,torchify=True),num_tasks=3,diag=[1,2,3])
         >>> x = torch.from_numpy(np.random.rand(4,2))
         >>> task = np.arange(3) 
-        >>> kmt(x[0],x[0],task[1],task[1]).item()
+        >>> kmt(task[1],task[1],x[0],x[0]).item()
         3.0
-        >>> kmt(x[0],x[0],task,task)
+        >>> kmt(task,task,x[0],x[0])
         tensor([2., 3., 4.], dtype=torch.float64, grad_fn=<SelectBackward0>)
-        >>> kmt(x[0],x[0],task[:,None],task[None,:]).shape
+        >>> kmt(task[:,None],task[None,:],x[0],x[0]).shape
         torch.Size([3, 3])
-        >>> kmt(x,x,task[1],task[1])
+        >>> kmt(task[1],task[1],x,x)
         tensor([3., 3., 3., 3.], dtype=torch.float64, grad_fn=<SelectBackward0>)
-        >>> kmt(x[:3],x[:3],task,task)
+        >>> kmt(task,task,x[:3],x[:3])
         tensor([2., 3., 4.], dtype=torch.float64, grad_fn=<SelectBackward0>)
-        >>> kmt(x,x,task[:,None],task[:,None]).shape
+        >>> kmt(task[:,None],task[:,None],x,x).shape
         torch.Size([3, 4])
-        >>> v = kmt(x[:3,None,:],x[None,:3,:],task,task)
+        >>> v = kmt(task,task,x[:3,None,:],x[None,:3,:])
         >>> v.shape
         torch.Size([3, 3])
         >>> torch.allclose(v,kmt.base_kernel(x[:3,None,:],x[None,:3,:])*kmt.taskmat[task,task])
         True
-        >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None],task[:,None,None]).shape
+        >>> kmt(task[:,None,None],task[:,None,None],x[:,None,:],x[None,:,:]).shape
         torch.Size([3, 4, 4])
-        >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None,None],task[None,:,None,None]).shape
+        >>> kmt(task[:,None,None,None],task[None,:,None,None],x[:,None,:],x[None,:,:]).shape
         torch.Size([3, 3, 4, 4])
 
         Batched inference
@@ -113,13 +139,13 @@ class KernelMultiTask(AbstractKernel):
         ...     diag = rng.uniform(low=0,high=1,size=(3,5,4)))
         >>> x = torch.from_numpy(np.random.rand(8,10))
         >>> task = torch.arange(4) 
-        >>> kmt(x[0],x[0],task[0],task[0]).shape
+        >>> kmt(task[0],task[0],x[0],x[0]).shape
         torch.Size([6, 3, 5])
-        >>> kmt(x[0],x[0],task,task).shape
+        >>> kmt(task,task,x[0],x[0]).shape
         torch.Size([6, 3, 5, 4])
-        >>> kmt(x,x,task[0],task[0]).shape
+        >>> kmt(task[0],task[0],x,x).shape
         torch.Size([6, 3, 5, 8])
-        >>> v = kmt(x[:4,None,:],x[None,:4,:],task,task)
+        >>> v = kmt(task,task,x[:4,None,:],x[None,:4,:])
         >>> v.shape
         torch.Size([6, 3, 5, 4, 4])
         >>> kmat_x = kmt.base_kernel(x[:4,None,:],x[None,:4,:])
@@ -132,14 +158,41 @@ class KernelMultiTask(AbstractKernel):
         True
         >>> torch.allclose(v,kmat_tasks[...,:,None]*kmat_x)
         False
-        >>> kmt(x[:,None,:],x[None,:,:],task[:,None,None,None],task[None,:,None,None]).shape
+        >>> kmt(task[:,None,None,None],task[None,:,None,None],x[:,None,:],x[None,:,:]).shape
         torch.Size([6, 3, 5, 4, 4, 8, 8])
-        >>> kmt(x[:,None,None,None,:],x[None,:,None,None,:],task[:,None],task[None,:]).shape
+        >>> kmt(task[:,None],task[None,:],x[:,None,None,None,:],x[None,:,None,None,:]).shape
         torch.Size([6, 3, 5, 8, 8, 4, 4])
         >>> kmt.factor.dtype
         torch.float32
         >>> kmt.diag.dtype
         torch.float64
+
+        Integrals 
+        
+        >>> kernel = KernelGaussian(
+        ...     d = 2,
+        ...     torchify = True,
+        ...     scale = rng.uniform(low=0,high=1,size=(3,1)),
+        ...     lengthscales = rng.uniform(low=0,high=1,size=(1,2)))
+        >>> kmt = KernelMultiTask(
+        ...     base_kernel=kernel,
+        ...     num_tasks=5,
+        ...     diag = rng.uniform(low=0,high=1,size=(6,3,5)),
+        ...     factor = rng.uniform(low=0,high=1,size=(3,5,2)))
+        >>> task = torch.arange(5) 
+        >>> kmt.double_integral_01d(task0=task[0],task1=task[1]).shape
+        torch.Size([6, 3])
+        >>> kmt.double_integral_01d(task0=task,task1=task).shape
+        torch.Size([6, 3, 5])
+        >>> kmt.double_integral_01d(task0=task[:,None],task1=task[None,:]).shape
+        torch.Size([6, 3, 5, 5])
+        >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(7,4,2)))
+        >>> kmt.single_integral_01d(task0=task[0],task1=task[1],x=x).shape
+        torch.Size([6, 3, 7, 4])
+        >>> kmt.single_integral_01d(task0=task[:,None,None],task1=task[:,None,None],x=x).shape
+        torch.Size([6, 3, 5, 7, 4])
+        >>> kmt.single_integral_01d(task0=task[:,None,None,None],task1=task[None,:,None,None],x=x).shape
+        torch.Size([6, 3, 5, 5, 7, 4])
     """
 
     def __init__(self,
@@ -216,17 +269,30 @@ class KernelMultiTask(AbstractKernel):
         taskmat = self.npt.einsum("...ij,...kj->...ik",factor,factor)+diag[...,None]*self.eye_num_tasks
         return taskmat
     
-    def __call__(self, x0, x1, task0, task1, beta0=None, beta1=None, c=None):
+    def _parsed__call__(self, task0, task1, k_x):
+        k_x = k_x[...,None]
+        nnbdim_v = k_x.ndim-self.nbdim_base-1
+        kmat_tasks = self.taskmat
+        nbdim = kmat_tasks.ndim-2
+        kmat_tasks = kmat_tasks[...,task0,task1,None]
+        nnbdim_kmat = kmat_tasks.ndim-nbdim-1
+        commondim = max(nnbdim_v,nnbdim_kmat)
+        k_x = insert_batch_dims(k_x,commondim-nnbdim_v,self.nbdim_base)
+        kmat_tasks = insert_batch_dims(kmat_tasks,commondim-nnbdim_kmat,nbdim)
+        kmat = k_x*kmat_tasks 
+        return kmat[...,0]
+    
+    def __call__(self, task0, task1, x0, x1, beta0=None, beta1=None, c=None):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
-        $$\sum_{\ell=1}^p c_\ell \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell,0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell,1}} K((\boldsymbol{x}_0,i_0),(\boldsymbol{x}_1,i_1)).$$
+        $$\sum_{\ell=1}^p c_\ell \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell,0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell,1}} K((i_0,\boldsymbol{x}_0),(i_1,\boldsymbol{x}_1)).$$
         
         Args:
-            x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel.
-            x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel. 
             task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$. 
             task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
+            x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel.
+            x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel. 
             beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
             beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
             c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
@@ -234,14 +300,41 @@ class KernelMultiTask(AbstractKernel):
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Kernel evaluations with batched shape, see the doctests for examples. 
         """
-        kmat_x = self.base_kernel.__call__(x0,x1,beta0,beta1,c)[...,None]
-        nnbdim_x = kmat_x.ndim-self.nbdim_base-1
-        kmat_tasks = self.taskmat
-        nbdim = kmat_tasks.ndim-2
-        kmat_tasks = kmat_tasks[...,task0,task1,None]
-        nnbdim_kmat = kmat_tasks.ndim-nbdim-1
-        commondim = max(nnbdim_x,nnbdim_kmat)
-        kmat_x = insert_batch_dims(kmat_x,commondim-nnbdim_x,self.nbdim_base)
-        kmat_tasks = insert_batch_dims(kmat_tasks,commondim-nnbdim_kmat,nbdim)
-        kmat = kmat_x*kmat_tasks 
-        return kmat[...,0]
+        kmat_x = self.base_kernel.__call__(x0,x1,beta0,beta1,c)
+        return self._parsed__call__(task0,task1,kmat_x)
+    
+    def single_integral_01d(self, task0, task1, x):
+        r"""
+        Evaluate the integral of the kernel over the unit cube
+
+        $$\tilde{K}((i_0,\boldsymbol{x}),i_1) = \int_{[0,1]^d} K((i_0,\boldsymbol{x}),(i_1,\boldsymbol{z}) \; \mathrm{d} \boldsymbol{z}.$$
+        
+        Args:
+            task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$. 
+            task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
+            x (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with 
+        
+        Returns:
+            tildek (Union[np.ndarray,torch.Tensor]): Shape `y.shape=x.shape[:-1]` integral kernel evaluations. 
+        """
+        kint_x = self.base_kernel.single_integral_01d(x)
+        return self._parsed__call__(task0,task1,kint_x)
+        
+    def double_integral_01d(self, task0, task1):
+        r"""
+        Evaluate the integral of the kernel over the unit cube
+
+        $$\tilde{K}(i_0,i_1) = \int_{[0,1]^d} \int_{[0,1]^d} K((i_0,\boldsymbol{x}),(i_1,\boldsymbol{z})) \; \mathrm{d} \boldsymbol{x} \; \mathrm{d} \boldsymbol{z}.$$
+        
+        Args:
+            task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$. 
+            task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
+        
+        Returns:
+            tildek (Union[np.ndarray,torch.Tensor]): Double integral kernel evaluations.
+        """
+        kint_x = self.base_kernel.double_integral_01d()
+        return self._parsed__call__(task0,task1,kint_x)
+
+
+        

@@ -178,6 +178,9 @@ class AbstractKernel(object):
         Evaluate the integral of the kernel over the unit cube
 
         $$\tilde{K} = \int_{[0,1]^d} \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \; \mathrm{d} \boldsymbol{x} \; \mathrm{d} \boldsymbol{z}.$$
+        
+        Returns:
+            tildek (Union[np.ndarray,torch.Tensor]): Double integral kernel evaluations.
         """
         raise MethodImplementationError(self, 'double_integral_01d')
 

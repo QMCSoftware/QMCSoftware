@@ -14,11 +14,11 @@
 
 ## `KernelShiftInvar` 
 
-::: qmcpy.kernel.shift_invar_kernel.KernelShiftInvar
+::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvar
 
 ## `KernelDigShiftInvar` 
 
-::: qmcpy.kernel.dig_shift_invar_kernel.KernelDigShiftInvar
+::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvar
 
 ## `KernelGaussian` 
 

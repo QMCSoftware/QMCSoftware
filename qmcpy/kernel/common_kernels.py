@@ -9,6 +9,8 @@ import scipy.special
 
 class AbstractKernelGaussianSE(AbstractKernelScaleLengthscales):
 
+    AUTOGRADKERNEL = True 
+    
     def parsed_single_integral_01d(self, x, batch_params):
         s = batch_params["scale"][...,0]
         l = batch_params["lengthscales"]
@@ -249,10 +251,7 @@ class KernelGaussian(AbstractKernelGaussianSE):
         tensor([ 97.6657,   3.8621, -65.9329,  -1.1932], dtype=torch.float64)
         >>> torch.allclose(y,yhat)
         True
-
     """
-
-    AUTOGRADKERNEL = True 
 
     def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
@@ -346,8 +345,6 @@ class KernelSquaredExponential(AbstractKernelGaussianSE):
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         torch.Size([4, 3, 6, 6, 5, 5])
     """
-
-    AUTOGRADKERNEL = True 
 
     def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
