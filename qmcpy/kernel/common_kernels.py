@@ -169,26 +169,26 @@ class KernelGaussian(AbstractKernelGaussianSE):
         ...     requires_grad_lengthscales = False)
         >>> kintint = kernel.double_integral_01d()
         >>> kintint
-        array([0.50079567, 0.11125229, 0.34760005])
+        tensor([0.5008, 0.1113, 0.3476], dtype=torch.float64)
         >>> x_qmc_4d = torch.from_numpy(DigitalNetB2(4,seed=7)(2**16))
         >>> kintint_qmc = kernel(x_qmc_4d[:,:2],x_qmc_4d[:,2:]).mean(1)
         >>> kintint_qmc
-        array([0.5007959 , 0.11125234, 0.34760021])
+        tensor([0.5008, 0.1113, 0.3476], dtype=torch.float64)
         >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
         ...     torch.abs(kintint-kintint_qmc).numpy()
         array([2.3e-07, 5.1e-08, 1.6e-07])
         >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
         >>> kint = kernel.single_integral_01d(x)
         >>> kint
-        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
-               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
-               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        tensor([[0.5461, 0.4273, 0.4300, 0.4469],
+                [0.1213, 0.0949, 0.0955, 0.0993],
+                [0.3790, 0.2966, 0.2985, 0.3102]], dtype=torch.float64)
         >>> x_qmc_2d = torch.from_numpy(DigitalNetB2(2,seed=7)(2**16))
         >>> kint_qmc = kernel(x[:,None,:],x_qmc_2d).mean(-1)
         >>> kint_qmc
-        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
-               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
-               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        tensor([[0.5461, 0.4273, 0.4300, 0.4469],
+                [0.1213, 0.0949, 0.0955, 0.0993],
+                [0.3790, 0.2966, 0.2985, 0.3102]], dtype=torch.float64)
         >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
         ...     torch.abs(kint-kint_qmc).numpy()
         array([[2.2e-13, 4.0e-13, 4.2e-12, 3.9e-12],
@@ -197,13 +197,15 @@ class KernelGaussian(AbstractKernelGaussianSE):
         >>> k_1l = KernelGaussian(d=2,lengthscales=[.5],torchify=True)
         >>> k_2l = KernelGaussian(d=2,lengthscales=[.5,.5],torchify=True)
         >>> k_2l.double_integral_01d()
-        0.5836282427162017
+        tensor(0.5836, grad_fn=<MulBackward0>)
         >>> k_1l.double_integral_01d()
-        0.5836282427162017
+        tensor(0.5836, grad_fn=<MulBackward0>)
         >>> k_1l.single_integral_01d(x)
-        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+        tensor([0.5812, 0.4656, 0.5760, 0.5349], dtype=torch.float64,
+               grad_fn=<MulBackward0>)
         >>> k_2l.single_integral_01d(x)
-        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+        tensor([0.5812, 0.4656, 0.5760, 0.5349], dtype=torch.float64,
+               grad_fn=<MulBackward0>)
         
         Derivatives 
 
@@ -230,7 +232,7 @@ class KernelGaussian(AbstractKernelGaussianSE):
         >>> with torch.no_grad():
         ...     y = kernel(x,z,beta0,beta1,c)
         >>> y
-        tensor([ 23.1060,  13.9306, -10.4810,   1.5511], dtype=torch.float64)
+        tensor([ 97.6657,   3.8621, -65.9329,  -1.1932], dtype=torch.float64)
         >>> y_no_deriv = kernel(x,z)
         >>> y_first = y_no_deriv.clone()
         >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
@@ -244,7 +246,7 @@ class KernelGaussian(AbstractKernelGaussianSE):
         >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
         >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
         >>> yhat
-        tensor([ 23.1060,  13.9306, -10.4810,   1.5511], dtype=torch.float64)
+        tensor([ 97.6657,   3.8621, -65.9329,  -1.1932], dtype=torch.float64)
         >>> torch.allclose(y,yhat)
         True
 
