@@ -57,7 +57,7 @@ class AbstractKernel(object):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
-        $$\sum_{\ell=1}^p c_\ell \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell,0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell,1}} K(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
+        $$\sum_{\ell=1}^p c_{\ell} \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell 0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell 1}} K(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
         
         Args:
             x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with 
