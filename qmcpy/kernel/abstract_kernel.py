@@ -35,7 +35,7 @@ class AbstractKernel(object):
             self.nptarraytype = np.ndarray
             self.device = None
             self.nptkwargs = {}
-        self.batch_params = {}
+        self.batch_param_names = []
         if compile_call:
             assert self.torchify, "compile_call requires torchify is True"
             import torch
@@ -49,6 +49,10 @@ class AbstractKernel(object):
         v = self.__call__(empty,empty)
         nbdim = v.ndim-1
         return nbdim
+    
+    @property 
+    def batch_params(self):
+        return {pname:getattr(self,pname) for pname in self.batch_param_names}
     
     def get_batch_params(self, ndim):
         return {pname: insert_batch_dims(batch_param,ndim,-1) for pname,batch_param in self.batch_params.items()}
@@ -249,7 +253,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_scale,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
-        self.batch_params["scale"] = self.scale
+        self.batch_param_names.append("scale")
         self.raw_lengthscales,self.tf_lengthscales = self.parse_assign_param(
             pname = "lengthscales",
             param = lengthscales, 
@@ -258,7 +262,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_lengthscales,
             endsize_ops = [1,self.d],
             constraints = ["POSITIVE"])
-        self.batch_params["lengthscales"] = self.lengthscales
+        self.batch_param_names.append("lengthscales")
 
     @property
     def scale(self):

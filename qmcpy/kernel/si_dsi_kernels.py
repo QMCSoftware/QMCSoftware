@@ -400,7 +400,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         
     def __init__(self,
             d,
-            t,
+            t=None,
             scale = 1., 
             lengthscales = 1.,
             alpha = 2,
@@ -449,12 +449,30 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
             compile_call = compile_call,
             comiple_call_kwargs = comiple_call_kwargs,
         )
-        self.t = t
+        self.set_t(t)
         assert all(1<=int(alphaj)<=4 for alphaj in self.alpha)
     
+    @property
+    def t(self):
+        if self._t is None: 
+            raise ParameterError("please use set_t to set the t value")
+        return self._t
+    
+    def set_t(self, t):
+        if t is None: 
+            self._t = t
+        else:
+            assert t%1==0
+            if self.torchify:
+                assert 0<=t<=63 # torch only supports torch.int64
+            else:
+                assert 0<=t<=64 # numpy supports np.uint64
+            self._t = t
+
     def get_per_dim_components(self, x0, x1, beta0, beta1):
-        x0 = to_bin(x0,self.t)
-        x1 = to_bin(x1,self.t)
+        t = self.t
+        x0 = to_bin(x0,t)
+        x1 = to_bin(x1,t)
         p = len(beta0)
         betasum = beta0+beta1
         order = self.alpha-betasum
@@ -470,10 +488,10 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
                 if order[l,j]==1: # order[j]=alpha[j] as we cannot take derivatives WRT the alpha=1 kernel and this cannot be the derivative of any kernels
                     flog2deltaj = -self.npt.inf*self.npt.ones(deltaj.shape)
                     pos = deltaj>0 
-                    flog2deltaj[pos] = self.npt.floor(self.npt.log2(deltaj[pos]))-self.t
+                    flog2deltaj[pos] = self.npt.floor(self.npt.log2(deltaj[pos]))-t
                     kparts_l[j] = 6*(1/6-2**(flog2deltaj-1))
                 else:
-                    kparts_l[j] = weighted_walsh_funcs(int(self.alpha[j]),deltaj[...,None],self.t)[...,0]-1
+                    kparts_l[j] = weighted_walsh_funcs(int(self.alpha[j]),deltaj[...,None],t)[...,0]-1
             kparts[l] = self.npt.concatenate(kparts_l,-1)
         kparts = self.npt.stack(kparts,-2)
         kperdim = (-2)**betasum*(ind+kparts)

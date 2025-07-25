@@ -503,7 +503,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             tfs_param = tfs_alpha,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
-        self.batch_params["alpha"] = self.alpha
+        self.batch_param_names.append("alpha")
     
     @property
     def alpha(self):

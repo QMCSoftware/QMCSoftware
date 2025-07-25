@@ -83,6 +83,8 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
     assert shape_param[-1] in endsize_ops, "%s not in %s"%(str(shape_param[-1]),str(endsize_ops))
     if "POSITIVE" in constraints: 
         assert (param>0).all(), "%s must be positive"%pname
+    if "NON-NEGATIVE" in constraints: 
+        assert (param>=0).all(), "%s must be non-negative"%pname
     if "INTEGER" in constraints:
         assert (param%1==0).all(), "%s must be integers"%pname
     return raw_param,tf_param

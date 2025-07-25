@@ -249,9 +249,9 @@ class KernelMultiTask(AbstractKernel):
             requires_grad_param = requires_grad_diag,
             tfs_param = tfs_diag,
             endsize_ops = [1,self.num_tasks],
-            constraints = ["POSITIVE"])
+            constraints = ["NON-NEGATIVE"])
         self.eye_num_tasks = self.npt.eye(self.num_tasks,**self.nptkwargs)
-        self.batch_params["taskmat"] = self.taskmat
+        self.batch_param_names.append("taskmat")
         self.nbdim_base = self.base_kernel.nbdim
     
     @property
