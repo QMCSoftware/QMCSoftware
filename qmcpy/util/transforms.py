@@ -61,10 +61,14 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
         param = param*npt.ones(shape_param,**nptkwargs)
     else:
         if torchify:
-            param = npt.atleast_1d(npt.tensor(param))
+            if not isinstance(param,npt.Tensor):
+                param = npt.tensor(param)
+            param = npt.atleast_1d(param)
             assert isinstance(param,npt.Tensor), "%s must be a scalar or torch.Tensor"%pname
         else: 
-            param = npt.atleast_1d(npt.array(param))
+            if not isinstance(param,npt.ndarray):
+                param = npt.array(param)
+            param = npt.atleast_1d(param)
             assert isinstance(param,npt.ndarray), "%s must be a scalar or np.ndarray"%pname
     shape_param = list(param.shape)
     assert len(shape_param)>=1, "invalid shape_%s = %s"%(pname,str(shape_param))

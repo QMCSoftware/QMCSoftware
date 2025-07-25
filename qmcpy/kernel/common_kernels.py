@@ -87,6 +87,49 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         torch.Size([4, 3, 6, 5, 5])
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         torch.Size([4, 3, 6, 6, 5, 5])
+
+        Derivatives 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 3,
+        ...     torchify = True,
+        ...     scale = torch.from_numpy(rng.uniform(low=0,high=1,size=(1,))),
+        ...     lengthscales = torch.from_numpy(rng.uniform(low=0,high=1,size=(3,))))
+        >>> x0 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x1 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x2 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x = torch.stack([x0,x1,x2],axis=-1)
+        >>> z0 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z1 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z2 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z = torch.stack([z0,z1,z2],axis=-1)
+        >>> c = torch.from_numpy(rng.uniform(low=0,high=1,size=(2,)))
+        >>> beta0 = torch.tensor([
+        ...     [1,0,0],
+        ...     [0,2,0]])
+        >>> beta1 = torch.tensor([
+        ...     [0,0,2],
+        ...     [2,1,0]])
+        >>> with torch.no_grad():
+        ...     y = kernel(x,z,beta0,beta1,c)
+        >>> y
+        tensor([ 23.1060,  13.9306, -10.4810,   1.5511], dtype=torch.float64)
+        >>> y_no_deriv = kernel(x,z)
+        >>> y_first = y_no_deriv.clone()
+        >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_first = torch.autograd.grad(y_first,z2,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_first = torch.autograd.grad(y_first,z2,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_second = y_no_deriv.clone()
+        >>> y_second = torch.autograd.grad(y_second,x1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,x1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
+        >>> yhat
+        tensor([ 23.1060,  13.9306, -10.4810,   1.5511], dtype=torch.float64)
+        >>> torch.allclose(y,yhat)
+        True
     """
 
     AUTOGRADKERNEL = True 

@@ -104,6 +104,12 @@ class AbstractKernel(object):
             else: # requires autograd, so self.npt=torch
                 assert self.torchify, "autograd requires torchify=True"
                 import torch
+                incoming_grad_enabled = torch.is_grad_enabled()
+                torch.set_grad_enabled(True)
+                incoming_grad_enabled_params = {pname: param.requires_grad for pname,param in self.named_parameters()}
+                if not incoming_grad_enabled:
+                    for pname,param in self.named_parameters():
+                        param.requires_grad_(False)
                 if (beta0>0).any():
                     tileshapex0 = tuple(self.npt.ceil(self.npt.tensor(x1.shape[:-1])/self.npt.tensor(x0.shape[:-1])).to(int))
                     x0gs = [self.npt.tile(x0[...,j].clone().requires_grad_(True),tileshapex0) for j in range(self.d)]
@@ -118,13 +124,6 @@ class AbstractKernel(object):
                     x1g = self.npt.stack(x1gs,dim=-1)
                 else:
                     x1g = x1
-                incoming_grad_enabled = torch.is_grad_enabled()
-                torch.set_grad_enabled(True)
-                if not incoming_grad_enabled:
-                    incoming_grad_enabled_params = {}
-                    for pname,param in self.named_parameters():
-                        incoming_grad_enabled_params[pname] = param.requires_grad
-                        param.requires_grad_(False)
                 batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
                 k = 0.
                 k_base = self.compiled_parsed___call__(x0g,x1g,batch_params)
@@ -143,6 +142,7 @@ class AbstractKernel(object):
                 if not incoming_grad_enabled:
                     for pname,param in self.named_parameters():
                         param.requires_grad_(incoming_grad_enabled_params[pname])
+                if (not incoming_grad_enabled) or ((not any(incoming_grad_enabled_params.values())) and (not x0.requires_grad) and (not x1.requires_grad)):
                     k = k.detach()
                 torch.set_grad_enabled(incoming_grad_enabled)
         return k

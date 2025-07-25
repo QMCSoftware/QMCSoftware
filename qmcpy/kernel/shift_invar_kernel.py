@@ -75,6 +75,63 @@ class KernelShiftInvar(AbstractKernelScaleLengthscales):
         array([10.])
         >>> kernel_torch.single_integral_01d(xtorch)
         tensor([10.], grad_fn=<SelectBackward0>)
+
+        Derivatives 
+
+        >>> rng = np.random.Generator(np.random.PCG64(7))
+        >>> scale = rng.uniform(low=0,high=1,size=(1,))
+        >>> lengthscales = rng.uniform(low=0,high=1,size=(3,))
+        >>> kernel = KernelShiftInvar(
+        ...     d = 3,
+        ...     alpha = 3,
+        ...     torchify = True,
+        ...     scale = torch.from_numpy(scale),
+        ...     lengthscales = torch.from_numpy(lengthscales))
+        >>> x0 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x1 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x2 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x = torch.stack([x0,x1,x2],axis=-1)
+        >>> z0 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z1 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z2 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z = torch.stack([z0,z1,z2],axis=-1)
+        >>> c = torch.from_numpy(rng.uniform(low=0,high=1,size=(2,)))
+        >>> beta0 = torch.tensor([
+        ...     [1,0,0],
+        ...     [0,2,0]])
+        >>> beta1 = torch.tensor([
+        ...     [0,0,2],
+        ...     [2,1,0]])
+        >>> with torch.no_grad():
+        ...     y = kernel(x,z,beta0,beta1,c)
+        >>> y
+        tensor([1455.1395, 9475.5695, 7807.0759, 2785.4733], dtype=torch.float64)
+        >>> y_no_deriv = kernel(x,z)
+        >>> y_first = y_no_deriv.clone()
+        >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_first = torch.autograd.grad(y_first,z2,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_first = torch.autograd.grad(y_first,z2,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_second = y_no_deriv.clone()
+        >>> y_second = torch.autograd.grad(y_second,x1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,x1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
+        >>> yhat
+        tensor([1455.1396, 9475.5700, 7807.0762, 2785.4735], dtype=torch.float64)
+        >>> torch.allclose(y,yhat)
+        True
+        >>> kernel = KernelShiftInvar(
+        ...     d = 3,
+        ...     alpha = 3,
+        ...     scale = scale,
+        ...     lengthscales = lengthscales)
+        >>> ynp = kernel(x.detach().numpy(),z.detach().numpy(),beta0.numpy(),beta1.numpy(),c.numpy())
+        >>> ynp
+        array([1455.14170759, 9475.58534891, 7807.088978  , 2785.47661877])
+        >>> np.allclose(ynp,y.numpy())
+        True
         
     **References:** 
     
