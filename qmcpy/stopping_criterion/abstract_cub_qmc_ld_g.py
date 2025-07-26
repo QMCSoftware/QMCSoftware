@@ -4,7 +4,7 @@ from ..util.data import Data
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
 from ..integrand import AbstractIntegrand
 import numpy as np
-from scipy.stats import gaussian_kde
+import scipy as sc
 from time import time
 import warnings
 
@@ -246,31 +246,29 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         values_cont = unique_values[counts==1]
         kde_discrete = counts[counts>1] / len(g) # Probability of each discrete value
         prob = len(values_cont) / len(g) # Probability of being continous
-        kde_cont = gaussian_kde(values_cont)
-
+        kde_cont = sc.stats.gaussian_kde(values_cont)
+        
         def kde_evaluate(values):
             """
             Args:
-            values: A vector of n points.
+                values: A vector of n points. 
+            Returns:
+                densities (vector of length n): the computed probabilities of the values (both discrete and continuous).
+                bool_flags (vector of length n): indicates whether the value is discrete (True) or continuous (False).
             """
             values = np.atleast_1d(values)
             if values.ndim != 1:
                 raise ParameterError("Values must be a vector of n points.")
+
             densities = kde_cont.evaluate(values) * prob
-            discrete_indices = []
-            discrete_values = []
-            for i in range(len(values)):
-                if values[i] in repeated_values:
-                    densities[i] = kde_discrete
-                    discrete_indices.append(i)
-                    discrete_values.append(values[i])
-            discrete_indices = np.array(discrete_indices)
-            discrete_values = np.array(discrete_values)
-            print("The values from KDE:", densities)
-            if len(discrete_indices) > 0:
-                values = np.delete(values,discrete_indices)
-                print("The values whose probability was computed using Probability Mass Function (PMF):", discrete_values)
-            print("The values whose probability was computed using Probability Density Function (PDF):", values)
+            discrete_indices = np.where(np.isin(values, repeated_values))[0]
+            bool_flags = np.full(len(values), False, dtype=bool)
+
+            if(len(discrete_indices) > 0):
+                densities[discrete_indices] = kde_discrete[np.where(np.isin(repeated_values,values))[0]]
+                bool_flags[discrete_indices] = True
+
+            return densities, bool_flags
         # End kde_evaluate function
 
         if plot_estimation_flag == True:
@@ -283,7 +281,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             ax1.set_ylabel('Density', color=color)
             ax1.plot(z, pdf_est, color=color)
             ax1.tick_params(axis='y', labelcolor=color)
-            
+
             ax2 = ax1.twinx() # Instantiate a second axes that shares the same x-axis
             color = 'tab:blue'
             ax2.set_ylabel('Probability', color=color) # We already handled the x-label with ax1
