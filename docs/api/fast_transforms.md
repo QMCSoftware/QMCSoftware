@@ -2,7 +2,6 @@
 
 ## `numpy` compatible
 
-
 ### `fwht`
 
 ::: qmcpy.fast_transform.ft.fwht

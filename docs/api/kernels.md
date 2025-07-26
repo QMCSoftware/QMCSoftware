@@ -1,5 +1,8 @@
 # Kernels 
 
+## UML Overview
+
+![](./umls/kernel_overview.svg)
 
 ## `AbstractKernel` 
 
@@ -41,6 +44,10 @@
 
 ::: qmcpy.kernel.common_kernels.KernelMatern52
 
+## `KernelMultiTask` 
 
+::: qmcpy.kernel.multitask_kernel.KernelMultiTask
 
+## UML Specific
 
+![](./umls/kernel_specific.svg)

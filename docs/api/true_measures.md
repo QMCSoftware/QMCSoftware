@@ -1,5 +1,9 @@
 # True Measures
 
+## UML Overview
+
+![](./umls/true_measure_overview.svg)
+
 ## `AbstractTrueMeasure`
 
 ::: qmcpy.true_measure.abstract_true_measure.AbstractTrueMeasure
@@ -39,3 +43,7 @@
 ## `Kumaraswamy`
 
 ::: qmcpy.true_measure.kumaraswamy.Kumaraswamy
+
+## UML Specific
+
+![](./umls/true_measure_specific.svg)

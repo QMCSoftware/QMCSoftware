@@ -11,6 +11,7 @@ from .kernel import (
     KernelMatern52,
     KernelShiftInvar,
     KernelDigShiftInvar,
+    KernelMultiTask,
 )
 from .fast_transform import (
     fftbr,

@@ -1,5 +1,9 @@
 # Integrands
 
+## UML Overview
+
+![](./umls/integrand_overview.svg)
+
 ## `AbstractIntegrand`
 
 ::: qmcpy.integrand.abstract_integrand.AbstractIntegrand
@@ -59,3 +63,7 @@
 ## `Linear0`
 
 ::: qmcpy.integrand.linear0.Linear0
+
+## UML Specific
+
+![](./umls/integrand_specific.svg)

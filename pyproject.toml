@@ -95,6 +95,7 @@ dev = [ # brew install weasyprint
     "mkdocs-jupyter >= 0.25.0",
     "mkdocstrings-python >= 1.16.0",
     "mkdocs-with-pdf >= 0.9.3",
+    "mkdocs-glightbox >= 0.4.0",
     "graphviz >= 0.20.0",
     "scikit-learn >= 1.0.0",
     "scikit-optimize >= 0.10.2",

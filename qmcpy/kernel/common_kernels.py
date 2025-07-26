@@ -38,7 +38,6 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelGaussian(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1])
         >>> kernel(x,x).shape 
@@ -79,7 +78,6 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelGaussian(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1],
         ...     torchify = True)
@@ -135,7 +133,6 @@ class KernelSquaredExponential(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelSquaredExponential(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1])
         >>> kernel(x,x).shape 
@@ -176,7 +173,6 @@ class KernelSquaredExponential(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelSquaredExponential(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1],
         ...     torchify = True)
@@ -232,7 +228,6 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelRationalQuadratic(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1])
         >>> kernel(x,x).shape 
@@ -273,7 +268,6 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelRationalQuadratic(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_alpha = [4,3,1],
         ...     shape_lengthscales = [3,1],
         ...     torchify = True)
@@ -292,7 +286,6 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             scale = 1., 
             lengthscales = 1.,
             alpha = 1.,
-            shape_batch = [],
             shape_scale = [1],
             shape_lengthscales = None, 
             shape_alpha = [1],
@@ -311,8 +304,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
             lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
             alpha (Union[np.ndarray,torch.Tensor]): Scale mixture parameter $\alpha$.
-            shape_batch (list): Shape of the batch output.
-            shape_scale (list): Shape of `scale` when np.isscalar(scale)`. 
+            shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
@@ -328,7 +320,6 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             d = d, 
             scale = scale, 
             lengthscales = lengthscales,
-            shape_batch = shape_batch,
             shape_scale = shape_scale,
             shape_lengthscales = shape_lengthscales, 
             tfs_scale = tfs_scale,
@@ -395,7 +386,6 @@ class KernelMatern12(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelMatern12(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1])
         >>> kernel(x,x).shape 
@@ -436,7 +426,6 @@ class KernelMatern12(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelMatern12(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1],
         ...     torchify = True)
@@ -492,7 +481,6 @@ class KernelMatern32(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelMatern32(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1])
         >>> kernel(x,x).shape 
@@ -533,7 +521,6 @@ class KernelMatern32(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelMatern32(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1],
         ...     torchify = True)
@@ -589,7 +576,6 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelMatern52(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1])
         >>> kernel(x,x).shape 
@@ -630,7 +616,6 @@ class KernelMatern52(AbstractKernelScaleLengthscales):
 
         >>> kernel = KernelMatern52(
         ...     d = 2, 
-        ...     shape_batch = [5,4,3],
         ...     shape_scale = [4,3,1],
         ...     shape_lengthscales = [3,1],
         ...     torchify = True)
