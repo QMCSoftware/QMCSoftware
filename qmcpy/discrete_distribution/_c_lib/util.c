@@ -10,8 +10,11 @@
 // in Windows, you must define an initialization function for your extension
 // because setuptools will build a .pyd file, not a DLL
 // https://stackoverflow.com/questions/34689210/error-exporting-symbol-when-building-python-c-extension-in-windows
-PyMODINIT_FUNC PyInit__c_lib(void) {
-    return PyModule_Create(&c_lib_module);
+PyMODINIT_FUNC PyInit__c_lib(void)
+{
+    // do stuff...
+    printf("");
+    return NULL;
 }
 
 EXPORT int get_unsigned_long_size() { return sizeof(unsigned long); }
