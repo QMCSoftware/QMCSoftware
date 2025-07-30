@@ -3,7 +3,6 @@ from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..util import ParameterError,ParameterWarning
 import qmctoolscl
 from numpy import *
-from .c_lib import c_lib
 import ctypes
 from math import *
 from copy import deepcopy
