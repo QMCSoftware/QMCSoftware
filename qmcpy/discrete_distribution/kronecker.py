@@ -1,4 +1,4 @@
-from ._discrete_distribution import LD
+from .abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from numpy import *
 from sympy import nextprime
 import time
@@ -14,7 +14,7 @@ PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41,
 
 RICHTMYER = sqrt(PRIMES) % 1
 
-class Kronecker(LD):
+class Kronecker(AbstractIIDDiscreteDistribution):
     def __init__(self, dimension = 1, alpha = 0, delta = 0, replications = 1, randomize = False, seed = None, m_max = 2 ** 21, d_max = None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
