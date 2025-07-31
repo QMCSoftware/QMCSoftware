@@ -177,7 +177,7 @@ class Lattice(AbstractLDDiscreteDistribution):
         self.input_m_max = deepcopy(m_max)
         if isinstance(generating_vector,str) and generating_vector=="kuo.lattice-33002-1024-1048576.9125.txt":
             self.gen_vec_source = generating_vector
-            gen_vec = np.load(dirname(abspath(__file__))+'/generating_vectors/kuo.lattice-33002-1024-1048576.9125.npy')[None,:]
+            gen_vec = load(dirname(abspath(__file__))+'/generating_vectors/kuo.lattice-33002-1024-1048576.9125.npy')[None,:]
             d_limit = 9125
             n_limit = 1048576
         elif isinstance(generating_vector,str):
@@ -203,8 +203,8 @@ class Lattice(AbstractLDDiscreteDistribution):
             datafile.close()
             d_limit = int(contents[0])
             n_limit = int(contents[1])
-            gen_vec = np.array(contents[2:],dtype=np.uint64)[None,:]
-        elif isinstance(generating_vector,np.ndarray):
+            gen_vec = array(contents[2:],dtype=uint64)[None,:]
+        elif isinstance(generating_vector,ndarray):
             self.gen_vec_source = "custom"
             gen_vec = generating_vector
             if m_max is None:
@@ -221,10 +221,10 @@ class Lattice(AbstractLDDiscreteDistribution):
         super(Lattice,self).__init__(dimension,replications,seed,d_limit,n_limit)
         if isinstance(generating_vector,int):
             self.gen_vec_source = "random"
-            m_max = int(np.log2(self.n_limit))
-            gen_vec = np.hstack([np.ones((self.replications,1),dtype=np.uint64),2*self.rng.integers(1,2**(m_max-1),size=(self.replications,dimension-1),dtype=np.uint64)+1]).copy()
-        assert isinstance(gen_vec,np.ndarray)
-        gen_vec = np.atleast_2d(gen_vec) 
+            m_max = int(log2(self.n_limit))
+            gen_vec = hstack([ones((self.replications,1),dtype=uint64),2*self.rng.integers(1,2**(m_max-1),size=(self.replications,dimension-1),dtype=uint64)+1]).copy()
+        assert isinstance(gen_vec,ndarray)
+        gen_vec = atleast_2d(gen_vec) 
         assert gen_vec.ndim==2 and gen_vec.shape[1]>=self.d and (gen_vec.shape[0]==1 or gen_vec.shape[0]==self.replications), "invalid gen_vec.shape = %s"%str(gen_vec.shape)
         self.gen_vec = gen_vec[:,self.dvec].copy()
         self.order = str(order).upper().strip().replace("_"," ")
@@ -246,11 +246,11 @@ class Lattice(AbstractLDDiscreteDistribution):
             raise ParameterError("Lattice does not support return_binary=True")
         if n_min==0 and self.randomize=="FALSE" and warn:
             warnings.warn("Without randomization, the first lattice point is the origin",ParameterWarning)
-        r_x = np.uint64(self.gen_vec.shape[0]) 
-        n = np.uint64(n_max-n_min)
-        d = np.uint64(self.d) 
-        n_start = np.uint64(n_min)
-        x = np.empty((r_x,n,d),dtype=np.float64)
+        r_x = uint64(self.gen_vec.shape[0]) 
+        n = uint64(n_max-n_min)
+        d = uint64(self.d) 
+        n_start = uint64(n_min)
+        x = empty((r_x,n,d),dtype=float64)
         if self.order=="LINEAR":
             assert r_x==1, "lattice linear currently requires there be only 1 generating matrix"
             x = self._gail_linear(n_min,n_max)[None,:,:]
@@ -264,25 +264,25 @@ class Lattice(AbstractLDDiscreteDistribution):
         if self.randomize=="FALSE":
             xr = x
         elif self.randomize=="SHIFT":
-            r = np.uint64(self.replications)
-            xr = np.empty((r,n,d),dtype=np.float64)
+            r = uint64(self.replications)
+            xr = empty((r,n,d),dtype=float64)
             qmctoolscl.lat_shift_mod_1(r,n,d,r_x,x,self.shift,xr,backend="c")
         return xr
 
     def _gen_block_linear(self, m_next, first=True):
         n = int(2**m_next)
         if first:
-            y = np.arange(0, 1, 1 / n).reshape((n, 1))
+            y = arange(0, 1, 1 / n).reshape((n, 1))
         else:
-            y = np.arange(1 / n, 1, 2 / n).reshape((n, 1))
-        x = np.outer(y, self.gen_vec) % 1
+            y = arange(1 / n, 1, 2 / n).reshape((n, 1))
+        x = outer(y, self.gen_vec) % 1
         return x
 
     def calculate_y(self, m_low, m_high, y):
         for m in range(m_low, m_high):
             n = 2 ** m
-            y_next = np.arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
-            temp = np.zeros((n, 1))
+            y_next = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            temp = zeros((n, 1))
             temp[0::2] = y
             temp[1::2] = y_next
             y = temp
@@ -290,15 +290,15 @@ class Lattice(AbstractLDDiscreteDistribution):
 
     def _gail_linear(self, n_min, n_max):
         """ Gail lattice generator in linear order. """
-        m_low = int(np.floor(np.log2(n_min))) + 1 if n_min > 0 else 0
-        m_high = int(np.ceil(np.log2(n_max)))
+        m_low = int(floor(log2(n_min))) + 1 if n_min > 0 else 0
+        m_high = int(ceil(log2(n_max)))
         if n_min == 0:
             return self._gen_block_linear(m_high, first=True)
         else:
             n = 2 ** (m_low)
-            y = np.arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
+            y = arange(1 / n, 1, 2 / n).reshape((int(n / 2), 1))
             y = self.calculate_y(m_low, m_high, y)
-            x = np.outer(y, self.gen_vec) % 1
+            x = outer(y, self.gen_vec) % 1
             return x
 
     def _spawn(self, child_seed, dimension):
