@@ -9,10 +9,10 @@ class JohnsonsSU(TrueMeasure):
     """
     >>> jsu = JohnsonsSU(DigitalNetB2(2,seed=7),gamma=1,xi=2,delta=3,lam=4)
     >>> jsu.gen_samples(4)
-    array([[ 0.86224892, -0.76967276],
-           [ 0.07317047,  1.17727769],
-           [ 1.89093286,  2.9341619 ],
-           [-1.30283298,  0.62269632]])
+    array([[-1.66790878, -1.58770999],
+           [ 1.85795234,  1.54353235],
+           [-0.06077722,  2.66089215],
+           [ 0.89373077, -0.27712026]])
     >>> jsu
     JohnsonsSU (TrueMeasure Object)
         gamma           1

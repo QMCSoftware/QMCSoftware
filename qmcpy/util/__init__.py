@@ -4,3 +4,8 @@ from .math_functions import _tol_fun
 from .latnetbuilder_linker import latnetbuilder_linker
 from .plot_functions import plot_proj
 from .stop_notebook import stop_notebook
+try: 
+    import gpytorch 
+    import torch 
+    from .exact_gpytorch_gression_model import ExactGPyTorchRegressionModel
+except: pass

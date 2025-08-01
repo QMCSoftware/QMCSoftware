@@ -1,4 +1,10 @@
 # General Python
+*.ckpt
+*.npz
+*.csv 
+*hparams.yaml
+*.ipynb_checkpoints/
+demos/fgpr_figs/
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -12,6 +18,9 @@ qmcpy.egg-info/
 .DS_Store
 .idea/
 .pytest_cache/
+demos/prob_failure_gp_ci_plots/
+raw.githubusercontent.com/*
+demos/.jupyter
 
 # tests
 .coverage
@@ -36,9 +45,14 @@ sphinx/demo_rst/
 sphinx/md_rst/
 sphinx/uml/
 node_modules/*
+sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
+demos/**.eps
+
+
 
 # release
 /build/
@@ -54,3 +68,9 @@ _ags/*
 
 # Fred's private stuff, not for tracking
 *Fred*
+
+# SC Choi's file exclusion
+.vscode/settings.json
+
+# Downloaded files
+raw.githubusercontent.com*

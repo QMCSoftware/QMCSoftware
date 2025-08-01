@@ -80,8 +80,7 @@ class CubMCCLTVec(StoppingCriterion):
     >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
     >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
     >>> true_value = array([sol3neg1,sol31])
-    >>> (abs(true_value-solution)<abs_tol).all()
-    True
+    >>> assert (abs(true_value-solution)<abs_tol).all()
     >>> cf = CustomFun(
     ...     true_measure = Uniform(IIDStdUniform(6,seed=7)),
     ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
@@ -199,7 +198,7 @@ class CubMCCLTVec(StoppingCriterion):
                 break # sufficiently estimated
             elif 2*self.data.n_total>self.n_max:
                 warning_s = """
-                Alread generated %d samples.
+                Already generated %d samples.
                 Trying to generate %d new samples would exceeds n_max = %d.
                 No more samples will be generated.
                 Note that error tolerances may not be satisfied. """ \
