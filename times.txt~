@@ -1,0 +1,15 @@
+;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with ‘<open>’ and enter text in its buffer.
+
+
+Fastests
+python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+......................................................
+----------------------------------------------------------------------
+Ran 54 tests in 25.894s
+
+OK
+
+real	0m28.499s
+user	0m59.897s
+sys	2m7.663s

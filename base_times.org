@@ -1,0 +1,417 @@
+;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with ‘<open>’ and enter text in its buffer.
+
+============================================ test session starts =============================================
+platform linux -- Python 3.9.13, pytest-7.1.2, pluggy-1.6.0
+rootdir: /home/r2q2/qmc_parallel_tests/QMCSoftware
+plugins: anyio-4.9.0
+collected 56 items                                                                                           
+
+qmcpy/discrete_distribution/halton.py .                                                                [  1%]
+qmcpy/discrete_distribution/iid_std_uniform.py .                                                       [  3%]
+qmcpy/discrete_distribution/digital_net_b2/digital_net_b2.py .                                         [  5%]
+qmcpy/discrete_distribution/digital_net_b2/sobol_scipy.py .                                            [  7%]
+qmcpy/discrete_distribution/lattice/lattice.py .                                                       [  8%]
+qmcpy/integrand/asian_option.py .                                                                      [ 10%]
+qmcpy/integrand/barrier_option.py .                                                                    [ 12%]
+qmcpy/integrand/bayesian_lr_coeffs.py .                                                                [ 14%]
+qmcpy/integrand/box_integral.py .                                                                      [ 16%]
+qmcpy/integrand/custom_fun.py .                                                                        [ 17%]
+qmcpy/integrand/european_option.py .                                                                   [ 19%]
+qmcpy/integrand/fourbranch2d.py .                                                                      [ 21%]
+qmcpy/integrand/genz.py .                                                                              [ 23%]
+qmcpy/integrand/hartmann6d.py .                                                                        [ 25%]
+qmcpy/integrand/ishigami.py .                                                                          [ 26%]
+qmcpy/integrand/keister.py .                                                                           [ 28%]
+qmcpy/integrand/linear0.py .                                                                           [ 30%]
+qmcpy/integrand/ml_call_options.py .                                                                   [ 32%]
+qmcpy/integrand/multimodal2d.py .                                                                      [ 33%]
+qmcpy/integrand/sensitivity_indices.py .                                                               [ 35%]
+qmcpy/integrand/sin1d.py .                                                                             [ 37%]
+qmcpy/kernel_methods/fast_transforms/ft_pytorch.py ...                                                 [ 42%]
+qmcpy/kernel_methods/gram_matrix/fast_gram_matrix.py ..                                                [ 46%]
+qmcpy/kernel_methods/gram_matrix/gram_matrix.py .                                                      [ 48%]
+qmcpy/kernel_methods/kernel/kernel_prod_autograd.py .                                                  [ 50%]
+qmcpy/kernel_methods/kernel/kernel_special.py ..                                                       [ 53%]
+qmcpy/kernel_methods/util/dig_shift_invar_ops.py ..                                                    [ 57%]
+qmcpy/kernel_methods/util/shift_invar_ops.py ..                                                        [ 60%]
+qmcpy/stopping_criterion/cub_mc_clt.py .                                                               [ 62%]
+qmcpy/stopping_criterion/cub_mc_clt_vec.py .                                                           [ 64%]
+qmcpy/stopping_criterion/cub_mc_g.py .                                                                 [ 66%]
+qmcpy/stopping_criterion/cub_mc_ml.py .                                                                [ 67%]
+qmcpy/stopping_criterion/cub_mc_ml_cont.py .                                                           [ 69%]
+qmcpy/stopping_criterion/cub_qmc_bayes_lattice_g.py .                                                  [ 71%]
+qmcpy/stopping_criterion/cub_qmc_bayes_net_g.py .                                                      [ 73%]
+qmcpy/stopping_criterion/cub_qmc_clt.py .                                                              [ 75%]
+qmcpy/stopping_criterion/cub_qmc_lattice_g.py .                                                        [ 76%]
+qmcpy/stopping_criterion/cub_qmc_ml.py .                                                               [ 78%]
+qmcpy/stopping_criterion/cub_qmc_ml_cont.py .                                                          [ 80%]
+qmcpy/stopping_criterion/cub_qmc_net_g.py .                                                            [ 82%]
+qmcpy/stopping_criterion/pf_gp_ci.py .                                                                 [ 83%]
+qmcpy/true_measure/bernoulli_cont.py .                                                                 [ 85%]
+qmcpy/true_measure/brownian_motion.py .                                                                [ 87%]
+qmcpy/true_measure/gaussian.py .                                                                       [ 89%]
+qmcpy/true_measure/johnsons_su.py .                                                                    [ 91%]
+qmcpy/true_measure/kumaraswamy.py .                                                                    [ 92%]
+qmcpy/true_measure/lebesgue.py .                                                                       [ 94%]
+qmcpy/true_measure/matern.py .                                                                         [ 96%]
+qmcpy/true_measure/scipy_wrapper.py .                                                                  [ 98%]
+qmcpy/true_measure/uniform.py .                                                                        [100%]
+
+======================================= 56 passed, 1 warning in 45.24s =======================================
+
+Fastests
+python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+......................................................
+----------------------------------------------------------------------
+Ran 54 tests in 9.937s
+
+OK
+
+Longtests
+python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 16.514s
+
+OK
+
+Code coverage
+python -m coverage report -m
+Name                                                           Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------
+__init__.py                                                        0      0   100%
+qmcpy/__init__.py                                                 12      2    83%   13-14
+qmcpy/accumulate_data/__init__.py                                 13      1    92%   13
+qmcpy/accumulate_data/_accumulate_data.py                         15      1    93%   15
+qmcpy/accumulate_data/ld_transform_bayes_data.py                 219     54    75%   52, 91, 100, 123-134, 140-146, 149-157, 163, 169, 201-210, 217-218, 229-233, 254-258, 271, 277, 292-295, 306-307, 326, 361, 364-369
+qmcpy/accumulate_data/ld_transform_data.py                       107      5    95%   64-68
+qmcpy/accumulate_data/mean_var_data.py                            64      5    92%   33, 35, 37, 40, 50
+qmcpy/accumulate_data/mean_var_data_rep.py                        18      0   100%
+qmcpy/accumulate_data/mean_var_data_vec.py                        12      0   100%
+qmcpy/accumulate_data/mlmc_data.py                                68      0   100%
+qmcpy/accumulate_data/mlqmc_data.py                               79     11    86%   98-109
+qmcpy/accumulate_data/pf_gp_ci_data.py                           176    108    39%   76-77, 93-112, 114-160, 162-223
+qmcpy/discrete_distribution/__init__.py                            5      0   100%
+qmcpy/discrete_distribution/_discrete_distribution.py             50     13    74%   18, 20, 24, 32, 48, 52, 74, 89, 95-104
+qmcpy/discrete_distribution/c_lib/__init__.py                      1      0   100%
+qmcpy/discrete_distribution/c_lib/load_c_lib.py                    8      2    75%   8-9
+qmcpy/discrete_distribution/digital_net_b2/__init__.py             2      0   100%
+qmcpy/discrete_distribution/digital_net_b2/digital_net_b2.py     207     20    90%   258, 264, 275, 277, 279, 281, 285, 303-312, 391, 412, 445, 461, 463
+qmcpy/discrete_distribution/digital_net_b2/sobol_scipy.py         40      5    88%   58-59, 62, 89, 104
+qmcpy/discrete_distribution/halton.py                             96      1    99%   225
+qmcpy/discrete_distribution/iid_std_uniform.py                    16      0   100%
+qmcpy/discrete_distribution/lattice/__init__.py                    1      0   100%
+qmcpy/discrete_distribution/lattice/lattice.py                   141     24    83%   166, 170, 186, 188, 190, 192, 196, 206-213, 257, 259, 274, 286, 293, 299-304
+qmcpy/integrand/__init__.py                                       18      0   100%
+qmcpy/integrand/_integrand.py                                    125     14    89%   36, 38, 49, 66, 90, 116, 142-145, 180, 218, 233, 254
+qmcpy/integrand/asian_option.py                                   61      4    93%   67, 70, 119, 126
+qmcpy/integrand/barrier_option.py                                 82     17    79%   62, 71, 74, 78, 82, 86, 120, 124-132, 139, 146
+qmcpy/integrand/bayesian_lr_coeffs.py                             44     11    75%   45, 47, 62, 70-76, 79
+qmcpy/integrand/box_integral.py                                   21      0   100%
+qmcpy/integrand/custom_fun.py                                     14      0   100%
+qmcpy/integrand/european_option.py                                43      2    95%   58, 67
+qmcpy/integrand/fourbranch2d.py                                   15      1    93%   31
+qmcpy/integrand/genz.py                                           32      2    94%   38, 65
+qmcpy/integrand/hartmann6d.py                                     16      0   100%
+qmcpy/integrand/ishigami.py                                       43     11    74%   40, 51, 81-97
+qmcpy/integrand/keister.py                                        29      0   100%
+qmcpy/integrand/linear0.py                                        13      0   100%
+qmcpy/integrand/ml_call_options.py                               120     11    91%   61, 86-96
+qmcpy/integrand/multimodal2d.py                                   15      1    93%   27
+qmcpy/integrand/sensitivity_indices.py                            74      3    96%   105, 148-149
+qmcpy/integrand/sin1d.py                                          15      1    93%   27
+qmcpy/integrand/um_bridge_wrapper.py                              36     24    33%   119-133, 140-146, 149, 165
+qmcpy/kernel_methods/__init__.py                                   8      2    75%   11-12
+qmcpy/kernel_methods/fast_transforms/__init__.py                   6      2    67%   5-6
+qmcpy/kernel_methods/fast_transforms/ft_pytorch.py                53      0   100%
+qmcpy/kernel_methods/fast_transforms/ft_qmctoolscl.py             42     21    50%   6-8, 32-40, 54-62
+qmcpy/kernel_methods/gram_matrix/__init__.py                       2      0   100%
+qmcpy/kernel_methods/gram_matrix/_gram_matrix.py                  72      7    90%   38-39, 54, 61-62, 74, 76
+qmcpy/kernel_methods/gram_matrix/fast_gram_matrix.py             299     35    88%   33-36, 142-146, 149-153, 179-181, 183-186, 188, 235, 241, 358-359, 468-470, 477-483
+qmcpy/kernel_methods/gram_matrix/gram_matrix.py                   67     14    79%   97-99, 101, 103-110, 112, 123-124
+qmcpy/kernel_methods/kernel/__init__.py                            2      0   100%
+qmcpy/kernel_methods/kernel/_kernel_prod.py                       45      1    98%   39
+qmcpy/kernel_methods/kernel/kernel_prod_autograd.py               47     10    79%   12-13, 15-19, 28-29, 45
+qmcpy/kernel_methods/kernel/kernel_special.py                     67      0   100%
+qmcpy/kernel_methods/util/__init__.py                              3      0   100%
+qmcpy/kernel_methods/util/dig_shift_invar_ops.py                  26      0   100%
+qmcpy/kernel_methods/util/misc.py                                 14     12    14%   4-16
+qmcpy/kernel_methods/util/shift_invar_ops.py                      24      0   100%
+qmcpy/stopping_criterion/__init__.py                              18      1    94%   18
+qmcpy/stopping_criterion/_cub_bayes_ld_g.py                      122     17    86%   24-30, 93, 98, 165-192
+qmcpy/stopping_criterion/_cub_qmc_ld_g.py                        118      9    92%   26-32, 53, 56, 103, 157-158
+qmcpy/stopping_criterion/_stopping_criterion.py                   42      7    83%   20, 23, 26, 31, 33, 47, 51
+qmcpy/stopping_criterion/cub_mc_clt.py                            55      2    96%   176-177
+qmcpy/stopping_criterion/cub_mc_clt_vec.py                        89      8    91%   138-140, 200-207, 235-236
+qmcpy/stopping_criterion/cub_mc_g.py                             107     15    86%   160-170, 181-188, 249-250
+qmcpy/stopping_criterion/cub_mc_ml.py                             72      8    89%   91, 93, 95, 151, 181-184
+qmcpy/stopping_criterion/cub_mc_ml_cont.py                        98     13    87%   89, 91, 93, 96, 156-163, 173-176, 202-205
+qmcpy/stopping_criterion/cub_qmc_bayes_lattice_g.py               94     37    61%   121, 123, 142-168, 201, 205-207, 225-235
+qmcpy/stopping_criterion/cub_qmc_bayes_net_g.py                   97     25    74%   121, 163-173, 182-184, 188-190, 194-196, 205-212, 251
+qmcpy/stopping_criterion/cub_qmc_clt.py                           97      6    94%   157-159, 177, 262-263
+qmcpy/stopping_criterion/cub_qmc_lattice_g.py                     13      2    85%   152, 154
+qmcpy/stopping_criterion/cub_qmc_ml.py                            53      6    89%   83, 115, 146-149
+qmcpy/stopping_criterion/cub_qmc_ml_cont.py                       87     11    87%   94, 145-153, 162-165, 183-186
+qmcpy/stopping_criterion/cub_qmc_net_g.py                         12      1    92%   203
+qmcpy/stopping_criterion/pf_gp_ci.py                             129     18    86%   41-44, 46-51, 163-167, 210, 223-224
+qmcpy/true_measure/__init__.py                                     9      0   100%
+qmcpy/true_measure/_true_measure.py                               77     12    84%   12, 14, 27-29, 39-41, 70, 87, 104, 127, 148, 168
+qmcpy/true_measure/bernoulli_cont.py                              36      2    94%   39, 61
+qmcpy/true_measure/brownian_motion.py                             23      0   100%
+qmcpy/true_measure/gaussian.py                                    51      4    92%   59, 61, 71, 88
+qmcpy/true_measure/johnsons_su.py                                 50      3    94%   58, 60, 81
+qmcpy/true_measure/kumaraswamy.py                                 36      3    92%   45, 47, 63
+qmcpy/true_measure/lebesgue.py                                    20      1    95%   32
+qmcpy/true_measure/matern.py                                      41      5    88%   101, 103, 105, 126, 145
+qmcpy/true_measure/scipy_wrapper.py                               27      3    89%   47, 52, 58
+qmcpy/true_measure/uniform.py                                     39      2    95%   43, 65
+qmcpy/util/__init__.py                                            11      1    91%   11
+qmcpy/util/abstraction_functions.py                               36      2    94%   37, 43
+qmcpy/util/exact_gpytorch_gression_model.py                       63     12    81%   20-22, 37-38, 61-67
+qmcpy/util/exceptions_warnings.py                                 17      2    88%   42-44
+qmcpy/util/latnetbuilder_linker.py                                40     37     8%   23-60
+qmcpy/util/math_functions.py                                       6      1    83%   20
+qmcpy/util/plot_functions.py                                      62     58     6%   29-93
+qmcpy/util/stop_notebook.py                                        7      6    14%   3-8
+setup.py                                                          31     31     0%   1-59
+test/__init__.py                                                   0      0   100%
+test/fasttests/test_discrete_distribs.py                         105      2    98%   17, 171
+test/fasttests/test_integrands.py                                 41      1    98%   65
+test/fasttests/test_stopping_criteria.py                         214      1    99%   281
+test/fasttests/test_true_measures.py                              37      1    97%   71
+test/longtests/test_cubbayes_vec.py                               92      0   100%
+test/longtests/test_integrate.py                                 110      1    99%   184
+test/longtests/test_workouts.py                                   23      1    96%   31
+workouts/__init__.py                                               4      0   100%
+workouts/integration_examples/__init__.py                          4      0   100%
+workouts/integration_examples/asian_option_multi_level.py          9      1    89%   33
+workouts/integration_examples/asian_option_single_level.py        58      2    97%   96-97
+workouts/integration_examples/keister.py                          36      1    97%   58
+workouts/integration_examples/pi_problem.py                       34     12    65%   22-30, 44-48
+workouts/lds_sequences/__init__.py                                 1      0   100%
+workouts/lds_sequences/python_sequences.py                        28      3    89%   52-54
+workouts/mc_vs_qmc/__init__.py                                     5      0   100%
+workouts/mc_vs_qmc/importance_sampling.py                         26      2    92%   31-36
+workouts/mc_vs_qmc/integrations_asian_call.py                     34      6    82%   36-38, 41-43
+workouts/mc_vs_qmc/integrations_keister.py                        34      6    82%   36-38, 41-43
+workouts/mc_vs_qmc/vary_abs_tol.py                                31      3    90%   39, 43-44
+workouts/mc_vs_qmc/vary_dimension.py                              28      2    93%   40-41
+workouts/mlmc/__init__.py                                          2      0   100%
+workouts/mlmc/european_option.py                                  42      1    98%   56
+workouts/mlmc/mcqmc06.py                                          11      1    91%   27
+workouts/mlmc/mlmc_test.py                                        79      7    91%   80-83, 85-87
+--------------------------------------------------------------------------------------------
+TOTAL                                                           6016    883    85%
+(qmcpy-fast-test) r2q2@selle:~/qmc_parallel_tests/QMCSoftware$ make clean
+make: *** No rule to make target 'clean'.  Stop.
+(qmcpy-fast-test) r2q2@selle:~/qmc_parallel_tests/QMCSoftware$ time make tests_no_docker
+
+Doctests Without Docker Containers
+python -m coverage run --source=./qmcpy/ -m pytest --doctest-modules --ignore qmcpy/integrand/um_bridge_wrapper.py --disable-pytest-warnings qmcpy
+============================================ test session starts =============================================
+platform linux -- Python 3.9.13, pytest-7.1.2, pluggy-1.6.0
+rootdir: /home/r2q2/qmc_parallel_tests/QMCSoftware
+plugins: anyio-4.9.0
+collected 56 items                                                                                           
+
+qmcpy/discrete_distribution/halton.py .                                                                [  1%]
+qmcpy/discrete_distribution/iid_std_uniform.py .                                                       [  3%]
+qmcpy/discrete_distribution/digital_net_b2/digital_net_b2.py .                                         [  5%]
+qmcpy/discrete_distribution/digital_net_b2/sobol_scipy.py .                                            [  7%]
+qmcpy/discrete_distribution/lattice/lattice.py .                                                       [  8%]
+qmcpy/integrand/asian_option.py .                                                                      [ 10%]
+qmcpy/integrand/barrier_option.py .                                                                    [ 12%]
+qmcpy/integrand/bayesian_lr_coeffs.py .                                                                [ 14%]
+qmcpy/integrand/box_integral.py .                                                                      [ 16%]
+qmcpy/integrand/custom_fun.py .                                                                        [ 17%]
+qmcpy/integrand/european_option.py .                                                                   [ 19%]
+qmcpy/integrand/fourbranch2d.py .                                                                      [ 21%]
+qmcpy/integrand/genz.py .                                                                              [ 23%]
+qmcpy/integrand/hartmann6d.py .                                                                        [ 25%]
+qmcpy/integrand/ishigami.py .                                                                          [ 26%]
+qmcpy/integrand/keister.py .                                                                           [ 28%]
+qmcpy/integrand/linear0.py .                                                                           [ 30%]
+qmcpy/integrand/ml_call_options.py .                                                                   [ 32%]
+qmcpy/integrand/multimodal2d.py .                                                                      [ 33%]
+qmcpy/integrand/sensitivity_indices.py .                                                               [ 35%]
+qmcpy/integrand/sin1d.py .                                                                             [ 37%]
+qmcpy/kernel_methods/fast_transforms/ft_pytorch.py ...                                                 [ 42%]
+qmcpy/kernel_methods/gram_matrix/fast_gram_matrix.py ..                                                [ 46%]
+qmcpy/kernel_methods/gram_matrix/gram_matrix.py .                                                      [ 48%]
+qmcpy/kernel_methods/kernel/kernel_prod_autograd.py .                                                  [ 50%]
+qmcpy/kernel_methods/kernel/kernel_special.py ..                                                       [ 53%]
+qmcpy/kernel_methods/util/dig_shift_invar_ops.py ..                                                    [ 57%]
+qmcpy/kernel_methods/util/shift_invar_ops.py ..                                                        [ 60%]
+qmcpy/stopping_criterion/cub_mc_clt.py .                                                               [ 62%]
+qmcpy/stopping_criterion/cub_mc_clt_vec.py .                                                           [ 64%]
+qmcpy/stopping_criterion/cub_mc_g.py .                                                                 [ 66%]
+qmcpy/stopping_criterion/cub_mc_ml.py .                                                                [ 67%]
+qmcpy/stopping_criterion/cub_mc_ml_cont.py .                                                           [ 69%]
+qmcpy/stopping_criterion/cub_qmc_bayes_lattice_g.py .                                                  [ 71%]
+qmcpy/stopping_criterion/cub_qmc_bayes_net_g.py .                                                      [ 73%]
+qmcpy/stopping_criterion/cub_qmc_clt.py .                                                              [ 75%]
+qmcpy/stopping_criterion/cub_qmc_lattice_g.py .                                                        [ 76%]
+qmcpy/stopping_criterion/cub_qmc_ml.py .                                                               [ 78%]
+qmcpy/stopping_criterion/cub_qmc_ml_cont.py .                                                          [ 80%]
+qmcpy/stopping_criterion/cub_qmc_net_g.py .                                                            [ 82%]
+qmcpy/stopping_criterion/pf_gp_ci.py .                                                                 [ 83%]
+qmcpy/true_measure/bernoulli_cont.py .                                                                 [ 85%]
+qmcpy/true_measure/brownian_motion.py .                                                                [ 87%]
+qmcpy/true_measure/gaussian.py .                                                                       [ 89%]
+qmcpy/true_measure/johnsons_su.py .                                                                    [ 91%]
+qmcpy/true_measure/kumaraswamy.py .                                                                    [ 92%]
+qmcpy/true_measure/lebesgue.py .                                                                       [ 94%]
+qmcpy/true_measure/matern.py .                                                                         [ 96%]
+qmcpy/true_measure/scipy_wrapper.py .                                                                  [ 98%]
+qmcpy/true_measure/uniform.py .                                                                        [100%]
+
+======================================= 56 passed, 1 warning in 43.64s =======================================
+
+Fastests
+python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/fasttests/ 1>/dev/null
+......................................................
+----------------------------------------------------------------------
+Ran 54 tests in 10.002s
+
+OK
+
+Longtests
+python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 16.445s
+
+OK
+
+Code coverage
+python -m coverage report -m
+Name                                                           Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------
+__init__.py                                                        0      0   100%
+qmcpy/__init__.py                                                 12      2    83%   13-14
+qmcpy/accumulate_data/__init__.py                                 13      1    92%   13
+qmcpy/accumulate_data/_accumulate_data.py                         15      1    93%   15
+qmcpy/accumulate_data/ld_transform_bayes_data.py                 219     54    75%   52, 91, 100, 123-134, 140-146, 149-157, 163, 169, 201-210, 217-218, 229-233, 254-258, 271, 277, 292-295, 306-307, 326, 361, 364-369
+qmcpy/accumulate_data/ld_transform_data.py                       107      5    95%   64-68
+qmcpy/accumulate_data/mean_var_data.py                            64      5    92%   33, 35, 37, 40, 50
+qmcpy/accumulate_data/mean_var_data_rep.py                        18      0   100%
+qmcpy/accumulate_data/mean_var_data_vec.py                        12      0   100%
+qmcpy/accumulate_data/mlmc_data.py                                68      0   100%
+qmcpy/accumulate_data/mlqmc_data.py                               79     11    86%   98-109
+qmcpy/accumulate_data/pf_gp_ci_data.py                           176    108    39%   76-77, 93-112, 114-160, 162-223
+qmcpy/discrete_distribution/__init__.py                            5      0   100%
+qmcpy/discrete_distribution/_discrete_distribution.py             50     13    74%   18, 20, 24, 32, 48, 52, 74, 89, 95-104
+qmcpy/discrete_distribution/c_lib/__init__.py                      1      0   100%
+qmcpy/discrete_distribution/c_lib/load_c_lib.py                    8      2    75%   8-9
+qmcpy/discrete_distribution/digital_net_b2/__init__.py             2      0   100%
+qmcpy/discrete_distribution/digital_net_b2/digital_net_b2.py     207     20    90%   258, 264, 275, 277, 279, 281, 285, 303-312, 391, 412, 445, 461, 463
+qmcpy/discrete_distribution/digital_net_b2/sobol_scipy.py         40      5    88%   58-59, 62, 89, 104
+qmcpy/discrete_distribution/halton.py                             96      1    99%   225
+qmcpy/discrete_distribution/iid_std_uniform.py                    16      0   100%
+qmcpy/discrete_distribution/lattice/__init__.py                    1      0   100%
+qmcpy/discrete_distribution/lattice/lattice.py                   141     24    83%   166, 170, 186, 188, 190, 192, 196, 206-213, 257, 259, 274, 286, 293, 299-304
+qmcpy/integrand/__init__.py                                       18      0   100%
+qmcpy/integrand/_integrand.py                                    125     14    89%   36, 38, 49, 66, 90, 116, 142-145, 180, 218, 233, 254
+qmcpy/integrand/asian_option.py                                   61      4    93%   67, 70, 119, 126
+qmcpy/integrand/barrier_option.py                                 82     17    79%   62, 71, 74, 78, 82, 86, 120, 124-132, 139, 146
+qmcpy/integrand/bayesian_lr_coeffs.py                             44     11    75%   45, 47, 62, 70-76, 79
+qmcpy/integrand/box_integral.py                                   21      0   100%
+qmcpy/integrand/custom_fun.py                                     14      0   100%
+qmcpy/integrand/european_option.py                                43      2    95%   58, 67
+qmcpy/integrand/fourbranch2d.py                                   15      1    93%   31
+qmcpy/integrand/genz.py                                           32      2    94%   38, 65
+qmcpy/integrand/hartmann6d.py                                     16      0   100%
+qmcpy/integrand/ishigami.py                                       43     11    74%   40, 51, 81-97
+qmcpy/integrand/keister.py                                        29      0   100%
+qmcpy/integrand/linear0.py                                        13      0   100%
+qmcpy/integrand/ml_call_options.py                               120     11    91%   61, 86-96
+qmcpy/integrand/multimodal2d.py                                   15      1    93%   27
+qmcpy/integrand/sensitivity_indices.py                            74      3    96%   105, 148-149
+qmcpy/integrand/sin1d.py                                          15      1    93%   27
+qmcpy/integrand/um_bridge_wrapper.py                              36     24    33%   119-133, 140-146, 149, 165
+qmcpy/kernel_methods/__init__.py                                   8      2    75%   11-12
+qmcpy/kernel_methods/fast_transforms/__init__.py                   6      2    67%   5-6
+qmcpy/kernel_methods/fast_transforms/ft_pytorch.py                53      0   100%
+qmcpy/kernel_methods/fast_transforms/ft_qmctoolscl.py             42     21    50%   6-8, 32-40, 54-62
+qmcpy/kernel_methods/gram_matrix/__init__.py                       2      0   100%
+qmcpy/kernel_methods/gram_matrix/_gram_matrix.py                  72      7    90%   38-39, 54, 61-62, 74, 76
+qmcpy/kernel_methods/gram_matrix/fast_gram_matrix.py             299     35    88%   33-36, 142-146, 149-153, 179-181, 183-186, 188, 235, 241, 358-359, 468-470, 477-483
+qmcpy/kernel_methods/gram_matrix/gram_matrix.py                   67     14    79%   97-99, 101, 103-110, 112, 123-124
+qmcpy/kernel_methods/kernel/__init__.py                            2      0   100%
+qmcpy/kernel_methods/kernel/_kernel_prod.py                       45      1    98%   39
+qmcpy/kernel_methods/kernel/kernel_prod_autograd.py               47     10    79%   12-13, 15-19, 28-29, 45
+qmcpy/kernel_methods/kernel/kernel_special.py                     67      0   100%
+qmcpy/kernel_methods/util/__init__.py                              3      0   100%
+qmcpy/kernel_methods/util/dig_shift_invar_ops.py                  26      0   100%
+qmcpy/kernel_methods/util/misc.py                                 14     12    14%   4-16
+qmcpy/kernel_methods/util/shift_invar_ops.py                      24      0   100%
+qmcpy/stopping_criterion/__init__.py                              18      1    94%   18
+qmcpy/stopping_criterion/_cub_bayes_ld_g.py                      122     17    86%   24-30, 93, 98, 165-192
+qmcpy/stopping_criterion/_cub_qmc_ld_g.py                        118      9    92%   26-32, 53, 56, 103, 157-158
+qmcpy/stopping_criterion/_stopping_criterion.py                   42      7    83%   20, 23, 26, 31, 33, 47, 51
+qmcpy/stopping_criterion/cub_mc_clt.py                            55      2    96%   176-177
+qmcpy/stopping_criterion/cub_mc_clt_vec.py                        89      8    91%   138-140, 200-207, 235-236
+qmcpy/stopping_criterion/cub_mc_g.py                             107     15    86%   160-170, 181-188, 249-250
+qmcpy/stopping_criterion/cub_mc_ml.py                             72      8    89%   91, 93, 95, 151, 181-184
+qmcpy/stopping_criterion/cub_mc_ml_cont.py                        98     13    87%   89, 91, 93, 96, 156-163, 173-176, 202-205
+qmcpy/stopping_criterion/cub_qmc_bayes_lattice_g.py               94     37    61%   121, 123, 142-168, 201, 205-207, 225-235
+qmcpy/stopping_criterion/cub_qmc_bayes_net_g.py                   97     25    74%   121, 163-173, 182-184, 188-190, 194-196, 205-212, 251
+qmcpy/stopping_criterion/cub_qmc_clt.py                           97      6    94%   157-159, 177, 262-263
+qmcpy/stopping_criterion/cub_qmc_lattice_g.py                     13      2    85%   152, 154
+qmcpy/stopping_criterion/cub_qmc_ml.py                            53      6    89%   83, 115, 146-149
+qmcpy/stopping_criterion/cub_qmc_ml_cont.py                       87     11    87%   94, 145-153, 162-165, 183-186
+qmcpy/stopping_criterion/cub_qmc_net_g.py                         12      1    92%   203
+qmcpy/stopping_criterion/pf_gp_ci.py                             129     18    86%   41-44, 46-51, 163-167, 210, 223-224
+qmcpy/true_measure/__init__.py                                     9      0   100%
+qmcpy/true_measure/_true_measure.py                               77     12    84%   12, 14, 27-29, 39-41, 70, 87, 104, 127, 148, 168
+qmcpy/true_measure/bernoulli_cont.py                              36      2    94%   39, 61
+qmcpy/true_measure/brownian_motion.py                             23      0   100%
+qmcpy/true_measure/gaussian.py                                    51      4    92%   59, 61, 71, 88
+qmcpy/true_measure/johnsons_su.py                                 50      3    94%   58, 60, 81
+qmcpy/true_measure/kumaraswamy.py                                 36      3    92%   45, 47, 63
+qmcpy/true_measure/lebesgue.py                                    20      1    95%   32
+qmcpy/true_measure/matern.py                                      41      5    88%   101, 103, 105, 126, 145
+qmcpy/true_measure/scipy_wrapper.py                               27      3    89%   47, 52, 58
+qmcpy/true_measure/uniform.py                                     39      2    95%   43, 65
+qmcpy/util/__init__.py                                            11      1    91%   11
+qmcpy/util/abstraction_functions.py                               36      2    94%   37, 43
+qmcpy/util/exact_gpytorch_gression_model.py                       63     12    81%   20-22, 37-38, 61-67
+qmcpy/util/exceptions_warnings.py                                 17      2    88%   42-44
+qmcpy/util/latnetbuilder_linker.py                                40     37     8%   23-60
+qmcpy/util/math_functions.py                                       6      1    83%   20
+qmcpy/util/plot_functions.py                                      62     58     6%   29-93
+qmcpy/util/stop_notebook.py                                        7      6    14%   3-8
+setup.py                                                          31     31     0%   1-59
+test/__init__.py                                                   0      0   100%
+test/fasttests/test_discrete_distribs.py                         105      2    98%   17, 171
+test/fasttests/test_integrands.py                                 41      1    98%   65
+test/fasttests/test_stopping_criteria.py                         214      1    99%   281
+test/fasttests/test_true_measures.py                              37      1    97%   71
+test/longtests/test_cubbayes_vec.py                               92      0   100%
+test/longtests/test_integrate.py                                 110      1    99%   184
+test/longtests/test_workouts.py                                   23      1    96%   31
+workouts/__init__.py                                               4      0   100%
+workouts/integration_examples/__init__.py                          4      0   100%
+workouts/integration_examples/asian_option_multi_level.py          9      1    89%   33
+workouts/integration_examples/asian_option_single_level.py        58      2    97%   96-97
+workouts/integration_examples/keister.py                          36      1    97%   58
+workouts/integration_examples/pi_problem.py                       34     12    65%   22-30, 44-48
+workouts/lds_sequences/__init__.py                                 1      0   100%
+workouts/lds_sequences/python_sequences.py                        28      3    89%   52-54
+workouts/mc_vs_qmc/__init__.py                                     5      0   100%
+workouts/mc_vs_qmc/importance_sampling.py                         26      2    92%   31-36
+workouts/mc_vs_qmc/integrations_asian_call.py                     34      6    82%   36-38, 41-43
+workouts/mc_vs_qmc/integrations_keister.py                        34      6    82%   36-38, 41-43
+workouts/mc_vs_qmc/vary_abs_tol.py                                31      3    90%   39, 43-44
+workouts/mc_vs_qmc/vary_dimension.py                              28      2    93%   40-41
+workouts/mlmc/__init__.py                                          2      0   100%
+workouts/mlmc/european_option.py                                  42      1    98%   56
+workouts/mlmc/mcqmc06.py                                          11      1    91%   27
+workouts/mlmc/mlmc_test.py                                        79      7    91%   80-83, 85-87
+--------------------------------------------------------------------------------------------
+TOTAL                                                           6016    883    85%
+
+real	1m16.833s
+user	8m37.237s
+sys	4m24.875s

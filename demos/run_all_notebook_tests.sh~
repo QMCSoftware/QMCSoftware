@@ -1,0 +1,23 @@
+#!/bin/bash
+# run_all_notebook_tests.sh
+
+echo "Running integration examples tests..."
+pytest test_integration_examples_notebook.py -v
+
+echo "Running Lebesgue integration tests..."
+pytest test_lebesgue_integration_notebook.py -v
+
+echo "Running Asian options pricing tests..."
+pytest test_pricing_asian_options_notebook.py -v
+
+echo "Running QMCPy intro tests..."
+pytest test_qmcpy_intro_notebook.py -v
+
+echo "Running quickstart tests..."
+pytest test_quickstart_notebook.py -v
+
+echo "Running saving QMC state tests..."
+pytest test_saving_qmc_state_notebook.py -v
+
+# Run all with coverage
+echo "Running all tests with coverage..."
