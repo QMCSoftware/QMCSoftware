@@ -5,7 +5,8 @@ from .abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError, _univ_repr
 import numpy as np
 from typing import Union
-
+import math
+from scipy.stats import norm
 
 class BrownianMotion(Gaussian):
     r"""
@@ -47,7 +48,7 @@ class BrownianMotion(Gaussian):
                 [2.06762574, 3.21756319, 4.93375923]]])
     """
 
-    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA'):
+    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA', bridge = 'FALSE'):
         r"""
         Args:
             sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
@@ -65,6 +66,9 @@ class BrownianMotion(Gaussian):
         """
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
+        self.bridge = bridge
+        assert bridge in (True, False), "bridge is True or False"
+
         self.domain = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
@@ -72,11 +76,57 @@ class BrownianMotion(Gaussian):
         self.drift = drift
         self.diffusion = diffusion
         self.time_vec = np.linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.diffused_sigma_bm = self.diffusion*np.array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        
+        if self.bridge: 
+            T =  self.t
+            self.diffused_sigma_bm = self.diffusion*np.array
+        else:
+            self.diffused_sigma_bm = self.diffusion*np.array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+
         self.drift_time_vec_plus_init = self.drift*self.time_vec+self.initial_value # mean
         self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type)
         self.range = np.array([[-np.inf,np.inf]])
+        
+        
+
         super(Gaussian,self).__init__()
+
+
+    def _transform(self, x):
+        z = norm.ppf(x)
+        if self.bridge: 
+            path = self.createPath_Bridge(z)
+        else: 
+            path = super._transform()
+        return path
+
+    def createPath_Bridge(self, z):
+        w_f = z[-1] * math.sqrt(self.t)
+        w_all = [None]*(self.d+1)
+        w_all[0] = 0
+        w_all[-1] = w_f
+        self._createPath_Bridge_helper(0, self.d, w_all, z)
+        w_all = np.array(w_all)
+        return w_all
+    
+    def _createPath_Bridge_helper(self, initial, final, w_all, z):
+        if (final - initial <= 1):
+            return; 
+    
+        mid = (final + initial)//2
+        #calculate actual time value 
+        t_f = self.time_vec[final]
+        t_i = self.time_vec[initial]
+        t = mid/self.dim * self.time
+
+        #calculate value at mid index 
+        mean = ((t_f - t)*w_all[initial] + (t - t_i)*w_all[final])/(t_f - t_i)
+        std = math.sqrt((t_f - t)*(t - t_i)/(t_f - t_i)) * z[mid - 1]
+        w_t = mean + std
+        w_all[mid] = w_t
+        
+        self._createPath_Bridge_helper(mid, final, w_all, z)
+        self._createPath_Bridge_helper(initial, mid, w_all, z)
     
     def _spawn(self, sampler, dimension):
         return BrownianMotion(sampler,t_final=self.t,drift=self.drift,decomp_type=self.decomp_type)
