@@ -229,8 +229,8 @@ class DigitalNetB2(LD):
             seed (list): int seed of list of seeds, one for each dimension.
             generating_matrices (:class:`numpy.ndarray` or str): Specify generating matrices. There are a number of optional input types. 
                 
+                - A string with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "dnet/mps.nx_s5_alpha3_m32.txt") or a NumPy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" (e.g., "gen_mat.21201.32.32.msb.npy")
                 - An ndarray of integers with shape (`d_max`, `m_max)` where each int has `t_max` bits.
-                - A string with either a relative path from `LDData repository <https://github.com/QMCSoftware/LDData>`__ (e.g., "LDData/main/dnet/mps.nx_s5_alpha3_m32.txt") or a NumPy file with format "name.d_max.t_max.m_max.{msb,lsb}.npy" (e.g., "gen_mat.21201.32.32.msb.npy")
 
             d_max (int): max dimension
             t_max (int): number of bits in each int of each generating matrix, aka: number of rows in a generating matrix with ints expanded into columns
@@ -270,9 +270,13 @@ class DigitalNetB2(LD):
             parts = generating_matrices.split('.')
             root = dirname(abspath(__file__))+'/generating_matrices/'
             repos = DataSource()
-            if "LDData" in generating_matrices and generating_matrices[-4:]!=".npy":
+            if generating_matrices[-4:]==".txt":
                 if repos.exists(generating_matrices):
                     datafile = repos.open(generating_matrices)
+                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices):
+                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices)
+                elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/"+generating_matrices):
+                    datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/"+generating_matrices)
                 elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:]):
                     datafile = repos.open("https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/dnet/"+generating_matrices[7:])
                 elif repos.exists("https://raw.githubusercontent.com/QMCSoftware/"+generating_matrices):
