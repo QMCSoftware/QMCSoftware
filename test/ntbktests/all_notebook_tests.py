@@ -6,8 +6,6 @@ This script executes demo notebooks in parallel via subprocess calls to nbconver
 
 import os
 import glob
-import sys
-import subprocess
 from parsl import load, python_app
 from parsl.config import Config
 from parsl.executors import HighThroughputExecutor
@@ -84,9 +82,13 @@ def run_notebook(path, project_root):
     print(f"PYTHONPATH: {env.get('PYTHONPATH', 'NOT SET')}")
     
     nb_dir = os.path.dirname(path)
+    nb_path = os.path.abspath(path)
     cmd = [
         sys.executable, '-m', 'nbconvert',
-        '--to', 'notebook', '--execute', path,
+        '--to', 'notebook',
+        '--execute',
+        '--stdout',
+        nb_path,
         '--ExecutePreprocessor.timeout=600'
     ]
     proc = subprocess.run(cmd, cwd=nb_dir, env=env,
@@ -117,3 +119,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # time python /Users/terrya/Documents/ProgramData/QMCSoftware/test/ntbktests/all_notebook_tests.py
+    # python   0.48s user 0.55s system 0% cpu 2:38.15 total

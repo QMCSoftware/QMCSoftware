@@ -29,7 +29,7 @@ config = Config(
             worker_debug=True,
             provider=LocalProvider(
                 init_blocks=1, 
-                max_blocks=1,
+                max_blocks=5,  # Increase max_blocks to allow more parallel execution
                 worker_init=f'''
 export PYTHONPATH={project_root}:$PYTHONPATH
 cd {project_root}
@@ -100,7 +100,7 @@ def run_notebook(path):
         sys.executable, '-m', 'nbconvert',
         '--to', 'notebook',
         '--execute',
-        '--inplace',
+        '--stdout',
         nb_path,
         '--ExecutePreprocessor.timeout=600'
     ]
@@ -120,26 +120,43 @@ def run_notebook(path):
         raise RuntimeError(error_msg)
 
 class TestNotebooks(unittest.TestCase):
-    """Dynamically generated notebook tests."""
-
-# Dynamically attach test methods
-all_nbs = glob.glob(os.path.join(DEMOS_PATH, '*.ipynb'))
-for nb_file in all_nbs:
-    nb_name = os.path.basename(nb_file)
-    if nb_name in exclude_notebooks:
-        continue
-    rel_path = os.path.join(DEMOS_PATH, nb_name)
-    test_name = f'test_{nb_name.replace(".ipynb","").replace("-","_")}_notebook'
-
-    def make_test(path):
-        def test(self):
-            future = run_notebook(path)
-            result = future.result()
-            self.assertEqual(result, path)
-        return test
-
-    setattr(TestNotebooks, test_name, make_test(rel_path))
+    """Test all notebooks in parallel using Parsl."""
+    
+    def test_all_notebooks_parallel(self):
+        """Execute all notebooks in parallel using Parsl"""
+        import time
+        
+        # Get all notebook paths
+        all_nbs = glob.glob(os.path.join(DEMOS_PATH, '*.ipynb'))
+        notebook_paths = [nb for nb in all_nbs if os.path.basename(nb) not in exclude_notebooks]
+        
+        print(f"Starting parallel execution of {len(notebook_paths)} notebooks...")
+        start_time = time.time()
+        
+        # Submit all notebooks as Parsl futures
+        futures = [run_notebook(path) for path in notebook_paths]
+        
+        # Collect results
+        failed_notebooks = []
+        for future, path in zip(futures, notebook_paths):
+            try:
+                result = future.result()
+                self.assertEqual(result, path)
+                print(f"✓ {os.path.basename(path)} executed successfully")
+            except Exception as e:
+                failed_notebooks.append((path, str(e)))
+                print(f"✗ {os.path.basename(path)} failed: {e}")
+        
+        end_time = time.time()
+        print(f"Parallel execution completed in {end_time - start_time:.2f} seconds")
+        
+        # Assert that all notebooks executed successfully
+        if failed_notebooks:
+            failure_msg = "\n".join([f"{os.path.basename(path)}: {error}" for path, error in failed_notebooks])
+            self.fail(f"Failed notebooks:\n{failure_msg}")
 
 if __name__ == '__main__':
     import unittest
     unittest.main()
+    # python all_notebook_tests_parsl.py
+    # Ran 1 test in 101.086s
