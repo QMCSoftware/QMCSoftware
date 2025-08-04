@@ -1,13 +1,7 @@
-""" Unit tests for long-running demo notebooks execution using testbook """
 import unittest
 from testbook import testbook
 
-class LongNotebookTests(unittest.TestCase):
-    """Test class for long-running demo notebooks (> 30 seconds typical execution)"""
-    
-    def setUp(self):
-        """Set up test fixtures before each test method."""
-        self.demos_path = '../../demos/'
+class NotebookTests(unittest.TestCase):
     
     @testbook('../../demos/control_variates.ipynb', execute=True) 
     def test_control_variates_notebook(self, tb):
