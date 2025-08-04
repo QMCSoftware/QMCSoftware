@@ -158,7 +158,7 @@ if __name__ == '__main__':
     """Custom parallel test runner with individual notebook reporting"""
     
     # Get all notebook paths
-    all_nbs = glob.glob(os.path.join(DEMOS_PATH, '*.ipynb'))
+    all_nbs = glob.glob(os.path.join(DEMOS_PATH, '*.ipynb'), recursive=True)
     notebook_paths = [nb for nb in all_nbs if os.path.basename(nb) not in exclude_notebooks]
     
     print("="*60)
@@ -228,4 +228,4 @@ if __name__ == '__main__':
 
 # run this script with:
 # time python all_notebook_tests_parsl2.py
-# python all_notebook_tests_parsl2.py  0.40s user 0.48s system 0% cpu 2:03.10 total
+# 12 notebooks:  python all_notebook_tests_parsl2.py  0.40s user 0.48s system 0% cpu 2:03.10 total

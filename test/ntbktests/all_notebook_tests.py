@@ -1,123 +1,150 @@
-#!/usr/bin/env python3
-"""
-Parallel notebook tests using Parsl and nbconvert, located in QMCSoftware/test/ntbktests.
-This script executes demo notebooks in parallel via subprocess calls to nbconvert.
-"""
+""" Unit tests for long-running demo notebooks execution using testbook """
+import unittest
+from testbook import testbook
 
-import os
-import glob
-from parsl import load, python_app
-from parsl.config import Config
-from parsl.executors import HighThroughputExecutor
-from parsl.providers import LocalProvider
-
-# Ensure project modules are found
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-os.environ['PYTHONPATH'] = project_root + os.pathsep + os.environ.get('PYTHONPATH', '')
-
-# Parsl configuration with enhanced environment setup
-config = Config(
-    executors=[
-        HighThroughputExecutor(
-            label="htex_local",
-            cores_per_worker=1,
-            worker_debug=True,  # Enable debug to see worker issues
-            provider=LocalProvider(
-                init_blocks=1, 
-                max_blocks=1,
-                worker_init=f'''
-export PYTHONPATH={project_root}:$PYTHONPATH
-cd {project_root}
-echo "Worker starting in directory: $(pwd)"
-echo "Worker PYTHONPATH: $PYTHONPATH"
-python -c "import sys; print('Worker sys.path:', sys.path)"
-python -c "
-try:
-    import qmcpy
-    print('qmcpy import test successful')
-except ImportError as e:
-    print('qmcpy import failed:', e)
-    import sys
-    print('Available paths:', sys.path)
-"
-'''
-            ),
-        )
-    ]
-)
-dfk = load(config)
-
-# Demos directory
-DEMOS_PATH = os.path.join(project_root, 'demos')
-
-# Notebooks to skip
-exclude = {
-    'linear-scrambled-halton.ipynb', 'sample_scatter_plots.ipynb', 'iris.ipynb',
-    'digital_net_b2.ipynb', 'MC_vs_QMC.ipynb', 'quasirandom_generators.ipynb',
-    'asian-option-mlqmc.ipynb', 'gaussian_diagnostics_demo.ipynb',
-    'importance_sampling.ipynb', 'lattice_random_generator.ipynb',
-    'ld_randomizations_and_higher_order_nets.ipynb', 'PricingAsianOptions.ipynb',
-    'vectorized_qmc_bayes.ipynb', 'prob_failure_gp_ci.ipynb', 'umbridge.ipynb',
-    'dakota_genz.ipynb', 'vectorized_qmc.ipynb', 'pydata.chi.2023.ipynb'
-}
-
-@python_app
-def run_notebook(path, project_root):
-    """
-    Execute a notebook via nbconvert in a subprocess.
-    Returns the notebook path if successful.
-    Raises RuntimeError on failure.
-    """
-    import os
-    import sys
-    import subprocess
+class LongNotebookTests(unittest.TestCase):
+    """Test class for long-running demo notebooks (> 30 seconds typical execution)"""
     
-    # Create environment with proper PYTHONPATH
-    env = os.environ.copy()
-    env['PYTHONPATH'] = project_root + os.pathsep + env.get('PYTHONPATH', '')
+    def setUp(self):
+        """Set up test fixtures before each test method."""
+        self.demos_path = '../../demos/'
     
-    # Debug: Print the environment
-    print(f"Running notebook: {os.path.basename(path)}")
-    print(f"Project root: {project_root}")
-    print(f"PYTHONPATH: {env.get('PYTHONPATH', 'NOT SET')}")
+    @testbook('../../demos/control_variates.ipynb', execute=True) 
+    def test_control_variates_notebook(self, tb):
+        pass
     
-    nb_dir = os.path.dirname(path)
-    nb_path = os.path.abspath(path)
-    cmd = [
-        sys.executable, '-m', 'nbconvert',
-        '--to', 'notebook',
-        '--execute',
-        '--stdout',
-        nb_path,
-        '--ExecutePreprocessor.timeout=600'
-    ]
-    proc = subprocess.run(cmd, cwd=nb_dir, env=env,
-                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if proc.returncode != 0:
-        print(f"Notebook {os.path.basename(path)} failed:")
-        print(f"STDOUT: {proc.stdout.decode()}")
-        print(f"STDERR: {proc.stderr.decode()}")
-        raise RuntimeError(f"Notebook failed: {proc.stderr.decode()}")
-    print(f"Notebook {os.path.basename(path)} completed successfully")
-    return path
+    @testbook('../../demos/elliptic-pde.ipynb', execute=True)
+    def test_elliptic_pde_notebook(self, tb):
+        pass
+    
+    @testbook('../../demos/nei_demo.ipynb', execute=True)
+    def test_nei_demo_notebook(self, tb):
+        pass
 
-def main():
-    notebooks = glob.glob(os.path.join(DEMOS_PATH, '*.ipynb'))
-    tasks = []
-    print("Dispatching tests...")
-    for nb in notebooks:
-        name = os.path.basename(nb)
-        if name in exclude:
-            print("Skipping", name)
-            continue
-        tasks.append(run_notebook(nb, project_root))
+    @testbook('../../demos/qei-demo-for-blog.ipynb', execute=True)
+    def test_qei_demo_blog_notebook(self, tb):
+        pass
+    
+    @testbook('../../demos/ray_tracing.ipynb', execute=True)
+    def test_ray_tracing_notebook(self, tb):
+        pass
 
-    results = [t.result() for t in tasks]
-    print("Completed:", len(results), "notebooks")
-    for r in results:
-        print(" -", r)
+    @testbook('../../demos/asian-option-mlqmc.ipynb', execute=True)
+    def test_asian_option_mlqmc_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/dakota_genz.ipynb', execute=True)
+    def test_dakota_genz_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/digital_net_b2.ipynb', execute=True)
+    def test_digital_net_b2_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/gaussian_diagnostics_demo.ipynb', execute=True)
+    def test_gaussian_diagnostics_demo_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/importance_sampling.ipynb', execute=True)
+    def test_importance_sampling_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/integration_examples.ipynb', execute=True)
+    def test_integration_examples_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/iris.ipynb', execute=True)
+    def test_iris_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/lattice_random_generator.ipynb', execute=True)
+    def test_lattice_random_generator_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/ld_randomizations_and_higher_order_nets.ipynb', execute=True)
+    def test_ld_randomizations_and_higher_order_nets_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/lebesgue_integration.ipynb', execute=True)
+    def test_lebesgue_integration_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/linear-scrambled-halton.ipynb', execute=True)
+    def test_linear_scrambled_halton_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/MC_vs_QMC.ipynb', execute=True)
+    def test_mc_vs_qmc_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/plot_proj_function.ipynb', execute=True)
+    def test_plot_proj_function_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/PricingAsianOptions.ipynb', execute=True)
+    def test_pricing_asian_options_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/prob_failure_gp_ci.ipynb', execute=True)
+    def test_prob_failure_gp_ci_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/pydata.chi.2023.ipynb', execute=True)
+    def test_pydata_chi_2023_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/qmcpy_intro.ipynb', execute=True)
+    def test_qmcpy_intro_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/quasirandom_generators.ipynb', execute=True)
+    def test_quasirandom_generators_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/quickstart.ipynb', execute=True)
+    def test_quickstart_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/sample_scatter_plots.ipynb', execute=True)
+    def test_sample_scatter_plots_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/saving_qmc_state.ipynb', execute=True)
+    def test_saving_qmc_state_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/umbridge.ipynb', execute=True)
+    def test_umbridge_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/vectorized_qmc.ipynb', execute=True)
+    def test_vectorized_qmc_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/vectorized_qmc_bayes.ipynb', execute=True)
+    def test_vectorized_qmc_bayes_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/some_true_measures.ipynb', execute=True)
+    def test_some_true_measures_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb', execute=True)
+    def test_argonne_talk_2023_figures_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/talk_paper_demos/MCQMC2022_Article_Figures/MCQMC2022_Article_Figures.ipynb', execute=True)
+    def test_mcqmc2022_article_figures_notebook(self, tb):
+        pass
+
+    @testbook('../../demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb', execute=True)
+    def test_purdue_talk_figures_notebook(self, tb):
+        pass
+    
 
 if __name__ == '__main__':
-    main()
-    # time python /Users/terrya/Documents/ProgramData/QMCSoftware/test/ntbktests/all_notebook_tests.py
-    # python   0.48s user 0.55s system 0% cpu 2:38.15 total
+    unittest.main()
+    # python -m pytest all_notebook_tests.py 
+    # Ran 33 tests in 547.652s
+    #FAILED (errors=21)
+    #python   1488.51s user 1480.95s system 541% cpu 9:08.55 total

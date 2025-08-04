@@ -126,8 +126,8 @@ class TestNotebooks(unittest.TestCase):
         """Execute all notebooks in parallel using Parsl"""
         import time
         
-        # Get all notebook paths
-        all_nbs = glob.glob(os.path.join(DEMOS_PATH, '*.ipynb'))
+        # Get all notebook paths (recursive)
+        all_nbs = glob.glob(os.path.join(DEMOS_PATH, '**/*.ipynb'), recursive=True)
         notebook_paths = [nb for nb in all_nbs if os.path.basename(nb) not in exclude_notebooks]
         
         print(f"Starting parallel execution of {len(notebook_paths)} notebooks...")
@@ -158,5 +158,5 @@ class TestNotebooks(unittest.TestCase):
 if __name__ == '__main__':
     import unittest
     unittest.main()
-    # python all_notebook_tests_parsl.py
-    # Ran 1 test in 101.086s
+    # time python all_notebook_tests_parsl.py
+    #  
