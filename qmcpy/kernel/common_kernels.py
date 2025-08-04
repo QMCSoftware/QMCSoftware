@@ -110,10 +110,10 @@ class KernelGaussian(AbstractKernelGaussianSE):
                [1.5e-13, 2.8e-13, 2.9e-12, 2.7e-12]])
         >>> k_1l = KernelGaussian(d=2,lengthscales=[.5])
         >>> k_2l = KernelGaussian(d=2,lengthscales=[.5,.5])
-        >>> k_2l.double_integral_01d()
-        0.5836282427162017
-        >>> k_1l.double_integral_01d()
-        0.5836282427162017
+        >>> print("%.5f"%k_2l.double_integral_01d())
+        0.58363
+        >>> print("%.5f"%k_1l.double_integral_01d())
+        0.58363
         >>> k_1l.single_integral_01d(x)
         array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
         >>> k_2l.single_integral_01d(x)

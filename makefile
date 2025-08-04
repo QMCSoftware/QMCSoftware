@@ -47,6 +47,10 @@ tests_no_docker: doctests_no_docker unittests coverage
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
 
+delcoverage:
+	@rm .coverage
+	@rm coverage.json 
+	
 mkdocserve: # mkdocs only looks for content in the docs/ folder, so we have to copy it there
 	@cp -r demos docs
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 

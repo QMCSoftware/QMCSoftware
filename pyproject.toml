@@ -74,7 +74,7 @@ test_torch = [
     "torch == 2.7.0",
     ]
 test_gpytorch = [
-    "gpytorch == 1.13",
+    "gpytorch == 1.11",
     ]
 test_botorch = [
     "botorch == 0.10.0",
@@ -103,6 +103,7 @@ dev = [ # brew install weasyprint
     "mkdocs-print-site-plugin >= 2.7.2",
     "mkdocs-exclude >= 1.0.2",
     "phmutest >= 1.0.1",
+    "pylint >= 2.14.4",
 ]
 
 [tool.pdm.build]
