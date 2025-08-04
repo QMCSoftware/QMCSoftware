@@ -14,6 +14,7 @@ from .kernel import (
     KernelSI,
     KernelDSI,
     KernelMultiTask,
+    KernelMultiTaskDerivs,
 )
 from .fast_transform import (
     fftbr,

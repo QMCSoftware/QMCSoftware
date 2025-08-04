@@ -252,7 +252,13 @@ class KernelMultiTask(AbstractKernel):
             constraints = ["NON-NEGATIVE"])
         self.eye_num_tasks = self.npt.eye(self.num_tasks,**self.nptkwargs)
         self.batch_param_names.append("taskmat")
-        self.nbdim_base = self.base_kernel.nbdim
+        self._nbdim_base = None
+    
+    @property
+    def nbdim_base(self):
+        if self._nbdim_base is None:
+            self._nbdim_base = self.base_kernel.nbdim
+        return self._nbdim_base
     
     @property
     def factor(self):
@@ -336,5 +342,21 @@ class KernelMultiTask(AbstractKernel):
         kint_x = self.base_kernel.double_integral_01d()
         return self._parsed__call__(task0,task1,kint_x)
 
-
+class KernelMultiTaskDerivs(KernelMultiTask):
+    def __init__(self,
+            base_kernel,
+            num_tasks, 
+            ):
+        super().__init__(
+            base_kernel = base_kernel, 
+            num_tasks = num_tasks, 
+            factor = 1.,
+            diag =  0.,
+            requires_grad_factor = False, 
+            requires_grad_diag = False,
+            tfs_factor = (tf_identity,tf_identity),
+            tfs_diag = (tf_identity,tf_identity),
+            rank_factor = 1,
+        )
         
+

@@ -7,7 +7,11 @@ from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_id
 class AbstractKernel(object):
 
     def __new__(cls, *args, **kwargs):
-        if ("torchify" in kwargs and kwargs["torchify"]) or ("base_kernel" in kwargs and kwargs["base_kernel"].torchify):
+        if (
+            ("torchify" in kwargs and kwargs["torchify"]) or 
+            ("base_kernel" in kwargs and kwargs["base_kernel"].torchify) or 
+            (len(args)>0 and isinstance(args[0],AbstractKernel) and args[0].torchify)
+            ):
             import torch 
             x = type(cls.__name__,(cls,torch.nn.Module),{})
             instance = super().__new__(x)

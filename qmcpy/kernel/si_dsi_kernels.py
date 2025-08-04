@@ -68,7 +68,7 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         ind = 1.*((beta0+beta1)==0)
-        k = scale*((ind+lengthscales*kperdim).prod(-1)*c).sum(-1)
+        k = scale*((ind+lengthscales[...,None,:]*kperdim).prod(-1)*c).sum(-1)
         return k
     
     def parsed___call__(self, x0, x1, beta0, beta1, c, batch_params):
@@ -146,10 +146,24 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         array([10.])
         >>> kernel_torch.single_integral_01d(xtorch)
         tensor([10.], grad_fn=<SelectBackward0>)
+        
+        Batch Params 
+        
+        >>> rng = np.random.Generator(np.random.PCG64(7))
+        >>> kernel = KernelShiftInvar(
+        ...     d = 2, 
+        ...     shape_scale = [4,3,1],
+        ...     shape_lengthscales = [3,2])
+        >>> x = rng.uniform(low=0,high=1,size=(6,5,2))
+        >>> kernel(x,x).shape 
+        (4, 3, 6, 5)
+        >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
+        (4, 3, 6, 5, 5)
+        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        (4, 3, 6, 6, 5, 5)
 
         Derivatives 
 
-        >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> scale = rng.uniform(low=0,high=1,size=(1,))
         >>> lengthscales = rng.uniform(low=0,high=1,size=(3,))
         >>> kernel = KernelShiftInvar(
@@ -176,7 +190,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> with torch.no_grad():
         ...     y = kernel(x,z,beta0,beta1,c)
         >>> y
-        tensor([1455.1395, 9475.5695, 7807.0759, 2785.4733], dtype=torch.float64)
+        tensor([ 3003.7945, -1517.1556,   701.6692,  1470.4241], dtype=torch.float64)
         >>> y_no_deriv = kernel(x,z)
         >>> y_first = y_no_deriv.clone()
         >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
@@ -190,7 +204,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
         >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
         >>> yhat
-        tensor([1455.1396, 9475.5700, 7807.0762, 2785.4735], dtype=torch.float64)
+        tensor([ 3003.7946, -1517.1557,   701.6692,  1470.4241], dtype=torch.float64)
         >>> torch.allclose(y,yhat)
         True
         >>> kernel = KernelShiftInvar(
@@ -200,7 +214,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         ...     lengthscales = lengthscales)
         >>> ynp = kernel(x.detach().numpy(),z.detach().numpy(),beta0.numpy(),beta1.numpy(),c.numpy())
         >>> ynp
-        array([1455.14170759, 9475.58534891, 7807.088978  , 2785.47661877])
+        array([ 3003.79938927, -1517.15808005,   701.6700331 ,  1470.42580601])
         >>> np.allclose(ynp,y.numpy())
         True
         
@@ -370,6 +384,22 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         array([10.])
         >>> kernel_torch.single_integral_01d(xtorch)
         tensor([10.], grad_fn=<SelectBackward0>)
+
+        Batch Params 
+        
+        >>> rng = np.random.Generator(np.random.PCG64(7))
+        >>> kernel = KernelDigShiftInvar(
+        ...     d = 2, 
+        ...     t = 10,
+        ...     shape_scale = [4,3,1],
+        ...     shape_lengthscales = [3,2])
+        >>> x = rng.uniform(low=0,high=1,size=(6,5,2))
+        >>> kernel(x,x).shape 
+        (4, 3, 6, 5)
+        >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
+        (4, 3, 6, 5, 5)
+        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        (4, 3, 6, 6, 5, 5)
 
     **References:**
         
