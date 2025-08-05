@@ -48,7 +48,7 @@ class BrownianMotion(Gaussian):
                 [2.06762574, 3.21756319, 4.93375923]]])
     """
 
-    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA', bridge = 'FALSE'):
+    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA', bridge = "FALSE"):
         r"""
         Args:
             sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
@@ -66,9 +66,8 @@ class BrownianMotion(Gaussian):
         """
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
-        self.bridge = bridge
-        assert bridge in (True, False), "bridge is True or False"
-
+        self.bridge = str(bridge).upper()
+        assert self.bridge in ["TRUE", "FALSE"]
         self.domain = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.t = t_final # exercise time
@@ -77,7 +76,7 @@ class BrownianMotion(Gaussian):
         self.diffusion = diffusion
         self.time_vec = np.linspace(self.t/self.d,self.t,self.d) # evenly spaced
         
-        if self.bridge: 
+        if self.bridge == "TRUE": 
             T =  self.t
             self.diffused_sigma_bm = self.diffusion*np.array
         else:
@@ -94,13 +93,13 @@ class BrownianMotion(Gaussian):
 
     def _transform(self, x):
         z = norm.ppf(x)
-        if self.bridge: 
+        if self.bridge == "TRUE": 
             path = self.createPath_Bridge(z)
         else: 
-            path = super._transform()
+            path = super._transform(x)
         return path
 
-    def createPath_Bridge(self, z):
+    def _createPath_Bridge(self, z):
         w_f = z[-1] * math.sqrt(self.t)
         w_all = [None]*(self.d+1)
         w_all[0] = 0
@@ -130,4 +129,4 @@ class BrownianMotion(Gaussian):
     
     def _spawn(self, sampler, dimension):
         return BrownianMotion(sampler,t_final=self.t,drift=self.drift,decomp_type=self.decomp_type)
-        
+    
