@@ -24,6 +24,11 @@ demos/.jupyter
 
 # tests
 .coverage
+test/booktests/*.eps
+test/booktests/*.pdf
+test/booktests/*.jpg
+test/booktests/*.part
+test/booktests/*.png
 
 # C
 *.so
