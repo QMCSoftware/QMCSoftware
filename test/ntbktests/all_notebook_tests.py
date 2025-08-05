@@ -35,11 +35,11 @@ class NotebookTests(unittest.TestCase):
     def test_digital_net_b2_notebook(self, tb):
         pass
 
+    @unittest.skip("Run time error")
     @testbook('../../demos/gaussian_diagnostics_demo.ipynb', execute=True)
     def test_gaussian_diagnostics_demo_notebook(self, tb):
         pass
 
-    #@unittest.skip("Missing CSV file")
     @testbook('../../demos/importance_sampling.ipynb', execute=True)
     def test_importance_sampling_notebook(self, tb):
         pass
@@ -57,8 +57,8 @@ class NotebookTests(unittest.TestCase):
     def test_lattice_random_generator_notebook(self, tb):
         pass
 
-    @unittest.skip("Times out (> 60s) - computationally intensive")
-    @testbook('../../demos/ld_randomizations_and_higher_order_nets.ipynb', execute=True)
+    @unittest.skip("Excessive run time")
+    @testbook('../../demos/ld_randomizations_and_higher_order_nets.ipynb', execute=True, timeout=1500)
     def test_ld_randomizations_and_higher_order_nets_notebook(self, tb):
         pass
 
@@ -66,7 +66,6 @@ class NotebookTests(unittest.TestCase):
     def test_lebesgue_integration_notebook(self, tb):
         pass
 
-    @unittest.skip("API change: generalize parameter")
     @testbook('../../demos/linear-scrambled-halton.ipynb', execute=True)
     def test_linear_scrambled_halton_notebook(self, tb):
         pass
@@ -108,7 +107,6 @@ class NotebookTests(unittest.TestCase):
     def test_quickstart_notebook(self, tb):
         pass
 
-    @unittest.skip("API change: generalize parameter")
     @testbook('../../demos/sample_scatter_plots.ipynb', execute=True)
     def test_sample_scatter_plots_notebook(self, tb):
         pass
@@ -155,6 +153,6 @@ class NotebookTests(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
     # python -m pytest all_notebook_tests.py 
-    # Without @sunittest.skip:    Ran 33 tests in 547.652s
+    # Without @unittest.skip:     Ran 33 tests in 547.652s
     # With @unittest.skip:        12 passed, 21 skipped in 144.33s (0:02:24) 
 

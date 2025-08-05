@@ -60,8 +60,9 @@ sphinx/*.jpg
 *checkpoint.ipynb
 demos/**.png
 demos/**.eps
-
-
+demos/**.jpg
+demos/**.pdf
+demos/**.part
 
 # release
 /build/

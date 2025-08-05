@@ -3,7 +3,6 @@ from testbook import testbook
 
 class NotebookTests(unittest.TestCase):
 
-    @unittest.skip("API change: generalize parameter")
     @testbook('../../demos/sample_scatter_plots.ipynb', execute=True)
     def test_sample_scatter_plots_notebook(self, tb):
         pass
