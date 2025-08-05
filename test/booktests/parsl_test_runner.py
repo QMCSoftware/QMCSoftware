@@ -58,12 +58,12 @@ def generate_summary_report(results):
     passed = sum(1 for _, status in results if status == 'PASSED')
     failed = total - passed
     
-    print(f"\n{'='*50}")
     print(f"PARALLEL TEST EXECUTION SUMMARY")
     print(f"{'='*50}")
     print(f"Total tests: {total}")
     print(f"Passed: {passed}")
     print(f"Failed: {failed}")
+    print(f"\n{'='*50}")
     if total > 0:
         print(f"Success rate: {(passed/total)*100:.1f}%")
     else:
@@ -81,7 +81,7 @@ def main():
     import parsl as pl
     try:
         # Check if Parsl is already configured
-        pl.dfk()
+        pl.dfk()  # DataFlowKernel
         print("Parsl already configured.")
     except:
         # Parsl not configured, so load a configuration
@@ -106,6 +106,13 @@ def main():
             parsl.clear()
         except:
             pass
+    
+    # shutdown Parsl
+    try:
+        parsl.dfk().cleanup()
+        parsl.dfk().shutdown()
+    except Exception:
+        pass
 
 if __name__ == '__main__':
     main()

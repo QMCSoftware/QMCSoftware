@@ -114,7 +114,8 @@ booktests-parallel:
 	python parsl_test_runner.py 
 	sleep 5 && \
 	rm -f *.eps *.jpg *.pdf *.part && rm -fr logs && rm -fr runinfo && \
-	cd ../..
+	killall python || true && \
+	cd ../.. 
 
 tests: doctests fasttests longtests coverage
 
