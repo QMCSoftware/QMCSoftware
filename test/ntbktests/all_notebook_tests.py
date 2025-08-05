@@ -23,7 +23,6 @@ class NotebookTests(unittest.TestCase):
     def test_ray_tracing_notebook(self, tb):
         pass
 
-    #@unittest.skip("Times out (> 1200s)")
     @testbook('../../demos/asian-option-mlqmc.ipynb', execute=True, timeout=1500)
     def test_asian_option_mlqmc_notebook(self, tb):
         pass
@@ -32,12 +31,10 @@ class NotebookTests(unittest.TestCase):
     def test_dakota_genz_notebook(self, tb):
         pass
 
-    @unittest.skip("Missing file path issue")
-    @testbook('../../demos/digital_net_b2.ipynb', execute=True)
+    @testbook('../../demos/digital_net_b2.ipynb', execute=True, timeout=600)
     def test_digital_net_b2_notebook(self, tb):
         pass
 
-    @unittest.skip("Array comparison bug")
     @testbook('../../demos/gaussian_diagnostics_demo.ipynb', execute=True)
     def test_gaussian_diagnostics_demo_notebook(self, tb):
         pass
