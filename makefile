@@ -98,6 +98,13 @@ longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 
+booktests:
+	@echo "\nBooktests"
+	cd test/booktests/ && \
+	rm -f *.eps *.jpg *.pdf *.part && \
+	python -W ignore -m coverage run --append --source=./ -m unittest discover -s . -p "tb_*.py" 1>/dev/null && \
+	cd ../..
+
 coverage:
 	@echo "\nCode coverage"
 	python -m coverage report -m
