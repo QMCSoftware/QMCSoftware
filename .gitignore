@@ -24,11 +24,15 @@ demos/.jupyter
 
 # tests
 .coverage
-test/booktests/*.eps
-test/booktests/*.pdf
-test/booktests/*.jpg
-test/booktests/*.part
-test/booktests/*.png
+test/*/*.eps
+test/*/*.pdf
+test/*/*.jpg
+test/*/*.part
+test/*/*.png
+
+# Parsl
+runinfo/
+logs/
 
 # C
 *.so
@@ -80,3 +84,5 @@ _ags/*
 # Downloaded files
 raw.githubusercontent.com*
 demos/x_full_dakota.txt
+
+
