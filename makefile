@@ -113,7 +113,7 @@ booktests-parallel:
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	python parsl_test_runner.py 
 	sleep 5 && \
-	rm -f *.eps *.jpg *.pdf *.part && rm -fr logs && rm -fr runinfo \
+	rm -f *.eps *.jpg *.pdf *.part && rm -fr logs && rm -fr runinfo && \
 	cd ../..
 
 tests: doctests fasttests longtests coverage
