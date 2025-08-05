@@ -23,12 +23,11 @@ class NotebookTests(unittest.TestCase):
     def test_ray_tracing_notebook(self, tb):
         pass
 
-    @unittest.skip("Times out (> 600s)")
-    @testbook('../../demos/asian-option-mlqmc.ipynb', execute=True)
+    #@unittest.skip("Times out (> 1200s)")
+    @testbook('../../demos/asian-option-mlqmc.ipynb', execute=True, timeout=1500)
     def test_asian_option_mlqmc_notebook(self, tb):
         pass
 
-    @unittest.skip("API change: generalize parameter")
     @testbook('../../demos/dakota_genz.ipynb', execute=True)
     def test_dakota_genz_notebook(self, tb):
         pass
