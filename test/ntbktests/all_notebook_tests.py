@@ -39,7 +39,7 @@ class NotebookTests(unittest.TestCase):
     def test_gaussian_diagnostics_demo_notebook(self, tb):
         pass
 
-    @unittest.skip("Missing CSV file")
+    #@unittest.skip("Missing CSV file")
     @testbook('../../demos/importance_sampling.ipynb', execute=True)
     def test_importance_sampling_notebook(self, tb):
         pass
@@ -48,7 +48,6 @@ class NotebookTests(unittest.TestCase):
     def test_integration_examples_notebook(self, tb):
         pass
 
-    @unittest.skip("Missing skopt dependency")
     @testbook('../../demos/iris.ipynb', execute=True)
     def test_iris_notebook(self, tb):
         pass
