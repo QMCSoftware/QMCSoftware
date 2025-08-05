@@ -101,7 +101,9 @@ longtests:
 booktests:
 	@echo "\nBooktests"
 	cd test/booktests/ && \
-	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" python -m coverage run --append --source=./ -m unittest discover -s . -p "tb_*.py" && \
+	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+	python -m coverage run --append --source=. -m unittest discover -s . -p "tb_*.py" && \
+	sleep 5 && \
 	rm -f *.eps *.jpg *.pdf *.part && \
 	cd ../..
 
