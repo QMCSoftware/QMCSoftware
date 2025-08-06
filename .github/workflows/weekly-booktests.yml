@@ -1,0 +1,48 @@
+name: Weekly Booktests
+
+on:
+schedule:
+    # Run every day at 2:00 PM UTC
+    - cron: '0 14 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  booktests:
+    name: Weekly Booktests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          activate-environment: qmcpy
+          environment-file: environment.yml
+          auto-activate-base: false
+          
+      - name: Conda info
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
+          
+      - name: Install QMCPy
+        shell: bash -l {0}
+        run: |
+          pip install -e .
+          
+      - name: Run Booktests
+        shell: bash -l {0}
+        run: |
+          make booktests
+          
+      - name: Upload test results
+        if: always()  # Run even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: booktest-results
+          path: |
+            test/booktests/*.xml
+            test/booktests/*.log
+          retention-days: 30
