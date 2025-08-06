@@ -376,7 +376,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         True
         >>> xftorch = to_float(xtorch,dnb2.t)
         >>> xftorch.dtype
-        torch.float64
+        torch.float32
         >>> kmat_torch_from_floats = kernel_torch(xftorch[:,None,:],xftorch[None,:,:])
         >>> torch.allclose(kmat_torch_from_floats,kmat_torch)
         True
