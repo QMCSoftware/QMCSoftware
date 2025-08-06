@@ -1,10 +1,10 @@
 import unittest
 from testbook import testbook
+from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-class NotebookTests(unittest.TestCase):
+class NotebookTests(BaseNotebookTest):
 
-    @unittest.skip("Times out (> 600s)")
-    @testbook('../../demos/vectorized_qmc.ipynb', execute=True)
+    @testbook('../../demos/vectorized_qmc.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_vectorized_qmc_notebook(self, tb):
         pass
 

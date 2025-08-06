@@ -1,10 +1,10 @@
 import unittest
 from testbook import testbook
+from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-class NotebookTests(unittest.TestCase):
+class NotebookTests(BaseNotebookTest):
 
-    #@unittest.skip("Times out (> 1200s)")
-    @testbook('../../demos/asian-option-mlqmc.ipynb', execute=True, timeout=1500)
+    @testbook('../../demos/asian-option-mlqmc.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_asian_option_mlqmc_notebook(self, tb):
         pass
 
