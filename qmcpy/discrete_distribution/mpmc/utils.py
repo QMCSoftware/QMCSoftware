@@ -1,9 +1,12 @@
 import torch
 import math
+from itertools import combinations
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+import numpy as np
+from itertools import product 
 
 
-def L2dis(x):
+def L2star(x):
     N = x.size(1) 
     dim = x.size(2)
     prod1 = 1. - x ** 2.
@@ -20,7 +23,7 @@ def L2dis(x):
     return out
 
 
-def L2dis_weighted(x, gamma):
+def L2star_weighted(x, gamma):
     N = x.size(1) 
     dim = x.size(2)
 
@@ -57,7 +60,7 @@ def L2ctr(x):
     sum2 = torch.sum(product, dim=(1, 2))
     two_div_N = 2. / N
     
-    out = math.pow(12., -dim) - two_div_N * sum1 + 1. / math.pow(N, 2.) * sum2
+    out = torch.sqrt(math.pow(12., -dim) - two_div_N * sum1 + 1. / math.pow(N, 2.) * sum2)
     return out
 
 
@@ -99,7 +102,7 @@ def L2ext(x):
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
 
-    out = math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
+    out = torch.sqrt(math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
     return out
 
 
@@ -113,11 +116,11 @@ def L2ext_weighted(x, gamma):
     prod1 = torch.prod(prod1, dim = 2)
     sum1 = torch.sum(prod1, dim = 1)
 
-    prod2 = 1 + gamma[None, None, None, :] * torch.min(x[: ,: ,None ,: ], x[: ,None ,: ,: ]) - x[: ,: ,None ,: ] * x[: ,None ,: ,: ]
+    prod2 = 1 + gamma[None, None, None, :] * (torch.min(x[: ,: ,None ,: ], x[: ,None ,: ,: ]) - x[: ,: ,None ,: ] * x[: ,None ,: ,: ])
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
 
-    out = p1 - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
+    out = torch.sqrt(p1 - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
     return out
 
 def L2per(x):
@@ -128,7 +131,7 @@ def L2per(x):
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
 
-    out = - math.pow(3., -dim) + math.pow(N, - 2.) * sum2
+    out = torch.sqrt(- math.pow(3., -dim) + math.pow(N, - 2.) * sum2)
     return out
 
 
@@ -138,11 +141,11 @@ def L2per_weighted(x, gamma):
 
     p1 = torch.prod(1 + gamma/3)
 
-    prod2 = 1 + gamma[None, None, None, :] * 0.5 - torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]) + (x[: ,: ,None ,: ] - x[: ,None ,: ,: ])**2
+    prod2 = 1 + gamma[None, None, None, :] * (0.5 - torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]) + (x[: ,: ,None ,: ] - x[: ,None ,: ,: ])**2)
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
 
-    out = - p1 + math.pow(N, - 2.) * sum2
+    out = torch.sqrt(- p1 + math.pow(N, - 2.) * sum2)
     return out
 
 
@@ -158,7 +161,7 @@ def L2sym(x):
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
 
-    out = math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
+    out = torch.sqrt(math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
     return out
 
 
@@ -176,12 +179,12 @@ def L2sym_weighted(x, gamma):
     product = torch.prod(prod2, dim = 3)
     sum2 = torch.sum(product, dim = (1,2))
 
-    out = p1 - (2. / N) * sum1 + math.pow(N, - 2.) * sum2
+    out = torch.sqrt(p1 - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
     return out
     
 
 
-def L2ags (x):
+def L2asd (x):
     N = x.size(1)
     dim = x.size(2)
 
@@ -209,7 +212,7 @@ def L2ags (x):
 
 
 
-def L2ags_weighted (x, gamma):
+def L2asd_weighted (x, gamma):
     N = x.size(1)
     dim = x.size(2)
 

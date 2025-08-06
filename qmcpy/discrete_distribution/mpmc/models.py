@@ -3,8 +3,8 @@ from torch import nn
 from torch_cluster import radius_graph
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from torch_geometric.nn import MessagePassing, InstanceNorm
-from .utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted, L2ext_weighted, L2ags_weighted, L2mix_weighted
-# from utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted, L2ext_weighted, L2ags_weighted, L2mix_weighted
+# from .utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted, L2ext_weighted, L2asd_weighted, L2mix_weighted
+from utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted, L2ext_weighted, L2asd_weighted, L2mix_weighted
 
 
 class MPNN_layer(MessagePassing):
@@ -68,8 +68,8 @@ class MPMC_net(nn.Module):
         self.batch = batch
         self.edge_index = radius_graph(self.x, r=radius, loop=True, batch=batch).to(device)
 
-        all_losses = {'L2dis', 'L2ctr', 'L2ext', 'L2per', 'L2sym', 'L2ags', 'L2mix', 'L2dis_weighted', 
-                      'L2ctr_weighted', 'L2ext_weighted', 'L2per_weighted', 'L2sym_weighted', 'L2ags_weighted', 'L2mix_weighted'}
+        all_losses = {'L2star', 'L2ctr', 'L2ext', 'L2per', 'L2sym', 'L2asd', 'L2mix', 'L2star_weighted', 
+                      'L2ctr_weighted', 'L2ext_weighted', 'L2per_weighted', 'L2sym_weighted', 'L2asd_weighted', 'L2mix_weighted'}
         if loss_fn in all_losses:
             self.loss_fn = globals()[loss_fn]
         else:

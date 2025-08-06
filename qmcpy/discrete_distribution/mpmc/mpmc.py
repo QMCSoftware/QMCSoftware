@@ -1,10 +1,10 @@
 from types import SimpleNamespace
 from qmcpy.discrete_distribution._discrete_distribution import LD
 from qmcpy.util import ParameterError
-from .utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2ags_weighted, L2mix_weighted
-# from utils import L2dis, L2ctr, L2ext, L2per, L2sym, L2ags, L2mix, L2dis_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2ags_weighted, L2mix_weighted
-# from models import *
-from .models import *
+# from .utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2asd_weighted, L2mix_weighted
+from utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2asd_weighted, L2mix_weighted
+from models import *
+# from .models import *
 from tqdm import tqdm 
 import torch
 import numpy as np
@@ -18,7 +18,7 @@ from pathlib import Path
 class MPMC(LD): 
     def __init__(self, randomize = 'shift', seed = None, dimension = 2,
                   replications = 1, d_max = None, lr = 0.001, nlayers = 3, weight_decay = 1e-6, nhid = 32,
-                  epochs = 2000, start_reduce = 1000, radius = 0.35, nbatch = 1,
+                  epochs = 10000, start_reduce = 8000, radius = 0.35, nbatch = 1,
                   loss_fn = 'L2dis', weights = None, n_projections = 15):
         """
         Args:
@@ -122,17 +122,41 @@ class MPMC(LD):
         x = np.empty([r, n, d])
 
         #in case pathlib not allowed, this uses everything lattice uses. 
-        # repos = np.lib.npyio.DataSource()
-        # none_folder = f"{self.lr}_{self.nlayers}_{self.weight_decay}_{self.replications}_{self.epochs}_{self.start_reduce}_{self.radius}_{self.weights}_{self.n_projections}.npy"        
-        # link = f"https://github.com/QMCSoftware/QMCSoftware/raw/refs/heads/mpmc_choi/qmcpy/discrete_distribution/mpmc/pretrained/dim_{self.dim}/nsamples_{n}/nhid_{self.nhid}/Lf{self.loss_fn}.npy"
-        # if (repos.exists(link)):
-        #     print("x = points already trained")
-        #     x = np.load(dirname(abspath(__file__)) + f'/pretrained/dim_{self.dim}/nsamples_{n}/nhid_{self.nhid}/Lf{self.loss_fn}.npy')
-
-        local_path = Path(dirname(abspath(__file__)) + f'/pretrained/dim_{self.dim}/nsamples_{n}/nhid_{self.nhid}/Lf{self.loss_fn}.npy')
-        if (local_path.exists()):
-            # print("x = points already trained")
-            x = np.load(local_path)
+        repos = np.lib.npyio.DataSource()
+        head = "https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/pregenerated_pointsets/mpmc/"
+        #change variables to be more compatible
+        wd = str(self.weight_decay).replace('e-0', 'e-').replace('e+0', 'e+')
+        if self.weights != None:
+            weights = ''.join(map(str, self.weights.tolist()))
+        else:
+            weights = None
+        filename = (
+            f"dim_{self.dim}.nsamples_{n}.nbatch_{self.nbatch}"
+            f".nhid_{self.nhid}.lr_{self.lr}.nlay_{self.nlayers}"
+            f".wd_{wd}.ep_{self.epochs}.sr_{self.start_reduce}"
+            f".r_{self.radius}.w_{weights}.nproj_{self.n_projections}"
+            f".Lf{self.loss_fn}.b_1.txt"
+        )
+        link = f"{head}{filename}"
+        if (repos.exists(link)):
+            print("x = points already trained")
+            temp = []
+            for b in range(1, self.nbatch + 1): 
+                filename = (
+                    f"dim_{self.dim}.nsamples_{n}.nbatch_{self.nbatch}"
+                    f".nhid_{self.nhid}.lr_{self.lr}.nlay_{self.nlayers}"
+                    f".wd_{wd}.ep_{self.epochs}.sr_{self.start_reduce}"
+                    f".r_{self.radius}.w_{weights}.nproj_{self.n_projections}"
+                    f".Lf{self.loss_fn}.b_{b}.txt"
+                )
+                link = f"{head}{filename}"
+                #extract from link 
+                datafile = repos.open(link)
+                data = np.loadtxt(datafile, skiprows = 15)
+                    #strip comments, turn into numpy array, extract d_limit, n_limit
+                #add to temp (many batches)
+                temp.append(data)
+            x = np.array(temp)
         else:
             x = self.train(SimpleNamespace(**model_params))
         #randomize
@@ -231,10 +255,10 @@ if __name__ == '__main__':
     print("\n Running MPMC example \n")
     # wpoints = MPMC(dimension = 8, epochs = 500, weights = [1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128], loss_fn = 'L2sym')
 
-    print("\nHere is an example with a pretrained point set: \n")
     w = [0]*52
     w[0:3] = [1,1,1]
-    wpoints = MPMC(dimension = 52, loss_fn = 'L2sym', weights = w)
+    wpoints = MPMC(dimension = 52, weights = w, loss_fn = 'L2asd', epochs = 200000, start_reduce = 100000)
+    # wpoints = MPMC(dimension = 2, loss_fn = 'L2asd', epochs = 200000, start_reduce = 100000)
  
     w = wpoints.gen_samples (n = 16)
     print("\n--- Generation Complete ---")
