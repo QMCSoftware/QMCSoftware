@@ -1,9 +1,9 @@
 name: Weekly Booktests
 
 on:
-schedule:
-    # Run every day at 2:00 PM UTC
-    - cron: '0 14 * * *'
+  schedule:
+    # Run every day at 4P UTC, 11A Chicago time
+    - cron: '0 4 * * 0'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
