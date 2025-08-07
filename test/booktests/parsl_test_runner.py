@@ -2,6 +2,7 @@ import parsl
 from parsl import bash_app
 import glob
 import os
+import time
 from pathlib import Path
 
 @bash_app
@@ -115,4 +116,8 @@ def main():
         pass
 
 if __name__ == '__main__':
-    main()
+	start = time.time()
+	main()
+	end = time.time()
+	print("Time elapsed in seconds")
+	print(end-start)
