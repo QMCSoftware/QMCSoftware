@@ -98,12 +98,11 @@ longtests:
 	@echo "\nLongtests"
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 
-booktests:  
-	@echo "\nBooktests"
+booktests:
+	@echo "\nNotebook tests"
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -m coverage run --append --source=. -m unittest discover -s . -p "tb_*.py" -v | tee booktests_run.log && \
-	sleep 5 && \
+	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v | tee booktests.log && \
 	rm -fr *.eps *.jpg *.pdf *.part *txt && \
 	cd ../..
 
@@ -111,7 +110,7 @@ booktests-parallel:
 	@echo "\nBooktests"
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py  | tee booktests_parallel_run.log
+	python parsl_test_runner.py  | tee booktests_parallel.log
 	sleep 5 && \
 	rm -fr *.eps *.jpg *.pdf *.part *.txt && rm -fr logs && rm -fr runinfo && \
 	killall python || true && \

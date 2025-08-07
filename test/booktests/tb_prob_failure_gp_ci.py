@@ -4,6 +4,7 @@ from __init__ import TB_TIMEOUT, BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
 
+    @unittest.skip("Requires external server")
     @testbook('../../demos/prob_failure_gp_ci.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_prob_failure_gp_ci_notebook(self, tb):
         pass

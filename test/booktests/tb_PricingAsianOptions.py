@@ -4,7 +4,6 @@ from __init__ import TB_TIMEOUT, BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
 
-    @unittest.skip("Missing LookBackOption class")
     @testbook('../../demos/PricingAsianOptions.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_pricing_asian_options_notebook(self, tb):
         pass
