@@ -22,13 +22,22 @@ demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
 
+# Ignores files containing #, ~, untitled, or Untitled
+*#*
+*~*
+*untitled*
+*Untitled*
+*temp*
+*backup*
+*copy*
+
 # tests
 .coverage
-test/*/*.eps
-test/*/*.pdf
-test/*/*.jpg
-test/*/*.part
-test/*/*.png
+test/**/**.eps
+test/**/**.pdf
+test/**/**.jpg
+test/**/**.part
+test/**/**.png
 
 # Parsl
 runinfo/
@@ -63,8 +72,9 @@ demos/**.eps
 demos/**.jpg
 demos/**.pdf
 demos/**.part
+demos/**/**/*.eps
 
-# release
+# releases
 /build/
 dist/
 
@@ -85,5 +95,6 @@ _ags/*
 # Downloaded files
 raw.githubusercontent.com*
 demos/x_full_dakota.txt
+
 
 

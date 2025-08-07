@@ -1,10 +1,10 @@
 import unittest
 from testbook import testbook
+from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-class NotebookTests(unittest.TestCase):
+class NotebookTests(BaseNotebookTest):
 
-    @unittest.skip("Missing CSV files")
-    @testbook('../../demos/quasirandom_generators.ipynb', execute=True)
+    @testbook('../../demos/quasirandom_generators.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_quasirandom_generators_notebook(self, tb):
         pass
 

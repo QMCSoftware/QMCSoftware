@@ -1,9 +1,10 @@
 import unittest
 from testbook import testbook
+from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-class NotebookTests(unittest.TestCase):
+class NotebookTests(BaseNotebookTest):
 
-    @testbook('../../demos/qei-demo-for-blog.ipynb', execute=True, timeout=300)
+    @testbook('../../demos/qei-demo-for-blog.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_qei_demo_blog_notebook(self, tb):
         pass
 

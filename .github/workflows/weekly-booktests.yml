@@ -1,5 +1,4 @@
-name: Weekly Booktests
-
+name: QMCPy Notebook Tests
 on:
   schedule:
     # Run every day at 4P UTC, 11A Chicago time
@@ -8,8 +7,12 @@ on:
 
 jobs:
   booktests:
-    name: Weekly Booktests
+    name: QMCPy Notebook Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: weekly-booktests
+      cancel-in-progress: false
     
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +46,8 @@ jobs:
         with:
           name: booktest-results
           path: |
+            test/booktests/logs/*.out
+            test/booktests/logs/*.err
             test/booktests/*.xml
             test/booktests/*.log
           retention-days: 30

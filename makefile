@@ -99,22 +99,19 @@ longtests:
 	python -W ignore -m coverage run --append --source=./ -m unittest discover -s test/longtests/ 1>/dev/null
 
 booktests:
-	@echo "\nBooktests"
+	@echo "\nNotebook tests"
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -m coverage run --append --source=. -m unittest discover -s . -p "tb_*.py" && \
-	sleep 5 && \
-	rm -f *.eps *.jpg *.pdf *.part && \
+	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v 1>/dev/null && \
+	rm -fr *.eps *.jpg *.pdf *.part *txt && \
 	cd ../..
 
 booktests-parallel:
 	@echo "\nBooktests"
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py 
-	sleep 5 && \
-	rm -f *.eps *.jpg *.pdf *.part && rm -fr logs && rm -fr runinfo && \
-	killall python || true && \
+	python parsl_test_runner.py  | 1>/dev/null && \
+	rm -fr *.eps *.jpg *.pdf *.part *.txt && rm -fr logs && rm -fr runinfo && \
 	cd ../.. 
 
 tests: doctests fasttests longtests coverage
