@@ -122,7 +122,6 @@ def _show_colab_button(nb_path: Optional[str], branch: str) -> None:
 
 def main() -> None:
     if IN_COLAB:
-        # Ensure the package install matches the same branch as this header
         os.environ["QMCSOFTWARE_REF"] = BOOT_BRANCH
         _run_bootstrap(BOOT_BRANCH)
         return
@@ -133,7 +132,11 @@ def main() -> None:
         print("[notebook_header] Not inside a git repo; skipping Colab button.")
         return
 
-    nb_path = _guess_nb_path(repo_root)
+    # 👇 Respect NB_PATH if the notebook set it (or env var), else try to auto-detect
+    nb_path = globals().get("NB_PATH") or os.environ.get("NB_PATH")
+    if not nb_path:
+        nb_path = _guess_nb_path(repo_root)
+
     _show_colab_button(nb_path, BOOT_BRANCH)
 
 
