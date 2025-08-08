@@ -18,6 +18,19 @@ import pathlib
 import subprocess
 from typing import Optional
 
+# --- Self-switching bootstrap ---
+# If running inside Colab but the file is being loaded locally, reload it from GitHub
+import sys
+if "google.colab" in sys.modules and not __file__.startswith("/content/"):
+    import urllib.request, pathlib
+    branch = "bootstrap_colab"  # change to develop after merge
+    url = f"https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/{branch}/utils/notebook_header.py"
+    dest = pathlib.Path("/content/notebook_header.py")
+    print(f"[notebook_header] Re-fetching from GitHub: {url}")
+    urllib.request.urlretrieve(url, dest)
+    get_ipython().run_line_magic("run", str(dest))
+    raise SystemExit  # stop running the local file
+
 # ---- One place to switch branches later ----
 BOOT_BRANCH = os.environ.get("BOOT_BRANCH", "bootstrap_colab")  # change to "develop" after merge
 
