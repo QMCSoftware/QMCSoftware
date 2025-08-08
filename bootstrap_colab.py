@@ -95,7 +95,7 @@ def _ensure_scientific_stack() -> None:
 
 def _install_qmcsoftware(ref: str) -> None:
     """Install QMCSoftware from Git into site-packages (non-editable)."""
-    url = f"git+https://github.com/QMCSoftware/QMCSoftware/blob@{ref}"
+    url = f"git+https://github.com/QMCSoftware/QMCSoftware/@{ref}"
     print(f"Installing QMCSoftware from {url} …")
     _pip_install((url,))
     try:
