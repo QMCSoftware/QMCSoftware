@@ -34,7 +34,11 @@ from typing import Iterable
 USE_TEX: bool = os.environ.get("USE_TEX", "0") == "1"
 
 # Which ref of QMCSoftware to install. Use a branch name (e.g., "develop") or a commit SHA.
-QMCSOFTWARE_REF: str = os.environ.get("QMCSOFTWARE_REF", "develop")
+# Future:
+# QMCSOFTWARE_REF: str = os.environ.get("QMCSOFTWARE_REF", "develop")
+
+# For now:
+QMCSOFTWARE_REF: str = os.environ.get("QMCSOFTWARE_REF", "bootstrap_colab")
 
 # When True, installs QMCSoftware from Git (non-editable, read-only for students).
 INSTALL_QMCSOFTWARE: bool = os.environ.get("INSTALL_QMCSOFTWARE", "1") == "1"

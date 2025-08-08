@@ -1,8 +1,9 @@
 # utils/colab_button.py
 import os, sys
+from typing import Optional
 from IPython.display import HTML, display
 
-def show(org: str, repo: str, branch: str, nb_path: str, message: str | None = None):
+def show(org: str, repo: str, branch: str, nb_path: str, message: Optional[str] = None):
     """Display an 'Open in Colab' button conditionally.
 
     - Hidden if already in Colab or in a conda env.
