@@ -1,10 +1,10 @@
 from types import SimpleNamespace
 from qmcpy.discrete_distribution._discrete_distribution import LD
 from qmcpy.util import ParameterError
-# from .utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2asd_weighted, L2mix_weighted
-from utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2asd_weighted, L2mix_weighted
-from models import *
-# from .models import *
+from .utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2asd_weighted, L2mix_weighted
+# from utils import L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix, L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted, L2sym_weighted, L2asd_weighted, L2mix_weighted
+# from models import *
+from .models import *
 from tqdm import tqdm 
 import torch
 import numpy as np
@@ -15,11 +15,12 @@ from os.path import dirname, abspath, isfile
 from pathlib import Path
 
 
+#temporarily use nbatch instead of replication bc of inherited error
 class MPMC(LD): 
     def __init__(self, randomize = 'shift', seed = None, dimension = 2,
                   replications = 1, d_max = None, lr = 0.001, nlayers = 3, weight_decay = 1e-6, nhid = 32,
                   epochs = 10000, start_reduce = 8000, radius = 0.35, nbatch = 1,
-                  loss_fn = 'L2dis', weights = None, n_projections = 15):
+                  loss_fn = 'L2dis', weights = None):
         """
         Args:
             dimension (int or ndarray): dimension of the generator.
@@ -56,9 +57,7 @@ class MPMC(LD):
         self.weights = weights
         if weights != None:
             self.weights = torch.tensor(weights, device=device, dtype = torch.float32).long() 
-        self.n_projections = n_projections
         self.d_max = dimension
-        self.n_projections = n_projections
 
         if ((self.loss_fn[-8:] == 'weighted') & (self.weights == None)):
             raise ValueError(f"Must specify weights for weighted loss function")
@@ -113,7 +112,6 @@ class MPMC(LD):
                     'dim': self.dim,                   # dimensionality of the points
                     'loss_fn': self.loss_fn,           # loss function to use
                     'weights': self.weights, # emphasized dimensionalities for projections
-                    'n_projections': self.n_projections  # list of weights
                     }
 
         #generate points  
@@ -125,28 +123,45 @@ class MPMC(LD):
         repos = np.lib.npyio.DataSource()
         head = "https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/pregenerated_pointsets/mpmc/"
         #change variables to be more compatible
-        wd = str(self.weight_decay).replace('e-0', 'e-').replace('e+0', 'e+')
-        if self.weights != None:
-            weights = ''.join(map(str, self.weights.tolist()))
-        else:
-            weights = None
+        # wd = str(self.weight_decay).replace('e-0', 'e-').replace('e+0', 'e+')
+        # if self.weights != None:
+        #     weights = ''.join(map(str, self.weights.tolist()))
+        # else:
+        #     weights = None
         filename = (
             f"dim_{self.dim}.nsamples_{n}.nbatch_{self.nbatch}"
-            f".nhid_{self.nhid}.lr_{self.lr}.nlay_{self.nlayers}"
-            f".wd_{wd}.ep_{self.epochs}.sr_{self.start_reduce}"
-            f".r_{self.radius}.w_{weights}.nproj_{self.n_projections}"
             f".Lf{self.loss_fn}.b_1.txt"
         )
         link = f"{head}{filename}"
         if (repos.exists(link)):
-            print("x = points already trained")
+            #ask if user wants pretrained points
+            # proceed = input("Points already trained with same dimensions, samples, batches, and loss function. *warning: other parameters may not be the same*. Proceed with pretrained points?(y/n) ")
+            # proceed = str(proceed).upper()
+            # if proceed == 'yes': proceed = 'Y'
+            # if proceed == 'no': proceed = 'N'
+            # assert proceed in ['Y', 'N']
+            # if (proceed == 'Y'):
+            #     temp = []
+            #     for b in range(1, self.nbatch + 1): 
+            #         filename = (
+            #             f"dim_{self.dim}.nsamples_{n}.nbatch_{self.nbatch}"
+            #             f".Lf{self.loss_fn}.b_{b}.txt"
+            #         )
+            #         link = f"{head}{filename}"
+            #         #extract from link 
+            #         datafile = repos.open(link)
+            #         data = np.loadtxt(datafile, skiprows = 15)
+            #             #strip comments, turn into numpy array, extract d_limit, n_limit
+            #         #add to temp (many batches)
+            #         temp.append(data)
+            #     x = np.array(temp)
+            # else: 
+            #     x = self.train(SimpleNamespace(**model_params))
+
             temp = []
             for b in range(1, self.nbatch + 1): 
                 filename = (
                     f"dim_{self.dim}.nsamples_{n}.nbatch_{self.nbatch}"
-                    f".nhid_{self.nhid}.lr_{self.lr}.nlay_{self.nlayers}"
-                    f".wd_{wd}.ep_{self.epochs}.sr_{self.start_reduce}"
-                    f".r_{self.radius}.w_{weights}.nproj_{self.n_projections}"
                     f".Lf{self.loss_fn}.b_{b}.txt"
                 )
                 link = f"{head}{filename}"
@@ -162,12 +177,12 @@ class MPMC(LD):
         #randomize
         if self.randomize == "FALSE":
             assert return_unrandomized is False, "cannot return_unrandomized when randomize='FALSE'"
-            if r==1: x=x[0]
+            if self.nbatch==1: x=x[0]
             return x 
         elif self.randomize == "SHIFT":
             xr = np.empty([r,n,d])
             xr = (x + self.shift) % 1
-            if r==1: xr=xr[0]
+            if self.nbatch==1: xr=xr[0]
             return (xr, x) if return_unrandomized else xr 
         else: 
             raise ParameterError("incorrect randomize parsing in lattice gen_samples")
@@ -199,7 +214,7 @@ class MPMC(LD):
     #returns an NP array of points (trained)
     def train(self, args):
         model = MPMC_net(dim = args.dim, nhid = args.nhid, nlayers = args.nlayers, nsamples = args.nsamples, nbatch = args.nbatch,
-                        radius = args.radius, loss_fn = args.loss_fn, weights = args.weights, n_projections = args.n_projections).to(device)
+                        radius = args.radius, loss_fn = args.loss_fn, weights = args.weights).to(device)
         optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         best_loss = 10000.
         patience = 0
@@ -257,10 +272,10 @@ if __name__ == '__main__':
 
     w = [0]*52
     w[0:3] = [1,1,1]
-    wpoints = MPMC(dimension = 52, weights = w, loss_fn = 'L2asd', epochs = 200000, start_reduce = 100000)
+    wpoints = MPMC(dimension = 52, nbatch=1, weights = w, loss_fn = 'L2asd')
     # wpoints = MPMC(dimension = 2, loss_fn = 'L2asd', epochs = 200000, start_reduce = 100000)
  
-    w = wpoints.gen_samples (n = 16)
+    w = wpoints.gen_samples (n = 32)
     print("\n--- Generation Complete ---")
     print(f"Shape of generated points: {w.shape}")
     print("First 5 points:\n", w[:5])
