@@ -1,15 +1,17 @@
-
 """
 Bootstrap for running QMCSoftware notebooks on Google Colab.
 
 Usage (top of a notebook):
 
+  # Change BOOT_BRANCH below to "develop" after merge
+  BOOT_BRANCH = "bootstrap_colab"
+
   # Option A: default (no LaTeX)
-  %run https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/develop/bootstrap_colab.py
+  %run https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/{BOOT_BRANCH}/bootstrap_colab.py
 
   # Option B: enable LaTeX via env var
   %env USE_TEX=1
-  %run https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/develop/bootstrap_colab.py
+  %run https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/{BOOT_BRANCH}/bootstrap_colab.py
 
   # Option C: enable LaTeX later at runtime
   import bootstrap_colab
@@ -18,7 +20,7 @@ Usage (top of a notebook):
 Behavior:
 - Detects Colab and installs a minimal scientific Python stack.
 - Conditionally installs a LaTeX toolchain for matplotlib's usetex.
-- Installs QMCSoftware from Git (read‑only), pointing at a branch or commit SHA.
+- Installs QMCSoftware from Git (read-only), pointing at a branch or commit SHA.
 - No changes when running locally.
 """
 from __future__ import annotations
@@ -30,15 +32,14 @@ from typing import Iterable
 # =====================
 # Configuration toggles
 # =====================
+# Branch used for examples and default install — change after merge
+BOOT_BRANCH = "bootstrap_colab"
+
 # Read from environment so notebooks can set: %env USE_TEX=1
 USE_TEX: bool = os.environ.get("USE_TEX", "0") == "1"
 
-# Which ref of QMCSoftware to install. Use a branch name (e.g., "develop") or a commit SHA.
-# Future:
-# QMCSOFTWARE_REF: str = os.environ.get("QMCSOFTWARE_REF", "develop")
-
-# For now:
-QMCSOFTWARE_REF: str = os.environ.get("QMCSOFTWARE_REF", "bootstrap_colab")
+# Which ref of QMCSoftware to install. Defaults to BOOT_BRANCH unless overridden by env.
+QMCSOFTWARE_REF: str = os.environ.get("QMCSOFTWARE_REF", BOOT_BRANCH)
 
 # When True, installs QMCSoftware from Git (non-editable, read-only for students).
 INSTALL_QMCSOFTWARE: bool = os.environ.get("INSTALL_QMCSOFTWARE", "1") == "1"
@@ -78,7 +79,7 @@ def _pip_install(pkgs: Iterable[str]) -> None:
     pkgs = tuple(pkgs)
     if not pkgs:
         return
-    _run([sys.executable, "-m", "pip", "install", "-q", "--disable-pip-version-check", "pip>=24.0"])  # keep pip modern
+    _run([sys.executable, "-m", "pip", "install", "-q", "--disable-pip-version-check", "pip>=24.0"])
     _run([sys.executable, "-m", "pip", "install", "-q", *pkgs])
 
 
@@ -95,7 +96,7 @@ def _ensure_scientific_stack() -> None:
 
 def _install_qmcsoftware(ref: str) -> None:
     """Install QMCSoftware from Git into site-packages (non-editable)."""
-    url = f"git+https://github.com/QMCSoftware/QMCSoftware/@{ref}"
+    url = f"git+https://github.com/QMCSoftware/QMCSoftware@{ref}"
     print(f"Installing QMCSoftware from {url} …")
     _pip_install((url,))
     try:
