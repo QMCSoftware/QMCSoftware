@@ -129,16 +129,19 @@ def main():
         # Check if Parsl is already configured
         pl.dfk()  # DataFlowKernel
         print("Parsl already configured.")
-    except:
+    except pl.errors.NoDataFlowKernelError:
         # Parsl not configured, so load a configuration
         try:
             from parsl.configs.htex_local import config
-            config.max_workers = 8  # Set to 8 workers (processors)
+            config.executors[0].max_workers = 4  # Set to 4 workers to reduce memory usage
             pl.load(config)
             print("Parsl configuration loaded successfully.")
         except Exception as e:
             print(f"Error loading Parsl configuration: {e}")
-            return
+            return None
+    except Exception as e:
+        print(f"Unexpected error checking Parsl configuration: {e}")
+        return None
     
     try:
         results, execution_time = execute_parallel_tests()
@@ -162,8 +165,4 @@ def main():
         pass
 
 if __name__ == '__main__':
-	start = time.time()
-	main()
-	end = time.time()
-	print("Time elapsed in seconds")
-	print(end-start)
+    main()
