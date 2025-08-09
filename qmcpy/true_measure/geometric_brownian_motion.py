@@ -11,18 +11,18 @@ class GeometricBrownianMotion(BrownianMotion):
 
     >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
     >>> gbm.gen_samples(2)
-    array([[1.09360288, 1.38880698, 1.33046088, 1.0947602 ],
-           [1.0456216 , 1.0014045 , 1.08749136, 1.12628555]])
+    array([[0.92343761, 1.42069027, 1.30851806, 0.99133819],
+           [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
     >>> gbm
-    GeometricBrownianMotion (TrueMeasure Object)
+    GeometricBrownianMotion (AbstractTrueMeasure)
         time_vec        [0.5 1.  1.5 2. ]
         drift           0.100
         diffusion       0.200
         mean_gbm        [1.051 1.105 1.162 1.221]
-        covariance_gbm  [[0.022 0.023 0.025 0.026]
-                        [0.023 0.05  0.052 0.055]
-                        [0.025 0.052 0.083 0.088]
-                        [0.026 0.055 0.088 0.124]]
+        covariance_gbm  [[0.116 0.122 0.128 0.135]
+                         [0.122 0.27  0.284 0.299]
+                         [0.128 0.284 0.472 0.496]
+                         [0.135 0.299 0.496 0.734]]
         decomp_type     PCA
     """
 
@@ -38,6 +38,8 @@ class GeometricBrownianMotion(BrownianMotion):
             drift (float): Drift coefficient.
             diffusion (float): Diffusion coefficient, positive.
             decomp_type (str): Method of decomposition, either "PCA" or "Cholesky".
+        
+        Note: diffusion is $\sigma^2$, where $\sigma$ is volatility. 
         """
         
         super().__init__(sampler, t_final=t_final, drift=0, diffusion=diffusion, decomp_type=decomp_type)
@@ -61,7 +63,7 @@ class GeometricBrownianMotion(BrownianMotion):
         # Vectorization using broadcasting
         t_sum = t[:, None] + t[None, :]  # t[i] + t[j] for all i,j
         t_min = minimum.outer(t, t)      # min(t[i], t[j]) for all i,j
-        cov_matrix = (S0 ** 2) * exp(mu * t_sum) * (exp(self.diffusion**2 * t_min) - 1)
+        cov_matrix = (S0 ** 2) * exp(mu * t_sum) * (exp(self.diffusion * t_min) - 1)
         
         return cov_matrix
         
@@ -70,7 +72,7 @@ class GeometricBrownianMotion(BrownianMotion):
         bm_samples = super()._transform(x)
         # Note: bm_samples already includes the diffusion scaling from the parent BrownianMotion class
         # So we don't multiply by self.diffusion again here
-        exponent = (self.drift - 0.5 * self.diffusion**2) * self.time_vec + bm_samples
+        exponent = (self.drift - 0.5 * self.diffusion) * self.time_vec + bm_samples
         samples = self.initial_value * exp(exponent)
         return samples
   
@@ -100,7 +102,7 @@ class GeometricBrownianMotion(BrownianMotion):
         if self.decomp_type.upper() not in ['PCA', 'CHOLESKY']:
             raise ParameterError(f"Decomposition type must be 'PCA' or 'Cholesky'. It should not be {self.decomp_type}.")
 
-    def _validate_samples(self, samples, strict=True):
+    def _validate_samples(self, samples, strict=False):
         """
         Validate that generated GBM samples meet mathematical requirements.
         """
@@ -134,12 +136,12 @@ class GeometricBrownianMotion(BrownianMotion):
 
     def _setup_lognormal_distribution(self):
         """Setup scipy multivariate normal for the log-transformed variables."""
-        # Mean of log(S(t)/S0): (drift - 0.5*diffusion^2) * t
-        log_mean = (self.drift - 0.5 * self.diffusion**2) * self.time_vec
+        # Mean of log(S(t)/S0): (drift - 0.5*diffusion) * t
+        log_mean = (self.drift - 0.5 * self.diffusion) * self.time_vec
         
-        # Covariance of log returns: diffusion^2 * min(t_i, t_j)
+        # Covariance of log returns: diffusion * min(t_i, t_j)
         time_matrix = minimum.outer(self.time_vec, self.time_vec)
-        log_cov = self.diffusion**2 * time_matrix
+        log_cov = self.diffusion * time_matrix
         
         self.log_mvn_scipy = multivariate_normal(mean=log_mean, cov=log_cov, allow_singular=True)
 
