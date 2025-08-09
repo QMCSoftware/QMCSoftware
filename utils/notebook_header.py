@@ -183,6 +183,7 @@ def show_colab_button(org: str, repo: str, branch: str, nb_path: str) -> None:
         f'<a target="_blank" href="{url}">'
         '<img src="https://colab.research.google.com/assets/colab-badge.svg" '
         'alt="Open In Colab"/></a>'
+        ', otherwise continue to the next cell for setup.'
     )
     display(HTML(html))
 
@@ -236,11 +237,21 @@ def _post_run_attempt_path(repo_root: pathlib.Path, org: str, repo: str, branch:
 def main(force: bool = False, quiet: bool = True):
     global _NB_PATH
 
+    repo_root = get_repo_root()
+    org, repo = get_org_repo()
+    branch = os.environ.get("BOOT_BRANCH", DEFAULT_BOOT_BRANCH)
+
     if _STATE["ran"] and not force:
-        if not quiet:
-            print("[notebook_header] already ran; set force=True to re-run.")
+        # Re-show the badge so re-running the cell doesn't blank it out
+        try:
+            show_colab_button(org, repo, branch, _NB_PATH)
+        except Exception as e:
+            if not quiet:
+                print("[notebook_header] Colab badge error:", e)
         return
+
     _STATE["ran"] = True
+    # ... keep the rest of your function body the same, but remove the old early-return block ...
 
     repo_root = get_repo_root()
     org, repo = get_org_repo()
