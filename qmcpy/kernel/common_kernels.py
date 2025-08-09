@@ -1,9 +1,37 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
+from ..discrete_distribution import DigitalNetB2
 from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,tf_identity
 from ..util import ParameterError
 import numpy as np 
+import scipy.stats
+import scipy.special
 
-class KernelGaussian(AbstractKernelScaleLengthscales):
+
+class AbstractKernelGaussianSE(AbstractKernelScaleLengthscales):
+
+    AUTOGRADKERNEL = True 
+    
+    def parsed_single_integral_01d(self, x, batch_params):
+        s = batch_params["scale"][...,0]
+        l = batch_params["lengthscales"]
+        nls = l.shape[-1]
+        norm_class = self.npt.distributions.Normal if self.torchify else scipy.stats.norm
+        norm = norm_class(x,l)
+        lb = self.nptarray([0],**self.nptkwargs)
+        ub = self.nptarray([1],**self.nptkwargs)
+        kint = s*self.npt.prod(np.sqrt(2*np.pi)*l*(norm.cdf(ub)-norm.cdf(lb)),-1)
+        return kint
+    
+    def double_integral_01d(self):
+        erf = self.npt.erf if self.torchify else scipy.special.erf
+        s = self.scale[...,0]
+        l = self.lengthscales
+        nls = l.shape[-1]
+        kintint = s*self.npt.prod(2*(-1+self.npt.exp(-1/(2*l**2)))*l**2+np.sqrt(2*np.pi)*l*erf(1/(np.sqrt(2)*l)),-1)**(self.d/nls)
+        return kintint
+
+
+class KernelGaussian(AbstractKernelGaussianSE):
     
     r"""
     Gaussian / Squared Exponential kernel implemented using the product of exponentials. 
@@ -47,6 +75,50 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         (4, 3, 6, 6, 5, 5)
 
+        Integrals 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 2,
+        ...     scale = rng.uniform(low=0,high=1,size=(3,1,)),
+        ...     lengthscales = rng.uniform(low=0,high=1,size=(1,2)))
+        >>> kintint = kernel.double_integral_01d()
+        >>> kintint
+        array([0.50079567, 0.11125229, 0.34760005])
+        >>> x_qmc_4d = DigitalNetB2(4,seed=7)(2**16)
+        >>> kintint_qmc = kernel(x_qmc_4d[:,:2],x_qmc_4d[:,2:]).mean(1)
+        >>> kintint_qmc
+        array([0.5007959 , 0.11125234, 0.34760021])
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     np.abs(kintint-kintint_qmc)
+        array([2.3e-07, 5.1e-08, 1.6e-07])
+        >>> x = rng.uniform(low=0,high=1,size=(4,2))
+        >>> kint = kernel.single_integral_01d(x)
+        >>> kint
+        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
+               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
+               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        >>> x_qmc_2d = DigitalNetB2(2,seed=7)(2**16)
+        >>> kint_qmc = kernel(x[:,None,:],x_qmc_2d).mean(-1)
+        >>> kint_qmc
+        array([[0.54610372, 0.4272801 , 0.43001936, 0.44688778],
+               [0.12131753, 0.09492073, 0.09552926, 0.0992766 ],
+               [0.37904817, 0.29657323, 0.29847453, 0.31018283]])
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     np.abs(kint-kint_qmc)
+        array([[2.2e-13, 4.0e-13, 4.2e-12, 3.9e-12],
+               [4.8e-14, 8.9e-14, 9.4e-13, 8.8e-13],
+               [1.5e-13, 2.8e-13, 2.9e-12, 2.7e-12]])
+        >>> k_1l = KernelGaussian(d=2,lengthscales=[.5])
+        >>> k_2l = KernelGaussian(d=2,lengthscales=[.5,.5])
+        >>> print("%.5f"%k_2l.double_integral_01d())
+        0.58363
+        >>> print("%.5f"%k_1l.double_integral_01d())
+        0.58363
+        >>> k_1l.single_integral_01d(x)
+        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+        >>> k_2l.single_integral_01d(x)
+        array([0.58119655, 0.46559577, 0.57603494, 0.53494393])
+                
         PyTorch
 
         >>> import torch
@@ -87,9 +159,99 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         torch.Size([4, 3, 6, 5, 5])
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         torch.Size([4, 3, 6, 6, 5, 5])
-    """
 
-    AUTOGRADKERNEL = True 
+        Integrals 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 2,
+        ...     torchify = True,
+        ...     scale = torch.from_numpy(rng.uniform(low=0,high=1,size=(3,1,))),
+        ...     lengthscales = torch.from_numpy(rng.uniform(low=0,high=1,size=(1,2))),
+        ...     requires_grad_scale = False, 
+        ...     requires_grad_lengthscales = False)
+        >>> kintint = kernel.double_integral_01d()
+        >>> kintint
+        tensor([0.5008, 0.1113, 0.3476], dtype=torch.float64)
+        >>> x_qmc_4d = torch.from_numpy(DigitalNetB2(4,seed=7)(2**16))
+        >>> kintint_qmc = kernel(x_qmc_4d[:,:2],x_qmc_4d[:,2:]).mean(1)
+        >>> kintint_qmc
+        tensor([0.5008, 0.1113, 0.3476], dtype=torch.float64)
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     torch.abs(kintint-kintint_qmc).numpy()
+        array([2.3e-07, 5.1e-08, 1.6e-07])
+        >>> x = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,2)))
+        >>> kint = kernel.single_integral_01d(x)
+        >>> kint
+        tensor([[0.5461, 0.4273, 0.4300, 0.4469],
+                [0.1213, 0.0949, 0.0955, 0.0993],
+                [0.3790, 0.2966, 0.2985, 0.3102]], dtype=torch.float64)
+        >>> x_qmc_2d = torch.from_numpy(DigitalNetB2(2,seed=7)(2**16))
+        >>> kint_qmc = kernel(x[:,None,:],x_qmc_2d).mean(-1)
+        >>> kint_qmc
+        tensor([[0.5461, 0.4273, 0.4300, 0.4469],
+                [0.1213, 0.0949, 0.0955, 0.0993],
+                [0.3790, 0.2966, 0.2985, 0.3102]], dtype=torch.float64)
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     torch.abs(kint-kint_qmc).numpy()
+        array([[2.2e-13, 4.0e-13, 4.2e-12, 3.9e-12],
+               [4.8e-14, 8.9e-14, 9.4e-13, 8.8e-13],
+               [1.5e-13, 2.8e-13, 2.9e-12, 2.7e-12]])
+        >>> k_1l = KernelGaussian(d=2,lengthscales=[.5],torchify=True)
+        >>> k_2l = KernelGaussian(d=2,lengthscales=[.5,.5],torchify=True)
+        >>> k_2l.double_integral_01d()
+        tensor(0.5836, grad_fn=<MulBackward0>)
+        >>> k_1l.double_integral_01d()
+        tensor(0.5836, grad_fn=<MulBackward0>)
+        >>> k_1l.single_integral_01d(x)
+        tensor([0.5812, 0.4656, 0.5760, 0.5349], dtype=torch.float64,
+               grad_fn=<MulBackward0>)
+        >>> k_2l.single_integral_01d(x)
+        tensor([0.5812, 0.4656, 0.5760, 0.5349], dtype=torch.float64,
+               grad_fn=<MulBackward0>)
+        
+        Derivatives 
+
+        >>> kernel = KernelGaussian(
+        ...     d = 3,
+        ...     torchify = True,
+        ...     scale = torch.from_numpy(rng.uniform(low=0,high=1,size=(1,))),
+        ...     lengthscales = torch.from_numpy(rng.uniform(low=0,high=1,size=(3,))))
+        >>> x0 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x1 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x2 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> x = torch.stack([x0,x1,x2],axis=-1)
+        >>> z0 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z1 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z2 = torch.from_numpy(rng.uniform(low=0,high=1,size=(4,))).requires_grad_(True)
+        >>> z = torch.stack([z0,z1,z2],axis=-1)
+        >>> c = torch.from_numpy(rng.uniform(low=0,high=1,size=(2,)))
+        >>> beta0 = torch.tensor([
+        ...     [1,0,0],
+        ...     [0,2,0]])
+        >>> beta1 = torch.tensor([
+        ...     [0,0,2],
+        ...     [2,1,0]])
+        >>> with torch.no_grad():
+        ...     y = kernel(x,z,beta0,beta1,c)
+        >>> y
+        tensor([ 97.6657,   3.8621, -65.9329,  -1.1932], dtype=torch.float64)
+        >>> y_no_deriv = kernel(x,z)
+        >>> y_first = y_no_deriv.clone()
+        >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_first = torch.autograd.grad(y_first,z2,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_first = torch.autograd.grad(y_first,z2,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
+        >>> y_second = y_no_deriv.clone()
+        >>> y_second = torch.autograd.grad(y_second,x1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,x1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
+        >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
+        >>> yhat
+        tensor([ 97.6657,   3.8621, -65.9329,  -1.1932], dtype=torch.float64)
+        >>> torch.allclose(y,yhat)
+        True
+    """
 
     def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
@@ -97,7 +259,7 @@ class KernelGaussian(AbstractKernelScaleLengthscales):
         k = scale*self.npt.exp(-((x0-x1)/(np.sqrt(2)*lengthscales))**2).prod(-1)
         return k
     
-class KernelSquaredExponential(AbstractKernelScaleLengthscales):
+class KernelSquaredExponential(AbstractKernelGaussianSE):
     
     r"""
     Gaussian / Squared Exponential kernel implemented using the pairwise distance function.  
@@ -183,8 +345,6 @@ class KernelSquaredExponential(AbstractKernelScaleLengthscales):
         >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
         torch.Size([4, 3, 6, 6, 5, 5])
     """
-
-    AUTOGRADKERNEL = True 
 
     def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]
@@ -297,6 +457,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales = True, 
             requires_grad_alpha = True, 
             device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
             ):
         r"""
         Args:
@@ -315,6 +477,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
             device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
         super().__init__(
             d = d, 
@@ -328,6 +492,8 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_scale = requires_grad_scale, 
             requires_grad_lengthscales = requires_grad_lengthscales, 
             device = device,
+            compile_call = compile_call,
+            comiple_call_kwargs = comiple_call_kwargs,
         )
         self.raw_alpha,self.tf_alpha = self.parse_assign_param(
             pname = "alpha",
@@ -337,7 +503,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             tfs_param = tfs_alpha,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
-        self.batch_params["alpha"] = self.alpha
+        self.batch_param_names.append("alpha")
     
     @property
     def alpha(self):

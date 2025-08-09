@@ -199,8 +199,7 @@ def to_float(x, t):
         >>> xbtorch
         tensor([0, 1, 2, 3, 4, 5, 6, 7])
         >>> to_float(xbtorch,3)
-        tensor([0.0000, 0.1250, 0.2500, 0.3750, 0.5000, 0.6250, 0.7500, 0.8750],
-               dtype=torch.float64)
+        tensor([0.0000, 0.1250, 0.2500, 0.3750, 0.5000, 0.6250, 0.7500, 0.8750])
     
     Args:
         x (Union[np.ndarray,torch.Tensor]): binary representation of samples with `dtype` either `np.uint64` or `torch.int64`.
@@ -219,7 +218,7 @@ def to_float(x, t):
             raise ParameterError("x.dtype must be np.uint64, got %s"%str(x.dtype))
     else:
         if x.dtype==npt.int64: 
-            return x.to(npt.float64)*2.**(-t) 
+            return x.to(npt.get_default_dtype())*2.**(-t) 
         elif npt.is_floating_point(x):
             return x 
         else:

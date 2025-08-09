@@ -11,7 +11,10 @@ from .kernel import (
     KernelMatern52,
     KernelShiftInvar,
     KernelDigShiftInvar,
+    KernelSI,
+    KernelDSI,
     KernelMultiTask,
+    KernelMultiTaskDerivs,
 )
 from .fast_transform import (
     fftbr,
@@ -28,4 +31,4 @@ from .fast_transform import (
 from .util import plot_proj,mlmc_test
 
 name = "qmcpy"
-__version__ = "1.6.3.1a"
+__version__ = "1.6.3.2a"

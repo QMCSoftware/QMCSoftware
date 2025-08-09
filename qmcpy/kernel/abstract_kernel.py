@@ -7,7 +7,11 @@ from ..util.transforms import tf_exp_eps,tf_exp_eps_inv,parse_assign_param,tf_id
 class AbstractKernel(object):
 
     def __new__(cls, *args, **kwargs):
-        if "torchify" in kwargs and kwargs["torchify"]:
+        if (
+            ("torchify" in kwargs and kwargs["torchify"]) or 
+            ("base_kernel" in kwargs and kwargs["base_kernel"].torchify) or 
+            (len(args)>0 and isinstance(args[0],AbstractKernel) and args[0].torchify)
+            ):
             import torch 
             x = type(cls.__name__,(cls,torch.nn.Module),{})
             instance = super().__new__(x)
@@ -15,7 +19,7 @@ class AbstractKernel(object):
             instance = super().__new__(cls)
         return instance
 
-    def __init__(self, d, torchify, device):
+    def __init__(self, d, torchify, device, compile_call, comiple_call_kwargs):
         super().__init__()
         # dimension 
         assert d%1==0 and d>0, "dimension d must be a positive int"
@@ -35,7 +39,13 @@ class AbstractKernel(object):
             self.nptarraytype = np.ndarray
             self.device = None
             self.nptkwargs = {}
-        self.batch_params = {}
+        self.batch_param_names = []
+        if compile_call:
+            assert self.torchify, "compile_call requires torchify is True"
+            import torch
+            self.compiled_parsed___call__ = torch.compile(self.parsed___call__,**comiple_call_kwargs)
+        else:
+            self.compiled_parsed___call__ = self.parsed___call__
     
     @property 
     def nbdim(self):
@@ -44,21 +54,25 @@ class AbstractKernel(object):
         nbdim = v.ndim-1
         return nbdim
     
+    @property 
+    def batch_params(self):
+        return {pname:getattr(self,pname) for pname in self.batch_param_names}
+    
     def get_batch_params(self, ndim):
         return {pname: insert_batch_dims(batch_param,ndim,-1) for pname,batch_param in self.batch_params.items()}
     
-    def __call__(self, x0, x1, beta0=None, beta1=None):
+    def __call__(self, x0, x1, beta0=None, beta1=None, c=None):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
-        $$\partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_0} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_1} K(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
+        $$\sum_{\ell=1}^p c_{\ell} \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell 0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell 1}} K(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
         
         Args:
             x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with 
             x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel with 
-            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
-            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape==(d,)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
-        
+            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
+            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
+            c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations. 
         """
@@ -67,27 +81,43 @@ class AbstractKernel(object):
         assert x0.shape[-1]==self.d, "the size of the last dimension of x0 must equal d=%d, got x0.shape=%s"%(self.d,str(tuple(x0.shape)))
         assert x1.shape[-1]==self.d, "the size of the last dimension of x1 must equal d=%d, got x1.shape=%s"%(self.d,str(tuple(x1.shape)))
         if beta0 is None:
-            beta0 = self.npt.zeros(self.d,dtype=int)
+            beta0 = self.npt.zeros((1,self.d),dtype=int,**self.nptkwargs)
         if beta1 is None:
-            beta1 = self.npt.zeros(self.d,dtype=int)
+            beta1 = self.npt.zeros((1,self.d),dtype=int,**self.nptkwargs)
         if not isinstance(beta0,self.nptarraytype):
             beta0 = self.nptarray(beta0)
         if not isinstance(beta1,self.nptarraytype):
             beta1 = self.nptarray(beta1)
-        beta0 = self.npt.atleast_1d(beta0)
-        beta1 = self.npt.atleast_1d(beta1)
-        assert beta0.shape==(self.d,), "expected beta0.shape=(%d,) but got beta0.shape=%s"%(self.d,str(tuple(beta0.shape)))
-        assert beta1.shape==(self.d,), "expected beta1.shape=(%d,) but got beta1.shape=%s"%(self.d,str(tuple(beta1.shape)))
+        beta0 = self.npt.atleast_2d(beta0)
+        beta1 = self.npt.atleast_2d(beta1)
+        assert beta0.ndim==2 and beta1.ndim==2, "beta0 and beta1 must both be 2 dimensional"
+        p = beta0.shape[0]
+        assert beta0.shape==(p,self.d), "expected beta0.shape=(%d,%d) but got beta0.shape=%s"%(p,self.d,str(tuple(beta0.shape)))
+        assert beta1.shape==(p,self.d), "expected beta1.shape=(%d,%d) but got beta1.shape=%s"%(p,self.d,str(tuple(beta1.shape)))
         assert (beta0%1==0).all() and (beta0>=0).all(), "require int beta0 >= 0"
         assert (beta1%1==0).all() and (beta1>=0).all(), "require int beta1 >= 0"
-        batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
+        if c is None:
+            c = self.npt.ones(p,**self.nptkwargs)
+        if not isinstance(c,self.nptarraytype):
+            c = self.nptarray(c) 
+        c = self.npt.atleast_1d(c) 
+        assert c.shape==(p,), "expected c.shape=(%d,) but got c.shape=%s"%(p,str(tuple(c.shape)))
         if not self.AUTOGRADKERNEL:
-            k = self.parsed___call__(x0,x1,beta0,beta1,batch_params)
+            batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
+            k = self.compiled_parsed___call__(x0,x1,beta0,beta1,c,batch_params)
         else:
             if (beta0==0).all() and (beta1==0).all():
-                k = self.parsed___call__(x0,x1,batch_params)
+                batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
+                k = c.sum()*self.compiled_parsed___call__(x0,x1,batch_params)
             else: # requires autograd, so self.npt=torch
                 assert self.torchify, "autograd requires torchify=True"
+                import torch
+                incoming_grad_enabled = torch.is_grad_enabled()
+                torch.set_grad_enabled(True)
+                incoming_grad_enabled_params = {pname: param.requires_grad for pname,param in self.named_parameters()}
+                if not incoming_grad_enabled:
+                    for pname,param in self.named_parameters():
+                        param.requires_grad_(False)
                 if (beta0>0).any():
                     tileshapex0 = tuple(self.npt.ceil(self.npt.tensor(x1.shape[:-1])/self.npt.tensor(x0.shape[:-1])).to(int))
                     x0gs = [self.npt.tile(x0[...,j].clone().requires_grad_(True),tileshapex0) for j in range(self.d)]
@@ -102,13 +132,27 @@ class AbstractKernel(object):
                     x1g = self.npt.stack(x1gs,dim=-1)
                 else:
                     x1g = x1
-                k = self.parsed___call__(x0g,x1g,batch_params)
-                for j0 in range(self.d):
-                    for _ in range(beta0[j0]):
-                        k = self.npt.autograd.grad(k,x0gs[j0],grad_outputs=self.npt.ones_like(k,requires_grad=True),create_graph=True)[0]
-                for j1 in range(self.d):
-                    for _ in range(beta1[j1]):
-                        k = self.npt.autograd.grad(k,x1gs[j1],grad_outputs=self.npt.ones_like(k,requires_grad=True),create_graph=True)[0]
+                batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
+                k = 0.
+                k_base = self.compiled_parsed___call__(x0g,x1g,batch_params)
+                for l in range(p):
+                    if (beta0[l]>0).any() or (beta1[l]>0).any():
+                        k_part = k_base.clone()
+                        for j0 in range(self.d):
+                            for _ in range(beta0[l,j0]):
+                                k_part = torch.autograd.grad(k_part,x0gs[j0],grad_outputs=torch.ones_like(k_part,requires_grad=True),create_graph=True)[0]
+                        for j1 in range(self.d):
+                            for _ in range(beta1[l,j1]):
+                                k_part = torch.autograd.grad(k_part,x1gs[j1],grad_outputs=torch.ones_like(k_part,requires_grad=True),create_graph=True)[0]
+                    else:
+                        k_part = k_base 
+                    k += c[l]*k_part
+                if not incoming_grad_enabled:
+                    for pname,param in self.named_parameters():
+                        param.requires_grad_(incoming_grad_enabled_params[pname])
+                if (not incoming_grad_enabled) or ((not any(incoming_grad_enabled_params.values())) and (not x0.requires_grad) and (not x1.requires_grad)):
+                    k = k.detach()
+                torch.set_grad_enabled(incoming_grad_enabled)
         return k
     
     def parsed___call__(self, *args, **kwargs):
@@ -137,12 +181,14 @@ class AbstractKernel(object):
     def parsed_single_integral_01d(self, x):
         raise MethodImplementationError(self, 'parsed_single_integral_01d')
     
-    @property
     def double_integral_01d(self):
         r"""
         Evaluate the integral of the kernel over the unit cube
 
         $$\tilde{K} = \int_{[0,1]^d} \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \; \mathrm{d} \boldsymbol{x} \; \mathrm{d} \boldsymbol{z}.$$
+        
+        Returns:
+            tildek (Union[np.ndarray,torch.Tensor]): Double integral kernel evaluations.
         """
         raise MethodImplementationError(self, 'double_integral_01d')
 
@@ -173,16 +219,18 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
 
     def __init__(self,
             d, 
-            scale = 1., 
+            scale = 1.,
             lengthscales = 1.,
             shape_scale = [1],
-            shape_lengthscales = None, 
+            shape_lengthscales = None,
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
             tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
-            torchify = False, 
+            torchify = False,
             requires_grad_scale = True, 
             requires_grad_lengthscales = True, 
             device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
             ):
         r"""
         Args:
@@ -197,8 +245,10 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
-        super().__init__(d=d,torchify=torchify,device=device)
+        super().__init__(d=d,torchify=torchify,device=device,compile_call=compile_call,comiple_call_kwargs=comiple_call_kwargs)
         self.raw_scale,self.tf_scale = self.parse_assign_param(
             pname = "scale",
             param = scale, 
@@ -207,7 +257,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_scale,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
-        self.batch_params["scale"] = self.scale
+        self.batch_param_names.append("scale")
         self.raw_lengthscales,self.tf_lengthscales = self.parse_assign_param(
             pname = "lengthscales",
             param = lengthscales, 
@@ -216,7 +266,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_lengthscales,
             endsize_ops = [1,self.d],
             constraints = ["POSITIVE"])
-        self.batch_params["lengthscales"] = self.lengthscales
+        self.batch_param_names.append("lengthscales")
 
     @property
     def scale(self):

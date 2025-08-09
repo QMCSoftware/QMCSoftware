@@ -3,7 +3,7 @@ import scipy.special
 from . import ParameterError
 from .torch_numpy_ops import get_npt
 
-EPS64 = np.finfo(np.float64).eps
+EPS64 = float(np.finfo(np.float64).eps)
     
 def insert_batch_dims(param, ndims, k):
     ones = [1]*ndims
@@ -61,10 +61,14 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
         param = param*npt.ones(shape_param,**nptkwargs)
     else:
         if torchify:
-            param = npt.atleast_1d(npt.tensor(param))
+            if not isinstance(param,npt.Tensor):
+                param = npt.tensor(param)
+            param = npt.atleast_1d(param)
             assert isinstance(param,npt.Tensor), "%s must be a scalar or torch.Tensor"%pname
         else: 
-            param = npt.atleast_1d(npt.array(param))
+            if not isinstance(param,npt.ndarray):
+                param = npt.array(param)
+            param = npt.atleast_1d(param)
             assert isinstance(param,npt.ndarray), "%s must be a scalar or np.ndarray"%pname
     shape_param = list(param.shape)
     assert len(shape_param)>=1, "invalid shape_%s = %s"%(pname,str(shape_param))
@@ -79,6 +83,8 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
     assert shape_param[-1] in endsize_ops, "%s not in %s"%(str(shape_param[-1]),str(endsize_ops))
     if "POSITIVE" in constraints: 
         assert (param>0).all(), "%s must be positive"%pname
+    if "NON-NEGATIVE" in constraints: 
+        assert (param>=0).all(), "%s must be non-negative"%pname
     if "INTEGER" in constraints:
         assert (param%1==0).all(), "%s must be integers"%pname
     return raw_param,tf_param
