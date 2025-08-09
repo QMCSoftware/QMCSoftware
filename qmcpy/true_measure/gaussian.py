@@ -1,78 +1,104 @@
-from ._true_measure import TrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
-from numpy.linalg import cholesky, slogdet, eigh
+import numpy as np
+from numpy.linalg import cholesky, slogdet
 from scipy.stats import norm, multivariate_normal
+from scipy.linalg import eigh
+from typing import Union
 
 
-class Gaussian(TrueMeasure):
+class Gaussian(AbstractTrueMeasure):
     """
-    Normal Measure.
+    Gaussian (Normal) distribution as described in [https://en.wikipedia.org/wiki/Multivariate_normal_distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution).
     
-    >>> g = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
-    >>> g.gen_samples(4)
-    array([[ 4.03221089,  6.5276106 ],
-           [-1.02398497, -0.48146467],
-           [ 3.64364042,  0.8425137 ],
-           [-0.04415595,  2.52642377]])
-    >>> g
-    Gaussian (TrueMeasure Object)
-        mean            [1 2]
-        covariance      [[9 4]
-                        [4 5]]
-        decomp_type     PCA
+    Note:
+        - `Normal` is an alias for `Gaussian`
+    
+    Examples:
+        >>> true_measure = Gaussian(DigitalNetB2(2,seed=7),mean=[1,2],covariance=[[9,4],[4,5]])
+        >>> true_measure(4)
+        array([[ 3.83994612,  1.19097885],
+               [-1.9727727 ,  0.49405353],
+               [ 5.87242307,  8.41341485],
+               [ 0.61222205,  1.48402653]])
+        >>> true_measure
+        Gaussian (AbstractTrueMeasure)
+            mean            [1 2]
+            covariance      [[9 4]
+                             [4 5]]
+            decomp_type     PCA
+        
+        With independent replications 
+
+        >>> x = Gaussian(DigitalNetB2(3,seed=7,replications=2),mean=0,covariance=3)(4)
+        >>> x.shape 
+        (2, 4, 3)
+        >>> x
+        array([[[-1.18721904, -1.57108272,  1.15371635],
+                [ 0.81749123,  0.72242445, -0.31025434],
+                [-0.0807895 ,  1.44651585, -2.41042379],
+                [ 2.38133494, -0.93225637,  1.30817519]],
+        <BLANKLINE>
+               [[-0.22304017,  1.86337427,  0.02386568],
+                [ 0.15807672, -2.96365385, -0.73502346],
+                [-1.26753687, -0.94427848, -2.57683314],
+                [ 1.1844196 ,  0.44964332,  1.27760936]]])
     """
 
     def __init__(self, sampler, mean=0., covariance=1., decomp_type='PCA'):
         """
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            mean (float): mu for Normal(mu,sigma^2)
-            covariance (ndarray): sigma^2 for Normal(mu,sigma^2). 
-                A float or d (dimension) vector input will be extended to covariance*eye(d)
-            decomp_type (str): method of decomposition either  
-                "PCA" for principal component analysis or 
-                "Cholesky" for cholesky decomposition.
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            mean (Union[float,np.ndarray]): Mean vector. 
+            covariance (Union[float,np.ndarray]): Covariance matrix. A float or vector will be expanded into a diagonal matrix.  
+            decomp_type (str): Method for decomposition for covariance matrix. Options include
+             
+                - `'PCA'` for principal component analysis, or 
+                - `'Cholesky'` for cholesky decomposition.
         """
         self.parameters = ['mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
-        self.domain = array([[0,1]])
+        self.domain = np.array([[0,1]])
         self._parse_sampler(sampler)
         self._parse_gaussian_params(mean,covariance,decomp_type)
-        self.range = array([[-inf,inf]])
+        self.range = np.array([[-np.inf,np.inf]])
         super(Gaussian,self).__init__()
+        assert self.mu.shape==(self.d,) and self.a.shape==(self.d,self.d)
     
     def _parse_gaussian_params(self, mean, covariance, decomp_type):
         self.decomp_type = decomp_type.upper()
         self.mean = mean
         self.covariance = covariance
-        if isscalar(mean):
-            mean = tile(mean,self.d)
-        if isscalar(covariance):
-            covariance = covariance*eye(self.d)
-        self.mu = array(mean)
-        self.sigma = array(covariance)
+        if np.isscalar(mean):
+            mean = np.tile(mean,self.d)
+        if np.isscalar(covariance):
+            covariance = covariance*np.eye(self.d)
+        self.mu = np.array(mean)
+        self.sigma = np.array(covariance)
         if self.sigma.shape==(self.d,):
-            self.sigma = diag(self.sigma)
+            self.sigma = np.diag(self.sigma)
+        self.sigma = (self.sigma+self.sigma.T)/2
         if not (len(self.mu)==self.d and self.sigma.shape==(self.d,self.d)):
             raise DimensionError('''
                     mean must have length d and
                     covariance must be of shape d x d''')
         if self.decomp_type == 'PCA':
             evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
-            order = argsort(-evals)
-            self.a = dot(evecs[:,order],diag(sqrt(evals[order])))
+            evecs = evecs*(1-2*(evecs[0]<0)) # force first entries of eigenvectors to be positive
+            order = np.argsort(-evals)
+            self.a = np.dot(evecs[:,order],np.diag(np.sqrt(evals[order])))
         elif self.decomp_type == 'CHOLESKY':
-            self.a = cholesky(self.sigma) #Fred changed this
+            self.a = cholesky(self.sigma)
         else:
             raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'") 
         self.mvn_scipy = multivariate_normal(mean=self.mu,cov=self.sigma, allow_singular=True)
 
     def _transform(self, x):
-        return self.mu + norm.ppf(x)@self.a.T
+        return self.mu+np.einsum("...ij,kj->...ik",norm.ppf(x),self.a)
 
     def _weight(self, t):
         return self.mvn_scipy.pdf(t)
@@ -83,7 +109,7 @@ class Gaussian(TrueMeasure):
         else:
             m = self.mu[0]
             c = self.sigma[0,0]
-            expected_cov = c*eye(int(self.d))
+            expected_cov = c*np.eye(int(self.d))
             if not ( (self.mu==m).all() and (self.sigma==expected_cov).all() ):
                 raise DimensionError('''
                         In order to spawn a Gaussian measure
@@ -91,5 +117,3 @@ class Gaussian(TrueMeasure):
                         covariance must be a scaler times I''')
             spawn = Gaussian(sampler,mean=m,covariance=c,decomp_type=self.decomp_type)
         return spawn
-
-class Normal(Gaussian): pass

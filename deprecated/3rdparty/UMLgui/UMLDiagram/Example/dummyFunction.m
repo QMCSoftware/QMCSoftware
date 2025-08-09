@@ -1,3 +1,0 @@
-function dummyFunction()
-
-end
