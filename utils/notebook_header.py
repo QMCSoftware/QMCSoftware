@@ -260,8 +260,7 @@ def main(force: bool = False, quiet: bool = True):
         print(f"[notebook_header] Time: {datetime.datetime.now().isoformat(timespec='seconds')}")
 
     try:
-        if not in_qmcpy_env() or in_colab():
-            show_colab_button(org, repo, branch, _NB_PATH)
+        show_colab_button(org, repo, branch, _NB_PATH)
     except Exception as e:
         if not quiet:
             print("[notebook_header] Colab badge error:", e)
