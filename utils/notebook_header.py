@@ -1,144 +1,292 @@
 """
-Unified VS Code + Colab bootstrap header (auto-detects notebook path).
+notebook_header.py — portable header for VS Code, JupyterLab, and Colab.
 
-Usage in a notebook:
-
-    # Remote run in Colab (from your repo):
-    %run https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/bootstrap_colab/utils/notebook_header.py
-    # (after merge, change branch above to "develop")
-
-    # Local run in VS Code (from repo root):
-    %run utils/notebook_header.py
+Features:
+- Location-independent: detects repo root, org/repo, and notebook path.
+- Honors NB_PATH override set in the notebook or environment.
+- Colab bootstrap: clones current repo (+ submodules) and installs deps.
+- Colab badge: shows "Open in Colab" when not in 'qmcpy' env (or always in Colab).
+- Post-cell hook: if NB path is unknown on first import, resolve it right after the first cell.
+- Auto-run on import; idempotent; re-run via reload_header().
+- quiet=True by default to suppress print output.
 """
 
 from __future__ import annotations
 import os
 import sys
-import pathlib
+import re
 import subprocess
-from typing import Optional
+import pathlib
+import datetime
+from typing import Optional, List
 
-# --- Self-switching bootstrap ---
-# If running inside Colab but the file is being loaded locally, reload it from GitHub
-import sys
-if "google.colab" in sys.modules and not __file__.startswith("/content/"):
-    import urllib.request, pathlib
-    branch = "bootstrap_colab"  # change to develop after merge
-    url = f"https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/{branch}/utils/notebook_header.py"
-    dest = pathlib.Path("/content/notebook_header.py")
-    print(f"[notebook_header] Re-fetching from GitHub: {url}")
-    urllib.request.urlretrieve(url, dest)
-    get_ipython().run_line_magic("run", str(dest))
-    raise SystemExit  # stop running the local file
+_STATE = {"ran": False}
+_NB_PATH = "unknown.ipynb"  # updated at runtime
 
-# ---- One place to switch branches later ----
-BOOT_BRANCH = os.environ.get("BOOT_BRANCH", "bootstrap_colab")  # change to "develop" after merge
+DEFAULT_BOOT_BRANCH = (
+    os.environ.get("BOOT_BRANCH")
+    or os.environ.get("QMCSOFTWARE_REF")
+    or "bootstrap_colab"
+)
 
-IN_COLAB = "google.colab" in sys.modules
-REPO = "QMCSoftware"
-ORG = "QMCSoftware"
-
-
-def _git_repo_root() -> Optional[pathlib.Path]:
+# ---------------------------
+# Environment helpers
+# ---------------------------
+def in_ipython() -> bool:
     try:
-        out = subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip()
+        get_ipython  # type: ignore[name-defined]
+        return True
+    except NameError:
+        return False
+
+def in_colab() -> bool:
+    return "COLAB_RELEASE_TAG" in os.environ or "COLAB_GPU" in os.environ
+
+def conda_env_name() -> Optional[str]:
+    name = os.environ.get("CONDA_DEFAULT_ENV")
+    if name:
+        return name
+    prefix = sys.prefix
+    m = re.search(r"(?:^|[/\\\\])envs[/\\\\]([^/\\\\]+)$", prefix)
+    return m.group(1) if m else None
+
+def in_qmcpy_env() -> bool:
+    env = (conda_env_name() or "").lower()
+    if env == "qmcpy":
+        return True
+    flag = os.environ.get("QMCPY_ENV", "").lower()
+    if flag in ("1", "true", "yes", "y"):
+        return True
+    return False
+
+# ---------------------------
+# Git / repo helpers
+# ---------------------------
+def get_repo_root() -> Optional[pathlib.Path]:
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"], text=True
+        ).strip()
         p = pathlib.Path(out)
         return p if p.exists() else None
     except Exception:
         return None
 
+def get_org_repo() -> tuple[str, str]:
+    org = globals().get("ORG") or os.environ.get("ORG")
+    repo = globals().get("REPO") or os.environ.get("REPO")
+    if org and repo:
+        return str(org), str(repo)
+    try:
+        url = subprocess.check_output(
+            ["git", "config", "--get", "remote.origin.url"], text=True
+        ).strip()
+        m = re.search(r"[:/](?P<org>[^/]+)/(?P<repo>[^/\\.]+)(?:\\.git)?$", url)
+        if m:
+            return m.group("org"), m.group("repo")
+    except Exception:
+        pass
+    return "QMCSoftware", "QMCSoftware"
 
-def _guess_nb_path(repo_root: pathlib.Path) -> Optional[str]:
-    """
-    Best-effort notebook path detection relative to repo root.
+# ---------------------------
+# NB_PATH override + detection
+# ---------------------------
+def get_nb_override() -> Optional[str]:
+    try:
+        if in_ipython():
+            ns = get_ipython().user_ns  # type: ignore[attr-defined]
+            val = ns.get("NB_PATH")
+            if isinstance(val, str) and val.strip():
+                return val
+    except Exception:
+        pass
+    val = os.environ.get("NB_PATH")
+    return val if val else None
 
-    Tries (in order):
-      1) ipynbname (no install, only if already available)
-      2) If exactly one .ipynb exists in CWD, use it
-      3) If the Python file name ends with .ipynb (rare in VS Code), use it
-    """
-    # 1) ipynbname (only if already installed)
+def guess_nb_path(repo_root: pathlib.Path) -> str:
     try:
         import ipynbname  # type: ignore
-        nb_path = pathlib.Path(ipynbname.path())  # absolute
-        try:
-            return str(nb_path.relative_to(repo_root))
-        except Exception:
-            return str(nb_path)
+        full = pathlib.Path(ipynbname.path())
+        return str(full.resolve().relative_to(repo_root))
     except Exception:
-        pass
+        return "unknown.ipynb"
 
-    # 2) exactly one .ipynb in current directory
-    cwd = pathlib.Path.cwd()
-    ipynbs = list(cwd.glob("*.ipynb"))
-    if len(ipynbs) == 1:
+# ---------------------------
+# Colab bootstrap
+# ---------------------------
+def ensure_pip_packages(pkgs: List[str]) -> None:
+    import importlib
+    to_install = []
+    for p in pkgs:
+        mod = p.split("==")[0].split(">=")[0]
         try:
-            return str(ipynbs[0].resolve().relative_to(repo_root))
+            importlib.import_module(mod if mod != "matplotlib" else "matplotlib")
         except Exception:
-            return str(ipynbs[0].name)
+            to_install.append(p)
+    if to_install:
+        print("[notebook_header] pip install:", " ".join(to_install))
+        subprocess.check_call([sys.executable, "-m", "pip", "install", *to_install])
 
-    # 3) Fallback: sometimes VS Code exposes __file__-like info (rare)
-    try:
-        import __main__  # type: ignore
-        fn = getattr(__main__, "__file__", None)
-        if isinstance(fn, str) and fn.endswith(".ipynb"):
-            p = pathlib.Path(fn).resolve()
-            try:
-                return str(p.relative_to(repo_root))
-            except Exception:
-                return str(p)
-    except Exception:
-        pass
-
-    return None
-
-
-def _run_bootstrap(branch: str) -> None:
-    """Download bootstrap_colab.py from given branch and run it (Colab only)."""
-    import urllib.request
-    url = f"https://raw.githubusercontent.com/{ORG}/{REPO}/{branch}/bootstrap_colab.py"
-    dest = pathlib.Path("/content/bootstrap_colab.py")
-    print(f"[notebook_header] Fetching: {url}")
-    urllib.request.urlretrieve(url, dest)  # raises on 404
-    print(f"[notebook_header] Saved to: {dest}")
-    get_ipython().run_line_magic("run", str(dest))
-
-
-def _show_colab_button(nb_path: Optional[str], branch: str) -> None:
-    try:
-        from utils.colab_button import show
-    except Exception as e:
-        print("[notebook_header] Colab button unavailable:", e)
-        return
-
-    if nb_path:
-        show(ORG, REPO, nb_path, branch=branch, new_tab=False)
+def colab_bootstrap(org: str, repo: str, branch: str) -> pathlib.Path:
+    repo_dir = pathlib.Path("/content") / repo
+    if not repo_dir.exists():
+        print(f"[notebook_header] Cloning {org}/{repo}@{branch} (with submodules) ...")
+        subprocess.check_call([
+            "git", "clone", "--depth", "1", "--recurse-submodules",
+            "-b", branch, f"https://github.com/{org}/{repo}.git", str(repo_dir)
+        ])
     else:
-        print("[notebook_header] Could not determine NB_PATH automatically.")
-        print("  Tip: set an explicit path at the very top of the notebook, then re-run:")
-        print('    NB_PATH = "relative/path/to/this_notebook.ipynb"')
-        print("  (from the repo root)")
+        print(f"[notebook_header] Using existing clone at {repo_dir}")
 
+    req = repo_dir / "requirements-colab.txt"
+    if req.exists():
+        print("[notebook_header] Installing requirements-colab.txt")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", str(req)])
+    else:
+        ensure_pip_packages([
+            "numpy", "scipy", "matplotlib", "pandas", "ipynbname"
+        ])
 
-def main() -> None:
-    if IN_COLAB:
-        os.environ["QMCSOFTWARE_REF"] = BOOT_BRANCH
-        _run_bootstrap(BOOT_BRANCH)
+    qmc_path = repo_dir / "QMCSoftware"
+    if qmc_path.exists():
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", str(qmc_path)])
+        except Exception as e:
+            print("[notebook_header] Editable install of QMCSoftware failed:", e)
+
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", str(repo_dir)])
+    except Exception as e:
+        print("[notebook_header] Editable install of repo failed:", e)
+
+    utils_dir = repo_dir / "utils"
+    if str(utils_dir) not in sys.path:
+        sys.path.insert(0, str(utils_dir))
+
+    try:
+        os.chdir(repo_dir)
+    except Exception:
+        pass
+
+    return repo_dir
+
+# ---------------------------
+# Colab badge helper
+# ---------------------------
+def show_colab_button(org: str, repo: str, branch: str, nb_path: str) -> None:
+    from IPython.display import HTML, display  # type: ignore
+    nb_quoted = nb_path.replace(" ", "%20")
+    url = f"https://colab.research.google.com/github/{org}/{repo}/blob/{branch}/{nb_quoted}"
+    badge = (
+        '<a target="_blank" href="{url}">'
+        '<img src="https://colab.research.google.com/assets/colab-badge.svg" '
+        'alt="Open In Colab"/></a>'
+    ).format(url=url)
+    display(HTML(badge))
+
+# ---------------------------
+# Auto imports (optional)
+# ---------------------------
+def try_auto_imports() -> None:
+    try:
+        from utils.auto_imports import inject_common  # type: ignore
+        inject_common(get_ipython().user_ns)  # type: ignore[attr-defined]
+    except Exception:
+        pass
+
+# ---------------------------
+# Post-run hook
+# ---------------------------
+def _post_run_attempt_path(repo_root: pathlib.Path, org: str, repo: str, branch: str, quiet: bool):
+    ip = get_ipython()  # type: ignore[attr-defined]
+
+    def _callback(*args, **kwargs):
+        global _NB_PATH
+        try:
+            override = get_nb_override()
+            new_path = override if override else guess_nb_path(repo_root)
+            if new_path != "unknown.ipynb":
+                _NB_PATH = new_path
+                if not quiet:
+                    print(f"[notebook_header] Detected notebook after first cell: {_NB_PATH}")
+                try:
+                    show_colab_button(org, repo, branch, _NB_PATH)
+                except Exception:
+                    pass
+                try:
+                    ip.events.unregister('post_run_cell', _callback)  # type: ignore[attr-defined]
+                except Exception:
+                    pass
+        except Exception:
+            try:
+                ip.events.unregister('post_run_cell', _callback)  # type: ignore[attr-defined]
+            except Exception:
+                pass
+
+    try:
+        ip.events.register('post_run_cell', _callback)  # type: ignore[attr-defined]
+    except Exception:
+        pass
+
+# ---------------------------
+# Main entry
+# ---------------------------
+def main(force: bool = False, quiet: bool = True):
+    global _NB_PATH
+
+    if _STATE["ran"] and not force:
+        if not quiet:
+            print("[notebook_header] already ran; set force=True to re-run.")
         return
+    _STATE["ran"] = True
 
-    # Local (VS Code / Jupyter)
-    repo_root = _git_repo_root()
-    if not repo_root:
-        print("[notebook_header] Not inside a git repo; skipping Colab button.")
-        return
+    repo_root = get_repo_root()
+    org, repo = get_org_repo()
+    branch = os.environ.get("BOOT_BRANCH", DEFAULT_BOOT_BRANCH)
 
-    # 👇 Respect NB_PATH if the notebook set it (or env var), else try to auto-detect
-    nb_path = globals().get("NB_PATH") or os.environ.get("NB_PATH")
-    if not nb_path:
-        nb_path = _guess_nb_path(repo_root)
+    nb_override = get_nb_override()
+    if nb_override:
+        _NB_PATH = nb_override
+        if not quiet:
+            print(f"[notebook_header] Using NB_PATH override: {_NB_PATH}")
+    elif repo_root:
+        _NB_PATH = guess_nb_path(repo_root)
+    else:
+        _NB_PATH = "unknown.ipynb"
 
-    _show_colab_button(nb_path, BOOT_BRANCH)
+    if not quiet:
+        print(f"[notebook_header] {org}/{repo}@{branch}")
+        print(f"[notebook_header] Notebook: {_NB_PATH}")
+        print(f"[notebook_header] Time: {datetime.datetime.now().isoformat(timespec='seconds')}")
 
+    try:
+        if not in_qmcpy_env() or in_colab():
+            show_colab_button(org, repo, branch, _NB_PATH)
+    except Exception as e:
+        if not quiet:
+            print("[notebook_header] Colab badge error:", e)
 
-if __name__ == "__main__":
-    main()
+    if in_colab():
+        try:
+            colab_bootstrap(org, repo, branch)
+        except Exception as e:
+            if not quiet:
+                print("[notebook_header] Colab bootstrap error:", e)
+
+    if _NB_PATH == "unknown.ipynb" and in_ipython() and repo_root:
+        _post_run_attempt_path(repo_root, org, repo, branch, quiet)
+
+    try_auto_imports()
+
+def reload_header(quiet: bool = True):
+    return main(force=True, quiet=quiet)
+
+# ---------------------------
+# Autorun
+# ---------------------------
+if os.environ.get("NOTEBOOK_HEADER_AUTORUN", "1").lower() in ("1", "true", "yes"):
+    if in_ipython():
+        try:
+            main(False)
+        except Exception as e:
+            print("[notebook_header] autorun failed:", e)
