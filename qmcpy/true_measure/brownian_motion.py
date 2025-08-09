@@ -80,4 +80,3 @@ class BrownianMotion(Gaussian):
     
     def _spawn(self, sampler, dimension):
         return BrownianMotion(sampler,t_final=self.t,drift=self.drift,decomp_type=self.decomp_type)
-        
