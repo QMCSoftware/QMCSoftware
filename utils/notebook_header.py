@@ -174,15 +174,17 @@ def colab_bootstrap(org: str, repo: str, branch: str) -> pathlib.Path:
 # Colab badge helper
 # ---------------------------
 def show_colab_button(org: str, repo: str, branch: str, nb_path: str) -> None:
-    from IPython.display import HTML, display  # type: ignore
+    from IPython.display import HTML, display
     nb_quoted = nb_path.replace(" ", "%20")
     url = f"https://colab.research.google.com/github/{org}/{repo}/blob/{branch}/{nb_quoted}"
-    badge = (
-        '<a target="_blank" href="{url}">'
+    html = (
+        'If you are not running this notebook in the '
+        '<code>conda qmcpy</code> environment, '
+        f'<a target="_blank" href="{url}">'
         '<img src="https://colab.research.google.com/assets/colab-badge.svg" '
         'alt="Open In Colab"/></a>'
-    ).format(url=url)
-    display(HTML(badge))
+    )
+    display(HTML(html))
 
 # ---------------------------
 # Auto imports (optional)
