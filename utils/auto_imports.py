@@ -68,14 +68,23 @@ def inject_common(ns, *, verbose=False, plot_prefs=None):
         rc['lines.linewidth']    = 2.0
         rc['lines.markersize']   = 4.0
 
-        # Enable LaTeX text + macro preamble
-        rc['text.usetex'] = True
         try:
-            from utils.latex_macros import MATPLOTLIB_PREAMBLE
-            rc['text.latex.preamble'] = MATPLOTLIB_PREAMBLE
-        except Exception as e:
+            from utils.notebook_header import have_tex_toolchain
+        except ImportError:
+            have_tex_toolchain = lambda: shutil.which("latex") is not None  # fallback minimal check
+
+        # Enable LaTeX text + macro preamble, but only if LaTeX toolchain is available
+        if have_tex_toolchain():
+            rc['text.usetex'] = True
+            try:
+                from utils.latex_macros import MATPLOTLIB_PREAMBLE
+                rc['text.latex.preamble'] = MATPLOTLIB_PREAMBLE
+            except Exception as e:
+                if verbose:
+                    print("[auto_imports] WARNING: latex_macros import failed:", e)
+        else:
             if verbose:
-                print("[auto_imports] WARNING: latex_macros import failed:", e)
+                print("[auto_imports] WARNING: LaTeX toolchain not found; skipping usetex=True.")
 
         # Optional smoke test
         if verbose:

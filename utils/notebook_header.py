@@ -143,7 +143,8 @@ def ensure_pip_packages(pkgs: list, quiet: bool = True) -> None:
             print("[notebook_header] pip install:", " ".join(to_install))
         subprocess.check_call([sys.executable, "-m", "pip", "install", *to_install])
 
-def _have_tex_toolchain() -> bool:
+def have_tex_toolchain() -> bool:
+    """Return True if LaTeX + dvipng/dvisvgm + ghostscript are available."""
     have_latex = shutil.which("latex") is not None
     have_dvipng = (shutil.which("dvipng") is not None) or (shutil.which("dvisvgm") is not None)
     have_gs = (shutil.which("gs") is not None) or (shutil.which("ghostscript") is not None)
@@ -151,7 +152,7 @@ def _have_tex_toolchain() -> bool:
 
 def ensure_latex_toolchain(quiet: bool = True) -> bool:
     """Colab: install LaTeX if missing (prints 'this may take several minutes'). Local: no install."""
-    if _have_tex_toolchain():
+    if have_tex_toolchain():
         return True
     if in_colab():
         # Be robust if Colab image ever changes or a similar environment lacks apt-get
@@ -166,7 +167,7 @@ def ensure_latex_toolchain(quiet: bool = True) -> bool:
                 "apt-get", "-y", "install",
                 "texlive-latex-extra", "texlive-fonts-recommended", "dvipng", "dvisvgm", "cm-super", "ghostscript"
             ], shell=False)
-            return _have_tex_toolchain()
+            return have_tex_toolchain()
         except Exception as e:
             print("[notebook_header] WARNING: LaTeX install failed; Matplotlib usetex may not work:", e)
             return False
