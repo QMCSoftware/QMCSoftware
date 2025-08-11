@@ -279,7 +279,7 @@ def show_colab_button(org: str, repo: str, branch: str, nb_path: str) -> None:
     url = f"https://colab.research.google.com/github/{org}/{repo}/blob/{branch}/{nb_quoted}"
     html = (
         '<div style="font-size:120%;">'
-        'If not running in the <code>conda qmcpy</code> environment, <br>'
+        'If not running in the <code>conda qmcpy</code> environment and not already in Colab, <br>'
         '<span style="margin-left:1.5em;">'
         f'push the button to <a target="_blank" href="{url}">'
         '<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>'
