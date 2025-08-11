@@ -133,13 +133,18 @@ def ensure_latex_toolchain(quiet: bool = True) -> bool:
     if _have_tex_toolchain():
         return True
     if in_colab():
+        # Be robust if Colab image ever changes or a similar environment lacks apt-get
+        if shutil.which("apt-get") is None:
+            print("[notebook_header] WARNING: 'apt-get' not found in this environment; "
+                  "cannot install LaTeX toolchain.")
+            return False
         try:
             print("[notebook_header] LaTeX not found — installing in Colab (this may take several minutes)...")
-            subprocess.check_call(["bash","-lc","apt-get -y update"])
+            subprocess.check_call(["apt-get", "-y", "update"], shell=False)
             subprocess.check_call([
-                "bash","-lc",
-                "apt-get -y install texlive-latex-extra texlive-fonts-recommended dvipng dvisvgm cm-super ghostscript"
-            ])
+                "apt-get", "-y", "install",
+                "texlive-latex-extra", "texlive-fonts-recommended", "dvipng", "dvisvgm", "cm-super", "ghostscript"
+            ], shell=False)
             return _have_tex_toolchain()
         except Exception as e:
             print("[notebook_header] WARNING: LaTeX install failed; Matplotlib usetex may not work:", e)
