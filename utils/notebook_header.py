@@ -34,6 +34,8 @@ DEFAULT_BOOT_BRANCH = (
     or "bootstrap_colab"
 )
 
+_QMCPY_GITHUB_URL_DEFAULT = "git+https://github.com/QMCSoftware/QMCSoftware.git"
+
 # ---------------- Basic env helpers ----------------
 def in_ipython() -> bool:
     try:
@@ -233,7 +235,7 @@ def ensure_qmcpy_from_github():
         pass
 
     branch = os.environ.get("QMCPY_BRANCH", "").strip()
-    url = "git+https://github.com/QMCSoftware/QMCSoftware.git"
+    url = os.environ.get("QMCPY_GITHUB_URL", _QMCPY_GITHUB_URL_DEFAULT)
     if branch:
         url += f"@{branch}"
     # '#egg=qmcpy' is optional; useful for some older pip resolutions
