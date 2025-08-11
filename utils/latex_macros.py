@@ -1,6 +1,9 @@
 # utils/latex_macros.py
-MARKDOWN_CELL = r"""
-$
+# Single source of truth for LaTeX macros used in Markdown cells and Matplotlib.
+
+# Core macros (kept identical across Markdown + Matplotlib)
+COMMON_MACROS = r"""
+\usepackage{amsmath,amssymb,amsfonts,bm}
 \newcommand{\vh}{\boldsymbol{h}}
 \newcommand{\vt}{\boldsymbol{t}}
 \newcommand{\vx}{\boldsymbol{x}}
@@ -10,20 +13,12 @@ $
 \newcommand{\dif}{\mathrm{d}}
 \newcommand{\Ex}{\mathbb{E}}
 \DeclareMathOperator{\disc}{disc}
-\newcommand{\norm}[2]{{\left \lVert #2 \right \rVert}_{#1}}
-$
+% \norm{x}{2} -> \left\lVert x \right\rVert_{2}
+\newcommand{\norm}[2]{{\left \lVert #1 \right \rVert}_{#2}}
 """.strip()
 
-MATPLOTLIB_PREAMBLE = (
-    r"\usepackage{amsmath,amssymb}"
-    r"\newcommand{\vh}{\boldsymbol{h}}"
-    r"\newcommand{\vt}{\boldsymbol{t}}"
-    r"\newcommand{\vx}{\boldsymbol{x}}"
-    r"\newcommand{\vX}{\boldsymbol{X}}"
-    r"\newcommand{\cf}{\mathcal{F}}"
-    r"\newcommand{\cu}{\mathcal{U}}"
-    r"\newcommand{\dif}{\mathrm{d}}"
-    r"\newcommand{\Ex}{\mathbb{E}}"
-    r"\DeclareMathOperator{\disc}{disc}"
-    r"\newcommand{\norm}[2]{{\left \lVert #2 \right \rVert}_{#1}}"
-)
+# For Matplotlib rcParams["text.latex.preamble"]
+MATPLOTLIB_PREAMBLE = COMMON_MACROS
+
+# For Jupyter Markdown cells (paste this cell to define macros in the notebook)
+MARKDOWN_CELL = "$$\n" + COMMON_MACROS + "\n$$"

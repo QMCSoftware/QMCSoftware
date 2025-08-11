@@ -86,17 +86,16 @@ def inject_common(ns, *, verbose=False, plot_prefs=None):
             if verbose:
                 print("[auto_imports] WARNING: LaTeX toolchain not found; skipping usetex=True.")
 
-        # Optional smoke test
-        if verbose:
-            try:
-                fig = plt.figure()
-                plt.text(0.5, 0.5, r"$\vx,\ \norm{2}{x}$")
-                fig.canvas.draw()
-                plt.close(fig)
-                print("[auto_imports] rcParams set (usetex=True, preamble OK).")
-            except Exception as e:
-                print("[auto_imports] WARNING: LaTeX render test failed. "
-                      "Ensure latex/dvipng/ghostscript are installed. Error:", e)
+        # LaTeX smoke test — verify usetex works by drawing a tiny figure
+        fig = plt.figure()
+        try:
+            plt.text(0.5, 0.5, r"$\vx,\ \norm{2}{x}$")
+            fig.canvas.draw()
+        except Exception as e:
+            if verbose:
+                print("[auto_imports] WARNING: LaTeX smoke test failed:", e)
+        finally:
+            plt.close(fig)
 
     # Tiny post-check (quiet unless something is missing)
     missing = [a for a in ('np','pd','plt') if a not in ns]
