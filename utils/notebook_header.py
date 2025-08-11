@@ -9,8 +9,27 @@ notebook_header.py — portable header for VS Code, JupyterLab, and Colab.
 - Colab-only execution time/timestamp hook (no duplicates in VS Code/JupyterLab).
 - Quiet by default; set AUTO_IMPORTS_VERBOSE=1 for light diagnostics.
 
-Env to set in first cell BEFORE importing this module:
-  BOOT_ORG, BOOT_REPO, NB_PATH, BOOT_BRANCH, NOTEBOOK_HEADER_AUTORUN, AUTO_PLOT_PREFS
+# ---------------------------------------------------------------------------
+# Environment Variables (set BEFORE importing notebook_header in your notebook)
+#
+# BOOT_ORG                – GitHub org for the repo (default: inferred from git remote or "QMCSoftware")
+# BOOT_REPO               – GitHub repo name (default: inferred from git remote or "QMCSoftware")
+# NB_PATH                 – Path to the notebook relative to repo root (default: auto-detected)
+# BOOT_BRANCH             – Branch used when cloning in Colab (precedence: BOOT_BRANCH → QMCSOFTWARE_REF → "bootstrap_colab")
+# QMCSOFTWARE_REF         – Fallback branch/tag ONLY for the Colab clone if BOOT_BRANCH is not set
+# NOTEBOOK_HEADER_AUTORUN – "1"/"true" to autorun on import (default: 1)
+# AUTO_IMPORTS_VERBOSE    – "1"/"true" for verbose auto_imports diagnostics (default: 0)
+# AUTO_PLOT_PREFS         – "1"/"true" to set common plotting defaults (default: 0)
+# QMCPY_BRANCH            – Branch/tag appended to the QMCSoftware pip URL if qmcpy isn’t importable
+# QMCPY_GITHUB_URL        – Full pip-installable URL for QMCSoftware fallback install
+#                            (default: git+https://github.com/QMCSoftware/QMCSoftware.git)
+# QMCPY_SKIP_GITHUB       – "1"/"true" to skip installing qmcpy from GitHub when not found (default: 0)
+#
+# Example (in a notebook cell, BEFORE running notebook_header):
+# import os
+# os.environ["QMCPY_GITHUB_URL"] = "git+https://github.com/yourfork/QMCSoftware.git"
+# os.environ["BOOT_BRANCH"] = "develop"
+# ---------------------------------------------------------------------------
 """
 
 from __future__ import annotations
@@ -227,12 +246,18 @@ def colab_bootstrap(org: str, repo: str, branch: str, quiet: bool = True) -> pat
     return repo_dir
 
 def ensure_qmcpy_from_github():
-    """If qmcpy is not importable, install from GitHub (optional branch via QMCPY_BRANCH)."""
+    """If qmcpy is not importable, install from GitHub unless skipped by QMCPY_SKIP_GITHUB."""
     try:
         import qmcpy  # noqa: F401
         return  # already available
     except Exception:
         pass
+
+    # Escape hatch for offline/prebuilt environments
+    skip = os.environ.get("QMCPY_SKIP_GITHUB", "0").lower() in ("1", "true", "yes")
+    if skip:
+        print("[notebook_header] qmcpy not found, but QMCPY_SKIP_GITHUB is set — skipping GitHub install.")
+        return
 
     branch = os.environ.get("QMCPY_BRANCH", "").strip()
     url = os.environ.get("QMCPY_GITHUB_URL", _QMCPY_GITHUB_URL_DEFAULT)
