@@ -309,17 +309,30 @@ def try_auto_imports() -> None:
 
 # ---------------- Colab-only execution timer ----------------
 def _register_execution_timer() -> None:
-    """Prints '[Executed in X.XXs at YYYY-MM-DD HH:MM:SS timezone]' after each cell (Colab only)."""
-    if _STATE.get("timer"):
-        return
-    # (rest as-is)
-    _STATE["timer"] = True
-    
+    """Colab-only: print '[Executed in X.XXs at YYYY-MM-DD HH:MM:SS TZ]' after each cell.
+
+    Idempotent across reloads: if handlers were registered before, we unregister them first.
+    """
+    # Only proceed in IPython (Colab/Jupyter). Main() already calls this only in Colab.
     if not in_ipython():
         return
     ip = get_ipython()  # type: ignore
     if not ip:
         return
+
+    # If we registered before, try to unregister old handlers to avoid duplicates.
+    prev = _STATE.get("timer_handlers")
+    if prev:
+        pre_old, post_old = prev
+        try:
+            ip.events.unregister("pre_run_cell", pre_old)
+        except Exception:
+            pass
+        try:
+            ip.events.unregister("post_run_cell", post_old)
+        except Exception:
+            pass
+
     _state = {"start": None}
 
     def pre_run_cell(_info):
@@ -332,9 +345,11 @@ def _register_execution_timer() -> None:
         ts = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %Z")
         print(f"[Executed in {elapsed:.2f}s at {ts}]")
 
-    # Register hooks (idempotent enough for our usage)
+    # Register fresh handlers and remember them so we can unregister later.
     ip.events.register("pre_run_cell", pre_run_cell)
     ip.events.register("post_run_cell", post_run_cell)
+    _STATE["timer_handlers"] = (pre_run_cell, post_run_cell)
+    _STATE["timer"] = True  # keep legacy flag in case other code checks it
 
 # ---------------- Main ----------------
 def main(force: bool = False, quiet: bool = True):
