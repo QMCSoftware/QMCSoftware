@@ -24,6 +24,10 @@
 
 ::: qmcpy.true_measure.brownian_motion.BrownianMotion
 
+## `GeometricBrownianMotion`
+
+::: qmcpy.true_measure.geometric_brownian_motion.GeometricBrownianMotion
+
 ## `MaternGP`
 
 ::: qmcpy.true_measure.matern_gp.MaternGP

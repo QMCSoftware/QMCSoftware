@@ -1,5 +1,6 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from .brownian_motion import BrownianMotion
+from .geometric_brownian_motion import GeometricBrownianMotion
 from .gaussian import Gaussian
 from .lebesgue import Lebesgue
 from .uniform import Uniform
