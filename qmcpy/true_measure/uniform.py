@@ -1,59 +1,78 @@
-from ._true_measure import TrueMeasure
-from ..util import TransformError, DimensionError
+from .abstract_true_measure import AbstractTrueMeasure
+from ..util import DimensionError
 from ..discrete_distribution import DigitalNetB2
-from numpy import *
+import numpy as np
 from scipy.stats import norm
+from typing import Union
 
 
-class Uniform(TrueMeasure):
-    """
-    >>> u = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
-    >>> u.gen_samples(4)
-    array([[0.1431124 , 0.69460269],
-           [1.62840337, 2.36213894],
-           [0.62818597, 2.83084783],
-           [1.14326115, 1.16339383]])
-    >>> u
-    Uniform (TrueMeasure Object)
-        lower_bound     [0.  0.5]
-        upper_bound     [2 3]
+class Uniform(AbstractTrueMeasure):
+    r"""
+    Uniform distribution, see [https://en.wikipedia.org/wiki/Continuous_uniform_distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution). 
+
+    Examples:
+        >>> true_measure = Uniform(DigitalNetB2(2,seed=7),lower_bound=[0,.5],upper_bound=[2,3])
+        >>> true_measure(4)
+        array([[1.44324713, 2.7873875 ],
+               [0.32691107, 1.5741214 ],
+               [1.97352511, 0.58590959],
+               [0.8591331 , 1.89690854]])
+        >>> true_measure
+        Uniform (AbstractTrueMeasure)
+            lower_bound     [0.  0.5]
+            upper_bound     [2 3]
+
+        With independent replications 
+
+        >>> x = Uniform(DigitalNetB2(3,seed=7,replications=2),lower_bound=[.25,.5,.75],upper_bound=[1.75,1.5,1.25])(4)
+        >>> x.shape 
+        (2, 4, 3)
+        >>> x
+        array([[[0.61979915, 0.6821862 , 1.12366296],
+                [1.27229355, 1.16169442, 0.9644598 ],
+                [0.97209782, 1.29818233, 0.79100643],
+                [1.62311988, 0.79520621, 1.13747905]],
+        <BLANKLINE>
+               [[0.92315337, 1.35899604, 1.0027484 ],
+                [1.05453886, 0.54353443, 0.91782473],
+                [0.59821215, 0.79281506, 0.78420518],
+                [1.37943573, 1.10241448, 1.13481488]]])
     """
     
-    def __init__(self, sampler, lower_bound=0., upper_bound=1.):
-        """
+    def __init__(self, sampler, lower_bound=0, upper_bound=1):
+        r"""
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform 
-            lower_bound (float): a for Uniform(a,b)
-            upper_bound (float): b for Uniform(a,b)
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            lower_bound (Union[float,np.ndarray]): Lower bound.
+            upper_bound (Union[float,np.ndarray]): Upper bound.
         """
         self.parameters = ['lower_bound', 'upper_bound']
-        self.domain = array([[0,1]])
+        self.domain = np.array([[0,1]])
         self._parse_sampler(sampler)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
-        if isscalar(self.lower_bound):
-            lower_bound = tile(self.lower_bound,self.d)
-        if isscalar(self.upper_bound):
-            upper_bound = tile(self.upper_bound,self.d)
-        self.a = array(lower_bound)
-        self.b = array(upper_bound)
+        if np.isscalar(self.lower_bound):
+            lower_bound = np.tile(self.lower_bound,self.d)
+        if np.isscalar(self.upper_bound):
+            upper_bound = np.tile(self.upper_bound,self.d)
+        self.a = np.array(lower_bound)
+        self.b = np.array(upper_bound)
         if len(self.a)!=self.d or len(self.b)!=self.d:
             raise DimensionError('upper bound and lower bound must be of length dimension')
-        self._set_constants()
-        self.range = hstack((self.a.reshape((self.d,1)),self.b.reshape((self.d,1))))
-        super(Uniform,self).__init__()
-
-    def _set_constants(self):
         self.delta = self.b - self.a
         self.inv_delta_prod = 1/self.delta.prod()
+        self.range = np.hstack((self.a.reshape((self.d,1)),self.b.reshape((self.d,1))))
+        super(Uniform,self).__init__()
+        assert self.a.shape==(self.d,) and self.b.shape==(self.d,)
 
     def _transform(self, x):
-        return x * self.delta + self.a
+        return x*self.delta+self.a
     
     def _weight(self, x):
-        return tile(self.inv_delta_prod,x.shape[0])
+        return np.tile(self.inv_delta_prod,x.shape[:-1])
     
     def _spawn(self, sampler, dimension):
         if dimension==self.d: # don't do anything if the dimension doesn't change
@@ -63,7 +82,7 @@ class Uniform(TrueMeasure):
             u = self.b[0]
             if not (all(self.a==l) and all(self.b==u)):
                 raise DimensionError('''
-                    In order to spawn a uniform measure
+                    In order to spawn a uniform measure with different dimensions
                     the lower bounds must all be the same and 
                     the upper bounds must all be the same''')
             spawn = Uniform(sampler,lower_bound=l,upper_bound=u)

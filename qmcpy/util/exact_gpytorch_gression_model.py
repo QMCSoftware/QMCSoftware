@@ -1,6 +1,6 @@
-import gpytorch 
-from numpy import *
+import numpy as np
 import torch 
+import gpytorch
 
 class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
     allowed_likelihood_types = (
@@ -8,8 +8,8 @@ class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
         gpytorch.likelihoods.GaussianLikelihoodWithMissingObs,
         gpytorch.likelihoods.FixedNoiseGaussianLikelihood)
     def __init__(self, x_t, y_t, prior_mean, prior_cov, likelihood, use_gpu=False):
-        if isinstance(x_t,ndarray): x_t = torch.from_numpy(x_t)
-        if isinstance(y_t,ndarray): y_t = torch.from_numpy(y_t)
+        if isinstance(x_t,np.ndarray): x_t = torch.from_numpy(x_t)
+        if isinstance(y_t,np.ndarray): y_t = torch.from_numpy(y_t)
         assert x_t.ndim==2 and y_t.ndim==1 and len(x_t)==len(y_t)
         super(ExactGPyTorchRegressionModel, self).__init__(x_t,y_t,likelihood)
         assert isinstance(self.likelihood,ExactGPyTorchRegressionModel.allowed_likelihood_types)
@@ -38,14 +38,14 @@ class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
                 for name,val in self.named_parameters(): print('\t\t\t%s %.2e'%(name.ljust(50,'.'),val))
             optimizer.step()
     def predict(self, x, noise_const=0, chunk_size=2**15):
-        if isinstance(x,ndarray): x = torch.from_numpy(x)
+        if isinstance(x,np.ndarray): x = torch.from_numpy(x)
         assert x.ndim==2 and x.shape[1]==self.d
         self.eval()
         self.likelihood.eval()
         n = len(x)
-        mean_post,std_post = zeros(n,dtype=float),zeros(n,dtype=float)
+        mean_post,std_post = np.zeros(n,dtype=float),np.zeros(n,dtype=float)
         for i in range(0,n,chunk_size):
-            lchunk,uchunk = i,minimum(i+chunk_size,n)
+            lchunk,uchunk = i,min(i+chunk_size,n)
             noise_chunk = noise_const*torch.ones(uchunk-lchunk)
             mean_post[lchunk:uchunk],std_post[lchunk:uchunk] = self._predict_batch(x[lchunk:uchunk],noise_chunk)
         return mean_post,std_post
@@ -58,8 +58,8 @@ class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
         if self.use_gpu: del x,noise,observed_pred; torch.cuda.empty_cache()
         return mean_post.numpy(),std_post.numpy()
     def add_data(self, x_t_new, y_t_new):
-        if isinstance(x_t_new,ndarray): x_t_new = torch.from_numpy(x_t_new)
-        if isinstance(y_t_new,ndarray): y_t_new = torch.from_numpy(y_t_new)
+        if isinstance(x_t_new,np.ndarray): x_t_new = torch.from_numpy(x_t_new)
+        if isinstance(y_t_new,np.ndarray): y_t_new = torch.from_numpy(y_t_new)
         assert x_t_new.ndim==2 and x_t_new.shape[1]==self.d and y_t_new.ndim==1 and len(x_t_new)==len(y_t_new)
         if self.use_gpu: x_t_new,y_t_new = x_t_new.cuda(),y_t_new.cuda()
         fantasy_model = self.get_fantasy_model(x_t_new,y_t_new)

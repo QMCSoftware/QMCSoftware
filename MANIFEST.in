@@ -1,7 +1,0 @@
-include qmcpy/discrete_distribution/c_lib/*.h
-include qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.txt
-include qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.npy
-include qmcpy/discrete_distribution/lattice/generating_vectors/*.txt
-include qmcpy/discrete_distribution/lattice/generating_vectors/*.npy
-include qmcpy/discrete_distribution/lattice/generating_vectors/*/*.npy
-include qmcpy/qmcpy.mplstyle
