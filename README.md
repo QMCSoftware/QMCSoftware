@@ -16,7 +16,7 @@ The [QMCPy documentation](https://QMCSoftware.github.io/QMCSoftware/) contains a
 
 - [mathematical description of QMCPy software and components](https://qmcsoftware.github.io/QMCSoftware/components).
 - [Aleksei Sorokin's 2023 PyData Chicago video tutorial](https://www.youtube.com/watch?v=bRcKiLA2yBQ) and [corresponding notebook](https://qmcsoftware.github.io/QMCSoftware/demos/talk_paper_demos/pydata.chi.2023/)
-- [Fred Hickernell's 2020 MCQMC video tutorial](https://www.youtube.com/watch?v=gL8M_7c-YUE) and [corresponding notebook](https://qmcsoftware.github.io/QMCSoftware/demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial.ipynb)
+- [Fred Hickernell's 2020 MCQMC video tutorial](https://www.youtube.com/watch?v=gL8M_7c-YUE) and [corresponding notebook](https://qmcsoftware.github.io/QMCSoftware/demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial/)
 - The QMCPy [introduction notebook](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro) and [quickstart notebook](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart)
 
 ## Installation
@@ -25,7 +25,7 @@ The [QMCPy documentation](https://QMCSoftware.github.io/QMCSoftware/) contains a
 pip install qmcpy
 ```
 
-To install from source, please see the [contributing guidelines](https://qmcsoftware.github.io/QMCSoftware/contributing).
+To install from source, please see the [contributing guidelines](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/).
 
 ## Citation
 
@@ -37,12 +37,12 @@ QMCPy: A Quasi-Monte Carlo Python Library. 2025.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
 
-We maintain [a list of publications on the development and use of QMCPy](https://qmcpy.org/publications/) as well as a [list of select references upon which QMCPy was built](https://qmcsoftware.github.io/QMCSoftware/references).
+We maintain a list of [publications on the development and use of QMCPy](https://qmcpy.org/publications/) as well as a [list of select references upon which QMCPy was built](https://qmcsoftware.github.io/QMCSoftware/community/#select-references)
 
 ## Development
 
-Want to contribute to QMCPy? Please see our [guidelines for contributors](https://qmcsoftware.github.io/QMCSoftware/contributing) which includes instructions on installation for developers, running tests, and compiling documentation.
+Want to contribute to QMCPy? Please see our [guidelines for contributors](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/) which includes instructions on installation for developers, running tests, and compiling documentation.
 
-This software would not be possible without the efforts and support of [QMCPy developers and sponsors](https://qmcsoftware.github.io/QMCSoftware/community).
+This software would not be possible without the efforts of the [QMCPy community](https://qmcsoftware.github.io/QMCSoftware/community) including our steering council, collaborators, contributors, and sponsors.
 
 QMCPy is distributed under an [Apache 2.0 license from the Illinois Institute of Technology](https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE).

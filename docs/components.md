@@ -10,7 +10,7 @@ $$E_n = \lvert \mu - \hat{\mu}_n \rvert.$$
 
 Classic **Monte Carlo** methods choose IID (independent and identically distributed) samples $\boldsymbol{x}_0,\dots,\boldsymbol{x}_{n-1} \overset{\mathrm{IID}}{\sim} \mathcal{U}[0,1]^d$ and have error $E_n$ like $\mathcal{O}(n^{-1/2})$. **Quasi-Monte Carlo (QMC)** methods achieve a significantly better error rate of $\mathcal{O}(n^{-1})$ by using low discrepancy (LD) sequences for $(\boldsymbol{x}_i)_{i=0}^{n-1}$ which more evenly fill the unit cube than IID points.
 
-| <img src="./assets/points.svg" alt="Alt Text" style="width:100%; height:auto;"> |
+| <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/points.svg" style="width:100%; height:auto;"> |
 |:--|
 | The first $32$ points of each sequence are shown as purple starts, the next $32$ points are shown as green triangles, and the $64$ points after that are shown as blue circles. Notice the gaps and clusters of IID points compared to the more uniform coverage of LD sequences. |
 
@@ -64,7 +64,7 @@ These define $g$, which `QMCPy` will use to define $f = g \circ \boldsymbol{\psi
 
 ## Stopping Criteria
 
-| <img src="./assets/stopping_crit.svg" alt="Alt Text" style="width:100%; height:auto;"> | 
+| <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/stopping_crit.svg" style="width:100%; height:auto;"> |
 |:--|
 | The cost of IID-Monte Carlo algorithms is $\mathcal{O}(n^2)$ in the number of samples $n$ while Quasi-Monte Carlo algorithms only cost around $\mathcal{O}(n)$. Both IID-Monte Carlo and Quasi-Monte Carlo stopping criterion consistently determine approximations which meet the desired error tolerance. |
 

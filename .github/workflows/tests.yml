@@ -1,9 +1,9 @@
-name: QMCPy Automated Tests and Coverage Report
-on:
-  push:
-    branches:
-      - master 
-# on: [push]
+name: Tests
+# on:
+#   push:
+#     branches:
+#       - master 
+on: [push]
 
 jobs:
   tests:
