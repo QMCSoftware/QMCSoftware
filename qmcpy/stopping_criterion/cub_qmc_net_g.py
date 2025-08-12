@@ -1,206 +1,246 @@
-from ._cub_qmc_ld_g import _CubQMCLDG
+from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
+from ..fast_transform import fwht,omega_fwht
 from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, CustomFun, BoxIntegral
-from numpy import *
+from ..integrand import Keister, BoxIntegral, CustomFun
+from ..integrand.genz import Genz
+from ..integrand.sensitivity_indices import SensitivityIndices
+import numpy as np
 
 
-class CubQMCNetG(_CubQMCLDG):
+class CubQMCNetG(AbstractCubQMCLDG):
     r"""
-    Quasi-Monte Carlo method using Sobol' cubature over the
-    d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Walsh-Fourier coefficients cone decay assumptions.
+    Quasi-Monte Carlo stopping criterion using digital net cubature 
+    with guarantees for cones of functions with a predictable decay in the Walsh coefficients.
 
-    >>> k = Keister(DigitalNetB2(2,seed=7))
-    >>> sc = CubQMCNetG(k,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        1.808
-        comb_bound_low  1.803
-        comb_bound_high 1.813
-        comb_flags      1
-        n_total         2^(10)
-        n               2^(10)
-        time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    DigitalNetB2 (DiscreteDistribution Object)
-        d               2^(1)
-        dvec            [0 1]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-    >>> dd = DigitalNetB2(3,seed=7)
-    >>> g1 = CustomFun(Uniform(dd,0,2),lambda t: 10*t[:,0]-5*t[:,1]**2+t[:,2]**3)
-    >>> cv1 = CustomFun(Uniform(dd,0,2),lambda t: t[:,0])
-    >>> cv2 = CustomFun(Uniform(dd,0,2),lambda t: t[:,1]**2)
-    >>> sc = CubQMCNetG(g1,abs_tol=1e-6,check_cone=True,
-    ...     control_variates = [cv1,cv2],
-    ...     control_variate_means = [1,4/3])
-    >>> sol,data = sc.integrate()
-    >>> sol
-    array([5.33333333])
-    >>> exactsol = 16/3
-    >>> abs(sol-exactsol)<1e-6
-    array([ True])
-    >>> dnb2 = DigitalNetB2(3,seed=7)
-    >>> f = BoxIntegral(dnb2, s=[-1,1])
-    >>> abs_tol = 1e-3
-    >>> sc = CubQMCNetG(f, abs_tol=abs_tol)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.18973505, 0.96056431])
-    >>> sol3neg1 = -pi/4-1/2*log(2)+log(5+3*sqrt(3))
-    >>> sol31 = sqrt(3)/4+1/2*log(2+sqrt(3))-pi/24
-    >>> true_value = array([sol3neg1,sol31])
-    >>> (abs(true_value-solution)<abs_tol).all()
-    True
-    >>> f2 = BoxIntegral(dnb2,s=[3,4])
-    >>> sc = CubQMCNetG(f2,control_variates=f,control_variate_means=true_value,update_beta=True)
-    >>> solution,data = sc.integrate()
-    >>> solution
-    array([1.10119574, 1.26661224])
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        [1.101 1.267]
-        comb_bound_low  [1.099 1.262]
-        comb_bound_high [1.104 1.271]
-        comb_flags      [ True  True]
-        n_total         2^(10)
-        n               [1024. 1024.]
-        time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
-        abs_tol         0.010
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-        cv              BoxIntegral (Integrand Object)
-                           s               [-1  1]
-        cv_mu           [1.19  0.961]
-        update_beta     1
-    BoxIntegral (Integrand Object)
-        s               [3 4]
-    Uniform (TrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
-        d               3
-        dvec            [0 1 2]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-    >>> cf = CustomFun(
-    ...     true_measure = Uniform(DigitalNetB2(6,seed=7)),
-    ...     g = lambda x,compute_flags=None: (2*arange(1,7)*x).reshape(-1,2,3),
-    ...     dimension_indv = (2,3))
-    >>> sol,data = CubQMCNetG(cf,abs_tol=1e-6).integrate()
-    >>> data
-    LDTransformData (AccumulateData Object)
-        solution        [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_low  [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_bound_high [[1. 2. 3.]
-                        [4. 5. 6.]]
-        comb_flags      [[ True  True  True]
-                        [ True  True  True]]
-        n_total         2^(13)
-        n               [[4096. 4096. 8192.]
-                        [2048. 2048. 4096.]]
-        time_integrate  ...
-    CubQMCNetG (StoppingCriterion Object)
-        abs_tol         1.00e-06
-        rel_tol         0
-        n_init          2^(10)
-        n_max           2^(35)
-    CustomFun (Integrand Object)
-    Uniform (TrueMeasure Object)
-        lower_bound     0
-        upper_bound     1
-    DigitalNetB2 (DiscreteDistribution Object)
-        d               6
-        dvec            [0 1 2 3 4 5]
-        randomize       LMS_DS
-        graycode        0
-        entropy         7
-        spawn_key       ()
-
-    Original Implementation:
-
-        https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m
-
-    References:
-
-        [1] Fred J. Hickernell and Lluis Antoni Jimenez Rugama, 
-        Reliable adaptive cubature using digital sequences, 2014. 
-        Submitted for publication: arXiv:1410.8615.
+    Examples:
+        >>> k = Keister(DigitalNetB2(seed=7))
+        >>> sc = CubQMCNetG(k,abs_tol=1e-3,rel_tol=0,check_cone=True)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array(1.38046669)
+        >>> data
+        Data (Data)
+            solution        1.380
+            comb_bound_low  1.380
+            comb_bound_high 1.381
+            comb_bound_diff 6.72e-04
+            comb_flags      1
+            n_total         2^(11)
+            n               2^(11)
+            time_integrate  ...
+        CubQMCNetG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               1
+            replications    1
+            randomize       LMS DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           RADICAL INVERSE
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
         
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou, 
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019. 
-        Available from http://gailgithub.github.io/GAIL_Dev/
+        Vector outputs
+        
+        >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
+        >>> abs_tol = 1e-3
+        >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.19003352, 0.96068403])
+        >>> data
+        Data (Data)
+            solution        [1.19  0.961]
+            comb_bound_low  [1.189 0.96 ]
+            comb_bound_high [1.191 0.962]
+            comb_bound_diff [0.001 0.002]
+            comb_flags      [ True  True]
+            n_total         2^(14)
+            n               [16384  1024]
+            time_integrate  ...
+        CubQMCNetG (AbstractStoppingCriterion)
+            abs_tol         0.001
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        BoxIntegral (AbstractIntegrand)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       LMS DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           RADICAL INVERSE
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
 
-    Guarantee:
-        This algorithm computes the integral of real valued functions in $[0,1]^d$
-        with a prescribed generalized error tolerance. The Fourier coefficients
-        of the integrand are assumed to be absolutely convergent. If the
-        algorithm terminates without warning messages, the output is given with
-        guarantees under the assumption that the integrand lies inside a cone of
-        functions. The guarantee is based on the decay rate of the Fourier
-        coefficients. For integration over domains other than $[0,1]^d$, this cone
-        condition applies to $f \circ \psi$ (the composition of the
-        functions) where $\psi$ is the transformation function for $[0,1]^d$ to
-        the desired region. For more details on how the cone is defined, please
-        refer to the references below.
+        Sensitivity indices 
+
+        >>> function = Genz(DigitalNetB2(3,seed=7))
+        >>> integrand = SensitivityIndices(function)
+        >>> sc = CubQMCNetG(integrand,abs_tol=5e-4,rel_tol=0,check_cone=True)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        [[0.02  0.196 0.667]
+                             [0.036 0.303 0.782]]
+            comb_bound_low  [[0.019 0.195 0.667]
+                             [0.035 0.303 0.781]]
+            comb_bound_high [[0.02  0.196 0.667]
+                             [0.036 0.303 0.782]]
+            comb_bound_diff [[0.001 0.    0.001]
+                             [0.001 0.001 0.001]]
+            comb_flags      [[ True  True  True]
+                             [ True  True  True]]
+            n_total         2^(16)
+            n               [[[16384 65536 65536]
+                              [16384 65536 65536]
+                              [16384 65536 65536]]
+        <BLANKLINE>
+                             [[ 2048 16384 32768]
+                              [ 2048 16384 32768]
+                              [ 2048 16384 32768]]]
+            time_integrate  ...
+        CubQMCNetG (AbstractStoppingCriterion)
+            abs_tol         5.00e-04
+            rel_tol         0
+            n_init          2^(10)
+            n_limit         2^(35)
+        SensitivityIndices (AbstractIntegrand)
+            indices         [[ True False False]
+                             [False  True False]
+                             [False False  True]]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       LMS DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           RADICAL INVERSE
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+    
+        Control Variates
+
+        >>> dnb2 = DigitalNetB2(dimension=4,seed=7)
+        >>> integrand = CustomFun(
+        ...     true_measure = Uniform(dnb2),
+        ...     g = lambda t: np.stack([
+        ...         1*t[...,0]+2*t[...,0]**2+3*t[...,0]**3,
+        ...         2*t[...,1]+3*t[...,1]**2+4*t[...,1]**3,
+        ...         3*t[...,2]+4*t[...,2]**2+5*t[...,2]**3]),
+        ...     dimension_indv = (3,))
+        >>> control_variates = [
+        ...     CustomFun(
+        ...         true_measure = Uniform(dnb2),
+        ...         g = lambda t: np.stack([t[...,0],t[...,1],t[...,2]],axis=0),
+        ...         dimension_indv = (3,)),
+        ...     CustomFun(
+        ...         true_measure = Uniform(dnb2),
+        ...         g = lambda t: np.stack([t[...,0]**2,t[...,1]**2,t[...,2]**2],axis=0),
+        ...         dimension_indv = (3,))]
+        >>> control_variate_means = np.array([[1/2,1/2,1/2],[1/3,1/3,1/3]])
+        >>> true_value = np.array([23/12,3,49/12])
+        >>> abs_tol = 1e-6
+        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_cv_coeffs=False)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.91666667, 3.        , 4.08333333])
+        >>> data.n
+        array([ 8192,  8192, 16384])
+        >>> assert (np.abs(true_value-solution)<abs_tol).all()
+        >>> sc = CubQMCNetG(integrand,abs_tol=abs_tol,rel_tol=0,control_variates=control_variates,control_variate_means=control_variate_means,update_cv_coeffs=True)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.91666667, 3.        , 4.08333333])
+        >>> data.n
+        array([16384, 16384, 16384])
+        >>> assert (np.abs(true_value-solution)<abs_tol).all()
+
+    **References:**
+
+    1.  Hickernell, Fred J., and Lluís Antoni Jiménez Rugama.  
+        "Reliable adaptive cubature using digital sequences."  
+        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014.  
+        Springer International Publishing, 2016.
+    
+    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m).
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0., n_init=2.**10, n_max=2.**35,
-        fudge=lambda m: 5.*2.**(-m), check_cone=False, 
-        control_variates=[], control_variate_means=[], update_beta=False,
-        error_fun = lambda sv,abs_tol,rel_tol: maximum(abs_tol,abs(sv)*rel_tol)):
-
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2,
+                 rel_tol = 0., 
+                 n_init = 2**10, 
+                 n_limit = 2**35,
+                 error_fun = "EITHER",
+                 fudge = lambda m: 5.*2.**(-m), 
+                 check_cone = False, 
+                 control_variates = [], 
+                 control_variate_means = [], 
+                 update_cv_coeffs = False,
+                 ):
+        r"""
         Args:
-            integrand (Integrand): an instance of Integrand
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
-            n_init (int): initial number of samples
-            n_max (int): maximum number of samples
-            fudge (function): positive function multiplying the finite
-                              sum of Fast Fourier coefficients specified 
-                              in the cone of functions
-            check_cone (boolean): check if the function falls in the cone
-            control_variates (list): list of integrand objects to be used as control variates. 
-                Control variates are currently only compatible with single level problems. 
-                The same discrete distribution instance must be used for the integrand and each of the control variates. 
-            control_variate_means (list): list of means for each control variate
-            update_beta (bool): update control variate beta coefficients at each iteration
-            error_fun: function taking in the approximate solution vector, 
-                absolute tolerance, and relative tolerance which returns the approximate error. 
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions. 
+            check_cone (bool): Whether or not to check if the function falls in the cone.
+            control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
+            control_variate_means (np.ndarray): Means of each control variate. 
+            update_cv_coeffs (bool): If set to true, the control variate coefficients are recomputed at each iteration. 
+                Otherwise they are estimated once after the initial sampling and then fixed.
         """
-        super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,
-            check_cone,control_variates,control_variate_means,update_beta,
+        super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,
+            check_cone,control_variates,control_variate_means,update_cv_coeffs,
             ptransform = 'none',
-            coefv = lambda nl: ones(nl,dtype=float), 
-            allowed_levels = ['single'],
+            ft = fwht,
+            omega = omega_fwht,
             allowed_distribs = [DigitalNetB2],
             cast_complex = False,
             error_fun = error_fun)
-        if (not self.discrete_distrib.randomize) or self.discrete_distrib.graycode:
-            raise ParameterError("CubSobol_g requires distribution to have randomize=True and graycode=False.")
-
-
-class CubQMCSobolG(CubQMCNetG): pass
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")

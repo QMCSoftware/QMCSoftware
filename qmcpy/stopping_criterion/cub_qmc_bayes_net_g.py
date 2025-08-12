@@ -1,159 +1,239 @@
-from ._cub_bayes_ld_g import _CubBayesLDG
-from ..accumulate_data.ld_transform_bayes_data import LDTransformBayesData
+from .abstract_cub_bayes_ld_g import AbstractCubBayesLDG
 from ..discrete_distribution import DigitalNetB2
-from ..integrand import Keister
+from ..integrand import Keister,BoxIntegral,Genz,SensitivityIndices
+from ..fast_transform import fwht,omega_fwht
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, NotYetImplemented
-from ..discrete_distribution.c_lib import c_lib
 import ctypes
-from numpy import log2, ctypeslib
 import numpy as np
 from time import time
 import warnings
 
 
-class CubBayesNetG(_CubBayesLDG):
+class CubQMCBayesNetG(AbstractCubBayesLDG):
     r"""
-    Stopping criterion for Bayesian Cubature using digital net sequence with guaranteed
-    accuracy over a d-dimensional region to integrate within a specified generalized error
-    tolerance with guarantees under Bayesian assumptions.
+    Quasi-Monte Carlo stopping criterion using fast Bayesian cubature and digital nets
+    with guarantees for Gaussian processes having certain digitally shift invariant kernels.
 
-    >>> k = Keister(DigitalNetB2(2, seed=123456789))
-    >>> sc = CubBayesNetG(k,abs_tol=.05)
-    >>> solution,data = sc.integrate()
-    >>> data
-    LDTransformBayesData (AccumulateData Object)
-        solution        1.804
-        comb_bound_low  1.786
-        comb_bound_high 1.821
-        comb_flags      1
-        n_total         2^(8)
-        n               2^(8)
-        time_integrate  ...
-    CubBayesNetG (StoppingCriterion Object)
-        abs_tol         0.050
-        rel_tol         0
-        n_init          2^(8)
-        n_max           2^(22)
-    Keister (Integrand Object)
-    Gaussian (TrueMeasure Object)
-        mean            0
-        covariance      2^(-1)
-        decomp_type     PCA
-    DigitalNetB2 (DiscreteDistribution Object)
-        d               2^(1)
-        dvec            [0 1]
-        randomize       LMS_DS
-        graycode        0
-        entropy         123456789
-        spawn_key       ()
+    Examples:
+        >>> k = Keister(DigitalNetB2(2, seed=123456789))
+        >>> sc = CubQMCBayesNetG(k,abs_tol=5e-3)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        1.809
+            comb_bound_low  1.807
+            comb_bound_high 1.810
+            comb_bound_diff 0.003
+            comb_flags      1
+            n_total         2^(10)
+            n               2^(10)
+            time_integrate  ...
+        CubQMCBayesNetG (AbstractStoppingCriterion)
+            abs_tol         0.005
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           1
+        Keister (AbstractIntegrand)
+        Gaussian (AbstractTrueMeasure)
+            mean            0
+            covariance      2^(-1)
+            decomp_type     PCA
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               2^(1)
+            replications    1
+            randomize       LMS DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           RADICAL INVERSE
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         123456789
+    
+        Vector outputs
+        
+        >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
+        >>> abs_tol = 1e-2
+        >>> sc = CubQMCBayesNetG(f,abs_tol=abs_tol,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> solution
+        array([1.18750491, 0.96076395])
+        >>> data
+        Data (Data)
+            solution        [1.188 0.961]
+            comb_bound_low  [1.18 0.96]
+            comb_bound_high [1.195 0.962]
+            comb_bound_diff [0.014 0.002]
+            comb_flags      [ True  True]
+            n_total         2^(11)
+            n               [2048  256]
+            time_integrate  ...
+        CubQMCBayesNetG (AbstractStoppingCriterion)
+            abs_tol         0.010
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           1
+        BoxIntegral (AbstractIntegrand)
+            s               [-1  1]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       LMS DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           RADICAL INVERSE
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        >>> sol3neg1 = -np.pi/4-1/2*np.log(2)+np.log(5+3*np.sqrt(3))
+        >>> sol31 = np.sqrt(3)/4+1/2*np.log(2+np.sqrt(3))-np.pi/24
+        >>> true_value = np.array([sol3neg1,sol31])
+        >>> assert (abs(true_value-solution)<abs_tol).all()
 
-    Adapted from `GAIL cubBayesNet_g <https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m>`_.
+        Sensitivity indices 
 
-    Guarantee:
-        This algorithm attempts to calculate the integral of function :math:`f` over the
-        hyperbox :math:`[0,1]^d` to a prescribed error tolerance :math:`\mbox{tolfun} := max(\mbox{abstol},
-        \mbox{reltol}*| I |)` with a guaranteed confidence level, e.g., :math:`99\%` when alpha= :math:`0.5\%`.
-        If the algorithm terminates without showing any warning messages and provides
-        an answer :math:`Q`, then the following inequality would be satisfied:
+        >>> function = Genz(DigitalNetB2(3,seed=7))
+        >>> integrand = SensitivityIndices(function)
+        >>> sc = CubQMCBayesNetG(integrand,abs_tol=5e-2,rel_tol=0)
+        >>> solution,data = sc.integrate()
+        >>> data
+        Data (Data)
+            solution        [[0.009 0.194 0.657]
+                             [0.036 0.312 0.783]]
+            comb_bound_low  [[0.007 0.178 0.636]
+                             [0.033 0.297 0.762]]
+            comb_bound_high [[0.012 0.209 0.679]
+                             [0.038 0.327 0.804]]
+            comb_bound_diff [[0.005 0.031 0.043]
+                             [0.004 0.03  0.042]]
+            comb_flags      [[ True  True  True]
+                             [ True  True  True]]
+            n_total         2^(8)
+            n               [[[256 256 256]
+                              [256 256 256]
+                              [256 256 256]]
+        <BLANKLINE>
+                             [[256 256 256]
+                              [256 256 256]
+                              [256 256 256]]]
+            time_integrate  ...
+        CubQMCBayesNetG (AbstractStoppingCriterion)
+            abs_tol         0.050
+            rel_tol         0
+            n_init          2^(8)
+            n_limit         2^(22)
+            order           1
+        SensitivityIndices (AbstractIntegrand)
+            indices         [[ True False False]
+                             [False  True False]
+                             [False False  True]]
+        Uniform (AbstractTrueMeasure)
+            lower_bound     0
+            upper_bound     1
+        DigitalNetB2 (AbstractLDDiscreteDistribution)
+            d               3
+            replications    1
+            randomize       LMS DS
+            gen_mats_source joe_kuo.6.21201.txt
+            order           RADICAL INVERSE
+            t               63
+            alpha           1
+            n_limit         2^(32)
+            entropy         7
+        
+    **References:**
 
-        .. math::
-                Pr(| Q - I | <= \mbox{tolfun}) = 99\%.
-
-        This Bayesian cubature algorithm guarantees for integrands that are considered
-        to be an instance of a Gaussian process that falls in the middle of samples space spanned.
-        Where The sample space is spanned by the covariance kernel parametrized by the scale
-        and shape parameter inferred from the sampled values of the integrand.
-        For more details on how the covariance kernels are defined and the parameters are obtained,
-        please refer to the references below.
-
-    References:
-        [1] Jagadeeswaran Rathinavel, Fast automatic Bayesian cubature using matching kernels and designs,
+    1.  Jagadeeswaran, Rathinavel, and Fred J. Hickernell.  
+        "Fast automatic Bayesian cubature using Sobol’sampling."  
+        Advances in Modeling and Simulation: Festschrift for Pierre L'Ecuyer.  
+        Springer International Publishing, 2022. 301-318.
+    
+    2.  Jagadeeswaran Rathinavel,  
+        Fast automatic Bayesian cubature using matching kernels and designs,  
         PhD thesis, Illinois Institute of Technology, 2019.
 
-        [2] Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        Available from `GAIL <http://gailgithub.github.io/GAIL_Dev/>`_.
-
+    3.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubBayesNet_g.m).
     """
 
-    def __init__(self, integrand, abs_tol=1e-2, rel_tol=0,
-                 n_init=2 ** 8, n_max=2 ** 22, alpha=0.01,
-                 error_fun=lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)):
-        """
+    def __init__(self, 
+                 integrand, 
+                 abs_tol = 1e-2, 
+                 rel_tol = 0,
+                 n_init = 2**8, 
+                 n_limit = 2**22, 
+                 error_fun = "EITHER", 
+                 alpha = 0.01,
+                 errbd_type="MLE",
+                 ):
+        r"""
         Args:
-            integrand (Integrand): an instance of Integrand
-            abs_tol (ndarray): absolute error tolerance
-            rel_tol (ndarray): relative error tolerance
-            n_init (int): initial number of samples
-            n_max (int): maximum number of samples
-            alpha (float): significance level or p-value
-            error_fun: function taking in the approximate solution vector,
-                absolute tolerance, and relative tolerance which returns the approximate error.
-                Default indicates integration until either absolute OR relative tolerance is satisfied.
+            integrand (AbstractIntegrand): The integrand.
+            abs_tol (np.ndarray): Absolute error tolerance.
+            rel_tol (np.ndarray): Relative error tolerance.
+            n_init (int): Initial number of samples. 
+            n_limit (int): Maximum number of samples.
+            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+
+                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
+                    ```
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                    Equivalent to setting
+                    ```python
+                    error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+                    ```
+            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            errbd_type (str): Options are 
+                
+                - `'MLE'`: Marginal Log Likelihood. 
+                - `'GCV'`: Generalized Cross Validation. 
+                - `'FULL'`: Full Bayes.
         """
-        super(CubBayesNetG, self).__init__(integrand, fbt=self._fwht_h, merge_fbt=self._merge_fwht,
+        super(CubQMCBayesNetG, self).__init__(integrand, ft=fwht, omega=omega_fwht,
                                            ptransform=None,
                                            allowed_distribs=[DigitalNetB2],
                                            kernel=self._shift_inv_kernel_digital,
                                            abs_tol=abs_tol, rel_tol=rel_tol,
-                                           n_init=n_init, n_max=n_max, alpha=alpha, error_fun=error_fun)
-
-        self.parameters = ['abs_tol', 'rel_tol', 'n_init', 'n_max']
-        # Set Attributes
+                                           n_init=n_init, n_limit=n_limit, alpha=alpha, error_fun=error_fun, errbd_type=errbd_type)
         self.order = 1  # Currently supports only order=1
-
-        self.use_gradient = False  # If true uses gradient descent in parameter search
-        self.one_theta = True  # If true use common shape parameter for all dimensions
-        # else allow shape parameter vary across dimensions
-        self.errbd_type = 'MLE'  # Available options {'MLE', 'GCV', 'full'}
-
         # private properties
         # Full Bayes - assumes m and s^2 as hyperparameters
         # GCV - Generalized cross validation
         self.kernType = 1  # Type-1:
-
-        self.uncert = 0  # quantile value for the error bound
-        self.data = None
-        self.fwht = FWHT()
-
-        if self.discrete_distrib.randomize == "FALSE":
-            raise ParameterError("CubBayesNet_g requires discrete_distrib to have randomize=True")
+        self._xfullundtype = np.uint64
+        if self.discrete_distrib.order!='RADICAL INVERSE':
+            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")
 
 
-    def _fwht_h(self, y):
-        ytilde = np.squeeze(y)
-        self.fwht.fwht_inplace(len(y), ytilde)
-        return ytilde
-        # ytilde = np.array(self.fwht_h_py(y), dtype=float)
-        # return ytilde
-
-    @staticmethod
-    def _merge_fwht(ftilde_new, ftilde_next_new, mnext):
-        ftilde_new = np.vstack([(ftilde_new + ftilde_next_new), (ftilde_new - ftilde_next_new)])
-        return ftilde_new
-
-    '''
-    Digitally shift invariant kernel
-    C1 : first row of the covariance matrix
-    Lambda : eigen values of the covariance matrix
-    Lambda_ring = fwht(C1 - 1)
-    '''
+    # Digitally shift invariant kernel
+    # C1 : first row of the covariance matrix
+    # Lambda : eigen values of the covariance matrix
+    # Lambda_ring = fwht(C1 - 1)
 
     def _shift_inv_kernel_digital(self, xun, order, a, avoid_cancel_error, kern_type, debug_enable):
-        kernel_func = CubBayesNetG.BuildKernelFunc(order)
+        kernel_func = CubQMCBayesNetG.BuildKernelFunc(order)
         const_mult = 1 / 10
 
         if avoid_cancel_error:
             # Computes C1m1 = C1 - 1
             # C1_new = 1 + C1m1 indirectly computed in the process
-            (vec_C1m1, C1_alt) = self.data.kernel_t(a * const_mult, kernel_func(xun))
+            (vec_C1m1, C1_alt) = self.kernel_t(a * const_mult, kernel_func(xun))
             lambda_factor = max(abs(vec_C1m1))
             C1_alt = C1_alt / lambda_factor
             vec_C1m1 = vec_C1m1 / lambda_factor
 
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda_ring = np.real(self._fwht_h(vec_C1m1.copy()))
+            vec_lambda_ring = np.real(fwht(vec_C1m1.copy())*np.sqrt(vec_C1m1.shape[-1]))
 
             vec_lambda = vec_lambda_ring.copy()
             vec_lambda[0] = vec_lambda_ring[0] + len(vec_lambda_ring) / lambda_factor
@@ -161,14 +241,14 @@ class CubBayesNetG(_CubBayesLDG):
             if debug_enable:
                 # eigenvalues must be real : Symmetric pos definite Kernel
                 vec_lambda_direct = np.real(
-                    np.array(self._fwht_h(C1_alt), dtype=float))  # Note: fwht output not normalized
+                    np.array(fwht(C1_alt)*np.sqrt(C1_alt.shape[-1]), dtype=float))  # Note: fwht output not normalized
                 if sum(abs(vec_lambda_direct - vec_lambda)) > 1:
                     print('Possible error: check vec_lambda_ring computation')
         else:
             # direct approach to compute first row of the kernel Gram matrix
             vec_C1 = np.prod(1 + a * const_mult * kernel_func(xun), 2)
             # eigenvalues must be real : Symmetric pos definite Kernel
-            vec_lambda = np.real(self._fwht_h(vec_C1))
+            vec_lambda = np.real(fwht(vec_C1)*np.sqrt(vec_C1.shape[-1]))
             vec_lambda_ring = 0
             lambda_factor = 1
 
@@ -177,9 +257,9 @@ class CubBayesNetG(_CubBayesLDG):
     # Builds High order walsh kernel function
     @staticmethod
     def BuildKernelFunc(order):
-        # a1 = @(x)(-floor(log2(x)))
+        # a1 = @(x)(-np.floor(np.log2(x)))
         def a1(x):
-            out = -np.floor(log2(x + np.finfo(float).eps))
+            out = -np.floor(np.log2(x + np.finfo(float).eps))
             out[x == 0] = 0  # a1 is zero when x is zero
             return out
 
@@ -201,7 +281,7 @@ class CubBayesNetG(_CubBayesLDG):
         ts3 = lambda x: ((1 - 43 * t2(x)) / 18 + (5 * t1(x) - 1) * x + (a1(x) - 2) * x ** 2)
 
         if order == 1:
-            kernFunc = lambda x: (6 * ((1 / 6) - 2 ** (np.floor(log2(x + np.finfo(float).eps)) - 1)))
+            kernFunc = lambda x: (6 * ((1 / 6) - 2 ** (np.floor(np.log2(x + np.finfo(float).eps)) - 1)))
         elif order == 2:
             omega2_1D = lambda x: (s1(x) + ts2(x))
             kernFunc = omega2_1D
@@ -212,48 +292,3 @@ class CubBayesNetG(_CubBayesLDG):
             NotYetImplemented('cubBayesNet_g: kernel order not yet supported')
 
         return kernFunc
-
-    '''
-    @staticmethod
-    def fwht_h_py(ynext):
-        mnext = int(np.log2(len(ynext)))
-        for l in range(mnext):
-            nl = 2**l
-            nmminlm1 = 2.**(mnext-l-1)
-            ptind_nl = np.hstack(( np.tile(True,nl), np.tile(False,nl) ))
-            ptind = np.tile(ptind_nl,int(nmminlm1))
-            evenval = ynext[ptind]
-            oddval = ynext[~ptind]
-            ynext[ptind] = (evenval + oddval)
-            ynext[~ptind] = (evenval - oddval)
-        return ynext
-    '''
-
-
-class FWHT():
-    def __init__(self):
-        self.fwht_copy_cf = c_lib.fwht_copy
-        self.fwht_copy_cf.argtypes = [
-            ctypes.c_uint32,
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
-        ]
-        self.fwht_copy_cf.restype = None
-
-        self.fwht_inplace_cf = c_lib.fwht_inplace
-        self.fwht_inplace_cf.argtypes = [
-            ctypes.c_uint32,
-            ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'),
-        ]
-        self.fwht_inplace_cf.restype = None
-
-    def fwht_copy(self, n, src, dst):
-        self.fwht_copy_cf(n, src, dst)
-
-    def fwht_inplace(self, n, src):
-        self.fwht_inplace_cf(n, src)
-
-
-class CubBayesSobolG(CubBayesNetG): pass
-class CubQMCBayesSobolG(CubBayesNetG): pass
-class CubQMCBayesNetG(CubBayesNetG): pass
