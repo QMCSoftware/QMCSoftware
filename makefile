@@ -52,9 +52,10 @@ delcoverage:
 	@rm coverage.json 
 	
 mkdocserve: # mkdocs only looks for content in the docs/ folder, so we have to copy it there
-	@cp -r demos docs
+	@cp README.md docs/README.md 
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
+	@cp -r demos docs
 	@mkdocs serve
 
 uml:
