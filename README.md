@@ -37,7 +37,7 @@ QMCPy: A Quasi-Monte Carlo Python Library. 2025.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
 
-We maintain a list of [publications on the development and use of QMCPy](https://qmcpy.org/publications/) as well as a [list of select references upon which QMCPy was built](https://qmcsoftware.github.io/QMCSoftware/community/#select-references)
+We maintain a list of [publications on the development and use of QMCPy](https://qmcpy.org/publications/) as well as a [list of select references upon which QMCPy was built](https://qmcsoftware.github.io/QMCSoftware/community/#select-references).
 
 ## Development
 
