@@ -50,13 +50,6 @@ coverage: # https://github.com/marketplace/actions/coverage-badge
 delcoverage:
 	@rm .coverage
 	@rm coverage.json 
-	
-mkdocserve: # mkdocs only looks for content in the docs/ folder, so we have to copy it there
-	@cp README.md docs/README.md 
-	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
-	@cp community.md docs/community.md 
-	@cp -r demos docs
-	@mkdocs serve
 
 uml:
 	# UML Diagrams
@@ -80,5 +73,16 @@ uml:
 	@pyreverse -k qmcpy/kernel/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/kernel_overview.svg
 	#	Kernel Specific
 	@pyreverse qmcpy/kernel/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/kernel_specific.svg
+
+copydocs: # mkdocs only looks for content in the docs/ folder, so we have to copy it there
+	@cp README.md docs/README.md 
+	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
+	@cp community.md docs/community.md 
+	@cp -r demos docs
+
+runmkdocserve: 
+	@mkdocs serve
 	
-doc: uml mkdocserve
+doc: uml copydocs runmkdocserve
+
+docnouml: copydocs runmkdocserve

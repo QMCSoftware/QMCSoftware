@@ -28,5 +28,6 @@ jobs:
             mkdocs-material-
       - uses: ts-graphviz/setup-graphviz@v2
       - run: pip install -e .[docs]
-      - run: make doc
+      - run: make uml
+      - run: make copydocs
       - run: mkdocs gh-deploy --force

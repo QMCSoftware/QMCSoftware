@@ -49,6 +49,7 @@ nav:
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
+      - Geometric Brownian Motion: demos/gbm_demo.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
