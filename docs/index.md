@@ -1,97 +1,118 @@
-# Quasi-Monte Carlo Community Software in Python
+# QMCPy: Quasi-Monte Carlo Community Software in Python
 
+[![](https://img.shields.io/badge/qmcpy.org-15bfa9)](https://qmcpy.org/)
 [![](https://img.shields.io/badge/Docs-6b03fc)](https://QMCSoftware.github.io/QMCSoftware/)
-[![](https://img.shields.io/badge/GitHub-15bfa9)](https://github.com/QMCSoftware/QMCSoftware)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/qmcpy.svg?label=PyPI%20downloads)](https://pypi.org/project/qmcpy/)
+[![](https://img.shields.io/badge/PyPI-fc7303)](https://pypi.org/project/qmcpy/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964489.svg)](https://doi.org/10.5281/zenodo.3964489)
-[![Tests](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/python-package-conda.yml)
-[![](https://img.shields.io/badge/QMC_Blogs-fc7005)](http://qmcpy.wordpress.com/)
+[![Tests](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/python-package-conda.yml/badge.svg?branch=master)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/python-package-conda.yml?query=branch%3Amaster)
+[![GitHub stars](https://img.shields.io/github/stars/QMCSoftware/QMCSoftware?style=social)](https://github.com/QMCSoftware/QMCSoftware)
+[![](https://img.shields.io/badge/GitHub_Issues-030ffc)](https://github.com/QMCSoftware/QMCSoftware/issues)
 
 [![](https://img.shields.io/badge/Fred_Hickernell's_MCQMC2020_Video_Tutorial-FF0000)](https://www.youtube.com/watch?v=gL8M_7c-YUE)
 [![](https://img.shields.io/badge/Aleksei_Sorokin's_PyData_Chicago_Video_Tutorial-FF0000)](https://www.youtube.com/watch?v=bRcKiLA2yBQ)
 
+Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: a discrete distribution, a true measure of randomness, an integrand, and a stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.
 
-```
+To learn more about the framework, please read our [mathematical description of QMCPy software and components](https://qmcsoftware.github.io/QMCSoftware/components).
+
+## Installation
+
+```bash
 pip install qmcpy
 ```
 
-Monte Carlo (MC) methods approximate the true mean (expectation) $\mu$ of a random variable $g(\boldsymbol{T})$ by the sample mean $\hat{\mu}_n = \frac{1}{n} \sum_{i=0}^{n-1} g(\boldsymbol{T}_i)$ for some samples $\boldsymbol{T}_0,\dots,\boldsymbol{T}_{n-1}$. We call the $d$-dimensional vector random variable $\boldsymbol{T}$ the **true measure** and we call $g$ the **integrand**. As most computer-generated random numbers are uniformly distributed, we use a transform $\boldsymbol{\psi}$ to write $\boldsymbol{T} \sim \boldsymbol{\psi}(\boldsymbol{X})$ where $\boldsymbol{X} \sim \mathcal{U}[0,1]^d$. The resulting Monte Carlo approximation is written in terms of the transformed integrand $f(\boldsymbol{x}) = g(\boldsymbol{\psi}(\boldsymbol{x}))$ as
+To install from source, please see the [contributing guidelines](https://qmcsoftware.github.io/QMCSoftware/contributing).
 
-$$\mu = \mathbb{E}[f(\boldsymbol{X})] = \int_{[0,1]^d} f(\boldsymbol{x}) \mathrm{d} \boldsymbol{x} \approx \int_{[0,1]^d} f(\boldsymbol{x}) \hat{\lambda}_n(\mathrm{d} \boldsymbol{x}) = \frac{1}{n} \sum_{i=0}^{n-1} f(\boldsymbol{x}_i) = \hat{\mu}, \qquad \boldsymbol{X} \sim \mathcal{U}[0,1]^d$$
+## Citation
 
-for some **discrete distribution** $\hat{\lambda}_n$ defined by samples $\boldsymbol{x}_0,\dots,\boldsymbol{x}_{n-1} \in [0,1]^d$ (formally $\hat{\lambda}_n(A)$ measures the proporation of points $(\boldsymbol{x}_i)_{i=0}^{n-1}$ which lie in some set $A$). The *error* of this approximation is
+If you find QMCPy helpful in your work, please support us by citing the following work, which is also available as a [QMCPy BibTex citation](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
 
-$$E_n = \lvert \mu - \hat{\mu}_n \rvert.$$
+~~~
+Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei G. Sorokin,
+QMCPy: A Quasi-Monte Carlo Python Library. 2025.
+https://qmcsoftware.github.io/QMCSoftware/
+~~~
 
-Classic **Monte Carlo** methods choose IID (independent and identically distributed) samples $\boldsymbol{x}_0,\dots,\boldsymbol{x}_{n-1} \overset{\mathrm{IID}}{\sim} \mathcal{U}[0,1]^d$ and have error $E_n$ like $\mathcal{O}(n^{-1/2})$. **Quasi-Monte Carlo (QMC)** methods achieve a significantly better error rate of $\mathcal{O}(n^{-1})$ by using low discrepancy (LD) sequences for $(\boldsymbol{x}_i)_{i=0}^{n-1}$ which more evenly fill the unit cube than IID points.
+We maintain [a list of publications on the development and use of QMCPy](https://qmcpy.org/publications/) as well as a [list of select references upon which QMCPy was built](https://qmcsoftware.github.io/QMCSoftware/references).
 
-| <img src="./assets/points.svg" alt="Alt Text" style="width:100%; height:auto;"> | 
-|:--|
-| The first $32$ points of each sequence are shown as purple starts, the next $32$ points are shown as green triangles, and the $64$ points after that are shown as blue circles. Notice the gaps and clusters of IID points compared to the more uniform coverage of LD sequences. |
+## For Developers
 
-Often practitioners would like to run their (Quasi-)Monte Carlo method until the error $E_n$ is below a desired error tolerance $\varepsilon$ and/or until they have expired their sample budget $B$. For example, one may wish to estimate the expected discounted payoff of a financial option to within a tolerance of one penny, $\varepsilon = 0.01$, or until $1$ million option paths have been simulated, $B=10^6$. **Stopping criterion** deploy (Quasi-)Monte Carlo methods under such constraints by utilizing adaptive sampling schemes and efficient error estimation procedures.  
+Want to contribute to QMCPy? Please see our [Guidelines for Contributors](https://qmcsoftware.github.io/QMCSoftware/contributing) which includes instructions on installation for developers, running tests, and compiling documentation.
 
-`QMCPy` is organized into into the four main components below. Details for each of these classes are available in the linked guides and API docs.
+This software would not be possible without the efforts and support of [QMCPy Developers and Sponsors](https://qmcsoftware.github.io/QMCSoftware/community).
 
-## Discrete Distributions
+QMCPy is distributed under an [Apache 2.0 License from the Illinois Institute of Technology](https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE).
 
-These generates IID or LD points $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$. Supported LD sequences include
 
-- **Lattices** with
-    - extensible constructions
-    - random shifts
-- **Digital Nets** in base $b=2$ with
-    - extensible constructions
-    - digital shifts
-    - linear matrix scrambling
-    - nested uniform scrambling (also called Owen scrambling)
-    - higher order constructions via digital interlacing
-- **Halton** point sets with
-    - extensible constructions
-    - digital shifts
-    - permutation scrambling
-    - linear matrix scrambling
-    - nested uniform scrambling
 
-## True Measures
+## Quickstart
 
-These define $\boldsymbol{T}$, for which `QMCPy` will automatically choose an appropriate transform $\boldsymbol{\psi}$ so that $\boldsymbol{T} \sim \boldsymbol{\psi}(\boldsymbol{X})$ with $\boldsymbol{X} \sim \mathcal{U}[0,1]^d$. Some popular true measures are
+Note: If the following mathematics is not rendering try using Google Chrome and installing the [Mathjax Plugin for GitHub](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima?hl=en).
 
-- **Uniform** $\boldsymbol{T} \sim \mathcal{U}[\boldsymbol{l},\boldsymbol{u}]$ with elementwise $\boldsymbol{l} \leq \boldsymbol{u}$ for which $\boldsymbol{\psi}(\boldsymbol{x}) = \boldsymbol{l}+(\boldsymbol{u}-\boldsymbol{l}) \odot \boldsymbol{x}$ with $\odot$ the Hadamard (elementwise) product.
-- **Gaussian** $\boldsymbol{T} \sim \mathcal{N}(\boldsymbol{m},\mathsf{\Sigma})$ for which $\boldsymbol{\psi}(\boldsymbol{x}) = \boldsymbol{m}+\mathsf{A}\boldsymbol{x}$ where the covariance $\mathsf{\Sigma} = \mathsf{A} \mathsf{A}^T$ may be decomposed using either
-    - the Cholesky decomposition or
-    - the eigendecomposition.
-- **Brownian Motion** observed with an initial value $B_0$, drift $\gamma$, and diffusion $\sigma^2$ at times $\boldsymbol{t} := (t_1,\dots,t_d)^T$ satisfying $0 \leq t_1 < t_1 < \dots < t_d$ is a Gaussian with mean and covariance
+We will approximate the expected value of the $d$ dimensional Keister integrand [18]
 
-$$\boldsymbol{m} = B_0 + \gamma \boldsymbol{t}$$
+$$g(X)=\pi^{d/2}\cos(\lVert X \rVert)$$
 
-$$\mathsf{\Sigma} = \sigma^2 \left(\min\{t_i,t_{i'}\}\right)_{i,i'=1}^{d}$$
+where $X \sim \mathcal{N}(\boldsymbol{0},\boldsymbol{I}/2)$.
 
-- **Independent Marginals** have $\boldsymbol{T} = (T_1,\dots,T_d)^T$ with $T_1,\dots,T_d$ independent. We support (continuous) marginal distributions from [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions).
+We may choose a Sobol' discrete distribution with a corresponding Sobol' cubature stopping criterion to preform quasi-Monte Carlo integration.
 
-## Integrands
+```python
+import qmcpy as qp
+from numpy import pi, cos, sqrt, linalg
+d = 2
+dnb2 = qp.DigitalNetB2(d)
+gauss_sobol = qp.Gaussian(dnb2, mean=0, covariance=1/2)
+k = qp.CustomFun(
+  true_measure = gauss_sobol, 
+  g = lambda x: pi**(d/2)*cos(linalg.norm(x,axis=1)))
+qmc_sobol_algorithm = qp.CubQMCSobolG(k, abs_tol=1e-3)
+solution,data = qmc_sobol_algorithm.integrate()
+print(data)
+```
 
-These define $g$, which `QMCPy` will use to define $f = g \circ \boldsymbol{\psi}$. Some popular integrands are
+Running the above code outputs
 
-- **User Defined Integrands**, where the user provides a function handle for $g$
-- **Financial Options**, including the *European option*, *Asian option*, and *Barrier option*
-- **[`UM-Bridge`](https://um-bridge-benchmarks.readthedocs.io/en/docs/) Functions**. From their docs, `UM-Bridge` is a universal interface that makes any numerical model accessible from any programming language or higher-level software through the use of containerized environments. `UM-Bridge` also enables simulations to scale to supercomputers or the cloud with minimal effort.
+```
+LDTransformData (AccumulateData Object)
+    solution        1.808
+    error_bound     4.68e-04
+    n_total         2^(13)
+    time_integrate  0.008
+CubQMCSobolG (StoppingCriterion Object)
+    abs_tol         0.001
+    rel_tol         0
+    n_init          2^(10)
+    n_max           2^(35)
+CustomFun (Integrand Object)
+Gaussian (TrueMeasure Object)
+    mean            0
+    covariance      2^(-1)
+    decomp_type     PCA
+Sobol (DiscreteDistribution Object)
+    d               2^(1)
+    dvec            [0 1]
+    randomize       LMS_DS
+    graycode        0
+    entropy         127071403717453177593768120720330942628
+    spawn_key       ()
+```
 
-## Stopping Criteria
+A more detailed quickstart can be found in our GitHub repo at `QMCSoftware/demos/quickstart.ipynb` or in [this Google Colab quickstart notebook](https://colab.research.google.com/drive/1CQweuON7jHJBMVyribvosJLW4LheQXBL?usp=sharing). 
 
-| <img src="./assets/stopping_crit.svg" alt="Alt Text" style="width:100%; height:auto;"> | 
-|:--|
-| The cost of IID-Monte Carlo algorithms is $\mathcal{O}(n^2)$ in the number of samples $n$ while Quasi-Monte Carlo algorithms only cost around $\mathcal{O}(n)$. Both IID-Monte Carlo and Quasi-Monte Carlo stopping criterion consistently determine approximations which meet the desired error tolerance. |
+We also highly recommend you take a look at [Fred Hickernell's tutorial at the Monte Carlo Quasi-Monte Carlo 2020 Conference](https://media.ed.ac.uk/media/Fred+Hickernell%2C+Illinois+Institute+of+Technology+++Quasi-Monte+Carlo+Software++%28MCQMC+2020%2C+10.08.20%29/1_2k12mwiw) and [the corresponding MCQMC2020 Google Colab notebook.](https://tinyurl.com/QMCPyTutorial)
 
-These deploy (Quasi-)Monte Carlo methods under error tolerance and budgetary constraints by utilizing adaptive sampling schemes and efficient error estimation procedures. Common stopping criteria include
+----
 
-- **Quasi-Monte Carlo** via tracking the decay of coefficients in an orthogonal basis expansion. These methods are *guaranteed* for cones of functions whose coefficients decay in a regular manner.  Efficient procedures exist to estimate coefficients when
-    - pairing lattices with the Fourier expansion or
-    - pairing digital nets with the Walsh expansion.
-- **Quasi-Monte Carlo** via efficient Bayesian cubature methods which assume $f$ is a draw from a Gaussian process so the posterior expectation has an analytic expression. While classic Bayesian cubature would require $\mathcal{O}(n^2)$ storage and $\mathcal{O}(n^3)$ computations, when matching certain LD sequences to special kernels the Gram matrices become nicely structured to permit Bayesian cubature with only $\mathcal{O}(n)$ storage and $\mathcal{O}(n \log n)$ computations. Specifically,
-    - pairing lattices with shift-invariant kernels gives circulant Gram matrices which are diagonalizable by the [Fast Fourier Transform (FFT)](https://en.wikipedia.org/wiki/Fast_Fourier_transform), and
-    - pairing digital nets with digitally-shift-invariant kernels gives Gram matrices which are diagonalizable by the [Fast Walsh-Hadamard Transform (FWHT)](https://en.wikipedia.org/wiki/Fast_Walsh%E2%80%93Hadamard_transform).
-- **Quasi-Monte Carlo** via multiple independent randomizations of an LD point set and Student's $t$ confidence intervals.
-- **IID Monte Carlo** via a two step procedure using the Central Limit Theorem (CLT). Error estimates are *not guaranteed* as CLT is asymptotic in $n$ is the variance must be estimated.
-- **IID Monte Carlo** via a two step procedure using Berry-Esseen inequalities to account for finite sample sizes. Error estimates are *guaranteed* for functions with bounded Kurtosis.
-- **Multilevel IID Monte Carlo and Quasi-Monte Carlo** which more efficiently integrate expensive functions by exploiting a telescoping sum over lower fidelity models. 
+## Community
+
+Please refer to [this document](https://github.com/QMCSoftware/QMCSoftware/blob/develop/community.md) for the key roles in the QMCPy community.
+
+---
+
+## Video Tutorial
+Please refer to [this video](https://www.youtube.com/watch?v=bRcKiLA2yBQ) for a quick introduction to QMCPy.
+[![Watch the video](https://img.youtube.com/vi/bRcKiLA2yBQ/0.jpg)](https://youtu.be/bRcKiLA2yBQ)
+
+For a more detail introduction refer to [this video](https://www.youtube.com/watch?v=gL8M_7c-YUE).
+[![Watch the video](https://img.youtube.com/vi/gL8M_7c-YUE/0.jpg)](https://youtu.be/gL8M_7c-YUE)
