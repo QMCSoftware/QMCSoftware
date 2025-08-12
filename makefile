@@ -101,17 +101,17 @@ longtests:
 booktests:
 	@echo "\nNotebook tests"
 	cd test/booktests/ && \
+	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v 1>/dev/null && \
-	rm -fr *.eps *.jpg *.pdf *.part *txt && \
+	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" 1>/dev/null && \
 	cd ../..
 
 booktests-parallel:
 	@echo "\nBooktests"
 	cd test/booktests/ && \
+	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py  | 1>/dev/null && \
-	rm -fr *.eps *.jpg *.pdf *.part *.txt && rm -fr logs && rm -fr runinfo && \
+	python parsl_test_runner.py 1>/dev/null && \
 	cd ../.. 
 
 tests: doctests fasttests longtests coverage
