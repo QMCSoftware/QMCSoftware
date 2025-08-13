@@ -92,7 +92,7 @@ def fwht(x):
     Returns:
         y (np.ndarray): FWHT values.
     """
-    y = x.copy()
+    y = x.copy()+0.
     n = x.shape[-1]
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2

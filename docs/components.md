@@ -1,31 +1,16 @@
-# Quasi-Monte Carlo Community Software in Python
-
-[![](https://img.shields.io/badge/Docs-6b03fc)](https://QMCSoftware.github.io/QMCSoftware/)
-[![](https://img.shields.io/badge/GitHub-15bfa9)](https://github.com/QMCSoftware/QMCSoftware)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/qmcpy.svg?label=PyPI%20downloads)](https://pypi.org/project/qmcpy/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964489.svg)](https://doi.org/10.5281/zenodo.3964489)
-[![Tests](https://github.com/QMCSoftware/QMCSoftware/workflows/QMCPy_CI/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/python-package-conda.yml)
-[![](https://img.shields.io/badge/QMC_Blogs-fc7005)](http://qmcpy.wordpress.com/)
-
-[![](https://img.shields.io/badge/Fred_Hickernell's_MCQMC2020_Video_Tutorial-FF0000)](https://www.youtube.com/watch?v=gL8M_7c-YUE)
-[![](https://img.shields.io/badge/Aleksei_Sorokin's_PyData_Chicago_Video_Tutorial-FF0000)](https://www.youtube.com/watch?v=bRcKiLA2yBQ)
-
-
-```
-pip install qmcpy
-```
+# Components of QMCPy: Quasi-Monte Carlo Software in Python
 
 Monte Carlo (MC) methods approximate the true mean (expectation) $\mu$ of a random variable $g(\boldsymbol{T})$ by the sample mean $\hat{\mu}_n = \frac{1}{n} \sum_{i=0}^{n-1} g(\boldsymbol{T}_i)$ for some samples $\boldsymbol{T}_0,\dots,\boldsymbol{T}_{n-1}$. We call the $d$-dimensional vector random variable $\boldsymbol{T}$ the **true measure** and we call $g$ the **integrand**. As most computer-generated random numbers are uniformly distributed, we use a transform $\boldsymbol{\psi}$ to write $\boldsymbol{T} \sim \boldsymbol{\psi}(\boldsymbol{X})$ where $\boldsymbol{X} \sim \mathcal{U}[0,1]^d$. The resulting Monte Carlo approximation is written in terms of the transformed integrand $f(\boldsymbol{x}) = g(\boldsymbol{\psi}(\boldsymbol{x}))$ as
 
 $$\mu = \mathbb{E}[f(\boldsymbol{X})] = \int_{[0,1]^d} f(\boldsymbol{x}) \mathrm{d} \boldsymbol{x} \approx \int_{[0,1]^d} f(\boldsymbol{x}) \hat{\lambda}_n(\mathrm{d} \boldsymbol{x}) = \frac{1}{n} \sum_{i=0}^{n-1} f(\boldsymbol{x}_i) = \hat{\mu}, \qquad \boldsymbol{X} \sim \mathcal{U}[0,1]^d$$
 
-for some **discrete distribution** $\hat{\lambda}_n$ defined by samples $\boldsymbol{x}_0,\dots,\boldsymbol{x}_{n-1} \in [0,1]^d$ (formally $\hat{\lambda}_n(A)$ measures the proporation of points $(\boldsymbol{x}_i)_{i=0}^{n-1}$ which lie in some set $A$). The *error* of this approximation is
+for some **discrete distribution** $\hat{\lambda}_n$ defined by samples $\boldsymbol{x}_0,\dots,\boldsymbol{x}_{n-1} \in [0,1]^d$ (formally $\hat{\lambda}_n(A)$ measures the proportion of points $(\boldsymbol{x}_i)_{i=0}^{n-1}$ which lie in some set $A$). The *error* of this approximation is
 
 $$E_n = \lvert \mu - \hat{\mu}_n \rvert.$$
 
 Classic **Monte Carlo** methods choose IID (independent and identically distributed) samples $\boldsymbol{x}_0,\dots,\boldsymbol{x}_{n-1} \overset{\mathrm{IID}}{\sim} \mathcal{U}[0,1]^d$ and have error $E_n$ like $\mathcal{O}(n^{-1/2})$. **Quasi-Monte Carlo (QMC)** methods achieve a significantly better error rate of $\mathcal{O}(n^{-1})$ by using low discrepancy (LD) sequences for $(\boldsymbol{x}_i)_{i=0}^{n-1}$ which more evenly fill the unit cube than IID points.
 
-| <img src="./assets/points.svg" alt="Alt Text" style="width:100%; height:auto;"> | 
+| <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/points.svg" style="width:100%; height:auto;"> |
 |:--|
 | The first $32$ points of each sequence are shown as purple starts, the next $32$ points are shown as green triangles, and the $64$ points after that are shown as blue circles. Notice the gaps and clusters of IID points compared to the more uniform coverage of LD sequences. |
 
@@ -79,7 +64,7 @@ These define $g$, which `QMCPy` will use to define $f = g \circ \boldsymbol{\psi
 
 ## Stopping Criteria
 
-| <img src="./assets/stopping_crit.svg" alt="Alt Text" style="width:100%; height:auto;"> | 
+| <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/stopping_crit.svg" style="width:100%; height:auto;"> |
 |:--|
 | The cost of IID-Monte Carlo algorithms is $\mathcal{O}(n^2)$ in the number of samples $n$ while Quasi-Monte Carlo algorithms only cost around $\mathcal{O}(n)$. Both IID-Monte Carlo and Quasi-Monte Carlo stopping criterion consistently determine approximations which meet the desired error tolerance. |
 
@@ -94,4 +79,4 @@ These deploy (Quasi-)Monte Carlo methods under error tolerance and budgetary con
 - **Quasi-Monte Carlo** via multiple independent randomizations of an LD point set and Student's $t$ confidence intervals.
 - **IID Monte Carlo** via a two step procedure using the Central Limit Theorem (CLT). Error estimates are *not guaranteed* as CLT is asymptotic in $n$ is the variance must be estimated.
 - **IID Monte Carlo** via a two step procedure using Berry-Esseen inequalities to account for finite sample sizes. Error estimates are *guaranteed* for functions with bounded Kurtosis.
-- **Multilevel IID Monte Carlo and Quasi-Monte Carlo** which more efficiently integrate expensive functions by exploiting a telescoping sum over lower fidelity models. 
+- **Multilevel IID Monte Carlo and Quasi-Monte Carlo** which more efficiently integrate expensive functions by exploiting a telescoping sum over lower fidelity models.

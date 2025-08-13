@@ -99,7 +99,7 @@ def ifftbr_torch(x):
     return xr
 
 def _fwht_torch(x):
-    y = x.clone()
+    y = x.clone()+0.
     n = x.size(-1)
     if n<=1: return y
     assert n&(n-1)==0 # require n is a power of 2
