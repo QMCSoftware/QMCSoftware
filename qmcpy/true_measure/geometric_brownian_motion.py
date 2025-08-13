@@ -17,7 +17,7 @@ class GeometricBrownianMotion(BrownianMotion):
         >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
         >>> gbm.gen_samples(2)
         array([[0.92343761, 1.42069027, 1.30851806, 0.99133819],
-            [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
+               [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
         >>> gbm
         GeometricBrownianMotion (AbstractTrueMeasure)
             time_vec        [0.5 1.  1.5 2. ]
@@ -25,9 +25,9 @@ class GeometricBrownianMotion(BrownianMotion):
             diffusion       0.200
             mean_gbm        [1.051 1.105 1.162 1.221]
             covariance_gbm  [[0.116 0.122 0.128 0.135]
-                            [0.122 0.27  0.284 0.299]
-                            [0.128 0.284 0.472 0.496]
-                            [0.135 0.299 0.496 0.734]]
+                             [0.122 0.27  0.284 0.299]
+                             [0.128 0.284 0.472 0.496]
+                             [0.135 0.299 0.496 0.734]]
             decomp_type     PCA
     """
 
