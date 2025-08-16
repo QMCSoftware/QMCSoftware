@@ -21,7 +21,11 @@ conda activate qmcpy
 pip install -e .[dev]
 ~~~
 
-While `dev` contains the most complete set of install dependencies, a number of other install dependency groups can be found in our `pyproject.toml` file.
+While `dev` contains the most complete set of install dependencies, a number of other install dependency groups can be found in our `pyproject.toml` file. If running in the `zsh` terminal you may need to use
+
+~~~bash
+pip install -e ".[dev]"
+~~~
 
 ## Tests
 
@@ -37,7 +41,7 @@ Optionally, you may install [Docker](https://www.docker.com/products/docker-desk
 make tests
 ~~~
 
-Please see the targets in the makefile for more granular control over tests. 
+Please see the targets in the makefile for more granular control over tests.
 
 ## Documentation
 
