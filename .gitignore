@@ -74,3 +74,7 @@ _ags/*
 
 # Downloaded files
 raw.githubusercontent.com*
+
+*.jupyterlab-workspace
+
+demos/talk_paper_demos/SURE_2025_Demos/64iidpts_d6.pdf
