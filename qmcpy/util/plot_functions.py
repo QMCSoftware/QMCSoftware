@@ -1,6 +1,7 @@
 import numpy as np 
 import os
 from typing import Union
+import qmcpy as qp
 
 def plot_proj(
         sampler, 
@@ -67,7 +68,7 @@ def plot_proj(
                         x_label_num = d_horizontal[i] + 1
                         y_label_num = d_vertical[j] + 1
                     
-                    if type(sampler).__name__=="AbstractDiscreteDistribution":
+                    if isinstance(sampler,qp.AbstractDiscreteDistribution):
                         ax[i,j].set_xlim([0-axis_pad,1+axis_pad])
                         ax[i,j].set_ylim([0-axis_pad,1+axis_pad])
                         ax[i,j].set_xticks([0,1/4,1/2,3/4,1])
