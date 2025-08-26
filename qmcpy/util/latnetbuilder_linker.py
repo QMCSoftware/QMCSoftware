@@ -1,5 +1,5 @@
 from ..util import ParameterError,NotYetImplemented
-from numpy import *
+import numpy as np
 
 
 def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
@@ -12,7 +12,7 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
         fout_prefix (str): start of output file name. 
             e.g. 'my_poly_lat_vec' 
     
-    Return:
+    Returns:
         str: path to file which can be passed into QMCPy's Lattice or Sobol' in order to use 
              the linked latnetbuilder generating vector/matrix
              e.g. 'my_poly_lat_vec.10.16.npy'
@@ -30,8 +30,8 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
         gen_vector = []
         for i in range(dim):
             gen_vector.append(int(Lines[5+i].split(sep)[0]))
-        v = array(gen_vector, dtype=uint64)
-        f_out = '%s/%s.%d.%d.npy'%(out_dir,fout_prefix,dim,log2(nb_points))
+        v = np.array(gen_vector, dtype=np.uint64)
+        f_out = '%s/%s.%d.%d.npy'%(out_dir,fout_prefix,dim,np.log2(nb_points))
         save(f_out,v)
         return f_out
     else:
@@ -46,15 +46,15 @@ def latnetbuilder_linker(lnb_dir ='./', out_dir='./', fout_prefix='lnb4qmcpy'):
         elif set_type == 'Sobol':
             line += dim
         mint = []
-        pows2 = 2**arange(nb_rows-1,-1,-1)[:,None]
+        pows2 = 2**np.arange(nb_rows-1,-1,-1)[:,None]
         for c in range(dim):
             line += 1
             M = []
             for i in range(nb_rows):
-                M.append(array([int(x) for x in Lines[line+i].split(' ')]))
+                M.append(np.array([int(x) for x in Lines[line+i].split(' ')]))
             line += nb_rows
-            mint.append((array(M)*pows2).sum(0))
-        mint = array(mint,dtype=uint64)
+            mint.append((np.array(M)*pows2).sum(0))
+        mint = np.array(mint,dtype=np.uint64)
         f_out = '%s/%s.%d.%d.%d.msb.npy'%(out_dir,fout_prefix,dim,nb_rows,nb_cols)
         save(f_out,mint)
         return f_out
