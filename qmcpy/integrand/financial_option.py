@@ -14,11 +14,12 @@ class FinancialOption(AbstractIntegrand):
     - Strike price $K$
     - Interest rate $r$ 
     - Volatility $\sigma$
+    - Drift $\gamma$
     - Equidistant monitoring times $\boldsymbol{\tau} = (\tau_1,\dots,\tau_d)^T$ with $\tau_d$ the final (exercise) time and $\tau_j = \tau_d j/d$. 
 
     Define the [geometric brownian motion](https://en.wikipedia.org/wiki/Geometric_Brownian_motion) as 
 
-    $$\boldsymbol{S}(\boldsymbol{t}) = S_0 e^{(r-\sigma^2/2)\boldsymbol{\tau}+\sigma\boldsymbol{t}}, \qquad \boldsymbol{T} \sim \mathcal{N}(\boldsymbol{0},\mathsf{\Sigma})$$
+    $$\boldsymbol{S}(\boldsymbol{t}) = S_0 e^{(\gamma-\sigma^2/2)\boldsymbol{\tau}+\sigma\boldsymbol{t}}, \qquad \boldsymbol{T} \sim \mathcal{N}(\boldsymbol{0},\mathsf{\Sigma})$$
 
     where $\boldsymbol{T}$ is a standard Brownian motion so $\mathsf{\Sigma} = \left(\min\{\tau_j,\tau_{j'}\}\right)_{j,j'=1}^d$.
 
@@ -28,7 +29,7 @@ class FinancialOption(AbstractIntegrand):
     
     where the payoff function $P$ will be defined depending on the option.
     
-    Below we wil luse $S_{-1}$ to denote the final element of $\boldsymbol{S}$, the value of the path at exercise time. 
+    Below we wil use $S_{-1}$ to denote the final element of $\boldsymbol{S}$, the value of the path at exercise time. 
     
     # European Options
     

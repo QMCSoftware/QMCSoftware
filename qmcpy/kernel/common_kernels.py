@@ -358,7 +358,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
     r"""
     Rational Quadratic kernel 
 
-    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\frac{d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})}{\alpha}\left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2^2\right)^{-\alpha}, \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\frac{d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})}{\alpha}\right)^{-\alpha}, \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
 
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
