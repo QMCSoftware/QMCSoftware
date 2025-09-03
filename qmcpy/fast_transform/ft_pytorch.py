@@ -115,10 +115,10 @@ def _fwht_torch(x):
     return y
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
-    def forward(self, x):
+    def forward(ctx, x):
         return _fwht_torch(x)
     @staticmethod
-    def backward(self, dx):
+    def backward(ctx, dx):
         return _fwht_torch(dx)
 def fwht_torch(x):
     r"""

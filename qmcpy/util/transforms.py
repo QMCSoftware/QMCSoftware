@@ -79,6 +79,8 @@ def parse_assign_param(pname, param, shape_param, requires_grad_param, tfs_param
     tf_param = tfs_param[1]
     if torchify:
         assert isinstance(requires_grad_param,bool)
+        if requires_grad_param:
+            raw_param = 1.*raw_param
         raw_param = npt.nn.Parameter(raw_param,requires_grad=requires_grad_param)
     assert shape_param[-1] in endsize_ops, "%s not in %s"%(str(shape_param[-1]),str(endsize_ops))
     if "POSITIVE" in constraints: 
