@@ -19,8 +19,10 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             lengthscales,
             alpha,
             shape_alpha,
+            alpha_endsize_ops,
             shape_scale,
             shape_lengthscales, 
+            tfs_alpha,
             tfs_scale,
             tfs_lengthscales,
             torchify, 
@@ -51,8 +53,8 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             param = alpha, 
             shape_param = shape_alpha,
             requires_grad_param = requires_grad_alpha,
-            tfs_param = (tf_identity,tf_identity),
-            endsize_ops = [self.d],
+            tfs_param = tfs_alpha,
+            endsize_ops = alpha_endsize_ops,
             constraints = ["POSITIVE"])
     
     @property
@@ -265,8 +267,10 @@ class KernelShiftInvar(AbstractSIDSIKernel):
             lengthscales = lengthscales,
             alpha = alpha, 
             shape_alpha = [d], 
+            alpha_endsize_ops = [d],
             shape_scale = shape_scale,
             shape_lengthscales = shape_lengthscales, 
+            tfs_alpha = (tf_identity,tf_identity), 
             tfs_scale = tfs_scale,
             requires_grad_alpha = False,
             tfs_lengthscales = tfs_lengthscales, 
@@ -469,8 +473,10 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
             lengthscales = lengthscales,
             alpha = alpha,
             shape_alpha = [d], 
+            alpha_endsize_ops = [d],
             shape_scale = shape_scale,
             shape_lengthscales = shape_lengthscales, 
+            tfs_alpha = (tf_identity,tf_identity), 
             tfs_scale = tfs_scale, 
             tfs_lengthscales = tfs_lengthscales, 
             torchify = torchify,
@@ -687,9 +693,11 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             scale = scale, 
             lengthscales = lengthscales,
             alpha = alpha, 
-            shape_alpha = shape_alpha,
+            shape_alpha = [d] if shape_alpha is None else shape_alpha,
+            alpha_endsize_ops = [d],
             shape_scale = shape_scale,
-            shape_lengthscales = shape_lengthscales, 
+            shape_lengthscales = shape_lengthscales,
+            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps), 
             tfs_scale = tfs_scale, 
             tfs_lengthscales = tfs_lengthscales, 
             torchify = torchify,
@@ -730,14 +738,19 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         flog2delta = -self.npt.inf*self.npt.ones(delta.shape,**self.nptkwargs)
         pos = delta>0 
         flog2delta[pos] = self.npt.floor(self.npt.log2(delta[pos]))-t
-        return flog2delta
+        flog2deltas = self.npt.stack([flog2delta for j in range(p)],-2)
+        return flog2deltas
     
-    def combine_per_dim_components(self, flog2delta, beta0, beta1, c, batch_params):
+    def combine_per_dim_components(self, flog2deltas, beta0, beta1, c, batch_params):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         alpha = batch_params["alpha"]
         p2alphap1 = 2**(alpha+1)
         nu = p2alphap1/(p2alphap1-2)
-        kparts = nu-(nu+1)*2**(alpha*(flog2delta+1))
-        k = scale*(1+lengthscales*kparts).prod(-1)*c.sum()
+        finite = self.npt.isfinite(flog2deltas)
+        flog2deltas[~finite] = 0
+        s = (nu+1)*2**(alpha*(flog2deltas+1))
+        kparts = nu-s
+        kparts[~finite] = (nu-0*s)[~finite]
+        k = scale*((1+lengthscales[...,None,:]*kparts).prod(-1)*c).sum(-1)
         return k
