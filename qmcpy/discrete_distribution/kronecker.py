@@ -1,4 +1,4 @@
-from ._discrete_distribution import LD
+from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from numpy import *
 from sympy import nextprime
 
@@ -13,8 +13,8 @@ PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41,
 
 RICHTMYER = sqrt(PRIMES) % 1
 
-class Kronecker(LD):
-    def __init__(self, dimension=1, alpha=0, delta=0, replications=1, randomize=False, m_max=2 ** 20, seed=None):
+class Kronecker(AbstractLDDiscreteDistribution):
+    def __init__(self, dimension=1, alpha=0, delta=0, replications=None, randomize=True, m_max=2 ** 20, seed=None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.d = dimension
@@ -36,7 +36,7 @@ class Kronecker(LD):
             else:
                 self.alpha = alpha
 
-        super(Kronecker,self).__init__(dimension, seed)
+        super(Kronecker,self).__init__(dimension,replications,seed,d_limit,n_lim) 
 
         if self.randomize:
             self.delta = random.rand(self.replications, self.dimension)
