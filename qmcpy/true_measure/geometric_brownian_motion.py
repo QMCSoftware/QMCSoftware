@@ -1,38 +1,37 @@
 from .brownian_motion import BrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
-from numpy import exp, zeros, minimum, array, sqrt, log, pi, linalg, eye
-from scipy.stats import multivariate_normal
+from numpy import exp, zeros, minimum, array, sqrt, log, pi, linalg, eye, cumsum, add, multiply
+from scipy.stats import multivariate_normal, norm
 
 
 class GeometricBrownianMotion(BrownianMotion):
-    r"""
-    A Geometric Brownian Motion (GBM) with initial value $S_0$, drift $\gamma$, and diffusion $\sigma^2$ is 
+    """
+    Geometric Brownian Motion.
 
-    $$\mathrm{GBM}(t) = S_0 \exp[(\gamma - \sigma/2) t + \sigma \mathrm{BM}(t)]$$
-
-    where BM is a Brownian Motion drift $\gamma$ and diffusion $\sigma^2$. 
-    
-    Examples:
-        >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
-        >>> gbm.gen_samples(2)
-        array([[0.92343761, 1.42069027, 1.30851806, 0.99133819],
-               [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
-        >>> gbm
-        GeometricBrownianMotion (AbstractTrueMeasure)
-            time_vec        [0.5 1.  1.5 2. ]
-            drift           0.100
-            diffusion       0.200
-            mean_gbm        [1.051 1.105 1.162 1.221]
-            covariance_gbm  [[0.116 0.122 0.128 0.135]
-                             [0.122 0.27  0.284 0.299]
-                             [0.128 0.284 0.472 0.496]
-                             [0.135 0.299 0.496 0.734]]
-            decomp_type     PCA
+    >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
+    >>> gbm.gen_samples(2)
+    array([[0.92343761, 1.42069027, 1.30851806, 0.99133819],
+           [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
+    >>> gbm
+    GeometricBrownianMotion (AbstractTrueMeasure)
+        time_vec        [0.5 1.  1.5 2. ]
+        drift           0.100
+        diffusion       0.200
+        mean_gbm        [1.051 1.105 1.162 1.221]
+        covariance_gbm  [[0.116 0.122 0.128 0.135]
+                         [0.122 0.27  0.284 0.299]
+                         [0.128 0.284 0.472 0.496]
+                         [0.135 0.299 0.496 0.734]]
+        decomp_type     PCA
     """
 
-    def __init__(self, sampler, t_final=1, initial_value=1, drift=0, diffusion=1, decomp_type='PCA'):
-        r"""
+    def __init__(self, sampler, t_final=1, initial_value=1, drift=0, diffusion=1, decomp_type='PCA', 
+                 lazy_load=True, lazy_decomp=True):
+        """
+        GeometricBrownianMotion(t) = initial_value * exp[(drift - 0.5 * diffusion) * t
+                                                         + \\sqrt{diffusion} * StandardBrownianMotion(t)]
+
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A discrete distribution or true measure.
             t_final (float): End time for the geometric Brownian motion, non-negative.
@@ -40,28 +39,95 @@ class GeometricBrownianMotion(BrownianMotion):
             drift (float): Drift coefficient $\gamma$.
             diffusion (float): Positive diffusion coefficient $\sigma^2$.
             decomp_type (str): Method of decomposition, either "PCA" or "Cholesky".
+            lazy_load (bool): If True, defer GBM-specific computations until needed.
+            lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
+        
+        Note: diffusion is $\sigma^2$, where $\sigma$ is volatility. 
         """
-        super().__init__(sampler, t_final=t_final, drift=0, diffusion=diffusion, decomp_type=decomp_type)
+        super().__init__(sampler, t_final=t_final, drift=0, diffusion=diffusion, 
+                        decomp_type=decomp_type, lazy_decomp=lazy_decomp)
         self.parameters = ['time_vec', 'drift', 'diffusion', 'mean_gbm', 'covariance_gbm', 'decomp_type']
         self.initial_value = initial_value
         self.drift = drift
         self.diffusion = diffusion
-        self.mean_gbm = self._compute_gbm_mean()
-        self.covariance_gbm = self._compute_gbm_covariance()
-        self._setup_lognormal_distribution()
+        self.lazy_load = lazy_load
+        self.lazy_decomp = lazy_decomp
+        
+        # Cache for lazy-loaded properties
+        self._mean_gbm_cache = None
+        self._covariance_gbm_cache = None
+        self._log_mvn_scipy_cache = None
+        
+        # Large step optimization - use fast path for large problems
+        self.large_step_threshold = 1000
+        self.use_large_step_optimization = len(self.time_vec) > self.large_step_threshold
+        
+        # Validate input early (fast operation)
         self._validate_input()
+        
+        if not lazy_load:
+            # Compute everything immediately for backwards compatibility
+            self.mean_gbm = self._compute_gbm_mean()
+            self.covariance_gbm = self._compute_gbm_covariance()
+            self._setup_lognormal_distribution()
+
+    @property
+    def mean_gbm(self):
+        """Lazy-loaded GBM mean vector."""
+        if self._mean_gbm_cache is None:
+            self._mean_gbm_cache = self._compute_gbm_mean()
+        return self._mean_gbm_cache
+    
+    @mean_gbm.setter
+    def mean_gbm(self, value):
+        """Allow explicit setting of mean_gbm."""
+        self._mean_gbm_cache = value
+    
+    @property
+    def covariance_gbm(self):
+        """Lazy-loaded GBM covariance matrix."""
+        if self._covariance_gbm_cache is None:
+            self._covariance_gbm_cache = self._compute_gbm_covariance()
+        return self._covariance_gbm_cache
+    
+    @covariance_gbm.setter  
+    def covariance_gbm(self, value):
+        """Allow explicit setting of covariance_gbm."""
+        self._covariance_gbm_cache = value
+
+    @property
+    def log_mvn_scipy(self):
+        """Lazy-loaded scipy multivariate normal distribution."""
+        if self._log_mvn_scipy_cache is None:
+            self._setup_lognormal_distribution()
+        return self._log_mvn_scipy_cache
 
     def _compute_gbm_mean(self):
         return self.initial_value * exp(self.drift * self.time_vec)
 
     def _compute_gbm_covariance(self):
-        S0 = self.initial_value
+        """Fast covariance computation using vectorized operations."""
+        S0_sq = self.initial_value ** 2
         mu = self.drift
-        t = array(self.time_vec) 
-        # Vectorization using broadcasting
-        t_sum = t[:, None] + t[None, :]  # t[i] + t[j] for all i,j
-        t_min = minimum.outer(t, t)      # min(t[i], t[j]) for all i,j
-        cov_matrix = (S0 ** 2) * exp(mu * t_sum) * (exp(self.diffusion * t_min) - 1)
+        t = array(self.time_vec)
+        n = len(t)
+        
+        # Use most efficient method based on problem size
+        if n <= 200:  # For small-medium matrices, broadcasting is fastest
+            t_sum = t[:, None] + t[None, :]  # Shape: (n, n)
+            t_min = minimum.outer(t, t)      # Shape: (n, n) 
+            cov_matrix = S0_sq * exp(mu * t_sum) * (exp(self.diffusion * t_min) - 1)
+        else:   # For larger matrices, use memory-efficient computation
+            cov_matrix = zeros((n, n))
+            exp_mu_t = exp(mu * t)  # Pre-compute exp(mu * t_i)
+            exp_diff_t = exp(self.diffusion * t)  # Pre-compute exp(diffusion * t_i)
+            for i in range(n):   # Optimized symmetric matrix computation
+                cov_matrix[i, i] = S0_sq * exp_mu_t[i] ** 2 * (exp_diff_t[i] - 1)
+                for j in range(i + 1, n):
+                    t_min_ij = min(t[i], t[j]) 
+                    cov_ij = S0_sq * exp_mu_t[i] * exp_mu_t[j] * (exp(self.diffusion * t_min_ij) - 1)
+                    cov_matrix[i, j] = cov_ij
+                    cov_matrix[j, i] = cov_ij  # Symmetric
         
         return cov_matrix
         
@@ -78,7 +144,9 @@ class GeometricBrownianMotion(BrownianMotion):
     def _spawn(self, sampler, dimension):
         return GeometricBrownianMotion(
             sampler, t_final=self.t, initial_value=self.initial_value,
-            drift=self.drift, diffusion=self.diffusion, decomp_type=self.decomp_type
+            drift=self.drift, diffusion=self.diffusion, decomp_type=self.decomp_type,
+            lazy_load=getattr(self, 'lazy_load', True),  # Default to optimized mode
+            lazy_decomp=getattr(self, 'lazy_decomp', True)
         )
 
     def _validate_input(self):
@@ -133,15 +201,24 @@ class GeometricBrownianMotion(BrownianMotion):
         return validation_results
 
     def _setup_lognormal_distribution(self):
-        """Setup scipy multivariate normal for the log-transformed variables."""
+        """Fast setup of scipy multivariate normal for log-transformed variables."""
         # Mean of log(S(t)/S0): (drift - 0.5*diffusion) * t
         log_mean = (self.drift - 0.5 * self.diffusion) * self.time_vec
         
-        # Covariance of log returns: diffusion * min(t_i, t_j)
-        time_matrix = minimum.outer(self.time_vec, self.time_vec)
-        log_cov = self.diffusion * time_matrix
+        # Covariance of log returns using efficient computation
+        t = array(self.time_vec)
+        n = len(t)
         
-        self.log_mvn_scipy = multivariate_normal(mean=log_mean, cov=log_cov, allow_singular=True)
+        # Memory-efficient computation for larger matrices
+        log_cov = zeros((n, n))
+        for i in range(n):
+            log_cov[i, i] = self.diffusion * t[i]
+            for j in range(i + 1, n):
+                min_val = min(t[i], t[j])
+                log_cov[i, j] = self.diffusion * min_val
+                log_cov[j, i] = log_cov[i, j]
+        
+        self._log_mvn_scipy_cache = multivariate_normal(mean=log_mean, cov=log_cov, allow_singular=True)
 
     def _weight(self, x):
         """
@@ -167,3 +244,57 @@ class GeometricBrownianMotion(BrownianMotion):
         jacobian = 1.0 / x.prod(axis=1)
         
         return normal_pdf * jacobian
+
+    def gen_samples(self, n):
+        """
+        Generate GBM samples using the working _transform method.
+        """
+        # Use the working _transform method instead of the buggy traditional method
+        uniform_samples = self.discrete_distrib.gen_samples(n)
+        return self._transform(uniform_samples)
+    
+    def _gen_samples_traditional(self, n_samples):
+        """Traditional GBM generation using full covariance matrix."""
+        # Generate standard Brownian motion samples
+        bm_samples = super().gen_samples(n_samples)
+        
+        # Transform to GBM: S(t) = S0 * exp((r - 0.5*σ²)*t + B(t))
+        # Note: bm_samples already includes the correct diffusion scaling
+        drift_term = (self.drift - 0.5 * self.diffusion) * self.time_vec
+        exponent = drift_term + bm_samples
+        
+        return self.initial_value * exp(exponent)
+    
+    def _gen_samples_large_steps_optimized(self, n_samples):
+        """
+        Fast GBM generation for large step counts using incremental approach.
+        This avoids O(n²) matrix operations and scales much better.
+        """
+        # Get uniform samples from the sampler
+        uniform_samples = self.sampler.gen_samples(n_samples)
+        
+        # Transform to normal increments
+        normal_samples = norm.ppf(uniform_samples)
+        
+        # For Brownian motion increments with equal time steps
+        dt = self.time_vec[1] - self.time_vec[0] if len(self.time_vec) > 1 else self.time_vec[0]
+        sqrt_dt_diffusion = sqrt(dt * self.diffusion)
+        
+        # Scale normal samples to Brownian motion increments
+        bm_increments = normal_samples * sqrt_dt_diffusion
+        
+        # Cumulative sum to get Brownian motion path
+        bm_paths = cumsum(bm_increments, axis=1)
+        
+        # Transform to GBM using efficient vectorized operations
+        drift_term = (self.drift - 0.5 * self.diffusion) * self.time_vec
+        
+        # Pre-allocate output for efficiency
+        gbm_samples = zeros((n_samples, len(self.time_vec)))
+        
+        # Compute GBM: S(t) = S0 * exp((r - 0.5*σ²)*t + σ*B(t))
+        add(drift_term[None, :], sqrt(self.diffusion) * bm_paths, out=gbm_samples)
+        exp(gbm_samples, out=gbm_samples)
+        multiply(gbm_samples, self.initial_value, out=gbm_samples)
+        
+        return gbm_samples

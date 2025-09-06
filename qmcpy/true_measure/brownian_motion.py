@@ -47,7 +47,7 @@ class BrownianMotion(Gaussian):
                 [2.06762574, 3.21756319, 4.93375923]]])
     """
 
-    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA'):
+    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA', lazy_decomp=True):
         r"""
         Args:
             sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
@@ -62,6 +62,7 @@ class BrownianMotion(Gaussian):
              
                 - `'PCA'` for principal component analysis, or 
                 - `'Cholesky'` for cholesky decomposition.
+            lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
         """
         self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
         # default to transform from standard uniform
@@ -72,9 +73,9 @@ class BrownianMotion(Gaussian):
         self.drift = drift
         self.diffusion = diffusion
         self.time_vec = np.linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.diffused_sigma_bm = self.diffusion*np.array([[min(self.time_vec[i],self.time_vec[j]) for i in range(self.d)] for j in range(self.d)])
+        self.diffused_sigma_bm = self.diffusion * np.minimum.outer(self.time_vec, self.time_vec)
         self.drift_time_vec_plus_init = self.drift*self.time_vec+self.initial_value # mean
-        self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type)
+        self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type,lazy_decomp)
         self.range = np.array([[-np.inf,np.inf]])
         super(Gaussian,self).__init__()
     
