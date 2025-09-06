@@ -41,22 +41,20 @@ def add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theo
         'Std Dev Error': abs(qp_emp_std - theoretical_std),
     })
 
-def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretical_std):
+def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretical_std, params_ql, params_qp):
     """Process data for a single sampler type"""
-    params_ql = {'initial_value': 100, 'mu': 0.05, 'sigma': 0.2, 'maturity': 1.0, 'n_steps': 252, 'n_paths': 2**14, 'sampler_type': sampler_type}
-    params_qp = {'initial_value': 100, 'mu': 0.05, 'diffusion': 0.2**2, 'maturity': 1.0, 'n_steps': 252, 'n_paths': 2**14, 'sampler_type': sampler_type}
     # Initialize quantlib_paths to None
+    params_ql['sampler_type'] = sampler_type
+    params_qp['sampler_type'] = sampler_type
     quantlib_paths, quantlib_final = None, None
+
     # Generate paths for both libraries
     if sampler_type in ['IIDStdUniform', 'Sobol']:
-        start_time = time.time()
         quantlib_paths, ql_gbm = qlu.generate_quantlib_paths(**params_ql)
-        quantlib_time = time.time() - start_time
         quantlib_final = quantlib_paths[:, -1]
+    else: quantlib_paths, ql_gbm = None, None
         
-    start_time = time.time()
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
-    qmcpy_time = time.time() - start_time
 
     # Final value statistics
     qmcpy_final = qmcpy_paths[:, -1]
@@ -67,7 +65,7 @@ def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretic
         add_quantlib_results(results_data, sampler_type, quantlib_final, theoretical_mean, theoretical_std)
     add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theoretical_mean, theoretical_std)
     
-    return quantlib_paths, qmcpy_paths, qp_gbm, params_ql
+    return quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp
 
 
 def create_timing_dataframe(quantlib_results, qmcpy_results, baseline_sampler):
