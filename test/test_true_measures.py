@@ -77,5 +77,160 @@ class TestMatern(unittest.TestCase):
         cov2 = 0.01 * kernel2.__call__(points) + 1e-6*np.eye(m2.covariance.shape[-1])
         assert np.allclose(cov2, m2.covariance)
 
+
+class TestBrownianMotion(unittest.TestCase):
+    def setUp(self):
+        """Set up test fixtures with fixed seeds for reproducibility."""
+        self.seed = 7
+    
+    def test_brownian_motion_parent_values(self):
+        """Test that underlying Brownian Motion values are correct."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=1,
+            drift=0.1,
+            diffusion=0.2
+        )
+        
+        # Test time vector from parent
+        expected_time_vec = np.array([0.25, 0.5, 0.75, 1.0])
+        np.testing.assert_array_almost_equal(
+            gbm.time_vec, expected_time_vec, decimal=10,
+            err_msg="Time vector from parent BrownianMotion changed unexpectedly"
+        )
+        
+        # Test parent's covariance matrix 
+        expected_parent_cov = gbm.diffusion * np.minimum.outer(gbm.time_vec, gbm.time_vec)
+
+        # Access parent's covariance 
+        if hasattr(gbm, 'covariance'):
+            np.testing.assert_array_almost_equal(
+                gbm.covariance, expected_parent_cov, decimal=10,
+                err_msg="Parent BrownianMotion covariance changed unexpectedly"
+            )
+
+
+class TestGeometricBrownianMotion(unittest.TestCase):
+    def setUp(self):
+        """Set up test fixtures with fixed seeds for reproducibility."""
+        self.seed = 7
+    
+    def test_gbm_basic_output_reproducibility(self):
+        """Test that basic GBM sample generation produces expected values with fixed seed."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed), 
+            t_final=2, 
+            drift=0.1, 
+            diffusion=0.2
+        )
+        
+        samples = gbm.gen_samples(2)
+        
+        # Expected output 
+        expected_samples = np.array([
+            [0.92343761, 1.42069027, 1.30851806, 0.99133819],
+            [0.7185916, 0.42028013, 0.42080335, 0.4696196]
+        ])
+        
+        np.testing.assert_array_almost_equal(
+            samples, expected_samples, decimal=6,
+            err_msg="GBM sample generation output changed unexpectedly"
+        )
+        
+    def test_gbm_mean_computation(self):
+        """Test that GBM mean computation produces expected values."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=2,
+            initial_value=1,
+            drift=0.1,
+            diffusion=0.2
+        )
+        
+        expected_mean = np.array([1.051271096, 1.105170918, 1.161834243, 1.221402758])
+        
+        np.testing.assert_array_almost_equal(
+            gbm.mean_gbm, expected_mean, decimal=6,
+            err_msg="GBM mean computation changed unexpectedly"
+        )
+        
+    def test_gbm_covariance_computation(self):
+        """Test that GBM covariance computation produces expected values."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=2,
+            initial_value=1,
+            drift=0.1,
+            diffusion=0.2
+        )
+        
+        # Expected covariance matrix - actual computed values
+        expected_cov = np.array([
+            [0.116232, 0.122191, 0.128456, 0.135042],
+            [0.122191, 0.270422, 0.284287, 0.298862],
+            [0.128456, 0.284287, 0.47226, 0.496473],
+            [0.135042, 0.298862, 0.496473, 0.733716]
+        ])
+        
+        np.testing.assert_array_almost_equal(
+            gbm.covariance_gbm, expected_cov, decimal=6,
+            err_msg="GBM covariance computation changed unexpectedly"
+        )
+
+    def test_gbm_weight_specific_values(self):
+        """Test that PDF weight computation produces expected values for specific inputs."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=1,
+            initial_value=1,
+            drift=0.05,
+            diffusion=0.1
+        )
+        
+        # Test with specific known samples
+        test_samples = np.array([
+            [1.0, 1.05, 1.1, 1.15],
+            [0.9, 0.95, 1.0, 1.05]
+        ])
+        
+        weights = gbm._weight(test_samples)
+        
+        # Expected weights - actual computed values
+        expected_weights = np.array([26.782039, 30.850616])
+        
+        np.testing.assert_array_almost_equal(
+            weights, expected_weights, decimal=6,
+            err_msg="GBM weight computation changed unexpectedly"
+        )
+
+    def test_transform_specific_inputs(self):
+            """Test _transform method with specific uniform inputs."""
+            gbm = GeometricBrownianMotion(
+                DigitalNetB2(4, seed=self.seed),
+                t_final=1,
+                drift=0.1,
+                diffusion=0.2,
+                initial_value=2.0
+            )
+            
+            # Specific uniform inputs
+            uniform_inputs = np.array([
+                [0.1, 0.3, 0.7, 0.9],
+                [0.5, 0.5, 0.5, 0.5]
+            ])
+            
+            transformed = gbm._transform(uniform_inputs)
+            
+            # Expected transformed values - actual computed values
+            expected_transformed = np.array([
+                [1.73828, 1.166842, 1.297715, 1.24253],
+                [2.0, 2.0, 2.0, 2.0]
+            ])
+            
+            np.testing.assert_array_almost_equal(
+                transformed, expected_transformed, decimal=6,
+                err_msg="Transform method output changed unexpectedly"
+            )
+    
 if __name__ == "__main__":
     unittest.main()
