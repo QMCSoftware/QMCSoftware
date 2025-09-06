@@ -231,6 +231,82 @@ class TestGeometricBrownianMotion(unittest.TestCase):
                 transformed, expected_transformed, decimal=6,
                 err_msg="Transform method output changed unexpectedly"
             )
+
+    def test_setup_lognormal_distribution_properties(self):
+        """Test that _setup_lognormal_distribution creates correct log-space distribution."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=2,
+            initial_value=1,
+            drift=0.1,
+            diffusion=0.2
+        )
+        
+        # Access log_mvn_scipy to trigger setup
+        log_mvn = gbm.log_mvn_scipy
+        
+        # Test log-space mean: (drift - 0.5*diffusion) * time_vec
+        expected_log_mean = (0.1 - 0.5 * 0.2) * gbm.time_vec
+        np.testing.assert_array_almost_equal(
+            log_mvn.mean, expected_log_mean, decimal=10,
+            err_msg="Log-space mean computation in lognormal setup changed unexpectedly"
+        )
+        
+        # Test log-space covariance structure: diffusion * min(t_i, t_j)
+        expected_log_cov = 0.2 * np.minimum.outer(gbm.time_vec, gbm.time_vec)
+        np.testing.assert_array_almost_equal(
+            log_mvn.cov, expected_log_cov, decimal=10,
+            err_msg="Log-space covariance computation in lognormal setup changed unexpectedly"
+        )
+
+    def test_lognormal_distribution_pdf_consistency(self):
+        """Test that the lognormal distribution PDF is mathematically consistent."""
+        gbm = GeometricBrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=1,
+            initial_value=2,
+            drift=0.05,
+            diffusion=0.1
+        )
+        
+        # Test with a known sample
+        test_sample = np.array([[2.1, 2.15, 2.2, 2.25]])
+        gbm_weight = gbm._weight(test_sample)[0]
+        
+        # Manually compute using log transformation
+        log_sample = np.log(test_sample / gbm.initial_value).flatten()
+        normal_pdf = gbm.log_mvn_scipy.pdf(log_sample)
+        jacobian = 1.0 / test_sample.prod()
+        manual_weight = normal_pdf * jacobian
+        
+        np.testing.assert_almost_equal(
+            gbm_weight, manual_weight, decimal=10,
+            err_msg="Lognormal PDF computation inconsistency detected"
+        )
+
+    def test_lognormal_setup_lazy_loading(self):
+        """Test that lognormal distribution setup works with lazy loading."""
+        # Test with lazy_load=True (default)
+        gbm_lazy = GeometricBrownianMotion(
+            DigitalNetB2(3, seed=self.seed),
+            t_final=1,
+            drift=0.1,
+            diffusion=0.2,
+            lazy_load=True
+        )
+        self.assertIsNone(gbm_lazy._log_mvn_scipy_cache)
+        log_mvn = gbm_lazy.log_mvn_scipy
+        self.assertIsNotNone(gbm_lazy._log_mvn_scipy_cache)
+        
+        # Test with lazy_load=False
+        gbm_eager = GeometricBrownianMotion(
+            DigitalNetB2(3, seed=self.seed),
+            t_final=1,
+            drift=0.1,
+            diffusion=0.2,
+            lazy_load=False
+        )
+        self.assertIsNotNone(gbm_eager._log_mvn_scipy_cache)
     
 if __name__ == "__main__":
     unittest.main()

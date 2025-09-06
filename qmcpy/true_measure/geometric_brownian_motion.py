@@ -201,22 +201,13 @@ class GeometricBrownianMotion(BrownianMotion):
         return validation_results
 
     def _setup_lognormal_distribution(self):
-        """Fast setup of scipy multivariate normal for log-transformed variables."""
+        """Setup scipy multivariate normal for the log-transformed variables."""
         # Mean of log(S(t)/S0): (drift - 0.5*diffusion) * t
         log_mean = (self.drift - 0.5 * self.diffusion) * self.time_vec
         
-        # Covariance of log returns using efficient computation
-        t = array(self.time_vec)
-        n = len(t)
-        
-        # Memory-efficient computation for larger matrices
-        log_cov = zeros((n, n))
-        for i in range(n):
-            log_cov[i, i] = self.diffusion * t[i]
-            for j in range(i + 1, n):
-                min_val = min(t[i], t[j])
-                log_cov[i, j] = self.diffusion * min_val
-                log_cov[j, i] = log_cov[i, j]
+        # Covariance of log returns: diffusion * min(t_i, t_j)
+        time_matrix = minimum.outer(self.time_vec, self.time_vec)
+        log_cov = self.diffusion * time_matrix
         
         self._log_mvn_scipy_cache = multivariate_normal(mean=log_mean, cov=log_cov, allow_singular=True)
 
@@ -249,52 +240,5 @@ class GeometricBrownianMotion(BrownianMotion):
         """
         Generate GBM samples using the working _transform method.
         """
-        # Use the working _transform method instead of the buggy traditional method
         uniform_samples = self.discrete_distrib.gen_samples(n)
         return self._transform(uniform_samples)
-    
-    def _gen_samples_traditional(self, n_samples):
-        """Traditional GBM generation using full covariance matrix."""
-        # Generate standard Brownian motion samples
-        bm_samples = super().gen_samples(n_samples)
-        
-        # Transform to GBM: S(t) = S0 * exp((r - 0.5*σ²)*t + B(t))
-        # Note: bm_samples already includes the correct diffusion scaling
-        drift_term = (self.drift - 0.5 * self.diffusion) * self.time_vec
-        exponent = drift_term + bm_samples
-        
-        return self.initial_value * exp(exponent)
-    
-    def _gen_samples_large_steps_optimized(self, n_samples):
-        """
-        Fast GBM generation for large step counts using incremental approach.
-        This avoids O(n²) matrix operations and scales much better.
-        """
-        # Get uniform samples from the sampler
-        uniform_samples = self.sampler.gen_samples(n_samples)
-        
-        # Transform to normal increments
-        normal_samples = norm.ppf(uniform_samples)
-        
-        # For Brownian motion increments with equal time steps
-        dt = self.time_vec[1] - self.time_vec[0] if len(self.time_vec) > 1 else self.time_vec[0]
-        sqrt_dt_diffusion = sqrt(dt * self.diffusion)
-        
-        # Scale normal samples to Brownian motion increments
-        bm_increments = normal_samples * sqrt_dt_diffusion
-        
-        # Cumulative sum to get Brownian motion path
-        bm_paths = cumsum(bm_increments, axis=1)
-        
-        # Transform to GBM using efficient vectorized operations
-        drift_term = (self.drift - 0.5 * self.diffusion) * self.time_vec
-        
-        # Pre-allocate output for efficiency
-        gbm_samples = zeros((n_samples, len(self.time_vec)))
-        
-        # Compute GBM: S(t) = S0 * exp((r - 0.5*σ²)*t + σ*B(t))
-        add(drift_term[None, :], sqrt(self.diffusion) * bm_paths, out=gbm_samples)
-        exp(gbm_samples, out=gbm_samples)
-        multiply(gbm_samples, self.initial_value, out=gbm_samples)
-        
-        return gbm_samples
