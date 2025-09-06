@@ -1,9 +1,10 @@
-name: ci 
+name: Docs 
 on:
   push:
     branches:
       - master 
       - main
+      # - develop
 permissions:
   contents: write
 jobs:
@@ -25,9 +26,8 @@ jobs:
           path: .cache 
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material 
-      - run: pip install mkdocstrings
-      - run: pip install mkdocstrings-python
-      - run: pip install mkdocs-jupyter
-      - run: cp README.md docs/index.md
+      - uses: ts-graphviz/setup-graphviz@v2
+      - run: pip install -e .[docs]
+      - run: make uml
+      - run: make copydocs
       - run: mkdocs gh-deploy --force
