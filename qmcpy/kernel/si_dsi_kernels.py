@@ -62,7 +62,7 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
         return self.tf_alpha(self.raw_alpha)
     
     def parsed_single_integral_01d(self, x, batch_params):
-        return batch_params["scale"][...,0]
+        return batch_params["scale"][...,0]+0*x[...,0]
     
     def double_integral_01d(self):
         return self.scale[...,0]
@@ -735,7 +735,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         assert (beta0==0).all() and (beta1==0).all(), "KernelDigShiftInvarAdaptiveAlpha does not support taking derivatives"
         p = len(beta0)
         delta = x0^x1
-        flog2delta = -self.npt.inf*self.npt.ones(delta.shape,**self.nptkwargs)
+        flog2delta = self.npt.zeros(delta.shape,**self.nptkwargs) # should be -inf
         pos = delta>0 
         flog2delta[pos] = self.npt.floor(self.npt.log2(delta[pos]))-t
         flog2deltas = self.npt.stack([flog2delta for j in range(p)],-2)
@@ -747,10 +747,9 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         alpha = batch_params["alpha"]
         p2alphap1 = 2**(alpha+1)
         nu = p2alphap1/(p2alphap1-2)
-        finite = self.npt.isfinite(flog2deltas)
-        flog2deltas[~finite] = 0
+        neginfs = flog2deltas==0
         s = (nu+1)*2**(alpha*(flog2deltas+1))
         kparts = nu-s
-        kparts[~finite] = (nu-0*s)[~finite]
+        kparts[neginfs] = (nu-0*s)[neginfs]
         k = scale*((1+lengthscales[...,None,:]*kparts).prod(-1)*c).sum(-1)
         return k
