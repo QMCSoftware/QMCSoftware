@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from qmcpy.discrete_distribution._discrete_distribution import LD
+from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from qmcpy.util import ParameterError
 from tqdm import tqdm
 import numpy as np
@@ -24,7 +24,7 @@ _DISCREPANCY = {
     'L2mix_weighted': L2mix_weighted,
 }
 
-class MPMC(LD):
+class MPMC(AbstractLDDiscreteDistribution):
     """
     Low-discrepancy generator trained by MPMC. Produces nbatch independent pointsets of size n in [0,1]^d.
     """
@@ -86,7 +86,7 @@ class MPMC(LD):
         if (self.weights is None) and (self.dim > 5):
             warnings.warn("Product coordinate weights are recommended for dimension > 5.", stacklevel=1)
 
-        # init LD base class (sets self.rng, self.d, etc.)
+        # init AbstractLDDiscreteDistribution base class (sets self.rng, self.d, etc.)
         super(MPMC, self).__init__(dimension=self.dim, seed=seed)
 
         # randomization mode
