@@ -4,7 +4,11 @@
 *.log
 *.out
 *.synctex*
+*.bak
 gbm*.md
 gbm.pdf
 gbm.tex
+sc_*.
 * copy*
+.DS_Store
+__pycache__/

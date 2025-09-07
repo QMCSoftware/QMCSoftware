@@ -78,6 +78,185 @@ class TestMatern(unittest.TestCase):
         assert np.allclose(cov2, m2.covariance)
 
 
+class TestGaussian(unittest.TestCase):
+    def setUp(self):
+        """Set up test fixtures with fixed seeds for reproducibility."""
+        self.seed = 42
+    
+    def test_gaussian_basic_output_reproducibility(self):
+        """Test that basic Gaussian sample generation produces expected values with fixed seed."""
+        gaussian = Gaussian(
+            Lattice(4, seed=self.seed),
+            mean=0,
+            covariance=1
+        )
+        
+        samples = gaussian.gen_samples(2)
+        
+        # Expected output based on fixed seed
+        expected_samples = np.array([
+            [-0.74346554, 0.31729144, -1.04728455, -1.34564641],
+            [0.31729144, -0.74346554, -1.34564641, -1.04728455]
+        ])
+        
+        np.testing.assert_array_almost_equal(
+            samples, expected_samples, decimal=6,
+            err_msg="Gaussian sample generation output changed unexpectedly"
+        )
+    
+    def test_gaussian_transformation_consistency(self):
+        """Test that Gaussian transformation is mathematically consistent."""
+        n_paths = 4
+        d = 8
+        sampler = Lattice(d, seed=self.seed)
+        
+        # Create Gaussian measure 
+        gaussian = Gaussian(sampler, mean=0, covariance=1)
+        
+        # Generate uniform samples
+        uniform_samples = sampler.gen_samples(n_paths)
+        
+        # Manual original transformation
+        from scipy.stats import norm
+        normal_samples = norm.ppf(uniform_samples)
+        original_result = gaussian.mu + np.einsum("...ij,kj->...ik", normal_samples, gaussian.a)
+        
+        # Optimized transformation
+        optimized_result = gaussian._transform(uniform_samples)
+        
+        # Check consistency
+        np.testing.assert_array_almost_equal(
+            original_result, optimized_result, decimal=10,
+            err_msg="Gaussian transformation methods are inconsistent"
+        )
+    
+    def test_gaussian_custom_mean_covariance(self):
+        """Test Gaussian with custom mean and covariance parameters."""
+        custom_mean = np.array([1.0, 2.0])
+        custom_cov = np.array([[4.0, 1.0], [1.0, 3.0]])
+        
+        gaussian = Gaussian(
+            Lattice(2, seed=self.seed),
+            mean=custom_mean,
+            covariance=custom_cov
+        )
+        
+        samples = gaussian.gen_samples(2)
+        
+        # Expected output with custom parameters
+        expected_samples = np.array([
+            [-0.48693108, 0.63458288],
+            [0.63458288, -0.48693108]
+        ])
+        
+        np.testing.assert_array_almost_equal(
+            samples, expected_samples, decimal=6,
+            err_msg="Gaussian with custom parameters output changed unexpectedly"
+        )
+    
+    def test_gaussian_weight_computation(self):
+        """Test that Gaussian PDF weight computation produces expected values."""
+        gaussian = Gaussian(
+            Lattice(2, seed=self.seed),
+            mean=np.array([0.0, 0.0]),
+            covariance=np.eye(2)
+        )
+        
+        # Test with specific known samples
+        test_samples = np.array([
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [-1.0, 1.0]
+        ])
+        
+        weights = gaussian._weight(test_samples)
+        
+        # Expected weights for standard bivariate normal
+        expected_weights = np.array([0.15915494, 0.05854983, 0.05854983])
+        
+        np.testing.assert_array_almost_equal(
+            weights, expected_weights, decimal=6,
+            err_msg="Gaussian weight computation changed unexpectedly"
+        )
+    
+    def test_gaussian_decomposition_types(self):
+        """Test different decomposition types for Gaussian."""
+        custom_cov = np.array([[4.0, 2.0], [2.0, 3.0]])
+        
+        # Test Cholesky decomposition
+        gaussian_chol = Gaussian(
+            Lattice(2, seed=self.seed),
+            mean=0,
+            covariance=custom_cov,
+            decomp_type='Cholesky'
+        )
+        
+        # Test PCA decomposition  
+        gaussian_pca = Gaussian(
+            Lattice(2, seed=self.seed),
+            mean=0,
+            covariance=custom_cov,
+            decomp_type='PCA'
+        )
+        
+        samples_chol = gaussian_chol.gen_samples(2)
+        samples_pca = gaussian_pca.gen_samples(2)
+        
+        # Both should produce valid samples (different due to decomposition method)
+        self.assertEqual(samples_chol.shape, (2, 2))
+        self.assertEqual(samples_pca.shape, (2, 2))
+        self.assertTrue(samples_chol.dtype == np.float64)
+        self.assertTrue(samples_pca.dtype == np.float64)
+    
+    def test_gaussian_mean_covariance_properties(self):
+        """Test that Gaussian maintains correct mean and covariance properties."""
+        custom_mean = np.array([1.0, -1.0, 2.0])
+        custom_cov = np.array([
+            [2.0, 0.5, 0.0],
+            [0.5, 1.5, -0.3],
+            [0.0, -0.3, 3.0]
+        ])
+        
+        gaussian = Gaussian(
+            Lattice(3, seed=self.seed),
+            mean=custom_mean,
+            covariance=custom_cov
+        )
+        
+        # Verify mean is stored correctly
+        np.testing.assert_array_almost_equal(
+            gaussian.mu, custom_mean, decimal=10,
+            err_msg="Gaussian mean property changed unexpectedly"
+        )
+        
+        # Verify covariance reconstruction
+        reconstructed_cov = gaussian.a @ gaussian.a.T
+        np.testing.assert_array_almost_equal(
+            reconstructed_cov, custom_cov, decimal=10,
+            err_msg="Gaussian covariance reconstruction changed unexpectedly"
+        )
+    
+    def test_gaussian_scalar_parameters(self):
+        """Test Gaussian with scalar mean and covariance parameters."""
+        gaussian = Gaussian(
+            Lattice(3, seed=self.seed),
+            mean=2.5,
+            covariance=1.5
+        )
+        
+        samples = gaussian.gen_samples(2)
+        
+        # Expected samples with scalar parameters
+        expected_samples = np.array([
+            [1.590431, 2.888667, 1.218033],
+            [2.888667, 1.590431, 1.218033]
+        ])
+        
+        np.testing.assert_array_almost_equal(
+            samples, expected_samples, decimal=6,
+            err_msg="Gaussian with scalar parameters output changed unexpectedly"
+        )
+        
 class TestBrownianMotion(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures with fixed seeds for reproducibility."""
