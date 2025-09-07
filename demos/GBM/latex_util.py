@@ -35,7 +35,7 @@ def generate_latex_table(df, caption, label):
         column_format="ll@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r"
     )
     # Replace default LaTeX table environment with booktabs format
-    latex_table = latex_table.replace("\\begin{table}[H]", "\\begin{table}[btp]\centering")
+    latex_table = latex_table.replace("\\begin{table}[H]", "\\begin{table}[btp]\\centering")
     latex_table = latex_table.replace("\\hline", "\\toprule", 1)
     latex_table = latex_table.replace("\\hline", "\\midrule", 1)
     latex_table = latex_table.replace("\\hline", "\\bottomrule")
