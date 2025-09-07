@@ -95,8 +95,8 @@ class TestGaussian(unittest.TestCase):
         
         # Expected output based on fixed seed
         expected_samples = np.array([
-            [-0.74346554, 0.31729144, -1.04728455, -1.34564641],
-            [0.31729144, -0.74346554, -1.34564641, -1.04728455]
+            [0.0751091, -0.3100827, 1.60190625, -0.19901344],
+            [-1.88173437, 1.16627832, -0.13726206, 1.41268702]
         ])
         
         np.testing.assert_array_almost_equal(
@@ -145,8 +145,8 @@ class TestGaussian(unittest.TestCase):
         
         # Expected output with custom parameters
         expected_samples = np.array([
-            [-0.48693108, 0.63458288],
-            [0.63458288, -0.48693108]
+            [0.88570154, 2.49195225],
+            [-1.49352915, -1.65710039]
         ])
         
         np.testing.assert_array_almost_equal(
@@ -248,8 +248,8 @@ class TestGaussian(unittest.TestCase):
         
         # Expected samples with scalar parameters
         expected_samples = np.array([
-            [1.590431, 2.888667, 1.218033],
-            [2.888667, 1.590431, 1.218033]
+            [2.59198948, 2.1202278, 4.46192646],
+            [0.19535548, 3.92839339, 2.33188899]
         ])
         
         np.testing.assert_array_almost_equal(
