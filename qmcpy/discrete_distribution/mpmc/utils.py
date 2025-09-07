@@ -6,289 +6,199 @@ import numpy as np
 from itertools import product 
 
 
-def L2star(x):
-    N = x.size(1) 
-    dim = x.size(2)
-    prod1 = 1. - x ** 2.
-    prod1 = torch.prod(prod1, dim=2) #multiplying across second dimenstion of x (dim)
-    sum1 = torch.sum(prod1, dim=1) #summing across second dimension of x (number of points in each batch)
-    pairwise_max = torch.maximum(x[:, :, None, :], x[:, None, :, :])
-    product = torch.prod(1 - pairwise_max, dim=3)
-    sum2 = torch.sum(product, dim=(1, 2))
-    one_dive_N = 1. / N
-    out = torch.sqrt(
-        math.pow(3., -dim) 
-        - one_dive_N * math.pow(2., 1. - dim) * sum1 
-        + 1. / math.pow(N, 2.) * sum2)
-    return out
-
-
-def L2star_weighted(x, gamma):
-    N = x.size(1) 
-    dim = x.size(2)
-
-    p1 = torch.prod(1 + gamma/3)
-    prod1 = 1 + (gamma[None, None, :]/2)*(1. - x ** 2.)
-    prod1 = torch.prod(prod1, dim=2) #multiplying across second dimenstion of x (dim)
-    sum1 = torch.sum(prod1, dim=1) #summing across second dimension of x (number of points in each batch)
-    
-    pairwise_max = torch.maximum(x[:, :, None, :], x[:, None, :, :])
-    product = torch.prod(1 + gamma[None, None, None, :]*(1- pairwise_max), dim=3)
-    sum2 = torch.sum(product, dim=(1, 2))
-
-    out = torch.sqrt(
-        p1
-        - 2./N * sum1 
-        + 1. / math.pow(N, 2.) * sum2)
-    
-    return out
-
-
-
-def L2ctr(x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod1 = 0.5*(torch.abs(x - 0.5) - (torch.abs(x - 0.5))**2.)
-    prod1 = torch.prod(prod1, dim=2)
-    sum1 = torch.sum(prod1, dim=1)
-
-    prod2 = 0.5*(torch.abs(x[:, :, None, :] - 0.5) 
-                    + torch.abs(x[:, None, :, :] - 0.5) 
-                    - torch.abs(x[:, :, None, :] - x[:, None, :, :]))
-    product = torch.prod(prod2, dim=3)
-    sum2 = torch.sum(product, dim=(1, 2))
-    two_div_N = 2. / N
-    
-    out = torch.sqrt(math.pow(12., -dim) - two_div_N * sum1 + 1. / math.pow(N, 2.) * sum2)
-    return out
-
-
-
-def L2ctr_weighted (x, gamma):
-    N = x.size(1)
-    dim = x.size(2)
-
-    term1_val = torch.prod(1.0 + gamma**2 / 12.0)
-
-    abs_x_half = torch.abs(x - 0.5)
-    prod1 = 1.0 + (gamma.view(1, 1, dim) / 2.0) * (abs_x_half - abs_x_half**2)
-    prod1 = torch.prod(prod1, dim=2)
-    sum1 = torch.sum(prod1, dim=1)
-
-    x_i = x.unsqueeze(2)
-    x_j = x.unsqueeze(1)
-
-    prod2 = 1.0 + (gamma.view(1, 1, 1, dim) / 2.0) * (torch.abs(x_i - 0.5) + torch.abs(x_j - 0.5) - torch.abs(x_i - x_j))
-    prod2 = torch.prod(prod2, dim=3)
-    sum2 = torch.sum(prod2, dim=(1, 2))
-
-    out_sq = term1_val - (2.0 / N) * sum1 + (1.0 / (N**2)) * sum2
-    out = torch.sqrt(torch.relu(out_sq))
-
-    return out
-
-
-
-def L2ext(x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod1 = 0.5*(x - x**2.)
-    prod1 = torch.prod(prod1, dim = 2)
-    sum1 = torch.sum(prod1, dim = 1)
-
-    prod2 = torch.min(x[: ,: ,None ,: ], x[: ,None ,: ,: ]) - x[: ,: ,None ,: ] * x[: ,None ,: ,: ]
-    product = torch.prod(prod2, dim = 3)
-    sum2 = torch.sum(product, dim = (1,2))
-
-    out = torch.sqrt(math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
-    return out
-
-
-def L2ext_weighted(x, gamma):
-    N = x.size(1)
-    dim = x.size(2)
-
-    p1 = torch.prod(1 + gamma/12)
-
-    prod1 = 1 + gamma[None, None, :] * 0.5*(x - x**2.)
-    prod1 = torch.prod(prod1, dim = 2)
-    sum1 = torch.sum(prod1, dim = 1)
-
-    prod2 = 1 + gamma[None, None, None, :] * (torch.min(x[: ,: ,None ,: ], x[: ,None ,: ,: ]) - x[: ,: ,None ,: ] * x[: ,None ,: ,: ])
-    product = torch.prod(prod2, dim = 3)
-    sum2 = torch.sum(product, dim = (1,2))
-
-    out = torch.sqrt(p1 - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
-    return out
-
-def L2per(x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod2 = 0.5 - torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]) + (x[: ,: ,None ,: ] - x[: ,None ,: ,: ])**2
-    product = torch.prod(prod2, dim = 3)
-    sum2 = torch.sum(product, dim = (1,2))
-
-    out = torch.sqrt(- math.pow(3., -dim) + math.pow(N, - 2.) * sum2)
-    return out
-
-
-def L2per_weighted(x, gamma):
-    N = x.size(1)
-    dim = x.size(2)
-
-    p1 = torch.prod(1 + gamma/3)
-
-    prod2 = 1 + gamma[None, None, None, :] * (0.5 - torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]) + (x[: ,: ,None ,: ] - x[: ,None ,: ,: ])**2)
-    product = torch.prod(prod2, dim = 3)
-    sum2 = torch.sum(product, dim = (1,2))
-
-    out = torch.sqrt(- p1 + math.pow(N, - 2.) * sum2)
-    return out
-
-
-def L2sym(x): 
-    N = x.size(1)
-    dim = x.size(2)
-
-    prod1 = 0.5*(x - x**2.)
-    prod1 = torch.prod(prod1, dim = 2)
-    sum1 = torch.sum(prod1, dim = 1)
-
-    prod2 = 0.25 * (1 - 2 * torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]))
-    product = torch.prod(prod2, dim = 3)
-    sum2 = torch.sum(product, dim = (1,2))
-
-    out = torch.sqrt(math.pow(12., -dim) - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
-    return out
-
-
-def L2sym_weighted(x, gamma): 
-    N = x.size(1)
-    dim = x.size(2)
-
-    p1 = torch.prod(1 + gamma/12)
-
-    prod1 = 1 + gamma[None, None, :] * 0.5*(x - x**2.)
-    prod1 = torch.prod(prod1, dim = 2)
-    sum1 = torch.sum(prod1, dim = 1)
-
-    prod2 = 1 + gamma[None, None, None, :] * 0.25 * (1 - 2 * torch.abs(x[: ,: ,None ,: ] - x[: ,None ,: ,: ]))
-    product = torch.prod(prod2, dim = 3)
-    sum2 = torch.sum(product, dim = (1,2))
-
-    out = torch.sqrt(p1 - (2. / N) * sum1 + math.pow(N, - 2.) * sum2)
-    return out
-    
-
-
-def L2asd (x):
-    N = x.size(1)
-    dim = x.size(2)
-
-    term1 = ((1 / 3) ** dim)
-
-    sum1 = 2. * x - 2. * x**2
-    sum2 = 1.0 + sum1 
-    prod1 = sum2 / 4.
-    prod2 = torch.prod(prod1, dim=2)
-    sum2 = torch.sum(prod2, dim=1)
-    term2 = -(2.0 / N) * sum2
-
-    x_i = x.unsqueeze(2) 
-    x_j = x.unsqueeze(1) 
-    sum3 = torch.abs(x_i - x_j)
-    prod3 = torch.prod( (1.0 - sum3) / 2.0, dim=3)
-    term3_sum = torch.sum(prod3, dim=(1, 2))
-    term3 = (1.0 / (N * N)) * term3_sum
-    
-    out = torch.sqrt(term1+ term2 + term3)
-    return out
-
-
-
-
-
-
-def L2asd_weighted (x, gamma):
-    N = x.size(1)
-    dim = x.size(2)
-
-    term1 = torch.prod(1.0 + gamma/ 3.0)
-
-    g_term2 = gamma.view(1, 1, dim)
-    sum1 = g_term2 * (1 + 2. * x - 2. * x**2)
-    prod1 = 1 + sum1 / 4. 
-    prod2 = torch.prod(prod1, dim=2)
-    sum_prod2 = torch.sum(prod2, dim=1)
-    term2 = -(2. / N) * sum_prod2
-
-    x_i = x.unsqueeze(2)
-    x_j = x.unsqueeze(1)
-    g_term3 = gamma.view(1, 1, 1, dim)   # need to reshape?
-    sum3 = g_term3 * (1 - torch.abs(x_i - x_j))
-    prod3 = torch.prod(1 + sum3/ 2., dim=3)
-    term3_sum = torch.sum(prod3, dim=(1, 2))
-    term3 = (1. / (N * N)) * term3_sum
-
-    out_sq = term1 + term2 + term3
-    out = torch.sqrt(out_sq)
-    
-    return out
-
-
-def L2mix(x):
-     N = x.size(1)
-     dim = x.size(2)
-     prod1 = 2/3 - 1/4 * (torch.abs(x - 1/2)) - 1/4 * ((x - 1/2)**2)
-     prod1 = torch.prod(prod1, dim = 2)
-     sum1 = torch.sum(prod1, dim = 1)
-
-     prod2 = 7/8 - 1/4 * torch.abs(x[: ,: ,None ,: ] - 1/2) - 1/4 * torch.abs(x[:, None, :, :] - 1/2) - 3/4*torch.abs(x[: ,: ,None ,: ] - x[:, None, :, :]) + 1/2 * torch.pow(x[: ,: ,None ,: ] - x[:, None, :, :], 2)
-     product = torch.prod(prod2, dim = 3)
-     sum2 = torch.sum(product, dim = (1,2))
-
-
-     out = torch.sqrt(abs(math.pow(7./12., dim) - (2. / N) * sum1 + math.pow(N, -2.) * sum2))
-     return out
-
-
-
-
-
-def L2mix_weighted(x, gamma):
-    N = x.size(1)
-    dim = x.size(2)
-
-    term1_val = torch.prod(1.0 + 7 * gamma / 12.0)
-
-    gamma_r = gamma.view(1, 1, dim)
-    inner_sum1 = 1.0 + gamma_r * (2./3. - 0.25 * torch.abs(x - 0.5) - 0.25 * (x - 0.5)**2)
-    prod1 = torch.prod(inner_sum1, dim=2)
-    sum1 = torch.sum(prod1, dim=1)
-    term2_val = (2.0 / N) * sum1
-
-    
-    x_i = x.unsqueeze(2)  #reshape to (batch, N, 1, dim)
-    x_j = x.unsqueeze(1)  # reshape to (batch, 1, N, dim)
-    
-    gamma_r_term3 = gamma.view(1, 1, 1, dim) 
-
-    inner_sum2 = 1.0 + gamma_r_term3 * (
-        7./8.
-        - 0.25 * torch.abs(x_i - 0.5)
-        - 0.25 * torch.abs(x_j - 0.5)
-        - 0.75 * torch.abs(x_i - x_j)
-        + 0.5 * (x_i - x_j)**2
-    )
-    prod2 = torch.prod(inner_sum2, dim=3)
-    sum2 = torch.sum(prod2, dim=(1, 2))
-    term3_val = (1.0 / (N * N)) * sum2
-
-    out_sq = term1_val - term2_val + term3_val
-
-    out = torch.sqrt((out_sq))
-    
-    return out
+import torch
+
+def _check_inputs(x, gamma=None):
+    """
+    x: (B, N, d) in [0,1]
+    gamma: (d,) nonnegative weights (optional)
+    """
+    if x.dim() != 3:
+        raise ValueError(f"x must be (batch,N,d); got {tuple(x.shape)}")
+    B, N, d = x.shape
+    if gamma is not None:
+        if gamma.dim() != 1 or gamma.shape[0] != d:
+            raise ValueError(f"gamma must be (d,) with d={d}; got {tuple(gamma.shape)}")
+    return B, N, d
+
+def _pairwise(x):
+    # x_i: (B, N, 1, d), x_j: (B, 1, N, d)
+    return x.unsqueeze(2), x.unsqueeze(1)
+
+def _sqrt_safe(v):
+    # numeric guard for small negatives from fp error
+    return torch.sqrt(torch.clamp_min(v, 0.0))
+
+# ----------------------------
+# L2 STAR (Warnock)
+# ----------------------------
+def L2star(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (1.0 / 3.0) ** d
+    p = torch.prod(1.0 - x**2, dim=2)              
+    t2 = (2.0 / N) * (2.0 ** (-d)) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    prod_ij = torch.prod(1.0 - torch.maximum(xi, xj), dim=3)  
+    t3 = (1.0 / (N * N)) * torch.sum(prod_ij, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+def L2star_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + g / 3.0)           
+    p = torch.prod(1.0 + (g.view(1, 1, d) / 2.0) * (1.0 - x**2), dim=2)  
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(1.0 + g.view(1, 1, 1, d) * (1.0 - torch.maximum(xi, xj)), dim=3)  
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+# -----------------------------------------
+# L2 EXTREME
+# -----------------------------------------
+def L2ext(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (1.0 / 12.0) ** d
+    p = torch.prod(0.5 * (x - x**2), dim=2)   
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(torch.minimum(xi, xj) - xi * xj, dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+def L2ext_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + g / 12.0)
+    p = torch.prod(1.0 + g.view(1, 1, d) * 0.5 * (x - x**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(1.0 + g.view(1, 1, 1, d) * (torch.minimum(xi, xj) - xi * xj), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+# -----------------------------------------
+# L2 PERIODIC
+# -----------------------------------------
+def L2per(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (1.0 / 3.0) ** d
+    xi, xj = _pairwise(x)
+    Δ = xi - xj
+    q = torch.prod(0.5 - torch.abs(Δ) + Δ**2, dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(-t1 + t3)
+
+def L2per_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + g / 3.0)
+    xi, xj = _pairwise(x)
+    Δ = xi - xj
+    q = torch.prod(1.0 + g.view(1, 1, 1, d) * (0.5 - torch.abs(Δ) + Δ**2), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(-t1 + t3)
+
+# -----------------------------------------
+# L2 CENTERED 
+# -----------------------------------------
+def L2ctr(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (1.0 / 12.0) ** d
+    u = torch.abs(x - 0.5)
+    p = torch.prod(0.5 * (u - u**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(0.5 * (torch.abs(xi - 0.5) + torch.abs(xj - 0.5) - torch.abs(xi - xj)), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+def L2ctr_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + g / 12.0)
+    u = torch.abs(x - 0.5)
+    p = torch.prod(1.0 + (g.view(1, 1, d) / 2.0) * (u - u**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(1.0 + (g.view(1, 1, 1, d) / 2.0) * (torch.abs(xi - 0.5) + torch.abs(xj - 0.5) - torch.abs(xi - xj)), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+# -----------------------------------------
+# L2 SYMMETRIC
+# -----------------------------------------
+def L2sym(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (1.0 / 12.0) ** d
+    p = torch.prod(0.5 * (x - x**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(0.25 * (1.0 - 2.0 * torch.abs(xi - xj)), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+def L2sym_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + g / 12.0)
+    p = torch.prod(1.0 + (g.view(1, 1, d) / 2.0) * (x - x**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(1.0 + (g.view(1, 1, 1, d) / 4.0) * (1.0 - 2.0 * torch.abs(xi - xj)), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+# -----------------------------------------
+# L2 MIXTURE 
+# -----------------------------------------
+def L2mix(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (7.0 / 12.0) ** d
+    u = x - 0.5
+    p = torch.prod(2.0 / 3.0 - 0.25 * torch.abs(u) - 0.25 * (u**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    ui, uj = xi - 0.5, xj - 0.5
+    Δ = xi - xj
+    q = torch.prod(7.0 / 8.0 - 0.25 * torch.abs(ui) - 0.25 * torch.abs(uj) - 0.75 * torch.abs(Δ) + 0.5 * (Δ**2), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+def L2mix_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + (7.0 / 12.0) * g)
+    u = x - 0.5
+    p = torch.prod(1.0 + g.view(1, 1, d) * (2.0 / 3.0 - 0.25 * torch.abs(u) - 0.25 * (u**2)), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    ui, uj = xi - 0.5, xj - 0.5
+    Δ = xi - xj
+    q = torch.prod(1.0 + g.view(1, 1, 1, d) * (7.0 / 8.0 - 0.25 * torch.abs(ui) - 0.25 * torch.abs(uj) - 0.75 * torch.abs(Δ) + 0.5 * (Δ**2)), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+# -----------------------------------------
+# L2 AVERAGE-SQUARED 
+# -----------------------------------------
+def L2asd(x: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x)
+    t1 = (1.0 / 3.0) ** d
+    p = torch.prod((1.0 + 2.0 * x - 2.0 * x**2) / 4.0, dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod((1.0 - torch.abs(xi - xj)) / 2.0, dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
+
+def L2asd_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
+    B, N, d = _check_inputs(x, gamma)
+    g = gamma
+    t1 = torch.prod(1.0 + g / 3.0)
+    p = torch.prod(1.0 + (g.view(1, 1, d) / 4.0) * (1.0 + 2.0 * x - 2.0 * x**2), dim=2)
+    t2 = (2.0 / N) * torch.sum(p, dim=1)
+    xi, xj = _pairwise(x)
+    q = torch.prod(1.0 + (g.view(1, 1, 1, d) / 2.0) * (1.0 - torch.abs(xi - xj)), dim=3)
+    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
+    return _sqrt_safe(t1 - t2 + t3)
