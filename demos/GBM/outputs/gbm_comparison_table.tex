@@ -1,4 +1,4 @@
-\begin{table}[tbp]\centering
+\begin{table}[tbp]
 \caption{GBM Final Value Statistics and Performance Comparison}
 \label{tab2}
 \begin{tabular}{ll@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r}
@@ -6,12 +6,12 @@
 Method & Sampler & Mean & Std Dev & Mean  & Std Dev  & Mean Time (s)  & Std Dev (s) & Speedup \\
  &  &  &   &  Error &  Error &   & &  \\
 \midrule
-QuantLib & IIDStdUniform & 105.3313 & 21.4671 & 0.2042 & 0.2296 & 0.8122 & 0.0000 & - \\
-QMCPy & IIDStdUniform & 105.1443 & 21.3848 & 0.0172 & 0.1474 & 0.5217 & 0.0000 & 1.5569 \\
-QuantLib & Sobol & 105.0905 & 21.0145 & 0.0366 & 0.2229 & 0.8852 & 0.0000 & - \\
-QMCPy & Sobol & 105.1274 & 21.2337 & 0.0003 & 0.0037 & 0.5256 & 0.0000 & 1.5452 \\
-QMCPy & Lattice & 105.1284 & 21.2460 & 0.0013 & 0.0085 & 0.5069 & 0.0000 & 1.6023 \\
-QMCPy & Halton & 105.1271 & 21.2337 & 0.0000 & 0.0037 & 2.1203 & 0.0000 & 0.3831 \\
+QuantLib & IIDStdUniform & 105.3313 & 21.4671 & 0.2042 & 0.2296 & 0.8545 & 0.0000 & - \\
+QMCPy & IIDStdUniform & 105.1443 & 21.3848 & 0.0172 & 0.1474 & 0.5127 & 0.0000 & 1.6666 \\
+QuantLib & Sobol & 105.0929 & 21.0518 & 0.0342 & 0.1857 & 0.9194 & 0.0000 & - \\
+QMCPy & Sobol & 105.1274 & 21.2337 & 0.0003 & 0.0037 & 0.5430 & 0.0000 & 1.5738 \\
+QMCPy & Lattice & 105.1284 & 21.2460 & 0.0013 & 0.0085 & 0.6047 & 0.0000 & 1.4131 \\
+QMCPy & Halton & 105.1271 & 21.2337 & 0.0000 & 0.0037 & 2.1521 & 0.0000 & 0.3971 \\
 \bottomrule
 \end{tabular}
 \end{table}

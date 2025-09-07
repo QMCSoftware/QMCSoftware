@@ -4,7 +4,6 @@
 *.log
 *.out
 *.synctex*
-code/
 gbm*.md
 gbm.pdf
 gbm.tex
