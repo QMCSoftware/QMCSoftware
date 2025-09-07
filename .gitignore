@@ -80,15 +80,4 @@ _ags/*
 
 # Downloaded files
 raw.githubusercontent.com*
-gbm_performance_benchmark.py
-gbm_performance_analysis.py
-gbm_benchmark_fixed.py
-gbm_optimized.py
-gbm_comparison.py
-gbm_performance_verification.py
-simple_gbm_test.py
-test_gbm_numerical.py
-qmcpy/true_measure/geometric_brownian_motion_backup.py
-test_gaussian_transform.py
-debug_high_dim_gbm.py
-debug_gbm.py
+
