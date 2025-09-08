@@ -70,6 +70,9 @@ test = [
     "pytest-cov == 6.1.1",
     "phmutest == 1.0.1",
     "pytest-accept == 0.1.10",
+    "testbook == 0.4.2",
+    "psutil == 5.9.5",
+    "parsl == 2025.7.28"
     ]
 test_torch = [
     "torch == 2.7.0",

@@ -8,8 +8,7 @@ from __init__ import TB_TIMEOUT, BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
     def setUp(self):
-        # Call parent setUp first to initialize timing attributes
-        super().setUp()
+        super().setUp()  # Call parent setUp first to initialize timing attributes
         subprocess.run(['pip', 'install', '-q', 'tueplots'], check=False)
         os.makedirs('outputs', exist_ok=True)
     
