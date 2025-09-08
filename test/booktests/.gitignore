@@ -1,1 +1,5 @@
 *outputs/
+
+# parsl files
+logs/
+runinfo/
