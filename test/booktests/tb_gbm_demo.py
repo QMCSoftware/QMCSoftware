@@ -7,7 +7,7 @@ class NotebookTests(BaseNotebookTest):
         super().setUp()  # Call parent setUp first to initialize timing attributes
 
     @unittest.skip("Skipping GBM demo notebook test for now.")
-    @testbook('../../demos/GBM/gbm_demo.ipynb', execute=True, timeout=TB_TIMEOUT)
+    @testbook('../../demos/gbm_demo.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_gbm_demo_notebook(self, tb):
         pass
 
