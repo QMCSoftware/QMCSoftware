@@ -24,16 +24,20 @@ class NotebookTests(BaseNotebookTest):
                 print(f"\n\tCopied {src} to {pkl_file}")
 
     def tearDown(self):
-        super().tearDown()
         # move *eps to outputs
         for file in os.listdir('.'):
             if file.endswith('.eps') or file.endswith('.pkl'):
                 shutil.move(file, os.path.join('outputs', file))
+        super().tearDown()
 
-    @unittest.skip("Requires external Docker service - umbridge")
-    @testbook('../../demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb', execute=True, timeout=TB_TIMEOUT)
+    @testbook('../../demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb', execute=False, timeout=TB_TIMEOUT)
     def test_argonne_talk_2023_figures_notebook(self, tb):
-        pass
+        # Execute cells up to but not including the stop_notebook cell
+        for i in range(len(self.cells)):  
+            if 'qp.util.stop_notebook()' not in self.cells[i]['source']:
+                self.execute_cell(i)
+            else:
+                break
 
 if __name__ == '__main__':
     unittest.main()
