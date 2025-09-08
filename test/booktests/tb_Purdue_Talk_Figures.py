@@ -13,10 +13,14 @@ class NotebookTests(BaseNotebookTest):
         # Create outputs directory if needed
         os.makedirs('outputs', exist_ok=True)
 
-    @unittest.skip("Requires external server - umbridge")
     @testbook('../../demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_purdue_talk_figures_notebook(self, tb):
-        pass
+        # Execute cells up to but not including the stop_notebook cell
+        for i in range(len(self.cells)):  
+            if "import umbridge" not in self.cells[i]['source']:
+                self.execute_cell(i)
+            else:
+                break  # not running the rest of the notebook depending on umbridge and docker
 
 if __name__ == '__main__':
     unittest.main()

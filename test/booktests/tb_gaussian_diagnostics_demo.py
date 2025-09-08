@@ -20,7 +20,7 @@ class NotebookTests(BaseNotebookTest):
             if "plt.style.use('seaborn-poster')" not in self.cells[i]['source']:
                 self.execute_cell(i)
             else:
-                break
+                break  # not running the rest of the notebook depending on umbridge and docker
 
 if __name__ == '__main__':
     unittest.main()
