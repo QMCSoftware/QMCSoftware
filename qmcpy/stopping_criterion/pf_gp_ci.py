@@ -479,9 +479,9 @@ class PFGPCIData(Data):
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
                 ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0])
-            # ax2j.set_title(r'$m_n(\boldsymbol{u})$')
+            # ax2j.set_title(r'$M_n(\boldsymbol{u})$')
             if j==0:
-                ax2j.set_ylabel(r'$m_n(\boldsymbol{u})$')
+                ax2j.set_ylabel(r'$M_n(\boldsymbol{u})$')
             row_idx += 1
             ax3j = fig.add_subplot(gs[row_idx,j])            
             ax3j.contourf(x0mesh,x1mesh,gp_std_mesh,cmap=cm.Greys,levels=clevels)
