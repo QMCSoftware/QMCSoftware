@@ -1,0 +1,38 @@
+name: Booktests
+
+on:
+  push:
+    paths:
+      - 'demos/**/*.ipynb'
+  pull_request:
+    paths:
+      - 'demos/**/*.ipynb'
+
+jobs:
+  booktests:
+    name: Notebook Tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-activate-base: true
+      - name: Install base dependencies
+        run: pip install -e .[test]
+      - name: Check for missing booktest files
+        run: make check_booktests
+      - name: Generate missing booktest files
+        run: make generate_booktests
+      - name: Install additional test dependencies
+        run: |
+          pip install -e .[test_torch]
+          pip install -e .[test_gpytorch]
+          pip install -e .[test_botorch]
+          pip install -e .[test_umbridge]
+      - name: Run notebook tests
+        shell: bash -l {0}
+        run: make booktests
