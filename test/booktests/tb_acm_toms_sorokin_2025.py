@@ -2,6 +2,8 @@ import unittest
 import os
 import subprocess
 from testbook import testbook
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
