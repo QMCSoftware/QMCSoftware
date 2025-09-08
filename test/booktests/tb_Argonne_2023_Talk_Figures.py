@@ -34,10 +34,10 @@ class NotebookTests(BaseNotebookTest):
     def test_argonne_talk_2023_figures_notebook(self, tb):
         # Execute cells up to but not including the stop_notebook cell
         for i in range(len(self.cells)):  
-            if 'qp.util.stop_notebook()' not in self.cells[i]['source']:
+            if "qp.util.stop_notebook()" not in self.cells[i]['source']:
                 self.execute_cell(i)
             else:
-                break
+                break  # not running the rest of the notebook depending on umbridge and docker
 
 if __name__ == '__main__':
     unittest.main()
