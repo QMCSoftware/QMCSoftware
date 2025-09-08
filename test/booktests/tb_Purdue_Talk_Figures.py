@@ -39,6 +39,5 @@ class NotebookTests(BaseNotebookTest):
             else:
                 break  # not running the rest of the notebook depending on umbridge and docker
 
-
 if __name__ == '__main__':
     unittest.main()
