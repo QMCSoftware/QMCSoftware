@@ -23,7 +23,7 @@ def generate_test_file(notebook_path, output_dir=None):
     """
     # Get notebook name and convert to test file name
     notebook_name = Path(notebook_path).stem
-    test_name = notebook_name.replace('-', '_').replace('.', '_')
+    test_name = notebook_name.replace('-', '_')#.replace('.', '_')
     
     # Determine output directory
     if output_dir is None:
@@ -105,7 +105,7 @@ def generate_missing_tests(demos_dir="../../demos", output_dir=None):
             continue
             
         # Convert notebook name to test file name
-        test_name = notebook_name#.replace('-', '_').replace('.', '_')
+        test_name = notebook_name.replace('-', '_')#.replace('.', '_')
         test_file_path = output_dir / f"tb_{test_name}.py"
         
         # Check if test file already exists
