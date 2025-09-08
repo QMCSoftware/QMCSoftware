@@ -10,7 +10,6 @@ class NotebookTests(BaseNotebookTest):
         super().setUp()
         subprocess.run(['pip', 'install', '-q', 'matplotlib', 'scipy', 'numpy'], check=False)   
     
-    @unittest.skip("Runtime error")
     @testbook('../../demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_mcqmc_2020_qmc_software_tutorial_notebook(self, tb):
         pass
