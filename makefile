@@ -40,6 +40,32 @@ doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_b
 unittests:
 	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
+check_booktests:
+	find demos -name '*.ipynb' | while read nb; do \
+		base=$$(basename "$$nb" .ipynb); \
+		test_base=$$(echo "$$base" | sed 's/[-.]/_/g'); \
+		if [ "$$base" != "parsl_fest_2025" ] && ! ls test/booktests/tb_"$$test_base".py &>/dev/null; then \
+			echo "Missing test for: $$nb -> Expected: test/booktests/tb_$$test_base.py"; \
+		fi; \
+	done
+
+booktests:
+	@echo "\nNotebook tests"
+	set -e && \
+	cd test/booktests/ && \
+	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log prob_failure_gp_ci_plots && \
+	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" --failfast && \
+	cd ../..
+
+booktests-parallel:
+	@echo "\nBooktests"
+	cd test/booktests/ && \
+	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
+	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+	python parsl_test_runner.py 1>/dev/null && \
+	cd ../.. 
+
 tests: doctests unittests coverage
 
 tests_no_docker: doctests_no_docker unittests coverage
