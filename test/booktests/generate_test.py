@@ -9,7 +9,6 @@ import sys
 import argparse
 from pathlib import Path
 
-
 def generate_test_file(notebook_path, output_dir=None):
     """
     Generate a tb_*.py test file for a given notebook.
