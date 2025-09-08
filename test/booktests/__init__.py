@@ -7,7 +7,7 @@ import unittest, gc
 TB_TIMEOUT = 3600
 
 import subprocess
-subprocess.run(['pip', 'install', '-q', 'psutil'], check=False)
+subprocess.run(['pip', 'install', '-q', 'psutil testbook parsl'], check=False)
 import psutil
 import gc
 import time
