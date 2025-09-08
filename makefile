@@ -1,5 +1,5 @@
 doctests_minimal:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
 		--ignore qmcpy/fast_transform/ft_pytorch.py \
 		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
@@ -11,23 +11,23 @@ doctests_minimal:
 		--ignore qmcpy/integrand/hartmann6d.py \
 
 doctests_torch:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/fast_transform/ft_pytorch.py \
 		--doctest-modules qmcpy/kernel/*.py \
 		--doctest-modules qmcpy/util/dig_shift_invar_ops.py \
 		--doctest-modules qmcpy/util/shift_invar_ops.py \
 
 doctests_gpytorch:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py \
 
 doctests_botorch:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
 doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	@docker --version
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/umbridge_wrapper.py \
 
 doctests_markdown:
@@ -38,7 +38,7 @@ doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch do
 doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
 unittests:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
+	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
 check_booktests:
 	find demos -name '*.ipynb' | while read nb; do \
@@ -55,7 +55,7 @@ booktests:
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" --failfast && \
+	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast && \
 	cd ../..
 
 booktests-parallel:
@@ -66,9 +66,11 @@ booktests-parallel:
 	python parsl_test_runner.py 1>/dev/null && \
 	cd ../.. 
 
-tests: doctests unittests coverage
+tests: 
+	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
-tests_no_docker: doctests_no_docker unittests coverage
+tests_no_docker: 
+	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests && $(MAKE) coverage
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
