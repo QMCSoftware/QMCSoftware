@@ -49,7 +49,11 @@ check_booktests:
 		fi; \
 	done
 
-booktests:
+generate_booktests:
+	@echo "\nGenerating missing booktest files..."
+	cd test/booktests/ && python generate_test.py --check-missing
+
+booktests: generate_booktests
 	@echo "\nNotebook tests"
 	set -e && \
 	cd test/booktests/ && \
@@ -58,7 +62,7 @@ booktests:
 	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast && \
 	cd ../..
 
-booktests-parallel:
+booktests-parallel: generate_booktests
 	@echo "\nBooktests"
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
