@@ -5,7 +5,8 @@ from __init__ import TB_TIMEOUT, BaseNotebookTest
 class NotebookTests(BaseNotebookTest):
 
     @testbook('../../demos/qei-demo-for-blog.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_qei_demo_blog_notebook(self, tb):
+    def test_qei_demo_for_blog_notebook(self, tb):
+        """Test that the notebook qei-demo-for-blog.ipynb executes without errors."""
         pass
 
 if __name__ == '__main__':
