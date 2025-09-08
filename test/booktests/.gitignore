@@ -1,5 +1,6 @@
 *outputs/
 *.eps
+*.pkl
 
 # parsl files
 logs/
