@@ -47,6 +47,8 @@ check_booktests:
 		if [ "$$base" != "parsl_fest_2025" ] && ! ls test/booktests/tb_"$$test_base".py &>/dev/null; then \
 			echo "Missing test for: $$nb -> Expected: test/booktests/tb_$$test_base.py"; \
 		fi; \
+		find demos -name "*.ipynb" |wc -l    
+		find test/booktests -name "tb_*.py"|wc -l     # one less
 	done
 
 generate_booktests:
