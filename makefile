@@ -69,7 +69,7 @@ booktests-parallel: generate_booktests
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py 1>/dev/null && \
+	python parsl_test_runner.py --failfast --verbose 1>/dev/null && \
 	cd ../.. 
 
 tests: 
