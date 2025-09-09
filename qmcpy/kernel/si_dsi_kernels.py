@@ -33,8 +33,8 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             compile_call,
             comiple_call_kwargs,
             ):
-        self._input_lengthscales_is_none = lengthscales is None
-        if self._input_lengthscales_is_none: lengthscales = 1.
+        input_lengthscales_is_none = lengthscales is None
+        if input_lengthscales_is_none: lengthscales = 1.
         super().__init__(
             d = d, 
             scale = scale, 
@@ -59,6 +59,13 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             endsize_ops = alpha_endsize_ops,
             constraints = ["POSITIVE"])
         self.tfs_alpha = tfs_alpha
+        if input_lengthscales_is_none:
+            lengthscales_new = (2**(1/self.d)-1.)
+            raw_lengthscales_new = self.tfs_lengthscales[0](self.nptarray([lengthscales_new]))
+            if self.torchify:
+                self.raw_lengthscales.data[:] = raw_lengthscales_new
+            else:
+                self.raw_lengthscales[:] = raw_lengthscales_new
     
     @property
     def alpha(self):
@@ -494,6 +501,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         assert self.alpha.shape==(self.d,)
         self.set_t(t)
         assert all(1<=int(alphaj)<=4 for alphaj in self.alpha)
+        
     
     @property
     def t(self):
@@ -714,8 +722,6 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         )
         self.set_t(t)
         self.batch_param_names.append("alpha")
-        if self._input_lengthscales_is_none:
-            pass
     
     @property
     def t(self):

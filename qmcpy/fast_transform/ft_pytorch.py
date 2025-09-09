@@ -108,10 +108,10 @@ def _fwht_torch(x):
     idx0 = [slice(None)]*(m-1)+[0]
     idx1 = [slice(None)]*(m-1)+[1]
     for k in range(m):
-        eps0 = it[idx0[-(k+1):]].flatten()
-        eps1 = it[idx1[-(k+1):]].flatten()
-        y0,y1 = y[[Ellipsis,eps0]],y[[Ellipsis,eps1]]
-        y[[Ellipsis,eps0]],y[[Ellipsis,eps1]] = (y0+y1)/np.sqrt(2),(y0-y1)/np.sqrt(2)
+        eps0 = it[tuple(idx0[-(k+1):])].flatten()
+        eps1 = it[tuple(idx1[-(k+1):])].flatten()
+        y0,y1 = y[(Ellipsis,eps0)],y[(Ellipsis,eps1)]
+        y[(Ellipsis,eps0)],y[(Ellipsis,eps1)] = (y0+y1)/np.sqrt(2),(y0-y1)/np.sqrt(2)
     return y
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
