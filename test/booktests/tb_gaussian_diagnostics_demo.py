@@ -17,7 +17,7 @@ class NotebookTests(BaseNotebookTest):
     def test_gaussian_diagnostics_demo_notebook(self, tb):
         # Execute cells up to but not including the stop_notebook cell
         for i in range(len(self.cells)):  
-            if "plt.style.use('seaborn-poster')" not in self.cells[i]['source']:
+            if "plt.style.use('seaborn-v0_8-poster')" not in self.cells[i]['source']:
                 self.execute_cell(i)
             else:
                 break  # not running the rest of the notebook depending on umbridge and docker

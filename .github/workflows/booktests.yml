@@ -1,3 +1,4 @@
+# cSpell:words Booktests ipynb booktests booktest gpytorch botorch umbridge
 name: Booktests
 
 on:
