@@ -33,6 +33,8 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             compile_call,
             comiple_call_kwargs,
             ):
+        self._input_lengthscales_is_none = lengthscales is None
+        if self._input_lengthscales_is_none: lengthscales = 1.
         super().__init__(
             d = d, 
             scale = scale, 
@@ -48,7 +50,7 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             compile_call = compile_call,
             comiple_call_kwargs = comiple_call_kwargs,
         )
-        self.raw_alpha,self.tf_alpha = self.parse_assign_param(
+        self.raw_alpha = self.parse_assign_param(
             pname = "alpha",
             param = alpha, 
             shape_param = shape_alpha,
@@ -56,10 +58,11 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
             tfs_param = tfs_alpha,
             endsize_ops = alpha_endsize_ops,
             constraints = ["POSITIVE"])
+        self.tfs_alpha = tfs_alpha
     
     @property
     def alpha(self):
-        return self.tf_alpha(self.raw_alpha)
+        return self.tfs_alpha[1](self.raw_alpha)
     
     def parsed_single_integral_01d(self, x, batch_params):
         return batch_params["scale"][...,0]+0*x[...,0]
@@ -146,9 +149,10 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> np.allclose(kmat_torch.detach().numpy(),kmat)
         True
         >>> kernel.single_integral_01d(x)
-        array([10.])
+        array([10., 10., 10., 10., 10., 10., 10., 10.])
         >>> kernel_torch.single_integral_01d(xtorch)
-        tensor([10.], grad_fn=<SelectBackward0>)
+        tensor([10., 10., 10., 10., 10., 10., 10., 10.], dtype=torch.float64,
+               grad_fn=<AddBackward0>)
         
         Batch Params 
         
@@ -231,7 +235,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
     def __init__(self,
             d, 
             scale = 1., 
-            lengthscales = 1.,
+            lengthscales = None,
             alpha = 2,
             shape_scale = [1],
             shape_lengthscales = None, 
@@ -389,9 +393,9 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         >>> torch.allclose(kmat_torch_from_floats,kmat_torch)
         True
         >>> kernel.single_integral_01d(x)
-        array([10.])
+        array([10., 10., 10., 10., 10., 10., 10., 10.])
         >>> kernel_torch.single_integral_01d(xtorch)
-        tensor([10.], grad_fn=<SelectBackward0>)
+        tensor([10., 10., 10., 10., 10., 10., 10., 10.], grad_fn=<AddBackward0>)
 
         Batch Params 
         
@@ -436,7 +440,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
             d,
             t=None,
             scale = 1., 
-            lengthscales = 1.,
+            lengthscales = None,
             alpha = 2,
             shape_scale = [1],
             shape_lengthscales = None, 
@@ -622,9 +626,9 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         >>> torch.allclose(kmat_torch_from_floats,kmat_torch)
         True
         >>> kernel.single_integral_01d(x)
-        array([10.])
+        array([10., 10., 10., 10., 10., 10., 10., 10.])
         >>> kernel_torch.single_integral_01d(xtorch)
-        tensor([10.], grad_fn=<SelectBackward0>)
+        tensor([10., 10., 10., 10., 10., 10., 10., 10.], grad_fn=<AddBackward0>)
 
         Batch Params 
         
@@ -653,7 +657,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             d,
             t=None,
             scale = 1., 
-            lengthscales = 1.,
+            lengthscales = None,
             alpha = 1,
             shape_alpha = None,
             shape_scale = [1],
@@ -710,6 +714,8 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         )
         self.set_t(t)
         self.batch_param_names.append("alpha")
+        if self._input_lengthscales_is_none:
+            pass
     
     @property
     def t(self):

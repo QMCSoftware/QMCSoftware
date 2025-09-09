@@ -382,7 +382,7 @@ class KernelMultiTask(AbstractKernel):
             diag_endsize_ops = [self.num_tasks]
         else:
             raise Exception("invalid method = %s, must be in ['LOW RANK','CHOLESKY']"%self.method)
-        self.raw_factor,self.tf_factor = self.parse_assign_param(
+        self.raw_factor = self.parse_assign_param(
             pname = "factor",
             param = factor,
             shape_param = shape_factor,
@@ -390,9 +390,10 @@ class KernelMultiTask(AbstractKernel):
             tfs_param = tfs_factor,
             endsize_ops = factor_endsize_ops,
             constraints = [])
+        self.tfs_factor = tfs_factor
         if self.method=="LOW RANK":
             assert self.raw_factor.shape[-2]==self.num_tasks
-        self.raw_diag,self.tf_diag = self.parse_assign_param(
+        self.raw_diag = self.parse_assign_param(
             pname = "diag",
             param = diag, 
             shape_param = [self.num_tasks] if shape_diag is None else shape_diag,
@@ -400,6 +401,7 @@ class KernelMultiTask(AbstractKernel):
             tfs_param = tfs_diag,
             endsize_ops = diag_endsize_ops,
             constraints = ["NON-NEGATIVE"])
+        self.tfs_diag = tfs_diag
         self.eye_num_tasks = self.npt.eye(self.num_tasks,**self.nptkwargs)
         self.batch_param_names.append("taskmat")
         self._nbdim_base = None
@@ -412,11 +414,11 @@ class KernelMultiTask(AbstractKernel):
     
     @property
     def factor(self):
-        return self.tf_factor(self.raw_factor)
+        return self.tfs_factor[1](self.raw_factor)
     
     @property
     def diag(self):
-        return self.tf_diag(self.raw_diag)
+        return self.tfs_diag[1](self.raw_diag)
 
     @property
     def taskmat(self):

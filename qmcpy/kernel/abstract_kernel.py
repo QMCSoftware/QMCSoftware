@@ -249,7 +249,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
         super().__init__(d=d,torchify=torchify,device=device,compile_call=compile_call,comiple_call_kwargs=comiple_call_kwargs)
-        self.raw_scale,self.tf_scale = self.parse_assign_param(
+        self.raw_scale= self.parse_assign_param(
             pname = "scale",
             param = scale, 
             shape_param = shape_scale,
@@ -257,8 +257,9 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_scale,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
+        self.tfs_scale = tfs_scale
         self.batch_param_names.append("scale")
-        self.raw_lengthscales,self.tf_lengthscales = self.parse_assign_param(
+        self.raw_lengthscales = self.parse_assign_param(
             pname = "lengthscales",
             param = lengthscales, 
             shape_param = [self.d] if shape_lengthscales is None else shape_lengthscales,
@@ -266,13 +267,14 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_lengthscales,
             endsize_ops = [1,self.d],
             constraints = ["POSITIVE"])
+        self.tfs_lengthscales = tfs_lengthscales
         self.batch_param_names.append("lengthscales")
 
     @property
     def scale(self):
-        return self.tf_scale(self.raw_scale)
+        return self.tfs_scale[1](self.raw_scale)
     
     @property
     def lengthscales(self):
-        return self.tf_lengthscales(self.raw_lengthscales)
+        return self.tfs_lengthscales[1](self.raw_lengthscales)
         
