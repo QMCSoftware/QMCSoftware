@@ -55,7 +55,7 @@ generate_booktests:
 	@echo "\nGenerating missing booktest files..."
 	cd test/booktests/ && python generate_test.py --check-missing
 
-booktests: check_booktests generate_booktests
+booktests_no_docker: check_booktests generate_booktests
 	@echo "\nNotebook tests"
 	set -e && \
 	cd test/booktests/ && \
