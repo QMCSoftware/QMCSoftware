@@ -64,7 +64,7 @@ booktests: check_booktests generate_booktests
 	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast && \
 	cd ../..
 
-booktests-parallel: check_booktests generate_booktests
+booktests_parallel_no_docker: check_booktests generate_booktests
 	@echo "\nBooktests"
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
