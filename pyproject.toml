@@ -74,6 +74,7 @@ test = [
     "psutil == 5.9.5",
     "parsl == 2025.7.28",
     "seaborn == 0.8",
+    "ipykernel",
     ]
 test_torch = [
     "torch == 2.7.0",

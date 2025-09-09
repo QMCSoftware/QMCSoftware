@@ -5,9 +5,11 @@ on:
   push:
     paths:
       - 'demos/**/*.ipynb'
+      - '.github/workflows/booktests.yml'
   pull_request:
     paths:
       - 'demos/**/*.ipynb'
+      - '.github/workflows/booktests.yml'
 
 jobs:
   booktests:
@@ -34,6 +36,8 @@ jobs:
           pip install -e .[test_gpytorch]
           pip install -e .[test_botorch]
           pip install -e .[test_umbridge]
+      - name: Install Jupyter kernel
+        run: python -m ipykernel install --user --name=qmcpy
       - name: Run notebook tests
         shell: bash -l {0}
         run: make booktests_no_docker
