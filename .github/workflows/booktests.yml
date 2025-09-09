@@ -36,4 +36,4 @@ jobs:
           pip install -e .[test_umbridge]
       - name: Run notebook tests
         shell: bash -l {0}
-        run: make booktests_parallel_no_docker
+        run: make booktests_no_docker
