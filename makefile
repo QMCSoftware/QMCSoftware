@@ -57,11 +57,17 @@ find_local_only_files:
 	chmod +x scripts/find_local_only_folders.sh
 	./scripts/find_local_only_folders.sh
 
+clean_local_only_files:
+	chmod +x scripts/find_local_only_folders.sh
+	for f in $(shell ./scripts/find_local_only_folders.sh); do \
+		rm -f "$$f"; \
+	done
+
 generate_booktests:
 	@echo "\nGenerating missing booktest files..."
 	cd test/booktests/ && python generate_test.py --check-missing
 
-booktests_no_docker: check_booktests generate_booktests
+booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests"
 	pip install -q -e ".[test]"  && \
 	set -e && \
@@ -71,7 +77,7 @@ booktests_no_docker: check_booktests generate_booktests
 	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast && \
 	cd ../..
 
-booktests_parallel_no_docker: check_booktests generate_booktests
+booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
 	pip install -q -e ".[test]"  && \
 	cd test/booktests/ && \
