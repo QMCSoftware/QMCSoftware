@@ -51,6 +51,12 @@ check_booktests:
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
 	@echo "Total test files: $$(find test/booktests -name 'tb_*.py' | wc -l)"
 
+
+# This helps locate generated or local-only folders like build, .pytest_cache, etc.
+find_local_only_files:
+	chmod +x scripts/find_local_only_folders.sh
+	./scripts/find_local_only_folders.sh
+
 generate_booktests:
 	@echo "\nGenerating missing booktest files..."
 	cd test/booktests/ && python generate_test.py --check-missing
@@ -123,3 +129,4 @@ runmkdocserve:
 doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
+
