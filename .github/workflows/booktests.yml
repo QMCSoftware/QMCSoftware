@@ -13,17 +13,17 @@ on:
 
 jobs:
   booktests:
-    name: Notebook Tests on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Notebook Tests
+    runs-on: ubuntu-latest-16-cores
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        os: ["ubuntu-latest"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up TeX Live
-        uses: xu-cheng/setup-texlive@v3
+        uses: teatimeguest/setup-texlive-action@v3
         with:
-          scheme: small
+          packages: scheme-basic
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
@@ -34,12 +34,6 @@ jobs:
         run: make check_booktests
       - name: Generate missing booktest files
         run: make generate_booktests
-      - name: Install additional test dependencies
-        run: |
-          pip install -e .[test_torch]
-          pip install -e .[test_gpytorch]
-          pip install -e .[test_botorch]
-          pip install -e .[test_umbridge]
       - name: Install Jupyter kernel
         run: python -m ipykernel install --user --name=qmcpy
       - name: Run notebook tests
