@@ -20,6 +20,10 @@ jobs:
         os: ["ubuntu-latest", "macos-latest"]
     steps:
       - uses: actions/checkout@v4
+      - name: Set up TeX Live
+        uses: xu-cheng/setup-texlive@v3
+        with:
+          scheme: small
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
