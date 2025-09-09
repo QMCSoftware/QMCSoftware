@@ -8,12 +8,18 @@ from __init__ import TB_TIMEOUT, BaseNotebookTest
 class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()  # Call parent setUp first to initialize timing attributes
-        # Install compatible package versions
-        subprocess.run(['pip', 'install', '-q', 'seaborn', 'tueplots'], check=False)
+        subprocess.run([
+            'pip', 'install', '-q', 
+            'seaborn>=0.13.0', 
+            'tueplots'
+        ], check=False)
         # Create the JOSS2025.outputs directory that the notebook expects
         self.output_dir = os.path.join(os.path.dirname(__file__), 'JOSS2025.outputs')
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir, exist_ok=True)
+            self._created_output_dir = True
+        else:
+            self._created_output_dir = False
         
     def tearDown(self):
         # Clean up the created directory if we created it
