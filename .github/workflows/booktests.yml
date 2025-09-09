@@ -14,16 +14,13 @@ on:
 jobs:
   booktests:
     name: Notebook Tests
-    runs-on: ubuntu-latest-16-cores
-    strategy:
-      matrix:
-        os: ["ubuntu-latest"]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up TeX Live
-        uses: teatimeguest/setup-texlive-action@v3
-        with:
-          packages: scheme-basic
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
