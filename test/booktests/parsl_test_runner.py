@@ -133,7 +133,7 @@ def main():
         # Parsl not configured, so load a configuration
         try:
             from parsl.configs.htex_local import config
-            config.max_workers = 13  # processors
+            config.max_workers = 8  # processors
             pl.load(config)
             print("Parsl configuration loaded successfully.")
         except Exception as e:
