@@ -1,5 +1,5 @@
 from .abstract_integrand import AbstractIntegrand
-from ..true_measure import BrownianMotion
+from ..true_measure import GeometricBrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
 import numpy as np
@@ -120,13 +120,14 @@ class FinancialOption(AbstractIntegrand):
             interest_rate   0
             t_final         1
         >>> integrand.true_measure
-        BrownianMotion (AbstractTrueMeasure)
+        GeometricBrownianMotion (AbstractTrueMeasure)
             time_vec        [0.333 0.667 1.   ]
             drift           0
-            mean            [0. 0. 0.]
-            covariance      [[0.333 0.333 0.333]
-                             [0.333 0.667 0.667]
-                             [0.333 0.667 1.   ]]
+            diffusion       2^(-2)
+            mean_gbm        [30. 30. 30.]
+            covariance_gbm  [[ 78.214  78.214  78.214]
+                             [ 78.214 163.224 163.224]
+                             [ 78.214 163.224 255.623]]
             decomp_type     PCA
 
         >>> integrand = FinancialOption(DigitalNetB2(dimension=64,seed=7),option="ASIAN")
@@ -247,11 +248,18 @@ class FinancialOption(AbstractIntegrand):
         self.t_final = t_final
         self.sampler = sampler
         self.decomp_type = decomp_type
-        self.true_measure = BrownianMotion(self.sampler,t_final=self.t_final,decomp_type=self.decomp_type)
         self.volatility = float(volatility)
         self.start_price = float(start_price)
         self.strike_price = float(strike_price)
         self.interest_rate = float(interest_rate)
+        self.true_measure = GeometricBrownianMotion(
+            self.sampler, 
+            t_final=self.t_final, 
+            initial_value=self.start_price,
+            drift=self.interest_rate,
+            diffusion=self.volatility**2,
+            decomp_type=self.decomp_type
+        )
         self.discount_factor = np.exp(-self.interest_rate*self.t_final)
         self.level = level
         self.d_coarsest = d_coarsest
@@ -318,7 +326,7 @@ class FinancialOption(AbstractIntegrand):
         super(FinancialOption,self).__init__(dimension_indv=dim_shape,dimension_comb=dim_shape,parallel=False)  
     
     def g(self, t, **kwargs):
-        gbm = self.gbm(t)
+        gbm = t  # GeometricBrownianMotion already provides GBM paths directly
         discounted_payoffs = self.payoff(gbm)*self.discount_factor
         if self.multilevel:
             if self.level==0:
@@ -327,11 +335,6 @@ class FinancialOption(AbstractIntegrand):
                 discounted_payoffs_coarse = self.payoff(gbm[...,1::2])*self.discount_factor
             discounted_payoffs = np.stack([discounted_payoffs_coarse,discounted_payoffs])
         return discounted_payoffs
-    
-    def gbm(self, t):
-        gbm = self.start_price*np.exp((self.interest_rate-self.volatility**2/2)*self.true_measure.time_vec+self.volatility*t)
-        gbm *= (gbm>0).cumprod(-1) # if a path hits 0, set remaining values in the path to 0
-        return gbm
     
     def payoff_european_call(self, gbm):
         return np.maximum(gbm[...,-1]-self.strike_price,0)

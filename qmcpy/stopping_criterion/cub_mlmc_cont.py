@@ -52,11 +52,12 @@ class CubMLMCCont(AbstractCubMLMC):
             interest_rate   0
             t_final         1
             asian_mean      ARITHMETIC
-        BrownianMotion (AbstractTrueMeasure)
+        GeometricBrownianMotion (AbstractTrueMeasure)
             time_vec        1
             drift           0
-            mean            0
-            covariance      1
+            diffusion       2^(-2)
+            mean_gbm        30
+            covariance_gbm  255.623
             decomp_type     PCA
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               1
