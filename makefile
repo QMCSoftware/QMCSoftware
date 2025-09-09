@@ -78,6 +78,7 @@ tests:
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
 tests_no_docker: 
+	pip install -q -e .[test] && \
 	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests && $(MAKE) coverage
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
