@@ -66,7 +66,7 @@ booktests_no_docker: check_booktests generate_booktests
 	cd ../..
 
 booktests_parallel_no_docker: check_booktests generate_booktests
-	@echo "\nnNotebook tests with Parsl"
+	@echo "\nNotebook tests with Parsl"
 	pip install -q -e ".[test]"  && \
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
