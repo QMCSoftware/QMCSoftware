@@ -58,7 +58,6 @@ class NotebookTests(BaseNotebookTest):
 
     @testbook('{rel_path}', execute=True, timeout=TB_TIMEOUT)
     def test_{test_name}_notebook(self, tb):
-        """Test that the notebook {notebook_name}.ipynb executes without errors."""
         pass
 
 if __name__ == '__main__':
