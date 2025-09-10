@@ -83,7 +83,7 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py -v --failfast && \
+	python parsl_test_runner.py $(TESTS) -v --failfast && \
 	cd ../.. 
 
 tests: 

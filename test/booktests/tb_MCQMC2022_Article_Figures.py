@@ -20,13 +20,6 @@ class NotebookTests(BaseNotebookTest):
             if os.path.exists(src):
                 shutil.copy2(src, pkl_file)
                 print(f"\n\tCopied {src} to {pkl_file}")
-                
-    def tearDown(self):
-        # move *eps to outputs
-        for file in os.listdir('.'):
-            if file.endswith('.eps') or file.endswith('.pkl'):
-                shutil.move(file, os.path.join('outputs', file))
-        super().tearDown()
 
     @testbook('../../demos/talk_paper_demos/MCQMC2022_Article_Figures/MCQMC2022_Article_Figures.ipynb', execute=False, timeout=TB_TIMEOUT)
     def test_mcqmc2022_article_figures_notebook(self, tb):

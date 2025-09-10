@@ -23,13 +23,6 @@ class NotebookTests(BaseNotebookTest):
                 shutil.copy2(src, pkl_file)
                 print(f"\n\tCopied {src} to {pkl_file}")
 
-    def tearDown(self):
-        # move *eps to outputs
-        for file in os.listdir('.'):
-            if file.endswith('.eps') or file.endswith('.pkl'):
-                shutil.move(file, os.path.join('outputs', file))
-        super().tearDown()
-
     @testbook('../../demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb', execute=False, timeout=TB_TIMEOUT)
     def test_purdue_talk_figures_notebook(self, tb):
         # Execute cells up to but not including the stop_notebook cell

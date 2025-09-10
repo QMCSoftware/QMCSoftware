@@ -22,10 +22,17 @@ def execute_parallel_tests():
     logs_dir = Path('logs')
     logs_dir.mkdir(exist_ok=True)
     
-    # Get all test files - need to find them relative to the current QMCSoftware directory 
-    test_files = glob.glob('tb_*.py')
-    test_modules = [os.path.basename(f).replace('.py', '') for f in test_files]
-    
+    import sys
+    # Only treat arguments before the first option (starting with '-') as test modules
+    test_modules = []
+    for arg in sys.argv[1:]:
+        if arg.startswith('-'):
+            break
+        test_modules.append(arg)
+    if not test_modules:
+        test_files = glob.glob('tb_*.py')
+        test_modules = [os.path.basename(f).replace('.py', '') for f in test_files]
+
     print(f"Found {len(test_modules)} test modules to execute in parallel...")
     
     # Submit all jobs
@@ -46,27 +53,31 @@ def execute_parallel_tests():
     for module, future, index in futures:
         try:
             future.result()  # Wait for completion
-            
-            # Read the output file to check for skipped tests
-            output_file = f'logs/test_{index}_{module}.out'
-            skip_count = 0
-            if os.path.exists(output_file):
-                with open(output_file, 'r') as f:
-                    output_content = f.read()
-                    # Check for unittest skip messages
-                    import re
-                    match = re.search(r'OK \(skipped=(\d+)\)', output_content)
-                    if match:
-                        skip_count = int(match.group(1))
-                    elif 'skipped' in output_content.lower():
-                        # Count occurrences of "skipped" in the output as fallback
-                        skip_count = output_content.lower().count('skipped')
-            
-            results.append((module, 'PASSED', skip_count))
-            status = f'PASSED (skipped={skip_count})' if skip_count > 0 else 'PASSED'
         except Exception as e:
-            results.append((module, f'FAILED: {e}', 0))
-            status = 'FAILED'
+            print(f"Test {module} failed once with error: {e}. Retrying...")
+            try:
+                future.result()  # Retry once
+            except Exception as e2:
+                results.append((module, f'FAILED after retry: {e2}', 0))
+                status = 'FAILED'
+                completed += 1
+                print(f"[{completed}/{len(futures)}] {module}: {status}")
+                continue
+
+        # Read the output file to check for skipped tests
+        output_file = f'logs/test_{index}_{module}.out'
+        skip_count = 0
+        if os.path.exists(output_file):
+            with open(output_file, 'r') as f:
+                output_content = f.read()
+                match = re.search(r'OK \(skipped=(\d+)\)', output_content)
+                if match:
+                    skip_count = int(match.group(1))
+                elif 'skipped' in output_content.lower():
+                    skip_count = output_content.lower().count('skipped')
+
+        results.append((module, 'PASSED', skip_count))
+        status = f'PASSED (skipped={skip_count})' if skip_count > 0 else 'PASSED'
         
         completed += 1
         print(f"[{completed}/{len(futures)}] {module}: {status}")

@@ -10,13 +10,6 @@ class NotebookTests(BaseNotebookTest):
         super().setUp()
         # Create outputs directory
         os.makedirs('outputs', exist_ok=True)
-    
-    def tearDown(self):
-        # move *eps to outputs
-        for file in os.listdir('.'):
-            if file.endswith('.eps') or file.endswith('.pkl'):
-                shutil.move(file, os.path.join('outputs', file))
-        super().tearDown()
 
     @testbook('../../demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb', execute=False, timeout=TB_TIMEOUT)
     def test_prob_failure_gp_ci_notebook(self, tb):
