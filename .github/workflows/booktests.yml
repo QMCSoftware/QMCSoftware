@@ -13,15 +13,22 @@ on:
 
 jobs:
   booktests:
-    timeout-minutes: 120  # Increase as needed
+    timeout-minutes: 120
     name: Notebook Tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
       - name: Install LaTeX
         run: |
-          sudo apt-get update
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
             sudo apt-get install -y texlive-full
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install --cask mactex
+          fi
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
