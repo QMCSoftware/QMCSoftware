@@ -12,6 +12,7 @@ PRIMES = array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41,
                 479, 487, 491, 499, 503, 509, 521, 523, 541])
 
 RICHTMYER = sqrt(PRIMES) % 1
+SUZUKI = lambda d : 2**(arange(1,d+1)/(d+1))
 
 class Kronecker(AbstractLDDiscreteDistribution):
     def __init__(self, dimension=1, alpha="RICHTMYER", delta=None, replications=None, randomize=True, seed=None):
@@ -24,8 +25,10 @@ class Kronecker(AbstractLDDiscreteDistribution):
                     self.alpha = RICHTMYER[:dimension]
                 else:
                     self.alpha = append(RICHTMYER, [sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)])
+        elif type(alpha) == str and alpha.lower() == 'suzuki':
+            self.alpha = SUZUKI(dimension)
         else:
-            self.alpha = alpha
+            self.alpha = alpha[:dimension]
 
         super(Kronecker,self).__init__(dimension,replications,seed,d_limit=dimension,n_limit=inf) 
 
