@@ -20,7 +20,7 @@ jobs:
       - name: Install LaTeX
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended
+          sudo apt-get install -y texlive-full texlive-latex-extra texlive-fonts-recommended
       - name: Install missing LaTeX packages
         run: sudo apt-get update && sudo apt-get install -y texlive-fonts-extra
       - uses: conda-incubator/setup-miniconda@v3

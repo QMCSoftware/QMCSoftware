@@ -44,8 +44,8 @@ check_booktests:
 	find demos -name '*.ipynb' | while read nb; do \
 		base=$$(basename "$$nb" .ipynb); \
 		test_base=$$(echo "$$base" | sed 's/[-.]/_/g'); \
-		if [ "$$base" != "parsl_fest_2025" ] && ! ls test/booktests/tb_"$$test_base".py &>/dev/null; then \
-			echo "Missing test for: $$nb -> Expected: test/booktests/tb_$$test_base.py"; \
+		if [ "$$base" != "parsl_fest_2025" ] && ! ls test/booktests/tb_"$$test_base".py > /dev/null 2>&1; then \
+			echo "    Missing test for: $$nb -> Expected: test/booktests/tb_$$test_base.py"; \
 		fi; \
 	done
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
@@ -135,4 +135,3 @@ runmkdocserve:
 doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
-
