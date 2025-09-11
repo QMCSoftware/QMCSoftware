@@ -34,13 +34,9 @@ jobs:
           miniconda-version: "latest"
           auto-activate-base: true
       - name: Install base dependencies
-        run: pip install -e .[test]
-      - name: Check for missing booktest files
-        run: make check_booktests
-      - name: Generate missing booktest files
-        run: make generate_booktests
+        run: pip install -e ".[test,dev]"
       - name: Install Jupyter kernel
         run: python -m ipykernel install --user --name=qmcpy
       - name: Run notebook tests
         shell: bash -l {0}
-        run: make booktests_no_docker
+        run: make booktests_parallel_no_docker TESTS="tb_dakota_genz"

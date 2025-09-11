@@ -28,12 +28,6 @@ class NotebookTests(BaseNotebookTest):
         else:
             self._created_dummy_file = None
 
-    def tearDown(self):
-        # Clean up dummy file if we created it
-        if hasattr(self, '_created_dummy_file') and self._created_dummy_file and os.path.isfile(self._created_dummy_file):
-            os.remove(self._created_dummy_file)
-        super().tearDown()
-
     @testbook('../../demos/DAKOTA_Genz/dakota_genz.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_dakota_genz_notebook(self, tb):
         pass
