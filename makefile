@@ -73,10 +73,16 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	set -e && \
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log prob_failure_gp_ci_plots && \
-	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast && \
+	if [ -z "$(TESTS)" ]; then \
+		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast; \
+	else \
+		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest $(TESTS) -v --failfast; \
+	fi && \
 	cd ../..
 
+# make booktests_parallel_no_docker  TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
 booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
 	pip install -q -e ".[test]"  && \

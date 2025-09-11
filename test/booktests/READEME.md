@@ -18,6 +18,12 @@ To execute all testbook files in parallel, run the following command in a termin
     make booktests_parallel_no_docker
 ```
 
+To execute say two testbook files sequentially, run the following command in a terminal:
+
+```{bash}
+    make booktests_no_docker TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
+```
+
 To execute say two testbook files in parallel, run the following command in a terminal:
 
 ```{bash}

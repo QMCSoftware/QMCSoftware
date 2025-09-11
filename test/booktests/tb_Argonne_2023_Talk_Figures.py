@@ -35,10 +35,6 @@ class NotebookTests(BaseNotebookTest):
                 self.execute_cell(i)
             else:
                 break  # not running the rest of the notebook depending on umbridge and docker
-        # After notebook execution, move .pkl files to outputs
-        for file in os.listdir('.'):
-            if file.endswith('.pkl'):
-                shutil.move(file, os.path.join('outputs', file))
 
 if __name__ == '__main__':
     unittest.main()
