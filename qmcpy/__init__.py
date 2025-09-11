@@ -10,13 +10,16 @@ from .kernel import (
     KernelMatern32,
     KernelMatern52,
     KernelShiftInvar,
-    KernelDigShiftInvar,
-    KernelDigShiftInvarAdaptiveAlpha,
     KernelSI,
+    KernelDigShiftInvar,
     KernelDSI,
+    KernelDigShiftInvarAdaptiveAlpha,
     KernelDSIAA,
+    KernelDigShiftInvarCombined,
+    KernelDSICombined,
     KernelMultiTask,
     KernelMultiTaskDerivs,
+
 )
 from .fast_transform import (
     fftbr,

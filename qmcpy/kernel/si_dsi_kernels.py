@@ -542,7 +542,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
                     flog2deltaj[pos] = self.npt.floor(self.npt.log2(deltaj[pos]))-t
                     kparts_l[j] = 6*(1/6-2**(flog2deltaj-1))
                 else:
-                    kparts_l[j] = weighted_walsh_funcs(int(self.alpha[j]),deltaj[...,None],t)[...,0]-1
+                    kparts_l[j] = weighted_walsh_funcs(int(order[l,j]),deltaj[...,None],t)[...,0]-1
             kparts[l] = self.npt.concatenate(kparts_l,-1)
         kparts = self.npt.stack(kparts,-2)
         kperdim = (-2)**betasum*(ind+kparts)
@@ -641,7 +641,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         Batch Params 
         
         >>> rng = np.random.Generator(np.random.PCG64(7))
-        >>> kernel = KernelDigShiftInvar(
+        >>> kernel = KernelDigShiftInvarAdaptiveAlpha(
         ...     d = 2, 
         ...     t = 10,
         ...     shape_scale = [4,3,1],
@@ -673,9 +673,9 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
             tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
             torchify = False, 
-            requires_grad_alpha = True, 
             requires_grad_scale = True, 
             requires_grad_lengthscales = True, 
+            requires_grad_alpha = True, 
             device = "cpu",
             compile_call = False,
             comiple_call_kwargs = {},
@@ -693,9 +693,9 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
-            requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
             requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
             device (torch.device): If `torchify`, put things onto this device.
             compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
             comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
@@ -763,5 +763,205 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         s = (nu+1)*2**(alpha*(flog2deltas+1))
         kparts = nu-s
         kparts[neginfs] = (nu-0*s)[neginfs]
+        k = scale*((1+lengthscales[...,None,:]*kparts).prod(-1)*c).sum(-1)
+        return k
+    
+class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
+    
+    r""" 
+    Digitally shift invariant kernel in base $b=2$ with 
+    combination weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$, smoothness $\boldsymbol{\alpha}$, product weights $\boldsymbol{\gamma}$, and scale $S$: 
+    
+    $$\begin{aligned}
+        K(\boldsymbol{x},\boldsymbol{z}) &= S \prod_{j=1}^d \left(1+ \gamma_j \left(\sum_{p=1}^4 \alpha_{jp} \tilde{K}_p(x_j \oplus z_j)\right)\right)
+    \end{aligned}$$
+
+    where, $\oplus$ is defined in the docs for `KernelDigShiftInvar` and so are $\tilde{K}_p$ for $p \in \{1,2,3,4\}$
+
+    Examples:
+        >>> from qmcpy import DigitalNetB2, fwht
+        >>> n = 8
+        >>> d = 4
+        >>> dnb2 = DigitalNetB2(d,seed=11)
+        >>> x = dnb2(n,return_binary=True)
+        >>> x.shape
+        (8, 4)
+        >>> x.dtype
+        dtype('uint64')
+        >>> kernel = KernelDigShiftInvarCombined(
+        ...     d = d, 
+        ...     t = dnb2.t,
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)])
+        >>> k00 = kernel(x[0],x[0])
+        >>> k00.item()
+        306.66030731930863
+        >>> k0 = kernel(x,x[0])
+        >>> with np.printoptions(precision=2):
+        ...     print(k0)
+        [306.66  -1.65   6.88 -13.5   22.57  -9.34   7.99  -7.54]
+        >>> assert k0[0]==k00
+        >>> kmat = kernel(x[:,None,:],x[None,:,:])
+        >>> with np.printoptions(precision=2):
+        ...     print(kmat)
+        [[306.66  -1.65   6.88 -13.5   22.57  -9.34   7.99  -7.54]
+         [ -1.65 306.66 -13.5    6.88  -9.34  22.57  -7.54   7.99]
+         [  6.88 -13.5  306.66  -1.65   7.99  -7.54  22.57  -9.34]
+         [-13.5    6.88  -1.65 306.66  -7.54   7.99  -9.34  22.57]
+         [ 22.57  -9.34   7.99  -7.54 306.66  -1.65   6.88 -13.5 ]
+         [ -9.34  22.57  -7.54   7.99  -1.65 306.66 -13.5    6.88]
+         [  7.99  -7.54  22.57  -9.34   6.88 -13.5  306.66  -1.65]
+         [ -7.54   7.99  -9.34  22.57 -13.5    6.88  -1.65 306.66]]
+        >>> assert (kmat[:,0]==k0).all()
+        >>> lam = np.sqrt(n)*fwht(k0)
+        >>> y = np.random.Generator(np.random.PCG64(7)).uniform(low=0,high=1,size=(n))
+        >>> np.allclose(fwht(fwht(y)*lam),kmat@y)
+        True
+        >>> np.allclose(fwht(fwht(y)/lam),np.linalg.solve(kmat,y))
+        True
+        >>> import torch 
+        >>> xtorch = bin_from_numpy_to_torch(x)
+        >>> kernel_torch = KernelDigShiftInvarCombined(
+        ...     d = d, 
+        ...     t = dnb2.t,
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)],
+        ...     torchify = True)
+        >>> kmat_torch = kernel_torch(xtorch[:,None,:],xtorch[None,:,:])
+        >>> np.allclose(kmat_torch.detach().numpy(),kmat)
+        True
+        >>> xf = to_float(x,dnb2.t)
+        >>> kmat_from_floats = kernel(xf[:,None,:],xf[None,:,:])
+        >>> np.allclose(kmat,kmat_from_floats)
+        True
+        >>> xftorch = to_float(xtorch,dnb2.t)
+        >>> xftorch.dtype
+        torch.float32
+        >>> kmat_torch_from_floats = kernel_torch(xftorch[:,None,:],xftorch[None,:,:])
+        >>> torch.allclose(kmat_torch_from_floats,kmat_torch)
+        True
+        >>> kernel.single_integral_01d(x)
+        array([10., 10., 10., 10., 10., 10., 10., 10.])
+        >>> kernel_torch.single_integral_01d(xtorch)
+        tensor([10., 10., 10., 10., 10., 10., 10., 10.], grad_fn=<AddBackward0>)
+
+        Batch Params 
+        
+        >>> rng = np.random.Generator(np.random.PCG64(7))
+        >>> kernel = KernelDigShiftInvarCombined(
+        ...     d = 2, 
+        ...     t = 10,
+        ...     shape_scale = [4,3,1],
+        ...     shape_lengthscales = [3,2])
+        >>> x = rng.uniform(low=0,high=1,size=(6,5,2))
+        >>> kernel(x,x).shape 
+        (4, 3, 6, 5)
+        >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
+        (4, 3, 6, 5, 5)
+        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        (4, 3, 6, 6, 5, 5)
+    """
+        
+    def __init__(self,
+            d,
+            t=None,
+            scale = 1., 
+            lengthscales = None,
+            alpha = 1.,
+            shape_scale = [1],
+            shape_lengthscales = None,
+            shape_alpha = None,
+            tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            torchify = False, 
+            requires_grad_scale = True, 
+            requires_grad_lengthscales = True,
+            requires_grad_alpha = True,
+            device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
+            ):
+        r"""
+        Args:
+            d (int): Dimension. 
+            t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
+            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray,torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$. 
+            shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
+            shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
+            requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
+            requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
+            device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
+        """
+        super().__init__(
+            d = d, 
+            scale = scale, 
+            lengthscales = lengthscales,
+            alpha = alpha,
+            shape_alpha = [4,d] if shape_alpha is None else shape_alpha, 
+            alpha_endsize_ops = [d],
+            shape_scale = shape_scale,
+            shape_lengthscales = shape_lengthscales, 
+            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps), 
+            tfs_scale = tfs_scale, 
+            tfs_lengthscales = tfs_lengthscales, 
+            torchify = torchify,
+            requires_grad_alpha = requires_grad_alpha,
+            requires_grad_scale = requires_grad_scale,
+            requires_grad_lengthscales = requires_grad_lengthscales,
+            device = device,
+            compile_call = compile_call,
+            comiple_call_kwargs = comiple_call_kwargs,
+        )
+        self.set_t(t)
+        assert self.alpha.shape[-2:]==(4,d)
+    
+    @property
+    def t(self):
+        if self._t is None: 
+            raise ParameterError("please use set_t to set the t value")
+        return self._t
+    
+    def set_t(self, t):
+        if t is None: 
+            self._t = t
+        else:
+            assert t%1==0
+            if self.torchify:
+                assert 0<=t<=63 # torch only supports torch.int64
+            else:
+                assert 0<=t<=64 # numpy supports np.uint64
+            self._t = t
+
+    def get_per_dim_components(self, x0, x1, beta0, beta1):
+        t = self.t
+        x0 = to_bin(x0,t)
+        x1 = to_bin(x1,t)
+        p = len(beta0)
+        assert (beta0==0).all() and (beta1==0).all(), "KernelDSICombined does not support derivatives"
+        delta = x0^x1
+        kparts = [None]*4 
+        flog2deltaj = -self.npt.inf*self.npt.ones(delta.shape,**self.nptkwargs)
+        pos = delta>0 
+        flog2deltaj[pos] = self.npt.floor(self.npt.log2(delta[pos]))-t
+        kparts[0] = 6*(1/6-2**(flog2deltaj-1))
+        kparts[1] = weighted_walsh_funcs(2,delta,t)-1
+        kparts[2] = weighted_walsh_funcs(3,delta,t)-1
+        kparts[3] = weighted_walsh_funcs(4,delta,t)-1
+        kparts = self.npt.stack(kparts,-2)
+        kperdim = self.npt.stack([kparts for j in range(p)],-2)
+        return kperdim
+    
+    def combine_per_dim_components(self, kparts, beta0, beta1, c, batch_params):
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        kparts = (self.alpha[...,None,:]*kparts).sum(-3)
         k = scale*((1+lengthscales[...,None,:]*kparts).prod(-1)*c).sum(-1)
         return k
