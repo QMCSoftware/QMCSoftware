@@ -81,6 +81,31 @@ def execute_parallel_tests():
         
         completed += 1
         print(f"[{completed}/{len(futures)}] {module}: {status}")
+        # Print output for successful tests and remove log files
+        test_name = module
+        test_case = ""
+        mem_used = ""
+        test_time = ""
+        ok_status = "ok"
+        # Example regex for extracting info
+        match = re.search(
+            r"(?P<test_case>[\w\.]+)\s+\.\.\.\s+Memory used:\s+(?P<mem>[\d\.]+)\s+GB\.\s+Test time:\s+(?P<time>[\d\.]+)\s+s", 
+            output_content
+        )
+        if match:
+            test_case = match.group("test_case")
+            mem_used = match.group("mem")
+            test_time = match.group("time")
+            print(f"{test_name} ({test_case}) ...     Memory used: {mem_used} GB.  Test time: {test_time} s\n{ok_status}")
+        print(output_content)
+
+        error_file = f'logs/test_{index}_{module}.err'
+        try:
+            os.remove(output_file)
+            if os.path.exists(error_file):
+                os.remove(error_file)
+        except Exception:
+            pass
     
     end_time = time.time()
     execution_time = end_time - start_time
@@ -130,7 +155,6 @@ def generate_summary_report(results, execution_time=0.0):
                 print("-" * 70)
                 print(f"Error: {status}")
                 print()
-
 
 def main():
     """Main function to run parallel tests"""
