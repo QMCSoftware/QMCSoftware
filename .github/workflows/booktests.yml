@@ -34,7 +34,7 @@ jobs:
           miniconda-version: "latest"
           auto-activate-base: true
       - name: Install base dependencies
-        run: pip install -e ".[test,dev]"
+        run: pip install -e ".[test]"
       - name: Install Jupyter kernel
         run: python -m ipykernel install --user --name=qmcpy
       - name: Run notebook tests
