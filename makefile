@@ -67,12 +67,12 @@ generate_booktests:
 	@echo "\nGenerating missing booktest files..."
 	cd test/booktests/ && python generate_test.py --check-missing
 
+
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests"
 	pip install -q -e ".[test]"  && \
 	set -e && \
 	cd test/booktests/ && \
-	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log prob_failure_gp_ci_plots && \
 	if [ -z "$(TESTS)" ]; then \
 		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast; \
