@@ -311,6 +311,184 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         return kperdim
 
 
+class KernelShiftInvarCombined(AbstractSIDSIKernel):
+
+    r""" 
+    Shift invariant kernel with 
+    combination weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$, product weights (lengthscales) $\boldsymbol{\gamma}$, and scale $S$:
+    
+    $$\begin{aligned}
+        K(\boldsymbol{x},\boldsymbol{z}) &= S \prod_{j=1}^d \left(1+ \gamma_j \left(\sum_{p=1}^4 \alpha_{jp} \tilde{K}_p(x_j \mod 1 z_j)\right)\right)
+    \end{aligned}$$
+
+    where, $\tilde{K}_p$ are defined in `KernelShiftInvar` for $p \in \{1,2,3,4\}$
+    
+    Examples:
+        >>> from qmcpy import Lattice, fftbr, ifftbr
+        >>> n = 8
+        >>> d = 4
+        >>> lat = Lattice(d,seed=11)
+        >>> x = lat(n)
+        >>> x.shape
+        (8, 4)
+        >>> x.dtype
+        dtype('float64')
+        >>> kernel = KernelShiftInvarCombined(
+        ...     d = d, 
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)])
+        >>> k00 = kernel(x[0],x[0])
+        >>> k00.item()
+        117.22427096475315
+        >>> k0 = kernel(x,x[0])
+        >>> with np.printoptions(precision=2):
+        ...     print(k0)
+        [ 117.22  153.84   28.59   36.1  -139.83   77.1    -8.51   35.22]
+        >>> assert k0[0]==k00
+        >>> kmat = kernel(x[:,None,:],x[None,:,:])
+        >>> with np.printoptions(precision=2):
+        ...     print(kmat)
+        [[ 117.22  153.84   36.1    28.59   35.22   -8.51   77.1  -139.83]
+         [ 153.84  117.22   28.59   36.1    -8.51   35.22 -139.83   77.1 ]
+         [  28.59   36.1   117.22  153.84 -139.83   77.1    35.22   -8.51]
+         [  36.1    28.59  153.84  117.22   77.1  -139.83   -8.51   35.22]
+         [-139.83   77.1    35.22   -8.51  117.22  153.84   36.1    28.59]
+         [  77.1  -139.83   -8.51   35.22  153.84  117.22   28.59   36.1 ]
+         [  -8.51   35.22 -139.83   77.1    28.59   36.1   117.22  153.84]
+         [  35.22   -8.51   77.1  -139.83   36.1    28.59  153.84  117.22]]
+        >>> assert (kmat[:,0]==k0).all()
+        >>> lam = np.sqrt(n)*fftbr(k0)
+        >>> y = np.random.Generator(np.random.PCG64(7)).uniform(low=0,high=1,size=(n))
+        >>> np.allclose(ifftbr(fftbr(y)*lam),kmat@y)
+        True
+        >>> np.allclose(ifftbr(fftbr(y)/lam),np.linalg.solve(kmat,y))
+        True
+        >>> import torch 
+        >>> xtorch = torch.from_numpy(x)
+        >>> kernel_torch = KernelShiftInvarCombined(
+        ...     d = d, 
+        ...     scale = 10,
+        ...     lengthscales = [1/j**2 for j in range(1,d+1)],
+        ...     torchify = True)
+        >>> kmat_torch = kernel_torch(xtorch[:,None,:],xtorch[None,:,:])
+        >>> np.allclose(kmat_torch.detach().numpy(),kmat)
+        True
+        >>> kernel.single_integral_01d(x)
+        array([10., 10., 10., 10., 10., 10., 10., 10.])
+        >>> kernel_torch.single_integral_01d(xtorch)
+        tensor([10., 10., 10., 10., 10., 10., 10., 10.], dtype=torch.float64,
+               grad_fn=<AddBackward0>)
+        
+        Batch Params 
+        
+        >>> rng = np.random.Generator(np.random.PCG64(7))
+        >>> kernel = KernelShiftInvarCombined(
+        ...     d = 2, 
+        ...     shape_scale = [4,3,1],
+        ...     shape_lengthscales = [3,2])
+        >>> x = rng.uniform(low=0,high=1,size=(6,5,2))
+        >>> kernel(x,x).shape 
+        (4, 3, 6, 5)
+        >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
+        (4, 3, 6, 5, 5)
+        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        (4, 3, 6, 6, 5, 5)
+        
+    **References:** 
+    
+    1.  Kaarnioja, Vesa, Frances Y. Kuo, and Ian H. Sloan.  
+        "Lattice-based kernel approximation and serendipitous weights for parametric PDEs in very high dimensions."  
+        International Conference on Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing. Cham: Springer International Publishing, 2022.
+    """
+        
+    def __init__(self,
+            d, 
+            scale = 1., 
+            lengthscales = None,
+            alpha = 1,
+            shape_scale = [1],
+            shape_lengthscales = None, 
+            shape_alpha = None,
+            tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps),
+            torchify = False, 
+            requires_grad_scale = True, 
+            requires_grad_lengthscales = True, 
+            requires_grad_alpha = True,
+            device = "cpu",
+            compile_call = False,
+            comiple_call_kwargs = {},
+            ):
+        r"""
+        Args:
+            d (int): Dimension. 
+            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray,torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$. 
+            shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
+            shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
+            tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_alpha (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
+            requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
+            requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
+            requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
+            device (torch.device): If `torchify`, put things onto this device.
+            compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method. 
+            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
+        """
+        super().__init__(
+            d = d, 
+            scale = scale, 
+            lengthscales = lengthscales,
+            alpha = alpha, 
+            alpha_endsize_ops = [d],
+            shape_scale = shape_scale,
+            shape_lengthscales = shape_lengthscales, 
+            shape_alpha = [4,d] if shape_alpha is None else shape_alpha, 
+            tfs_scale = tfs_scale,
+            tfs_alpha = tfs_alpha, 
+            tfs_lengthscales = tfs_lengthscales, 
+            torchify = torchify,
+            requires_grad_scale = requires_grad_scale,
+            requires_grad_lengthscales = requires_grad_lengthscales,
+            requires_grad_alpha = requires_grad_alpha,
+            device = device,
+            compile_call = compile_call,
+            comiple_call_kwargs = comiple_call_kwargs,
+        )
+        assert self.alpha.shape[-2:]==(4,d)
+        if self.torchify:
+            import torch 
+            self.lgamma = torch.lgamma 
+        else:
+            self.lgamma = scipy.special.loggamma
+        a = self.npt.arange(1,5,**self.nptkwargs)
+        self.coeffs = (-1)**(a+1)*self.npt.exp(2*a*np.log(2*np.pi)-self.lgamma(2*a+1))
+    
+    def get_per_dim_components(self, x0, x1, beta0, beta1):
+        p = len(beta0)
+        assert (beta0==0).all() and (beta1==0).all(), "KernelDSICombined does not support derivatives"
+        delta = (x0-x1)%1
+        kparts = [None]*4 
+        kparts[0] = bernoulli_poly(1,delta)
+        kparts[1] = bernoulli_poly(2,delta)
+        kparts[2] = bernoulli_poly(3,delta)
+        kparts[3] = bernoulli_poly(4,delta)
+        kparts = self.coeffs[:,None]*self.npt.stack(kparts,-2)
+        kperdim = self.npt.stack([kparts for j in range(p)],-2)
+        return kperdim
+
+    def combine_per_dim_components(self, kparts, beta0, beta1, c, batch_params):
+        scale = batch_params["scale"][...,0]
+        lengthscales = batch_params["lengthscales"]
+        kparts = (self.alpha[...,None,:]*kparts).sum(-3)
+        k = scale*((1+lengthscales[...,None,:]*kparts).prod(-1)*c).sum(-1)
+        return k
+
 class KernelDigShiftInvar(AbstractSIDSIKernel):
     
     r""" 
@@ -445,7 +623,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         
     def __init__(self,
             d,
-            t=None,
+            t = None,
             scale = 1., 
             lengthscales = None,
             alpha = 2,
@@ -667,11 +845,12 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             scale = 1., 
             lengthscales = None,
             alpha = 1,
-            shape_alpha = None,
             shape_scale = [1],
             shape_lengthscales = None, 
+            shape_alpha = None,
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
             tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps),
             torchify = False, 
             requires_grad_scale = True, 
             requires_grad_lengthscales = True, 
@@ -692,6 +871,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
+            tfs_alpha (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
             requires_grad_scale (bool): If `True` and `torchify`, set `requires_grad=True` for `scale`.
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
@@ -709,7 +889,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
             alpha_endsize_ops = [d],
             shape_scale = shape_scale,
             shape_lengthscales = shape_lengthscales,
-            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps), 
+            tfs_alpha = tfs_alpha, 
             tfs_scale = tfs_scale, 
             tfs_lengthscales = tfs_lengthscales, 
             torchify = torchify,
@@ -864,7 +1044,7 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
         
     def __init__(self,
             d,
-            t=None,
+            t = None,
             scale = 1., 
             lengthscales = None,
             alpha = 1.,
@@ -873,6 +1053,7 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
             shape_alpha = None,
             tfs_scale = (tf_exp_eps_inv,tf_exp_eps),
             tfs_lengthscales = (tf_exp_eps_inv,tf_exp_eps),
+            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps),
             torchify = False, 
             requires_grad_scale = True, 
             requires_grad_lengthscales = True,
@@ -890,6 +1071,7 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
             alpha (Union[np.ndarray,torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$. 
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`. 
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
+            shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             tfs_lengthscales (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             torchify (bool): If `True`, use the `torch` backend. Set to `True` if computing gradients with respect to inputs and/or hyperparameters.
@@ -909,7 +1091,7 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
             alpha_endsize_ops = [d],
             shape_scale = shape_scale,
             shape_lengthscales = shape_lengthscales, 
-            tfs_alpha = (tf_exp_eps_inv,tf_exp_eps), 
+            tfs_alpha = tfs_alpha, 
             tfs_scale = tfs_scale, 
             tfs_lengthscales = tfs_lengthscales, 
             torchify = torchify,

@@ -20,6 +20,10 @@
 
 ::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvar
 
+## `KernelDigShiftInvarCombined` 
+
+::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvarCombined
+
 ## `KernelDigShiftInvarAdaptiveAlpha` 
 
 ::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvarAdaptiveAlpha

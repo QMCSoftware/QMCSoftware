@@ -11,6 +11,8 @@ from .kernel import (
     KernelMatern52,
     KernelShiftInvar,
     KernelSI,
+    KernelShiftInvarCombined,
+    KernelSICombined,
     KernelDigShiftInvar,
     KernelDSI,
     KernelDigShiftInvarAdaptiveAlpha,
