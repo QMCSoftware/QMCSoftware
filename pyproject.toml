@@ -69,6 +69,7 @@ test = [
     "pytest == 8.3.5",
     "pytest-cov == 6.1.1",
     "phmutest == 1.0.1",
+    "pytest-accept == 0.1.10",
     ]
 test_torch = [
     "torch == 2.7.0",
@@ -82,14 +83,8 @@ test_botorch = [
 test_umbridge = [
     "umbridge == 1.2.4",
     ]
-dev = [ # brew install weasyprint
-    "qmcpy[test,test_gpytorch,test_botorch,test_umbridge]",
+docs = [
     "nbval >= 0.10.0",
-    "pytest-accept >= 0.1.10",
-    "jupyterlab >= 4.0.0",
-    "matplotlib >= 3.9.0",
-    "tueplots >= 0.2.0",
-    "pandas >= 2.0.0",
     "mkdocs >= 1.5.0",
     "mkdocs-material >= 9.6.12",
     "mkdocs-jupyter >= 0.25.0",
@@ -97,13 +92,20 @@ dev = [ # brew install weasyprint
     "mkdocs-with-pdf >= 0.9.3",
     "mkdocs-glightbox >= 0.4.0",
     "graphviz >= 0.20.0",
-    "scikit-learn >= 1.0.0",
-    "scikit-optimize >= 0.10.2",
+    "phmutest >= 1.0.1",
     "mkpdfs-mkdocs >= 1.0.1",
     "mkdocs-print-site-plugin >= 2.7.2",
     "mkdocs-exclude >= 1.0.2",
-    "phmutest >= 1.0.1",
     "pylint >= 2.14.4",
+]
+dev = [ # brew install weasyprint
+    "qmcpy[docs,test,test_gpytorch,test_botorch,test_umbridge]",
+    "jupyterlab >= 4.0.0",
+    "matplotlib >= 3.9.0",
+    "tueplots >= 0.2.0",
+    "pandas >= 2.0.0",
+    "scikit-learn >= 1.0.0",
+    "scikit-optimize >= 0.10.2",
 ]
 
 [tool.pdm.build]

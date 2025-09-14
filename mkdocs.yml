@@ -1,7 +1,10 @@
 site_name: "QMCPy"
 nav:
-  - Quasi Monte Carlo Software: index.md
-  - API:
+  - Quasi Monte Carlo Software: README.md
+  - Components: components.md
+  - Contributing: CONTRIBUTING.md
+  - Community: community.md
+  - Package Reference:
     - Discrete Distributions: api/discrete_distributions.md
     - True Measures: api/true_measures.md
     - Integrands: api/integrands.md
@@ -26,6 +29,7 @@ nav:
       - 2023 Probability of Failure Paper: demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb
       - 2023 Purdue Talk: demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb
       - 2023 PyData Chicago Talk: demos/talk_paper_demos/pydata.chi.2023.ipynb
+      - 2020 MCQMC Software Tutorial: demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial.ipynb
     - Blog Posts:
       - 2023 Random Lattice Generating Vectors: demos/lattice_random_generator.ipynb
       - 2022 Bayesian Cubature Stopping Criterion: demos/gaussian_diagnostics/gaussian_diagnostics_demo.ipynb
@@ -45,17 +49,11 @@ nav:
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
+      - Geometric Brownian Motion: demos/gbm_demo.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
-  - Development:
-    - Citing QMCPy: citation.md
-    - Community: community.md
-    - Contributing: CONTRIBUTING.md
-    - License: https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE
-    - Sponsors: sponsors.md
-    - Select References: select_references.md
   - Printable Docs: print_page/
 
 plugins:
