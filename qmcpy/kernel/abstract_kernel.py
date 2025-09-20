@@ -178,7 +178,7 @@ class AbstractKernel(object):
         batch_params = self.get_batch_params(x.ndim-1)
         return self.parsed_single_integral_01d(x,batch_params)
     
-    def parsed_single_integral_01d(self, x):
+    def parsed_single_integral_01d(self, x, batch_params):
         raise MethodImplementationError(self, 'parsed_single_integral_01d')
     
     def double_integral_01d(self):

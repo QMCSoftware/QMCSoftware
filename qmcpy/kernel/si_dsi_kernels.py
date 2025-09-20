@@ -494,7 +494,7 @@ class KernelShiftInvarCombined(AbstractSIDSIKernel):
         return kperdim
 
     def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params):
-        kparts = (self.alpha[...,None,:]*kparts).sum(-3)
+        kparts = (self.alpha[...,None,:,None,:]*kparts).sum(-3)
         return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params)
 
 class KernelDigShiftInvar(AbstractSIDSIKernel):
@@ -1147,5 +1147,5 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
         return kperdim
     
     def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params):
-        kparts = (self.alpha[...,None,:]*kparts).sum(-3)
+        kparts = (self.alpha[...,None,:,None,:]*kparts).sum(-3)
         return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params)
