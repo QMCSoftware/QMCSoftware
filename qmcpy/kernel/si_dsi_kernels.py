@@ -77,28 +77,33 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
     def double_integral_01d(self):
         return self.scale[...,0]
     
-    def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params):
+    def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params, stable):
         scale = batch_params["scale"][...,0]
         lengthscales = batch_params["lengthscales"]
         ind = 1.*((beta0+beta1)==0)
         v = 1 
         p = lengthscales[...,None,:]*kparts
-        v = p[...,0]
-        icp = ind[...,0]
-        for j in range(1,p.shape[-1]):
-            v = v*(ind[...,j]+p[...,j])+icp*p[...,j]
-            icp = icp*ind[...,j]
-        v = v-1.*(icp==0)
-        return scale*c.sum(-1),scale*(v*c).sum(-1)
+        sc = scale*c.sum(-1)
+        if stable:
+            v = p[...,0]
+            icp = ind[...,0]
+            for j in range(1,p.shape[-1]):
+                v = v*(ind[...,j]+p[...,j])+icp*p[...,j]
+                icp = icp*ind[...,j]
+            v = v-1.*(icp==0)
+            v = scale*(v*c).sum(-1)
+        else:
+            v = scale*((ind+p).prod(-1)*c).sum(-1)-sc
+        return sc,v
     
-    def combine_per_dim_components(self, kparts, beta0, beta1, c, batch_params):
-        a,v = self.combine_per_dim_components_raw_m1(kparts, beta0, beta1, c, batch_params)
-        k = a+v
+    def combine_per_dim_components(self, kparts, beta0, beta1, c, batch_params, stable):
+        sc,v = self.combine_per_dim_components_raw_m1(kparts, beta0, beta1, c, batch_params, stable)
+        k = sc+v
         return k
     
-    def parsed___call__(self, x0, x1, beta0, beta1, c, batch_params):
+    def parsed___call__(self, x0, x1, beta0, beta1, c, batch_params, stable=False):
         kparts = self.get_per_dim_components(x0,x1,beta0,beta1)
-        k = self.combine_per_dim_components(kparts,beta0,beta1,c,batch_params)
+        k = self.combine_per_dim_components(kparts,beta0,beta1,c,batch_params,stable)
         return k
 
 class KernelShiftInvar(AbstractSIDSIKernel):
@@ -184,8 +189,12 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         (4, 3, 6, 5)
         >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
         (4, 3, 6, 5, 5)
-        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        >>> kfast = kernel(x[:,None,:,None,:],x[None,:,None,:,:])
+        >>> kfast.shape
         (4, 3, 6, 6, 5, 5)
+        >>> kstable = kernel(x[:,None,:,None,:],x[None,:,None,:,:],stable=True)
+        >>> np.abs(kfast-kstable).max()
+        np.float64(4.440892098500626e-16)
 
         Derivatives 
 
@@ -242,7 +251,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         array([ 3003.79938927, -1517.15808005,   701.6700331 ,  1470.42580601])
         >>> np.allclose(ynp,y.numpy())
         True
-        
+
     **References:** 
     
     1.  Kaarnioja, Vesa, Frances Y. Kuo, and Ian H. Sloan.  
@@ -402,8 +411,12 @@ class KernelShiftInvarCombined(AbstractSIDSIKernel):
         (4, 3, 6, 5)
         >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
         (4, 3, 6, 5, 5)
-        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        >>> kfast = kernel(x[:,None,:,None,:],x[None,:,None,:,:])
+        >>> kfast.shape
         (4, 3, 6, 6, 5, 5)
+        >>> kstable = kernel(x[:,None,:,None,:],x[None,:,None,:,:],stable=True)
+        >>> np.abs(kfast-kstable).max()
+        np.float64(3.552713678800501e-15)
         
     **References:** 
     
@@ -493,9 +506,9 @@ class KernelShiftInvarCombined(AbstractSIDSIKernel):
         kperdim = self.npt.stack([kparts for j in range(p)],-2)
         return kperdim
 
-    def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params):
+    def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params, stable):
         kparts = (self.alpha[...,None,:,None,:]*kparts).sum(-3)
-        return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params)
+        return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params,stable)
 
 class KernelDigShiftInvar(AbstractSIDSIKernel):
     
@@ -539,7 +552,7 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         ...     lengthscales = [1/j**2 for j in range(1,d+1)])
         >>> k00 = kernel(x[0],x[0])
         >>> k00.item()
-        34.49037002918452
+        34.490370029184525
         >>> k0 = kernel(x,x[0])
         >>> with np.printoptions(precision=2):
         ...     print(k0)
@@ -603,8 +616,12 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         (4, 3, 6, 5)
         >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
         (4, 3, 6, 5, 5)
-        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        >>> kfast = kernel(x[:,None,:,None,:],x[None,:,None,:,:])
+        >>> kfast.shape
         (4, 3, 6, 6, 5, 5)
+        >>> kstable = kernel(x[:,None,:,None,:],x[None,:,None,:,:],stable=True)
+        >>> np.abs(kfast-kstable).max()
+        np.float64(4.440892098500626e-16)
 
     **References:**
         
@@ -773,7 +790,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         ...     lengthscales = [1/j**2 for j in range(1,d+1)])
         >>> k00 = kernel(x[0],x[0])
         >>> k00.item()
-        48.08465608465609
+        48.084656084656096
         >>> k0 = kernel(x,x[0])
         >>> with np.printoptions(precision=2):
         ...     print(k0)
@@ -837,8 +854,12 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         (4, 3, 6, 5)
         >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
         (4, 3, 6, 5, 5)
-        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        >>> kfast = kernel(x[:,None,:,None,:],x[None,:,None,:,:])
+        >>> kfast.shape
         (4, 3, 6, 6, 5, 5)
+        >>> kstable = kernel(x[:,None,:,None,:],x[None,:,None,:,:],stable=True)
+        >>> np.abs(kfast-kstable).max()
+        np.float64(4.440892098500626e-16)
 
     **References:**
         
@@ -941,7 +962,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         flog2deltas = self.npt.stack([flog2delta for j in range(p)],-2)
         return flog2deltas
     
-    def combine_per_dim_components_raw_m1(self, flog2deltas, beta0, beta1, c, batch_params):
+    def combine_per_dim_components_raw_m1(self, flog2deltas, beta0, beta1, c, batch_params, stable):
         alpha = batch_params["alpha"]
         p2alphap1 = 2**(alpha+1)
         nu = p2alphap1/(p2alphap1-2)
@@ -949,7 +970,7 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         s = (nu+1)*2**(alpha*(flog2deltas+1))
         kparts = nu-s
         kparts[neginfs] = (nu-0*s)[neginfs]
-        return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params)
+        return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params,stable)
     
 class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
     
@@ -1043,8 +1064,12 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
         (4, 3, 6, 5)
         >>> kernel(x[:,:,None,:],x[:,None,:,:]).shape
         (4, 3, 6, 5, 5)
-        >>> kernel(x[:,None,:,None,:],x[None,:,None,:,:]).shape
+        >>> kfast = kernel(x[:,None,:,None,:],x[None,:,None,:,:])
+        >>> kfast.shape
         (4, 3, 6, 6, 5, 5)
+        >>> kstable = kernel(x[:,None,:,None,:],x[None,:,None,:,:],stable=True)
+        >>> np.abs(kfast-kstable).max()
+        np.float64(8.881784197001252e-16)
     """
         
     def __init__(self,
@@ -1146,6 +1171,6 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
         kperdim = self.npt.stack([kparts for j in range(p)],-2)
         return kperdim
     
-    def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params):
+    def combine_per_dim_components_raw_m1(self, kparts, beta0, beta1, c, batch_params, stable):
         kparts = (self.alpha[...,None,:,None,:]*kparts).sum(-3)
-        return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params)
+        return super().combine_per_dim_components_raw_m1(kparts,beta0,beta1,c,batch_params,stable)

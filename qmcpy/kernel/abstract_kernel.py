@@ -61,7 +61,7 @@ class AbstractKernel(object):
     def get_batch_params(self, ndim):
         return {pname: insert_batch_dims(batch_param,ndim,-1) for pname,batch_param in self.batch_params.items()}
     
-    def __call__(self, x0, x1, beta0=None, beta1=None, c=None):
+    def __call__(self, x0, x1, beta0=None, beta1=None, c=None, **kwargs):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
@@ -73,6 +73,7 @@ class AbstractKernel(object):
             beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
             beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
             c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
+            kwargs (dict): keyword arguments to parsed call
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations. 
         """
@@ -104,11 +105,11 @@ class AbstractKernel(object):
         assert c.shape==(p,), "expected c.shape=(%d,) but got c.shape=%s"%(p,str(tuple(c.shape)))
         if not self.AUTOGRADKERNEL:
             batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
-            k = self.compiled_parsed___call__(x0,x1,beta0,beta1,c,batch_params)
+            k = self.compiled_parsed___call__(x0,x1,beta0,beta1,c,batch_params,**kwargs)
         else:
             if (beta0==0).all() and (beta1==0).all():
                 batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
-                k = c.sum()*self.compiled_parsed___call__(x0,x1,batch_params)
+                k = c.sum()*self.compiled_parsed___call__(x0,x1,batch_params,**kwargs)
             else: # requires autograd, so self.npt=torch
                 assert self.torchify, "autograd requires torchify=True"
                 import torch
@@ -134,7 +135,7 @@ class AbstractKernel(object):
                     x1g = x1
                 batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
                 k = 0.
-                k_base = self.compiled_parsed___call__(x0g,x1g,batch_params)
+                k_base = self.compiled_parsed___call__(x0g,x1g,batch_params,**kwargs)
                 for l in range(p):
                     if (beta0[l]>0).any() or (beta1[l]>0).any():
                         k_part = k_base.clone()
