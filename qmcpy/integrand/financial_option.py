@@ -313,6 +313,12 @@ class FinancialOption(AbstractIntegrand):
             self.payoff = self.payoff_lookback_call if self.call_put=='CALL' else self.payoff_lookback_put
         elif self.option=="DIGITAL":
             self.payoff = self.payoff_digital_call if self.call_put=='CALL' else self.payoff_digital_put
+        elif self.option == "AMERICAN":
+            if self.call_put == "PUT":
+                self.payoff = self.payoff_american_put
+            else:
+                self.payoff = self.payoff_american_call
+
         else:
             raise ParameterError("invalid option type %s"%self.option)
         super(FinancialOption,self).__init__(dimension_indv=dim_shape,dimension_comb=dim_shape,parallel=False)  
@@ -320,6 +326,10 @@ class FinancialOption(AbstractIntegrand):
     def g(self, t, **kwargs):
         gbm = self.gbm(t)
         discounted_payoffs = self.payoff(gbm)*self.discount_factor
+        if self.option == "AMERICAN":
+            discounted_payoffs = self.payoff(gbm)
+        else:
+            discounted_payoffs = self.payoff(gbm) * self.discount_factor
         if self.multilevel:
             if self.level==0:
                 discounted_payoffs_coarse = np.zeros_like(discounted_payoffs)
@@ -430,6 +440,22 @@ class FinancialOption(AbstractIntegrand):
     
     def payoff_digital_put(self, gbm):
         return np.where(gbm[...,-1]<=self.strike_price,self.digital_payout,0)
+    def _basis_functions(self, x: np.ndarray) -> np.ndarray:
+        """
+        Basis functions for Longstaff-Schwartz regression.
+        Args:
+            x: stock price(s), shape (n_paths,)
+        Returns:
+            (n_paths, n_basis)
+        """
+        x = np.asarray(x)
+        return np.column_stack([
+            np.ones_like(x),
+            x,
+            x**2
+        ])
+
+
     
     def get_exact_value(self):
         """
@@ -467,6 +493,59 @@ class FinancialOption(AbstractIntegrand):
             raise ParameterError("exact value not supported for option = %s"%self.option)
         return fp
     
+    def payoff_american_put(self, gbm: np.ndarray) -> np.ndarray:
+        orig_shape = gbm.shape[:-1]  # everything except time dimension
+        gbm_reshaped = gbm.reshape(-1, gbm.shape[-1])  # flatten leading dims
+        n_paths, n_times = gbm_reshaped.shape
+
+        dt = self.t_final / (n_times - 1)
+        disc = np.exp(-self.interest_rate * dt)
+
+        putpayoff = np.maximum(self.strike_price - gbm_reshaped, 0)
+        cashflow = putpayoff[:, -1].copy()
+
+        for t in range(n_times - 2, 0, -1):
+            itm = np.where(putpayoff[:, t] > 0)[0]
+            if itm.size > 0:
+                X = self._basis_functions(gbm_reshaped[itm, t])
+                Y = cashflow[itm] * (disc ** (n_times - 1 - t))
+                coeffs, _, _, _ = np.linalg.lstsq(X, Y, rcond=None)
+                continuation = X @ coeffs
+                exercise = putpayoff[itm, t]
+                ex_idx = itm[exercise > continuation]
+                cashflow[ex_idx] = exercise[exercise > continuation] * (disc ** t)
+
+        return cashflow.reshape(orig_shape)  # restore leading dims
+
+
+
+
+    def payoff_american_call(self, gbm: np.ndarray) -> np.ndarray:
+        """
+        American call via Longstaff-Schwartz regression.
+        If no dividends, this should collapse to European call.
+        """
+        n_paths, n_times = gbm.shape
+        dt = self.t_final / (n_times - 1)
+        disc = np.exp(-self.interest_rate * dt)
+
+        callpayoff = np.maximum(gbm - self.strike_price, 0)
+        cashflow = callpayoff[:, -1].copy()
+
+        for t in range(n_times - 2, 0, -1):
+            itm = np.where(callpayoff[:, t] > 0)[0]
+            if itm.size > 0:
+                X = self._basis_functions(gbm[itm, t])
+                Y = cashflow[itm] * (disc ** (n_times - 1 - t))
+                coeffs, _, _, _ = np.linalg.lstsq(X, Y, rcond=None)
+                continuation = X @ coeffs
+                exercise = callpayoff[itm, t]
+                ex_idx = itm[exercise > continuation]
+                cashflow[ex_idx] = exercise[exercise > continuation] * (disc ** t)
+
+        return cashflow
+
+
     def get_exact_value_inf_dim(self):
         r"""
         Get the exact analytic fair price of the option in infinite dimensions. Supports 
@@ -556,3 +635,7 @@ class DigitalOption(FinancialOption):
         if "option" in kwargs:
             raise ParameterError("please do not pass 'option' to DigitalOption")
         super(DigitalOption,self).__init__(*args, **kwargs, option="DIGITAL")
+
+
+
+
