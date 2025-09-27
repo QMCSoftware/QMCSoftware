@@ -27,6 +27,20 @@ _DISCREPANCY = {
 class MPMC(AbstractLDDiscreteDistribution):
     """
     Low-discrepancy generator trained by MPMC. Produces nbatch independent pointsets of size n in [0,1]^d.
+    
+    Examples:    
+        >>> mpmc = MPMC(dimension=2, loss_fn='L2dis', epochs=100)
+        >>> points = mpmc.gen_samples(n=50)  # doctest: +SKIP
+        >>> points.shape  # doctest: +SKIP
+        (50, 2)
+        >>> mpmc
+        MPMC Generator Object
+            dimension       2
+            randomize       SHIFT
+            loss_fn         L2dis
+            epochs          100
+            lr              0.001
+            nhid            32
     """
 
     def __init__(
