@@ -493,57 +493,60 @@ class FinancialOption(AbstractIntegrand):
             raise ParameterError("exact value not supported for option = %s"%self.option)
         return fp
     
-    def payoff_american_put(self, gbm: np.ndarray) -> np.ndarray:
-        orig_shape = gbm.shape[:-1]  # everything except time dimension
-        gbm_reshaped = gbm.reshape(-1, gbm.shape[-1])  # flatten leading dims
-        n_paths, n_times = gbm_reshaped.shape
+    def _fit_and_apply_longstaff_schwartz(self, gbm: np.ndarray, is_call: bool):
+        if not hasattr(self, "_american_paths"):
+            self._american_paths = gbm.copy()
+        else:
+            self._american_paths = np.concatenate([self._american_paths, gbm], axis=0)
 
+        gbm_all = self._american_paths
+        n_paths, n_times = gbm_all.shape
         dt = self.t_final / (n_times - 1)
         disc = np.exp(-self.interest_rate * dt)
 
-        putpayoff = np.maximum(self.strike_price - gbm_reshaped, 0)
-        cashflow = putpayoff[:, -1].copy()
+        
+        payoff = np.maximum(gbm_all - self.strike_price, 0) if is_call else np.maximum(self.strike_price - gbm_all, 0)
+
+        
+        cashflow = payoff[:, -1].copy()
+        exercise_time = np.full(n_paths, n_times - 1, dtype=int)
 
         for t in range(n_times - 2, 0, -1):
-            itm = np.where(putpayoff[:, t] > 0)[0]
-            if itm.size > 0:
-                X = self._basis_functions(gbm_reshaped[itm, t])
-                Y = cashflow[itm] * (disc ** (n_times - 1 - t))
+            itm = payoff[:, t] > 0
+            if np.any(itm):
+                X = self._basis_functions(gbm_all[itm, t])
+                Y = cashflow[itm] * disc  
                 coeffs, _, _, _ = np.linalg.lstsq(X, Y, rcond=None)
-                continuation = X @ coeffs
-                exercise = putpayoff[itm, t]
-                ex_idx = itm[exercise > continuation]
-                cashflow[ex_idx] = exercise[exercise > continuation] * (disc ** t)
+                continuation = (X @ coeffs)
+                exercise = payoff[itm, t]
+                ex_now = exercise > continuation
+                
+                ex_idx = np.where(itm)[0][ex_now]
+                cashflow[ex_idx] = exercise[ex_now]
+                exercise_time[ex_idx] = t
 
-        return cashflow.reshape(orig_shape)  # restore leading dims
+        
+        discounted_cf = cashflow * np.exp(-self.interest_rate * exercise_time * dt)
 
+        
+        start_idx = gbm_all.shape[0] - gbm.shape[0]
+        return discounted_cf[start_idx:]
 
+    def payoff_american_put(self, gbm: np.ndarray) -> np.ndarray:
+  
+        orig_shape = gbm.shape[:-1]
+        gbm_reshaped = gbm.reshape(-1, gbm.shape[-1])
 
+        cashflow_new = self._fit_and_apply_longstaff_schwartz(gbm_reshaped, is_call=False)
+        return cashflow_new.reshape(orig_shape)
 
     def payoff_american_call(self, gbm: np.ndarray) -> np.ndarray:
-        """
-        American call via Longstaff-Schwartz regression.
-        If no dividends, this should collapse to European call.
-        """
-        n_paths, n_times = gbm.shape
-        dt = self.t_final / (n_times - 1)
-        disc = np.exp(-self.interest_rate * dt)
+        orig_shape = gbm.shape[:-1]
+        gbm_reshaped = gbm.reshape(-1, gbm.shape[-1])
 
-        callpayoff = np.maximum(gbm - self.strike_price, 0)
-        cashflow = callpayoff[:, -1].copy()
+        cashflow_new = self._fit_and_apply_longstaff_schwartz(gbm_reshaped, is_call=True)
+        return cashflow_new.reshape(orig_shape)
 
-        for t in range(n_times - 2, 0, -1):
-            itm = np.where(callpayoff[:, t] > 0)[0]
-            if itm.size > 0:
-                X = self._basis_functions(gbm[itm, t])
-                Y = cashflow[itm] * (disc ** (n_times - 1 - t))
-                coeffs, _, _, _ = np.linalg.lstsq(X, Y, rcond=None)
-                continuation = X @ coeffs
-                exercise = callpayoff[itm, t]
-                ex_idx = itm[exercise > continuation]
-                cashflow[ex_idx] = exercise[exercise > continuation] * (disc ** t)
-
-        return cashflow
 
 
     def get_exact_value_inf_dim(self):
