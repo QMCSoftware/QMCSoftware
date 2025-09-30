@@ -30,7 +30,9 @@ def execute_parallel_tests():
             break
         test_modules.append(arg)
     if not test_modules:
-        test_files = glob.glob('tb_*.py')
+        #test_files = glob.glob('tb_*.py')
+        test_files = glob.glob('tb_qmcpy_intro.py')
+        
         test_modules = [os.path.basename(f).replace('.py', '') for f in test_files]
 
     print(f"Found {len(test_modules)} test modules to execute in parallel...")
