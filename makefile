@@ -82,15 +82,19 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	fi && \
 	cd ../..
 
-# make booktests_parallel_no_docker  TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
+# Usage:
+# make booktests_parallel_no_docker TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures" UARGS="-v --failfast"
+
 booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
-	@echo "\nNotebook tests with Parsl"
-	pip install -q -e ".[test]"  && \
-	cd test/booktests/ && \
-	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
+	@echo "Notebook tests with Parsl"
+	pip install -q -e ".[test]" parsl>=2024.12.0 && \
+	cd test/booktests && \
+	rm -rf *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -rf logs runinfo prob_failure_gp_ci_plots && \
+	PARSL_WORKERS=$$(nproc || echo 2) \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py $(TESTS) -v --failfast && \
-	cd ../.. 
+	PYTHONPATH=. \
+	python ../../parsl_unittest_runner.py $(TESTS) $(UARGS) && \
+	cd ../..
 
 tests: 
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
