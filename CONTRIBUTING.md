@@ -37,7 +37,9 @@ make tests_no_docker
 
 Testbook tests are recommended to run in parallel using the following command.
 
+```
 make booktests_parallel_no_docker
+```
 
 Optionally, you may install [Docker](https://www.docker.com/products/docker-desktop/) and then run all tests with
 
