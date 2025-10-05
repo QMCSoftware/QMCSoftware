@@ -2,98 +2,6 @@ from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import DistributionCompatibilityError, ParameterError, MethodImplementationError, _univ_repr
 import numpy as np
 
-# Diagnostic flag and utility for all stopping criteria
-IS_PRINT_DIAGNOSTIC = False
-
-def print_diagnostic(label, data):
-    """
-    Print diagnostic information for integration state.
-    Args:
-        label (str): Label for the diagnostic print (e.g., '[RESUME] Before resuming:').
-        data (object): Data object containing integration state.
-    """
-    solution = getattr(data, 'solution', None)
-    m = getattr(data, 'm', None)
-    n_total = getattr(data, 'n_total', None)
-    n_min = getattr(data, 'n_min', None)
-    xfull = getattr(data, 'xfull', None)
-    
-    # Safely handle solution display
-    try:
-        solution_display = solution[0] if solution is not None and hasattr(solution, '__len__') and len(solution) > 0 else solution
-    except (TypeError, IndexError):
-        solution_display = solution
-    
-    # For convergence check steps, if solution is NaN, try to show current best estimate
-    if (solution_display is not None and isinstance(solution_display, float) and 
-        solution_display != solution_display and  # Check for NaN
-        'After convergence check' in label):
-        # Try different fallback estimates in order of preference
-        best_estimate = None
-        
-        # Try muhat first
-        muhat = getattr(data, 'muhat', None)
-        if muhat is not None:
-            try:
-                muhat_display = muhat[0] if hasattr(muhat, '__len__') and len(muhat) > 0 else muhat
-                if muhat_display is not None and not (isinstance(muhat_display, float) and muhat_display != muhat_display):
-                    best_estimate = muhat_display
-            except (TypeError, IndexError):
-                pass
-        
-        # If muhat doesn't work, try computing from yfull
-        if best_estimate is None:
-            yfull = getattr(data, 'yfull', None)
-            if yfull is not None and hasattr(yfull, 'size') and yfull.size > 0:
-                try:
-                    # Compute mean of finite values
-                    finite_values = yfull[np.isfinite(yfull)]
-                    if len(finite_values) > 0:
-                        best_estimate = np.mean(finite_values)
-                except (TypeError, IndexError, AttributeError):
-                    pass
-        
-        # Use the best estimate if we found one
-        if best_estimate is not None:
-            solution_display = best_estimate
-    
-    # Safely handle m display    
-    try:
-        m_display = int(m[0]) if m is not None and hasattr(m, '__len__') and len(m) > 0 else (int(m) if m is not None else None)
-    except (TypeError, IndexError):
-        m_display = int(m) if m is not None else None
-    n_total_display = int(n_total) if n_total is not None else None
-    xfull_shape = getattr(xfull, 'shape', None)
-    n_total_formatted = f"{n_total_display:>10}" if n_total_display is not None else f"{'None':>10}"
-    # Safely handle solution display for formatting
-    if solution_display is not None:
-        if isinstance(solution_display, (int, float)):
-            # Scalar case
-            if np.isnan(solution_display):
-                solution_formatted = f"{'nan':>10}"
-            else:
-                solution_formatted = f"{solution_display:>10.7f}"
-        else:
-            # Array case - convert to scalar if possible, otherwise show summary
-            try:
-                if hasattr(solution_display, 'shape') and solution_display.shape == ():
-                    # 0-dimensional array
-                    scalar_val = solution_display.item()
-                    solution_formatted = f"{scalar_val:>10.7f}" if not np.isnan(scalar_val) else f"{'nan':>10}"
-                elif hasattr(solution_display, '__len__') and len(solution_display) == 1:
-                    # Single element array
-                    scalar_val = solution_display[0]
-                    solution_formatted = f"{scalar_val:>10.7f}" if not np.isnan(scalar_val) else f"{'nan':>10}"
-                else:
-                    # Multi-element array - show summary
-                    solution_formatted = f"{'[array]':>10}"
-            except (TypeError, IndexError, AttributeError):
-                solution_formatted = f"{'[complex]':>10}"
-    else:
-        solution_formatted = f"{'None':>10}"
-    m_formatted = f"{m_display:>4}" if m_display is not None else f"{'None':>4}"
-    n_min_formatted = f"{n_min:>10}" if n_min is not None else f"{'None':>10}"
-    print(f"{label}: solution: {solution_formatted}, n_total: {n_total_formatted}, n_min: {n_min_formatted}, m: {m_formatted}, xfull.shape: {xfull_shape}")
 
 class AbstractStoppingCriterion(object):
     
@@ -123,7 +31,7 @@ class AbstractStoppingCriterion(object):
         if not hasattr(self,'parameters'):
             self.parameters = []
             
-    def integrate(self, resume=None):
+    def integrate(self):
         """
         *Abstract method* to determine the number of samples needed to satisfy the tolerance(s).
 
