@@ -158,7 +158,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
                  abs_tol = 1e-2, 
                  rel_tol = 0., 
                  n_init = 2**10,
-                 n_limit = 2**30,
+                 n_max = 2**30,
                  error_fun = "EITHER",
                  fudge = lambda m: 5.*2.**(-m), 
                  check_cone = False,
@@ -170,7 +170,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
             n_init (int): Initial number of samples. 
-            n_limit (int): Maximum number of samples.
+            n_max (int): Maximum number of samples.
             error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
                 - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
@@ -187,13 +187,12 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             check_cone (bool): Whether or not to check if the function falls in the cone.
             ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
         """
-        super(CubQMCLatticeG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,check_cone,
+        super().__init__(integrand,abs_tol,rel_tol,n_init,n_max,fudge,check_cone,
             control_variates = [],
             control_variate_means = [],
             update_beta = False,
             ptransform = ptransform,
-            ft = fftbr,
-            omega = omega_fftbr,
+            coefv = fftbr,
             allowed_distribs = [Lattice],
             cast_complex = True,
             error_fun = error_fun)

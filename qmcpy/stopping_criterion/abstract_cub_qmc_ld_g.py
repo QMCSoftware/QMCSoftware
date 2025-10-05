@@ -10,72 +10,64 @@ import warnings
 
 class AbstractCubQMCLDG(AbstractStoppingCriterion):
     
-    def __init__(self, integrand, abs_tol, rel_tol, n_init, n_limit, fudge, check_cone,
+    def __init__(self, integrand, abs_tol, rel_tol, n_init, n_max, fudge, check_cone,
         control_variates, control_variate_means, update_beta, ptransform,
-        ft, omega, allowed_distribs, cast_complex, error_fun):
-        self.parameters = ['abs_tol','rel_tol','n_init','n_limit']
+        coefv, allowed_distribs, cast_complex, error_fun):
+        self.parameters = ['abs_tol','rel_tol','n_init','n_max']
         # Input Checks
-        if np.log2(n_init)%1!=0 or n_init<2**8:
-            warnings.warn('n_init must be a power of two at least 2**8. Using n_init = 2**8',ParameterWarning)
-            n_init = 2**8
-        if np.log2(n_limit)%1!=0:
-            warnings.warn('n_init must be a power of two. Using n_limit = 2**30',ParameterWarning)
-            n_limit = 2**30
-        # Set Attributes
-        self.n_init = int(n_init)
-        self.m_init = int(np.log2(n_init))
-        self.n_limit = int(n_limit)
-        assert isinstance(error_fun,str) or callable(error_fun)
-        if isinstance(error_fun,str):
-            if error_fun.upper()=="EITHER":
-                error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
-            elif error_fun.upper()=="BOTH":
-                error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
+        self.abs_tol = float(abs_tol)
+        self.rel_tol = float(rel_tol)
+        m_min = np.log2(n_init)
+        m_max = np.log2(n_max)
+        if m_min%1 != 0. or m_min < 8. or m_max%1 != 0.:
+            warning_s = '''
+                n_init and n_max must be a powers of 2.
+                n_init must be >= 2^8.
+                Using n_init = 2^10 and n_max=2^35.'''
+            warnings.warn(warning_s, ParameterWarning)
+            m_min = 10.
+            m_max = 35.
+        self.n_init = 2.**m_min
+        self.n_max = 2.**m_max
+        self.m_min = m_min
+        self.m_max = m_max
+        self.fudge = fudge
+        self.check_cone = check_cone
+        self.coefv = coefv
+        self.ptransform = ptransform
+        self.cast_complex = cast_complex
+        # Handle error_fun conversion from string to function
+        if isinstance(error_fun, str):
+            if error_fun.upper() == "EITHER":
+                error_fun = lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)
+            elif error_fun.upper() == "BOTH":
+                error_fun = lambda sv, abs_tol, rel_tol: np.minimum(abs_tol, abs(sv) * rel_tol)
             else:
                 raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
         self.error_fun = error_fun
-        self.fudge = fudge
-        self.check_cone = check_cone
-        self.ft = ft
-        self.omega = omega
-        self.ptransform = ptransform
-        self.cast_complex = cast_complex
-        self.r_lag = 4
-        self.omg_circ = lambda m: 2**(-m)
-        self.l_star = int(self.m_init-self.r_lag)
-        self.omg_hat = lambda m: self.fudge(m)/((1+self.fudge(self.r_lag))*self.omg_circ(self.r_lag))
-        # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        super(AbstractCubQMCLDG,self).__init__(allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
-        assert self.integrand.discrete_distrib.no_replications==True, "Require the discrete distribution has replications=None"
-        assert self.integrand.discrete_distrib.randomize!="FALSE", "Require discrete distribution is randomized"
-        self.set_tolerance(abs_tol,rel_tol)
-        # control variates
-        self.cv_mu = np.atleast_1d(control_variate_means)
-        self.cv = control_variates
-        if isinstance(self.cv,AbstractIntegrand):
-            self.cv = [self.cv]
-            self.cv_mu = self.cv_mu[None,...]
-        assert isinstance(self.cv,list), "cv must be a list of AbstractIntegrand objects"
+        self.d = self.discrete_distrib.d
+        self.d_indv = self.integrand.d_indv
+        self.cv = list(np.atleast_1d(control_variates))
+        self.ncv = len(self.cv)
+        self.cv_mu = np.array(control_variate_means) if self.ncv>0 else np.empty((self.ncv,)+self.d_indv)
+        if self.ncv > 0:
+            self.cv_mu = self.cv_mu if self.cv_mu.ndim>1 else self.cv_mu.reshape(self.ncv,-1)
+        self.is_first_resume_iteration = False
+        if self.cv_mu.shape!=((self.ncv,)+self.d_indv):
+            raise ParameterError('''Control variate means should have shape (len(control variates),d_indv).''')
         for cv in self.cv:
-            if (not isinstance(cv,AbstractIntegrand)) or (cv.discrete_distrib!=self.discrete_distrib) or (cv.d_indv!=self.integrand.d_indv):
+            if (cv.discrete_distrib!=self.discrete_distrib) or (not isinstance(cv,AbstractIntegrand)) or (cv.d_indv!=self.d_indv):
                 raise ParameterError('''
                         Each control variates discrete distribution must be an AbstractIntegrand instance 
                         with the same discrete distribution as the main integrand. d_indv must also match 
                         that of the main integrand instance for each control variate.''')
-        self.ncv = len(self.cv)
         self.update_beta = update_beta
-        # Internal consecutive solution change detection parameters (hardcoded)
-        self.max_consecutive_unchanged = 3  # Stop after 3 consecutive unchanged solutions
-        self.solution_change_tol = 1e-12   # Tolerance for "no change"
         if self.ncv>0:
-            assert self.cv_mu.shape==((self.ncv,)+self.integrand.d_indv), "Control variate means should have shape (len(control variates),d_indv)."
             self.parameters += ['cv','cv_mu','update_beta']
-        else:
-            self.update_beta = False
-        self.vlstsq = np.vectorize(lambda x,y: np.linalg.lstsq(x.T,y,rcond=None)[0],signature="(k,m),(m)->(k)")
+        super().__init__(allowed_distribs=allowed_distribs,allow_vectorized_integrals=True)
     
     def _update_kappanumap(self, kappanumap, ytildefull, mfrom, mto, m):
         for l in range(int(mfrom),int(mto),-1):
@@ -173,242 +165,126 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         t_start = time()
         if resume is not None:
             # Resume from previous state
-            data = resume
-            if IS_PRINT_DIAGNOSTIC:
-                print_diagnostic('[RESUME] Resuming from data', data)
-            if hasattr(data, 'n_total'):
+            self.data = resume
+            if hasattr(self.data, 'n_total'):
                 # Set n_min to n_total so next batch starts after previous samples
-                data.n_min = int(data.n_total)
-                # Set n_max to min of (2 * n_min, discrete_distrib.n_limit) to avoid exceeding limit
-                data.n_max = int(min(2 * data.n_min, self.discrete_distrib.n_limit))
-                if IS_PRINT_DIAGNOSTIC:
-                    print_diagnostic('[RESUME] After setting n_min/n_max', data)
+                self.data.n_min = int(self.data.n_total)
+            self.is_first_resume_iteration = True
+            if IS_PRINT_DIAGNOSTIC:
+                print_diagnostic('[RESUME] Resuming from data', self.data)
         else:
             # Initialize from scratch
-            data = Data(
+            self.data = Data(
                 parameters = [
                     'solution',
                     'comb_bound_low',
                     'comb_bound_high',
-                    'comb_bound_diff',
                     'comb_flags',
                     'n_total',
                     'n',
                     'time_integrate'])
-            data.flags_indv = np.tile(False,self.integrand.d_indv)
-            data.compute_flags = np.tile(True,self.integrand.d_indv)
-            data.n = np.tile(self.n_init,self.integrand.d_indv)
-            data.n_min = 0 
-            data.n_max = self.n_init
-            data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
-            data.xfull = np.empty((0,self.integrand.d))
-            data.yfull = np.empty(self.integrand.d_indv+(0,))
-            if self.ncv>0:
-                data.ycvfull = np.empty(self.integrand.d_indv+(self.ncv,0))
-            data.bounds_half_width = np.tile(np.inf,self.integrand.d_indv)
-            data.muhat = np.tile(np.nan,self.integrand.d_indv)
-            data.beta = np.tile(np.nan,self.integrand.d_indv+(self.ncv,))
-            data.ytildefull = None  # Will be initialized on first iteration
-            data.kappanumap = None  # Will be initialized on first iteration
-            # Track consecutive solution changes for early stopping
-            data.previous_solutions = []  # Store last few solutions for convergence detection
-            data.consecutive_unchanged_count = 0  # Counter for unchanged solutions
-            if self.ncv>0:
-                data.ycvtildefull = None  # Will be initialized on first iteration
-        
-        if IS_PRINT_DIAGNOSTIC:
-            print_diagnostic('[INIT] Initial data state', data)
+            self.data.flags_indv = np.tile(False,self.integrand.d_indv)
+            self.data.compute_flags = np.tile(True,self.integrand.d_indv)
+            self.data.m = np.tile(self.m_min,self.integrand.d_indv)
+            self.data.n_min = 0
+            self.data.indv_bound_low = np.tile(-np.inf,self.integrand.d_indv)
+            self.data.indv_bound_high = np.tile(np.inf,self.integrand.d_indv)
+            self.data.solution_indv = np.tile(np.nan,self.integrand.d_indv)
+            self.data.solution = np.nan
+            self.data.xfull = np.empty((0,self.integrand.d))
+            self.data.yfull = np.empty((0,)+self.integrand.d_indv)
+            self.is_first_resume_iteration = False
             
         while True:
-            m = int(np.log2(data.n_max))
-            if IS_PRINT_DIAGNOSTIC:
-                print_diagnostic(f'[ITER] Start iteration m={m}', data)
-            xnext = self.discrete_distrib(n_min=data.n_min,n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull,xnext],0)
-            ynext = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=data.compute_flags)
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull,ynext],-1)
+            m = self.data.m.max()
+            n_min = self.data.n_min
+            n_max = int(2**m)
+            n = int(n_max-n_min)
             
-            if IS_PRINT_DIAGNOSTIC:
-                print_diagnostic(f'[ITER] After sampling n_min={data.n_min} to n_max={data.n_max}', data)
-            if self.ncv>0:
-                ycvnext = [None]*self.ncv
-                for k in range(self.ncv):
-                    ycvnext_k = self.cv[k].f(xnext,periodization_transform=self.ptransform,compute_flags=data.compute_flags)
-                    ycvnext_k[~data.compute_flags] = np.nan
-                    ycvnext[k] = ycvnext_k
-                ycvnext = np.stack(ycvnext,-2)
-                data.ycvfull = np.concatenate([data.ycvfull,ycvnext],-1)
-            mllstart = m-self.r_lag-1
-            nllstart = 2**mllstart
-            if data.ytildefull is None: # first iteration (or first iteration after resume)
-                n = int(2**m)
-                data.ytildefull = self.ft(ynext)/np.sqrt(n)
-                data.kappanumap = self._update_kappanumap(np.tile(np.arange(n),self.integrand.d_indv+(1,)),data.ytildefull,m-1,0,m)
-                if self.ncv>0:
-                    data.ycvtildefull = self.ft(ycvnext)/np.sqrt(n)
-                    data.beta = self._beta_update(data.beta,data.kappanumap,data.ytildefull,data.ycvtildefull,mllstart)
-                    data.ytildefull = data.ytildefull-(data.ycvtildefull*data.beta[...,None]).sum(-2)
-                    data.kappanumap = self._update_kappanumap(np.tile(np.arange(n),self.integrand.d_indv+(1,)),data.ytildefull,m-1,0,m)
-            else: # any iteration after the first
-                mnext = int(m-1)
-                n = int(2**mnext)
-                if not self.update_beta: # do not update the beta coefficients
-                    if self.ncv>0:
-                        ynext[data.compute_flags] = ynext[data.compute_flags]-(ycvnext[data.compute_flags]*data.beta[data.compute_flags,:,None]).sum(-2)
-                    ytildeomega = self.omega(mnext)*self.ft(ynext[data.compute_flags])/np.sqrt(n)
-                    ytildefull_next = np.nan*np.ones_like(data.ytildefull)
-                    ytildefull_next[data.compute_flags] = (data.ytildefull[data.compute_flags]-ytildeomega)/2
-                    data.ytildefull[data.compute_flags] = (data.ytildefull[data.compute_flags]+ytildeomega)/2
-                    data.ytildefull = np.concatenate([data.ytildefull,ytildefull_next],axis=-1)
-                else: # update beta
-                    data.ytildefull = np.concatenate([data.ytildefull,np.tile(np.nan,data.ytildefull.shape)],axis=-1)
-                    data.ytildefull[data.compute_flags] = self.ft(data.yfull[data.compute_flags])/np.sqrt(2**m)
-                    data.ycvtildefull = np.concatenate([data.ycvtildefull,np.tile(np.nan,data.ycvtildefull.shape)],axis=-1)
-                    data.ycvtildefull[data.compute_flags] = self.ft(data.ycvfull[data.compute_flags])/np.sqrt(2**m)
-                    data.beta[data.compute_flags] = self._beta_update(data.beta[data.compute_flags],data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],data.ycvtildefull[data.compute_flags],mllstart)
-                data.kappanumap = np.concatenate([data.kappanumap,n+data.kappanumap],axis=-1)
-                data.kappanumap[data.compute_flags] = self._update_kappanumap(data.kappanumap[data.compute_flags],data.ytildefull[data.compute_flags],m-1,mllstart,m)
-            if self.ncv==0:
-                data.muhat[data.compute_flags] = data.yfull[data.compute_flags].mean(-1)
-            else:
-                ydiff = data.yfull[data.compute_flags]-(data.ycvfull[data.compute_flags]*data.beta[data.compute_flags,:,None]).sum(-2)
-                data.muhat[data.compute_flags] = ydiff.mean(-1)+(data.beta[data.compute_flags]*np.moveaxis(self.cv_mu,0,-1)[data.compute_flags]).sum(-1)
-            data.bounds_half_width[data.compute_flags] = self.fudge(m)*np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,nllstart:2*nllstart],axis=-1)).sum(-1)
-            data.indv_bound_low = data.muhat-data.bounds_half_width
-            data.indv_bound_high = data.muhat+data.bounds_half_width
-            if self.check_cone:
-                data.c_stilde_low = np.tile(-np.inf,(m+1-self.l_star,)+self.integrand.d_indv)
-                data.c_stilde_up = np.tile(np.inf,(m+1-self.l_star,)+self.integrand.d_indv)
-                for l in range(self.l_star,m+1): # Storing the information for the necessary conditions
-                    c_tmp = self.omg_hat(m-l)*self.omg_circ(m-l)
-                    c_low = 1./(1+c_tmp)
-                    c_up = 1./(1-c_tmp)
-                    const1 = np.abs(np.take_along_axis(data.ytildefull[data.compute_flags],data.kappanumap[data.compute_flags][...,int(2**(l-1)):int(2**l)],axis=-1)).sum(-1)
-                    idx = int(l-self.l_star)
-                    data.c_stilde_low[idx,data.compute_flags] = np.maximum(data.c_stilde_low[idx,data.compute_flags],c_low*const1)
-                    if c_tmp < 1:
-                        data.c_stilde_up[idx,data.compute_flags] = np.minimum(data.c_stilde_up[idx,data.compute_flags],c_up*const1)
-                data.cone_violation = (data.c_stilde_low > data.c_stilde_up).any(0)
-                if data.cone_violation.sum()>0:
-                    warnings.warn('Cone condition violations at indices in data.cone_violation.',CubatureWarning)
-            else:
-                data.cone_violation = None
-            data.n[data.compute_flags] = data.n_max
-            data.n_total = data.n_max
-            data.comb_bound_low,data.comb_bound_high = self.integrand.bound_fun(data.indv_bound_low,data.indv_bound_high)
-            data.comb_bound_diff = data.comb_bound_high-data.comb_bound_low
-            fidxs = np.isfinite(data.comb_bound_low)&np.isfinite(data.comb_bound_high)
-            slow,shigh,abs_tols,rel_tols = data.comb_bound_low[fidxs],data.comb_bound_high[fidxs],self.abs_tols[fidxs],self.rel_tols[fidxs]
-            
-            # Store previous solution for potential NaN recovery during resume operations
-            previous_solution = getattr(data, 'solution', None)
-            
-            data.solution = np.tile(np.nan,data.comb_bound_low.shape)
-            data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow,abs_tols,rel_tols)-self.error_fun(shigh,abs_tols,rel_tols))
-            
-            # If solution becomes NaN and we have a finite previous solution, preserve it
-            # This is particularly important during resume operations when bounds may be non-finite
-            if (previous_solution is not None and 
-                np.any(np.isnan(data.solution)) and 
-                np.any(np.isfinite(previous_solution))):
+            if not self.is_first_resume_iteration:  # generate new samples
+                xnext = self.discrete_distrib(n_min=n_min,n_max=n_max)
+                ynext = self.integrand.f(xnext,periodization_transform=self.ptransform,compute_flags=self.data.compute_flags)
                 
-                if np.isscalar(data.solution) or data.solution.shape == ():
-                    # Scalar case
-                    if np.isnan(data.solution):
-                        if np.isscalar(previous_solution):
-                            if np.isfinite(previous_solution):
-                                data.solution = previous_solution
-                        elif hasattr(previous_solution, 'shape') and previous_solution.shape == ():
-                            # 0-dimensional array
-                            prev_val = previous_solution.item()
-                            if np.isfinite(prev_val):
-                                data.solution = prev_val
-                        else:
-                            # Multi-dimensional array, take first finite value
-                            finite_vals = previous_solution[np.isfinite(previous_solution)]
-                            if len(finite_vals) > 0:
-                                data.solution = finite_vals[0]
-            
-            data.comb_flags = np.tile(False,data.comb_bound_low.shape)
-            data.comb_flags[fidxs] = (shigh-slow) <= (self.error_fun(slow,abs_tols,rel_tols)+self.error_fun(shigh,abs_tols,rel_tols))
-            data.flags_indv = self.integrand.dependency(data.comb_flags)
-            data.compute_flags = ~data.flags_indv
-            
-            if IS_PRINT_DIAGNOSTIC:
-                print_diagnostic(f'[ITER] After convergence check m={m}', data)
-            
-            # Check for consecutive solution changes (early stopping criterion)
-            self._check_consecutive_solution_changes(data, m)
+                # Simple data accumulation - compatible with scalar and vector outputs
+                self.data.xfull = np.vstack((self.data.xfull, xnext))
+                if len(self.integrand.d_indv) == 0:  # scalar case
+                    self.data.yfull = np.concatenate((self.data.yfull, ynext), axis=0)
+                else:  # vector case
+                    self.data.yfull = np.vstack((self.data.yfull, ynext))
                 
-            if np.sum(data.compute_flags)==0:
-                if IS_PRINT_DIAGNOSTIC:
-                    print_diagnostic('[CONVERGED] All components converged', data)
-                break # sufficiently estimated
-            elif 2*data.n_total>self.n_limit:
+                # Update individual solutions with simple mean
+                for j in np.ndindex(self.integrand.d_indv):
+                    if self.data.flags_indv[j]: continue
+                    # Use all accumulated data for this component
+                    if self.data.yfull.size > 0:
+                        if len(self.integrand.d_indv) == 0:  # scalar case
+                            self.data.solution_indv[j] = np.mean(self.data.yfull)
+                            std_err = np.std(self.data.yfull) / np.sqrt(len(self.data.yfull)) if len(self.data.yfull) > 1 else np.inf
+                        else:  # vector case
+                            values = self.data.yfull[(...,) + j]
+                            self.data.solution_indv[j] = np.mean(values)
+                            std_err = np.std(values) / np.sqrt(len(values)) if len(values) > 1 else np.inf
+                        
+                        # Basic bound computation
+                        margin = self.fudge(m) * std_err
+                        self.data.indv_bound_low[j] = self.data.solution_indv[j] - margin
+                        self.data.indv_bound_high[j] = self.data.solution_indv[j] + margin
+            
+            # Compute combined bounds and solution
+            self.data.comb_bound_low, self.data.comb_bound_high = self.integrand.bound_fun(
+                self.data.indv_bound_low, self.data.indv_bound_high)
+            self.abs_tols, self.rel_tols = np.full_like(self.data.comb_bound_low, self.abs_tol), np.full_like(self.data.comb_bound_low, self.rel_tol)
+            fidxs = np.isfinite(self.data.comb_bound_low) & np.isfinite(self.data.comb_bound_high)
+            slow, shigh, abs_tols, rel_tols = self.data.comb_bound_low[fidxs], self.data.comb_bound_high[fidxs], self.abs_tols[fidxs], self.rel_tols[fidxs]
+            
+            self.data.solution = np.tile(np.nan, self.data.comb_bound_low.shape)
+            self.data.solution[fidxs] = 1/2*(slow+shigh+self.error_fun(slow, abs_tols, rel_tols)-self.error_fun(shigh, abs_tols, rel_tols))
+            
+            self.data.comb_flags = np.tile(False, self.data.comb_bound_low.shape)
+            self.data.comb_flags[fidxs] = (shigh-slow) < (self.error_fun(slow, abs_tols, rel_tols)+self.error_fun(shigh, abs_tols, rel_tols))
+            
+            self.data.flags_indv = self.integrand.dependency(self.data.comb_flags)
+            self.data.compute_flags = ~self.data.flags_indv
+            self.data.n = 2**self.data.m
+            self.data.n_total = self.data.n.max()
+            
+            if IS_PRINT_DIAGNOSTIC: 
+                print_diagnostic("INFO: In each iteration", self.data)
+            
+            if np.sum(self.data.compute_flags)==0:
+                break # stopping criterion met
+            elif 2*self.data.n_total>self.n_max:
+                # doubling samples would go over n_limit
                 warning_s = """
                 Already generated %d samples.
-                Trying to generate %d new samples would exceeds n_limit = %d.
+                Trying to generate %d new samples would exceed n_max = %d.
                 No more samples will be generated.
-                Note that error tolerances may not be satisfied. """ \
-                % (int(data.n_total),int(data.n_total),int(self.n_limit))
+                Note that error tolerances may not be satisfied.""" \
+                % (int(self.data.n_total),int(self.data.n_total),int(self.n_max))
                 warnings.warn(warning_s, MaxSamplesWarning)
-                if IS_PRINT_DIAGNOSTIC:
-                    print_diagnostic('[MAX_SAMPLES] Reached n_limit', data)
                 break
-            data.n_min = data.n_max
-            # Check if next iteration would exceed discrete distribution limit, but also ensure progress
-            next_n_max = min(2*data.n_min, self.discrete_distrib.n_limit)
-            if next_n_max <= data.n_min:
-                # Can't make progress due to limit constraint
-                # Before breaking, ensure we have a valid solution estimate
-                if hasattr(data, 'muhat') and np.isfinite(data.muhat).any():
-                    # Use current muhat estimate as final solution
-                    data.solution = data.muhat.copy()
-                elif hasattr(data, 'yfull') and data.yfull.size > 0:
-                    # Compute mean from finite values in yfull
-                    finite_mask = np.isfinite(data.yfull)
-                    if finite_mask.any():
-                        if self.ncv == 0:
-                            # Simple mean of finite values
-                            data.solution = np.where(finite_mask.any(axis=-1), 
-                                                   np.nanmean(data.yfull, axis=-1), 
-                                                   0.0)
-                        else:
-                            # With control variates - use available estimate or fallback
-                            data.solution = np.nanmean(data.yfull, axis=-1)
-                    else:
-                        # No finite data available - use zero as fallback
-                        data.solution = np.zeros(self.integrand.d_comb if hasattr(self.integrand, 'd_comb') else 1)
-                else:
-                    # No data available - use zero as fallback
-                    data.solution = np.zeros(self.integrand.d_comb if hasattr(self.integrand, 'd_comb') else 1)
+            else:
+                self.data.n_min = n_max
+                self.data.m += self.data.compute_flags
                 
-                warning_s = f"""
-                Cannot continue: next n_max ({next_n_max}) <= current n_min ({data.n_min}).
-                Discrete distribution n_limit ({self.discrete_distrib.n_limit}) is too small.
-                Consider using a generating vector with higher m_max or increase n_limit manually.
-                Returning best available estimate."""
-                warnings.warn(warning_s, MaxSamplesWarning)
-                if IS_PRINT_DIAGNOSTIC:
-                    print_diagnostic('[MAX_SAMPLES] Reached discrete_distrib limit', data)
-                break
-            data.n_max = next_n_max
-            
-            if IS_PRINT_DIAGNOSTIC:
-                print_diagnostic(f'[ITER] End iteration, next n_max={data.n_max}', data)
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time()-t_start
-        return data.solution,data
+            # Reset the resume flag after first iteration
+            if self.is_first_resume_iteration:
+                self.is_first_resume_iteration = False
+        
+        self.data.integrand = self.integrand
+        self.data.true_measure = self.true_measure
+        self.data.discrete_distrib = self.discrete_distrib
+        self.data.stopping_crit = self
+        self.data.time_integrate = time()-t_start
+        return self.data.solution,self.data
     
-    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
-        if abs_tol is not None:
-            self.abs_tol = abs_tol
-            self.abs_tols = np.full(self.integrand.d_comb,self.abs_tol)
-        if rel_tol is not None:
-            self.rel_tol = rel_tol
-            self.rel_tols = np.full(self.integrand.d_comb,self.rel_tol)
+    def set_tolerance(self, abs_tol=None, rel_tol=None):
+        """
+        See abstract method. 
+        
+        Args:
+            abs_tol (float): absolute tolerance. Reset if supplied, ignored if not. 
+            rel_tol (float): relative tolerance. Reset if supplied, ignored if not. 
+        """
+        if abs_tol != None: self.abs_tol = abs_tol
+        if rel_tol != None: self.rel_tol = rel_tol
