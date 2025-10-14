@@ -1,4 +1,16 @@
 # General Python
+packages.svg
+.pypirc
+test_readme.py
+github.com/QMCSoftware/LDData/
+api.github.com/
+coverage.json
+*.ckpt
+*.npz
+*.csv 
+*hparams.yaml
+*.ipynb_checkpoints/
+demos/fgpr_figs/
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -14,6 +26,7 @@ qmcpy.egg-info/
 .pytest_cache/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
+demos/.jupyter
 
 # tests
 .coverage
@@ -42,6 +55,10 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
+demos/**.eps
+
+
 
 # release
 /build/
@@ -61,3 +78,5 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 
+# Downloaded files
+raw.githubusercontent.com*

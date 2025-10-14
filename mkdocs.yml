@@ -1,0 +1,185 @@
+site_name: "QMCPy"
+nav:
+  - Quasi Monte Carlo Software: README.md
+  - Components: components.md
+  - Contributing: CONTRIBUTING.md
+  - Community: community.md
+  - Package Reference:
+    - Discrete Distributions: api/discrete_distributions.md
+    - True Measures: api/true_measures.md
+    - Integrands: api/integrands.md
+    - Stopping Criteria: api/stopping_criteria.md
+    - Kernels: api/kernels.md
+    - Fast Transforms: api/fast_transforms.md
+    - Util: api/util.md
+  - Demos:
+    - Getting Started:
+      - Introduction: demos/qmcpy_intro.ipynb
+      - Quickstart: demos/quickstart.ipynb
+      - Pricing Options: demos/pricing_options.ipynb 
+      - Lebesgue Integration: demos/lebesgue_integration.ipynb
+    - Publication Notebooks:
+      - 2025 JOSS Paper: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
+      - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
+      - 2023 Argonne Talk: demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb
+      - 2022 MCQMC Paper 1: demos/talk_paper_demos/MCQMC2022_Article_Figures/MCQMC2022_Article_Figures.ipynb
+      - 2022 MCQMC Paper 2: 
+        - Vectorized QMC Algorithms Tracking Fourier Coefficient Decay: demos/vectorized_qmc.ipynb
+        - Vectorized QMC Bayesian Cubature: demos/vectorized_qmc_bayes.ipynb
+      - 2023 Probability of Failure Paper: demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb
+      - 2023 Purdue Talk: demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb
+      - 2023 PyData Chicago Talk: demos/talk_paper_demos/pydata.chi.2023.ipynb
+      - 2020 MCQMC Software Tutorial: demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial.ipynb
+    - Blog Posts:
+      - 2023 Random Lattice Generating Vectors: demos/lattice_random_generator.ipynb
+      - 2022 Bayesian Cubature Stopping Criterion: demos/gaussian_diagnostics/gaussian_diagnostics_demo.ipynb
+      - 2020 Why Add Q to MC?: demos/talk_paper_demos/why_add_q_to_mc_blog/why_add_q_to_mc_blog.ipynb
+      - 2020 Bayesian Optimization Expected Improvement: 
+        - qEI: demos/qei-demo-for-blog.ipynb
+        - Noisy EI: demos/nei_demo.ipynb 
+    - Multilevel (Quasi-)Monte Carlo: 
+      - Single and Multilevel (Q)MC for an Elliptic PDE: demos/elliptic-pde.ipynb
+      - Multilevel (Q)MC for Option Pricing: demos/asian-option-mlqmc.ipynb
+    - Links and Comparisons with Existing Software: 
+      - UM-Bridge: demos/umbridge.ipynb
+      - DAKOTA Halton Points: demos/DAKOTA_Genz/dakota_genz.ipynb
+    - Plotting: 
+      - Plotting Points Automatically: demos/plot_proj_function.ipynb 
+      - Plotting Points Manually: demos/sample_scatter_plots.ipynb
+    - Algorithm Testing:
+      - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
+      - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
+      - Geometric Brownian Motion: demos/gbm_demo.ipynb
+      - Control Variates: demos/control_variates.ipynb 
+      - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
+      - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
+      - Ray Tracing: demos/ray_tracing.ipynb 
+  - Printable Docs: print_page/
+
+plugins:
+  - search
+  - mkdocs-jupyter:
+      ignore_h1_titles: true    # Include H1 from notebooks
+      execute: false              # Execute notebooks during build
+      include_source: true       # Add download link for source notebooks
+      remove_empty_cells: true
+      # theme: dark               # Use dark theme for code cells
+      # include: ["*.ipynb"]  # File patterns to include
+      # execute_ignore: []  # Skip certain files
+      # allow_errors: false        # Fail build on notebook errors
+      # kernel_name: python3       # Specify kernel to use
+      # show_input: true          # Show input cells by default
+      # no_input: false           # Don't hide all inputs
+      # remove_tag_config:
+      #   remove_cell_tags:
+      #     - "hide"              # Hide cells with these tags
+      #     - "hide-cell"
+      #   remove_all_outputs_tags:
+      #     - "hide-output"       # Hide outputs for tagged cells
+      #   remove_input_tags:
+      #     - "hide-input"        # Hide input for tagged cells
+  - mkdocstrings:
+      #enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
+      #custom_templates: templates
+      default_handler: python
+      handlers:
+        python:
+          paths: [qmcpy]  # search packages in the src folder
+          options:
+            members_order: source
+            show_root_toc_entry: false
+            heading_level: 3
+            docstring_section_style: table
+            separate_signature: true
+            line_length: 50
+            show_submodules: true
+            docstring_style: google
+            docstring_options:
+              ignore_init_summary: false
+            merge_init_into_class: true
+  - glightbox:
+       touchNavigation: true
+       loop: false
+       effect: zoom
+       slide_effect: zoom
+       width: 100%
+       height: auto
+       zoomable: true
+       draggable: false
+       skip_classes:
+         - custom-skip-class-name
+       auto_caption: false
+       caption_position: bottom
+       background: white
+       shadow: true
+       manual: false
+  - print-site # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
+  
+theme:
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: cyan
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      primary: cyan
+  name: material
+  navigation_depth: 6
+  color_mode: auto
+  user_color_mode_toggle: True
+  features:
+    # - navigation.instant
+    - navigation.expand
+    - toc.follow
+    - navigation.sections
+    - toc.integrate
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+  icon:
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+markdown_extensions:
+  - toc
+  - attr_list
+  - admonition
+  # - mdx_math
+  - extra
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
