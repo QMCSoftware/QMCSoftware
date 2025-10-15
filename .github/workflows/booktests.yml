@@ -39,4 +39,4 @@ jobs:
         run: python -m ipykernel install --user --name=qmcpy
       - name: Run notebook tests
         shell: bash -l {0}
-        run: make booktests_parallel_no_docker TESTS="tb_dakota_genz"
+        run: make booktests_parallel_no_docker TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures" UARGS="-v --failfast"
