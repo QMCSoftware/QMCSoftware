@@ -41,13 +41,7 @@ jobs:
       - name: Install project + test extras in Conda env
         shell: bash -l {0}
         run: python -m pip install -U pip wheel setuptools && python -m pip install -e ".[test]"
-
-      - name: Sanity check Parsl in Conda env
-        shell: bash -l {0}
-        run: python - <<'PY'
-import parsl, sys; print("parsl", parsl.__version__); print(sys.executable)
-PY
-
+        
       - name: Run notebook tests
         shell: bash -l {0}
         run: |
