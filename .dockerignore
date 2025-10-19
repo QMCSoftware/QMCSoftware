@@ -1,0 +1,17 @@
+.git
+.github
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+*.egg-info/
+build/
+dist/
+.mypy_cache/
+.pytest_cache/
+.DS_Store
+demos/
+docs/
+sphinx/
+test/
+workouts/

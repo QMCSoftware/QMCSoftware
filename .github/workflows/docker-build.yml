@@ -1,0 +1,33 @@
+name: docker-build
+
+on:
+  push:
+    branches: [ develop, test_notebook_sc ]
+  pull_request:
+    branches: [ develop, test_notebook_sc ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (linux/amd64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: qmcpy:ci
+
+      - name: Smoke test
+        run: docker run --rm qmcpy:ci python -c "import qmcpy; print('import ok')"
