@@ -60,12 +60,9 @@ booktests:
 	cd ../..
 
 booktests-parallel:
-	@echo "\nBooktests"
 	cd test/booktests/ && \
-	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
-	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py 1>/dev/null && \
-	cd ../.. 
+	python parsl_test_runner.py
+
 tests: doctests unittests coverage
 
 tests_no_docker: doctests_no_docker unittests coverage
