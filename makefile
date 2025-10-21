@@ -56,7 +56,7 @@ booktests:
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" --failfast && \
+	python -W ignore -m coverage run --append --source=qmcpy/ -m unittest discover -s . -p "*.py" --failfast && \
 	cd ../..
 
 booktests-parallel:
