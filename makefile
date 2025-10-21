@@ -93,7 +93,7 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	PARSL_WORKERS=$$(nproc || echo 2) \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	PYTHONPATH=. \
-	python ../../parsl_unittest_runner.py $(TESTS) $(UARGS) && \
+	python /home/runner/work/QMCSoftware/QMCSoftware/test/booktests/parsl_unittest_runner.py $(TESTS) $(UARGS) && \
 	cd ../..
 
 tests: 
