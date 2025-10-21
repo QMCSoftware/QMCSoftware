@@ -1,6 +1,7 @@
 import parsl
 from parsl import bash_app
 import glob
+import logging
 import os
 import re
 import time
@@ -151,15 +152,15 @@ def main():
         # Clean up Parsl
         try:
             parsl.clear()
-        except:
-            pass
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
     
     # shutdown Parsl
     try:
         parsl.dfk().cleanup()
         parsl.dfk().shutdown()
-    except Exception:
-        pass
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
 
 if __name__ == '__main__':
     main()
