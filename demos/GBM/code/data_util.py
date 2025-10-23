@@ -25,7 +25,7 @@ def add_quantlib_results(results_data, sampler_type, quantlib_final, theoretical
         'Sampler': sampler_type,
         'Mean': ql_emp_mean,
         'Std Dev': ql_emp_std,
-        'Mean Error': abs(ql_emp_mean - theoretical_mean),
+        'Mean Absolute Error': abs(ql_emp_mean - theoretical_mean),
         'Std Dev Error': abs(ql_emp_std - theoretical_std),
     })
 
@@ -103,7 +103,7 @@ def extract_comparison_data(results_df):
     theoretical_data = results_df[results_df['Method'] == 'Theoretical'].copy()
     
     samplers = qmcpy_data['Sampler'].values
-    qmcpy_errors = qmcpy_data['Mean Error'].values
+    qmcpy_errors = qmcpy_data['Mean Absolute Error'].values
     qmcpy_times = qmcpy_data['Mean Time (s)'].values if 'Mean Time (s)' in qmcpy_data.columns else None
     
     # Get QuantLib data (only available for some samplers)
@@ -112,7 +112,7 @@ def extract_comparison_data(results_df):
     for sampler in samplers:
         ql_row = quantlib_data[quantlib_data['Sampler'] == sampler]
         if not ql_row.empty:
-            quantlib_errors.append(ql_row['Mean Error'].iloc[0])
+            quantlib_errors.append(ql_row['Mean Absolute Error'].iloc[0])
             if 'Mean Time (s)' in ql_row.columns:
                 quantlib_times.append(ql_row['Mean Time (s)'].iloc[0])
         else:
@@ -140,7 +140,7 @@ def add_theoretical_row(results, series_name, n_steps, n_paths, theoretical_mean
         'Sampler': '-',
         'Mean': theoretical_mean,
         'Std Dev': theoretical_std,
-        'Mean Error': 0,
+        'Mean Absolute Error': 0,
         'Std Dev Error': 0,
         'Runtime (s)': 0,
         'Runtime Std (s)': 0
@@ -181,7 +181,7 @@ def collect_library_results(sampler, series_name, n_steps, n_paths,
                 'Sampler': sampler,
                 'Mean': ql_mean,
                 'Std Dev': ql_std,
-                'Mean Error': abs(ql_mean - theoretical_mean),
+                'Mean Absolute Error': abs(ql_mean - theoretical_mean),
                 'Std Dev Error': abs(ql_std - theoretical_std),
                 'Runtime (s)': ql_timing[sampler]['average'],
                 'Runtime Std (s)': ql_timing[sampler]['stdev']
@@ -204,7 +204,7 @@ def collect_library_results(sampler, series_name, n_steps, n_paths,
             'Sampler': sampler,
             'Mean': qp_mean,
             'Std Dev': qp_std,
-            'Mean Error': abs(qp_mean - theoretical_mean),
+            'Mean Absolute Error': abs(qp_mean - theoretical_mean),
             'Std Dev Error': abs(qp_std - theoretical_std),
             'Runtime (s)': qp_timing[sampler]['average'],
             'Runtime Std (s)': qp_timing[sampler]['stdev']
