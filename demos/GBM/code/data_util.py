@@ -12,7 +12,7 @@ def add_theoretical_results(results_data, theoretical_mean, theoretical_std):
         'Sampler': '-',
         'Mean': theoretical_mean,
         'Std Dev': theoretical_std,
-        'Mean Error': 0,
+        'Mean Absolute Error': 0,
         'Std Dev Error': 0,
     })
 
@@ -37,7 +37,7 @@ def add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theo
         'Sampler': sampler_type,
         'Mean': qp_emp_mean,
         'Std Dev': qp_emp_std,
-        'Mean Error': abs(qp_emp_mean - theoretical_mean),
+        'Mean Absolute Error': abs(qp_emp_mean - theoretical_mean),
         'Std Dev Error': abs(qp_emp_std - theoretical_std),
     })
 

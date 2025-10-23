@@ -25,7 +25,7 @@ def format_results_dataframe(df, numeric_columns):
 def generate_latex_table(df, caption, label):
     """Generate LaTeX table with booktabs formatting"""
     # Create custom header
-    header = "Method & Sampler & Mean & Std Dev & Mean  & Std Dev  & Mean Time (s)  & Std Dev (s) & Speedup \\\\\n &  &  &   &  Error &  Error &   & &  \\\\"
+    header = "Method & Sampler & Mean & Std Dev & Mean Absolute & Std Dev  & Mean Time (s)  & Std Dev (s) & Speedup \\\\\n &  &  &   &  Error &  Error &   & &  \\\\"
     
     latex_table = df.style.hide(axis='index').to_latex(
         caption=caption,
