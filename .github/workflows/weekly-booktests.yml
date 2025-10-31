@@ -38,8 +38,7 @@ jobs:
       - name: Run Booktests
         shell: bash -l {0}
         run: |
-          cd test/booktests
-          python parsl_test_runner.py
+          make -d booktests
           
       - name: Upload test results
         if: always()  # Run even if tests fail
