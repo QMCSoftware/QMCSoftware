@@ -25,4 +25,5 @@ dependencies:
     - umbridge==1.2.1
     - scikit-learn
     - botorch
+    - phmutest
     - -e .
