@@ -2,11 +2,12 @@
 # Summary
 
 `QMCPy` is an open-source Python package for high-dimensional numerical
-integration using Monte Carlo (MC) and quasi-MC (QMC) methods—collectively
-"(Q)MC." Its object-oriented (OO) design enables researchers to easily implement
-novel algorithms. The framework offers user-friendly APIs, diverse (Q)MC
-algorithms, reliable adaptive error estimation, and integration with scientific
-libraries following reproducible research practices.
+integration using Monte Carlo (MC) and quasi-Monte Carlo (QMC)
+methods—collectively "(Q)MC." Its object-oriented (OO) design enables
+researchers to easily implement novel algorithms. The framework offers
+user-friendly APIs, diverse (Q)MC algorithms, reliable adaptive error
+estimation, and integration with scientific libraries following reproducible
+research practices.
 
 # Statement of Need
 
@@ -31,9 +32,9 @@ While (Q)MC methods are well established,
 practical implementation demands numerical and algorithmic expertise. Our
 `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library
 (GAIL), with both softwares adhering to reproducible
-research practices. `QMCPy` bridges theory and practice
-by consolidating cutting-edge (Q)MC algorithms  into a unified
-framework with:
+research practices. However, `QMCPy` consolidates a substantially
+broader range of cutting-edge (Q)MC algorithms  into a unified
+framework, bridging theory and practice, with the following features:
 
 - **Intuitive APIs** for problem specification and accessing (Q)MC methods,
 - **Flexible integrations** with `NumPy`  and `SciPy`, 
@@ -88,7 +89,7 @@ algorithms:
 **Discrete Distributions** generate IID or LD sampling nodes. Available LD
 pointsets include lattices, digital
 nets  (including Sobol' ), and Halton
- sequences. We also support 
+sequences. We also support 
 
 * robust randomization routines, including
  
@@ -123,7 +124,8 @@ measures, including those from `SciPy`'s `scipy.stats`.
 $\boldsymbol{\psi}$, define the transformed integrand $f = g \circ
 \boldsymbol{\psi}$ so that $\mu = \mathbb{E}[g(\mathbf{T})] =
 \mathbb{E}[f(\mathbf{X})]$ where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. This
-change of variables is done automatically. Users only need to specify $g$ and $\mathbf{T}$.
+change of variables is performed automatically. Users only need to specify $g$
+and $\mathbf{T}$.
 
 **Stopping Criteria (SC)** adaptively increase the sample size until (Q)MC
 estimates satisfy user-defined error tolerances. SC vary depending on properties of $f$, and can include
@@ -135,13 +137,13 @@ guaranteed MC algorithms  or QMC algorithms based on:
  . 
   
 \autoref{fig:stopping_crit} compares MC and QMC SC performance. `QMCPy` is also
-capable of simultaneously approximate functions of multiple integrands. Inspired by Julia's `MultilevelEstimators.jl`, `QMCPy` is expanding support for multilevel (Q)MC SC
+capable of simultaneously approximating functions of multiple integrands. Inspired by Julia's `MultilevelEstimators.jl`, `QMCPy` is expanding support for multilevel (Q)MC SC
  which exploit cheaper low-fidelity
 surrogates to accelerate estimates of expensive integrands, often in high or
 infinite dimensions.
 
 ![MC and QMC SC comparison for adaptively estimating the fair price of an Asian
-option. SC were ran 100 times per error tolerance; shaded regions show 10%-90%
+option. SC were run 100 times per error tolerance; shaded regions show 10%-90%
 quantiles, violins show error distributions. MC algorithms require $n =
 \mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n =
 \mathcal{O}(1/\varepsilon)$ samples to meet the same error tolerance
@@ -156,7 +158,8 @@ width=100% }
 \autoref{fig:points} and \autoref{fig:stopping_crit} are reproducible via the
 Jupyter Notebook. Our project website 
 features publications, presentations, blogs, documentation, and
-demos. Our GitHub repository  contains open-source code, tests,
-and issue tracking. `QMCPy` is distributed
-under the Apache (v2.0) license. Community feedback and engagement are welcome.
+demos. Our GitHub repository  contains open-source code,
+tests, and issue tracking. `QMCPy` is
+distributed under the Apache (v2.0) license. Community feedback and
+engagement are welcome.
 

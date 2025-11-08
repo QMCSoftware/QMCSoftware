@@ -58,11 +58,12 @@ header-includes:
 # Summary
 
 `QMCPy` is an open-source Python package for high-dimensional numerical
-integration using Monte Carlo (MC) and quasi-MC (QMC) methods—collectively
-"(Q)MC." Its object-oriented (OO) design enables researchers to easily implement
-novel algorithms. The framework offers user-friendly APIs, diverse (Q)MC
-algorithms, reliable adaptive error estimation, and integration with scientific
-libraries following reproducible research practices.
+integration using Monte Carlo (MC) and quasi-Monte Carlo (QMC)
+methods—collectively "(Q)MC." Its object-oriented (OO) design enables
+researchers to easily implement novel algorithms. The framework offers
+user-friendly APIs, diverse (Q)MC algorithms, reliable adaptive error
+estimation, and integration with scientific libraries following reproducible
+research practices.
 
 <!--================================================================================-->
 # Statement of Need
@@ -89,10 +90,10 @@ While (Q)MC methods are well established [@dick2010digital; @dick2013high],
 practical implementation demands numerical and algorithmic expertise. Our
 `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library
 (GAIL) [@ChoEtal21a2; @TonEtAl22a], with both softwares adhering to reproducible
-research practices [@Cho14a2; @ChoEtal22a]. `QMCPy` bridges theory and practice
-by consolidating cutting-edge (Q)MC algorithms [@sorokin2022bounding;
-@ChoEtal22a; @ChoEtal24a; @sorokin2025unified; @HicKirSor26a] into a unified
-framework with:
+research practices [@Cho14a2; @ChoEtal22a]. However, `QMCPy` consolidates a substantially
+broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a; @ChoEtal24a;
+@sorokin2022bounding; @sorokin2025unified; @HicKirSor26a] into a unified
+framework, bridging theory and practice, with the following features:
 
 - **Intuitive APIs** for problem specification and accessing (Q)MC methods,
 - **Flexible integrations** with `NumPy` [@harris2020array] and `SciPy` [@2020SciPy-NMeth], 
@@ -150,7 +151,7 @@ algorithms:
 **Discrete Distributions** generate IID or LD sampling nodes. Available LD
 pointsets include lattices [@Ric51; @coveyou1967fourier; @WanHic02a], digital
 nets [@Nie87; @Nie92; @DicPil10a] (including Sobol' [@Sob67]), and Halton
-[@Hal60] sequences. We also support 
+sequences [@Hal60]. We also support 
 
 * robust randomization routines [@sorokin2025unified], including
  
@@ -189,7 +190,8 @@ measures, including those from `SciPy`'s `scipy.stats` [@2020SciPy-NMeth].
 $\boldsymbol{\psi}$, define the transformed integrand $f = g \circ
 \boldsymbol{\psi}$ so that $\mu = \mathbb{E}[g(\mathbf{T})] =
 \mathbb{E}[f(\mathbf{X})]$ where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. This
-change of variables is done automatically. Users only need to specify $g$ and $\mathbf{T}$.
+change of variables is performed automatically. Users only need to specify $g$
+and $\mathbf{T}$.
 
 <!------------------------------------------------------------------------------------>
 **Stopping Criteria (SC)** adaptively increase the sample size until (Q)MC
@@ -204,7 +206,7 @@ guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
   [@Jag19a; @RatHic19a; @JagHic22a]. 
   
 \autoref{fig:stopping_crit} compares MC and QMC SC performance. `QMCPy` is also
-capable of simultaneously approximate functions of multiple integrands
+capable of simultaneously approximating functions of multiple integrands
 [@sorokin2022bounding]. Inspired by Julia's `MultilevelEstimators.jl`
 [@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC
 [@giles2009multilevel; @giles2015multilevel] which exploit cheaper low-fidelity
@@ -212,7 +214,7 @@ surrogates to accelerate estimates of expensive integrands, often in high or
 infinite dimensions.
 
 ![MC and QMC SC comparison for adaptively estimating the fair price of an Asian
-option. SC were ran 100 times per error tolerance; shaded regions show 10%-90%
+option. SC were run 100 times per error tolerance; shaded regions show 10%-90%
 quantiles, violins show error distributions. MC algorithms require $n =
 \mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n =
 \mathcal{O}(1/\varepsilon)$ samples to meet the same error tolerance
@@ -228,9 +230,10 @@ width=100% }
 \autoref{fig:points} and \autoref{fig:stopping_crit} are reproducible via the
 Jupyter Notebook [@QMCPyJOSS2025Notebook]. Our project website [@QMCBlog]
 features publications, presentations, blogs, documentation [@QMCPyDocs], and
-demos. Our GitHub repository [@choi2023qmcpy] contains open-source code, tests,
-and issue tracking [@ChoEtal22a; @sorokin2025unified]. `QMCPy` is distributed
-under the Apache (v2.0) license. Community feedback and engagement are welcome.
+demos. Our GitHub repository [@choi2023qmcpy] contains open-source code,
+tests, and issue tracking [@ChoEtal22a; @sorokin2025unified]. `QMCPy` is
+distributed under the Apache (v2.0) license. Community feedback and
+engagement are welcome.
 
 <!--================================================================================-->
 # Acknowledgements
