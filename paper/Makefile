@@ -62,7 +62,7 @@ main_pdf: cleanall refs_all.bib $(MD_SRC) $(LUA_FILTER)
 	  EXTRA_FILTER=""; \
 	  echo "pandoc-crossref not found; proceeding without it"; \
 	fi; \
-	$(PANDOC) $(MD_SRC) -o main.pdf --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=refs_all.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
+	$(PANDOC) $(MD_SRC) -o main.pdf --template=template.latex --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=refs_all.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
 	@echo "✅ Done: main.pdf generated successfully."
 	open main.pdf &
 

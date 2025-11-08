@@ -1,0 +1,80 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{authblk}
+
+$if(geometry)$
+\geometry{$for(geometry)$$geometry$$sep$,$endfor$}
+$else$
+\geometry{margin=1in}
+$endif$
+
+$if(colorlinks)$
+\hypersetup{
+  colorlinks=true,
+  linkcolor=$if(linkcolor)$$linkcolor$$else$blue$endif$,
+  citecolor=$if(citecolor)$$citecolor$$else$blue$endif$,
+  urlcolor=$if(urlcolor)$$urlcolor$$else$blue$endif$
+}
+$endif$
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+% Pandoc compatibility
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% CSL references environment
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+% Suppress the automatic heading by redefining CSLReferences to not add a section
+\newenvironment{CSLReferences}[2]
+  {\begin{thebibliography}{#1}}
+  {\end{thebibliography}}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+% Citation processing commands
+\providecommand{\citeproctext}{}
+\providecommand{\citeproc}[1]{#1}
+
+% Redefine bibitem to handle empty labels properly
+\let\oldbibitem\bibitem
+\renewcommand{\bibitem}[2][]{\oldbibitem{#2}}
+
+% Suppress pandoc's automatic reference section heading
+\renewcommand{\refname}{}
+
+\title{$title$}
+
+$for(authors)$
+\author[$authors.affiliation$]{$authors.name$}
+$endfor$
+
+$for(affiliations)$
+\affil[$affiliations.index$]{$affiliations.name$}
+$endfor$
+
+$if(date)$
+\date{$date$}
+$else$
+\date{}
+$endif$
+
+\begin{document}
+
+\maketitle
+
+$body$
+
+\end{document}
