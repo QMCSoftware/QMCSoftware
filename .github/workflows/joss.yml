@@ -1,0 +1,65 @@
+name: Markdown to PDF
+
+on:
+  push:
+    branches:
+      - develop
+      - joss
+    paths:
+      - 'paper/main.md'
+      - '.github/workflows/joss.yml'
+      - 'paper/choi2025.bib'
+      - 'paper/FJH25.bib'
+      - 'paper/FJHown25.bib'
+      - 'paper/other.bib'
+      - 'paper/refs_all.bib'
+      - 'paper/Makefile'
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    name: Paper Draft
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: List files in workspace
+        run: ls -R
+          
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: paper/main.md
+
+      - name: List generated PDFs (diagnostic)
+        run: |
+          echo "Searching workspace for PDFs..."
+          find . -type f -name '*.pdf' -print || true
+          echo "Also listing top-level files:"
+          ls -la || true
+      - name: Find generated PDF and set output
+        id: find-pdf
+        run: |
+          # Find any PDF produced by the build (first match)
+          PDF_PATH=$(find . -type f -name '*.pdf' -print -quit || true)
+          if [ -z "$PDF_PATH" ]; then
+            echo "::error::No PDF found after build. Dumping workspace for debugging."
+            ls -R
+            # Try to show common log locations used by build container (helpful for debugging)
+            for f in pandoc.log pandoc.err input.log build.log make.log; do
+              if [ -f "$f" ]; then
+                echo "=== $f ==="
+                sed -n '1,200p' "$f" || true
+              fi
+            done
+            exit 1
+          else
+            echo "Found PDF: $PDF_PATH"
+            echo "pdf_path=$PDF_PATH" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: main
+          path: ${{ steps.find-pdf.outputs.pdf_path }}
