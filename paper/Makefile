@@ -72,13 +72,17 @@ refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	sed -i.bak '79,$$s/\\HickernellFJ/Hickernell/g' $@
 	sed -i.bak -E 's/@(online|software|url)\{/@misc{/g; s/@inproceedings\{/@article{/g' $@
 	sed -i.bak -E 's/Choi, Sou[- ]?Cheng( T\.?)?/Choi, S.-C. T./g' $@
+	sed -i.bak -E 's/Xiaoqun Wang/Wang, X./g' $@
+	sed -i.bak -E 's/Dick, Josef/Dick, J./g' $@
+	sed -i.bak -E 's/(A.|Art) B. Owen/Owen A. B./g' $@
+	sed -i.bak -E 's/([A-Z]\.) ([A-Z][a-z]+) et al\./\1 \2, et al./g' $@
 	@echo "✅ refs_all.bib generated successfully."
 
 clean:
 	find . -type f \( -name '*.aux' -o -name '*.fdb_latexmk' -o -name '*.fls' -o -name '*.log' -o -name '*.out' -o -name '*.synctex.gz' -o -name '*.toc' -o -name '*.bbl' -o -name '*.blg' -o -name '*.awk' -o -name '*.pyg' \) -delete
 
 cleanall: clean
-	rm -f $(OUTPUT) $(OUT) $(OUT2) main.pdf
+	rm -f $(OUTPUT) $(OUT) $(OUT2) main.pdf refs_all.bib
 
 install-mac:
 	@echo "Installing dependencies (Pandoc, pandoc-crossref, TeX Live)..."
