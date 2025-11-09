@@ -74,8 +74,7 @@ refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	sed -i.bak -E 's/Choi, Sou[- ]?Cheng( T\.?)?/Choi, S.-C. T./g' $@
 	sed -i.bak -E 's/Xiaoqun Wang/Wang, X./g' $@
 	sed -i.bak -E 's/Dick, Josef/Dick, J./g' $@
-	sed -i.bak -E 's/(A.|Art) B. Owen/Owen A. B./g' $@
-	sed -i.bak -E 's/([A-Z]\.) ([A-Z][a-z]+) et al\./\1 \2, et al./g' $@
+	sed -i.bak -E 's/(A.|Art) B. Owen/Owen, A. B./g' $@
 	@echo "✅ refs_all.bib generated successfully."
 
 clean:
