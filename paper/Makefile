@@ -131,12 +131,12 @@ show-config:
 
 wordcount:
 	# Count words in the Markdown source file, excluding YAML header, comments, citations, 
-	# and everything after the "Acknowledgements" section.
-	@echo "Counting words in $(MD_SRC) (exclude YAML header, comments, citations, and everything after Acknowledgements)..."
-	@awk 'BEGIN{in_comment=0; in_yaml=1} /^---$$/ && in_yaml && NR>1{in_yaml=0; next} in_yaml{next} /^[[:space:]]*<!--/{ if ($$0 ~ /-->/) next; in_comment=1; next } in_comment{ if ($$0 ~ /-->/) in_comment=0; next } /^# (Acknowledgements|References)$$/{ exit } { print }' $(MD_SRC) | tr '\n' '\r' | sed -E 's/\[@[^]]*\]//g; s/\\label\{[^}]*\}//g; s/ ([,.])/\1/g; s/\r([,.])/\1/g' | tr '\r' '\n' | tr -cd "\11\12\15\40-\176" | wc -w
+	# figure paths/attributes (but keeping captions), standalone punctuation, and everything after the "Acknowledgements" section.
+	@echo "Counting words in $(MD_SRC) (exclude YAML header, comments, citations, figure syntax, standalone punctuation, and everything after Acknowledgements)..."
+	@awk 'BEGIN{in_comment=0; in_yaml=1} /^---$$/ && in_yaml && NR>1{in_yaml=0; next} in_yaml{next} /^[[:space:]]*<!--/{ if ($$0 ~ /-->/) next; in_comment=1; next } in_comment{ if ($$0 ~ /-->/) in_comment=0; next } /^# (Acknowledgements|References)$$/{ exit } { print }' $(MD_SRC) | tr '\n' '\r' | sed -E 's/!\[/ /g; s/\]\([^)]*\)\{[^}]*\}//g; s/\[@[^]]*\]//g; s/\\label\{[^}]*\}//g; s/ ([,.])/\1/g; s/\r([,.])/\1/g' | tr '\r' '\n' | tr -cd "\11\12\15\40-\176" | tr -s ' ' '\n' | grep -vE '^[[:punct:]]+$$' | wc -l
 
 	# Generate a temporary Markdown file (tmp.md) for verification purposes, 
 	# applying the same filtering rules as the word count.
 	@echo "Generating tmp.md for verification..."
-	@awk 'BEGIN{in_comment=0; in_yaml=1} /^---$$/ && in_yaml && NR>1{in_yaml=0; next} in_yaml{next} /^[[:space:]]*<!--/{ if ($$0 ~ /-->/) next; in_comment=1; next } in_comment{ if ($$0 ~ /-->/) in_comment=0; next } /^# (Acknowledgements|References)$$/{ exit } { print }' $(MD_SRC) | tr '\n' '\r' | sed -E 's/\[@[^]]*\]//g; s/\\label\{[^}]*\}//g; s/ ([,.])/\1/g; s/\r([,.])/\1/g' | tr '\r' '\n' > tmp.md
+	@awk 'BEGIN{in_comment=0; in_yaml=1} /^---$$/ && in_yaml && NR>1{in_yaml=0; next} in_yaml{next} /^[[:space:]]*<!--/{ if ($$0 ~ /-->/) next; in_comment=1; next } in_comment{ if ($$0 ~ /-->/) in_comment=0; next } /^# (Acknowledgements|References)$$/{ exit } { print }' $(MD_SRC) | tr '\n' '\r' | sed -E 's/!\[/ /g; s/\]\([^)]*\)\{[^}]*\}//g; s/\[@[^]]*\]//g; s/\\label\{[^}]*\}//g; s/ ([,.])/\1/g; s/\r([,.])/\1/g' | tr '\r' '\n' > tmp.md
 

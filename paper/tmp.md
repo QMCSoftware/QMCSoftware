@@ -20,13 +20,13 @@ QMC methods which use low-discrepancy (LD) sequences that more evenly cover the
 unit cube and therefore allow for faster rates of convergence.
 \autoref{fig:points} visualizes IID and LD pointsets. 
 
-![IID points with gaps and clusters alongside LD pointsets which more evenly
+ IID points with gaps and clusters alongside LD pointsets which more evenly
 fill the space. IID and LD pointsets. Each of the three randomized LD sequences
 contain purple stars (initial 32 points), green triangles (next 32), and blue
 circles (subsequent 64). The lattice was randomly shifted; the digital net was
 randomized with nested uniform scrambling (Owen scrambling); the Halton pointset
 was randomized with linear matrix scrambling and permutation
-scrambling.](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/points.png){width=100%}
+scrambling.
 
 While (Q)MC methods are well established,
 practical implementation demands numerical and algorithmic expertise. Our
@@ -135,21 +135,25 @@ guaranteed MC algorithms  or QMC algorithms based on:
 2. quickly tracking the decay of Fourier coefficients, or
 3. efficient Bayesian cubature by inducing structured Gram matrices
  . 
-  
-\autoref{fig:stopping_crit} compares MC and QMC SC performance. `QMCPy` is also
-capable of simultaneously approximating functions of multiple integrands. Inspired by Julia's `MultilevelEstimators.jl`, `QMCPy` is expanding support for multilevel (Q)MC SC
+
+`QMCPy` is also capable of simultaneously approximating functions of multiple
+integrands. Inspired by Julia's `MultilevelEstimators.jl`, `QMCPy` is expanding support for multilevel (Q)MC SC
  which exploit cheaper low-fidelity
 surrogates to accelerate estimates of expensive integrands, often in high or
 infinite dimensions.
 
-![MC and QMC SC comparison for adaptively estimating the fair price of an Asian
-option. SC were run 100 times per error tolerance; shaded regions show 10%-90%
-quantiles, violins show error distributions. MC algorithms require $n =
-\mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n =
-\mathcal{O}(1/\varepsilon)$ samples to meet the same error tolerance
-$\varepsilon$. Both consistently meet
-tolerances.](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
-width=100% }
+\autoref{fig:stopping_crit} compares MC and QMC SC performance for adaptively
+estimating the fair price of an Asian option across 100 trials per error
+tolerance. Both methods consistently meet tolerances. The left panel shows
+sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$
+samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$
+samples, with shaded regions showing 10%-90% quantiles. The middle panel
+displays computational time, highlighting that QMC methods are much faster than
+MC methods. The right panel presents error distributions via violin plots,
+showing that the average error performance is better for QMC methods.
+
+ MC and QMC SC comparison for pricing of an Asian option.
+
 
 
 # Distribution and Resources

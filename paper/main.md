@@ -204,22 +204,26 @@ guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
   @JimHic16a; @HicEtal17a; @DinHic20a], or
 3. efficient Bayesian cubature by inducing structured Gram matrices
   [@Jag19a; @RatHic19a; @JagHic22a]. 
-  
-\autoref{fig:stopping_crit} compares MC and QMC SC performance. `QMCPy` is also
-capable of simultaneously approximating functions of multiple integrands
-[@sorokin2022bounding]. Inspired by Julia's `MultilevelEstimators.jl`
+
+`QMCPy` is also capable of simultaneously approximating functions of multiple
+integrands [@sorokin2022bounding]. Inspired by Julia's `MultilevelEstimators.jl`
 [@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC
 [@giles2009multilevel; @giles2015multilevel] which exploit cheaper low-fidelity
 surrogates to accelerate estimates of expensive integrands, often in high or
 infinite dimensions.
 
-![MC and QMC SC comparison for adaptively estimating the fair price of an Asian
-option. SC were run 100 times per error tolerance; shaded regions show 10%-90%
-quantiles, violins show error distributions. MC algorithms require $n =
-\mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n =
-\mathcal{O}(1/\varepsilon)$ samples to meet the same error tolerance
-$\varepsilon$. Both consistently meet
-tolerances.\label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
+\autoref{fig:stopping_crit} compares MC and QMC SC performance for adaptively
+estimating the fair price of an Asian option across 100 trials per error
+tolerance. Both methods consistently meet tolerances. The left panel shows
+sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$
+samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$
+samples, with shaded regions showing 10%-90% quantiles. The middle panel
+displays computational time, highlighting that QMC methods are much faster than
+MC methods. The right panel presents error distributions via violin plots,
+showing that the average error performance is better for QMC methods.
+
+![MC and QMC SC comparison for pricing of an Asian option.
+\label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
 width=100% }
 
 
