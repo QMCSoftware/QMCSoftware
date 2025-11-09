@@ -37,12 +37,6 @@ jobs:
           journal: joss
           paper-path: paper/main.md
 
-      - name: List generated PDFs (diagnostic)
-        run: |
-          echo "Searching workspace for PDFs..."
-          find . -type f -name '*.pdf' -print || true
-          echo "Also listing top-level files:"
-          ls -la || true
       - name: Find generated PDF and set output
         id: find-pdf
         run: |
