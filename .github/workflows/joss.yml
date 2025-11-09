@@ -25,6 +25,11 @@ jobs:
 
       - name: List files in workspace
         run: ls -R
+
+      - name: Generate refs_all.bib with transformations
+        run: |
+          cd paper
+          make refs_all.bib
           
       - name: Build draft PDF
         uses: openjournals/openjournals-draft-action@master
