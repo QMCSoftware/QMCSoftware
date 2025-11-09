@@ -155,7 +155,7 @@ sequences [@Hal60]. We also support
 
 * robust randomization routines [@sorokin2025unified], including
  
-  - **Lattices** with shifts modulo one [@CraPat76; HicEtal03].
+  - **Lattices** with random shifts [@CraPat76; @HicEtal03].
   - **Digital Nets** with digital shifts [@dick2005multivariate], linear matrix
     scrambling (LMS) [@Mat98], or nested uniform scrambling (NUS, also called
     Owen scrambling) [@Owe95; @owen2003variance; @dick2011higher].
@@ -218,7 +218,7 @@ tolerance. Both methods consistently meet tolerances. The left panel shows
 sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$
 samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$
 samples, with shaded regions showing 10%-90% quantiles. The middle panel
-displays computational time, highlighting that QMC methods are much faster than
+displays the computational time, highlighting that QMC methods are much faster than
 MC methods. The right panel presents error distributions via violin plots,
 showing that the average error performance is better for QMC methods.
 
