@@ -72,7 +72,7 @@ refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	sed -i.bak '79,$$s/\\HickernellFJ/Hickernell/g' $@
 	sed -i.bak -E 's/@(online|software|url)\{/@misc{/g; s/@inproceedings\{/@article{/g' $@
 	sed -i.bak -E 's/Choi, Sou[- ]?Cheng( T\.?)?/Choi, S.-C. T./g' $@
-	sed -i.bak -E 's/Xiaoqun Wang/Wang, X./g' $@
+	sed -i.bak -E 's/(X.|Xiaoqun) Wang/Wang, X./g' $@
 	sed -i.bak -E 's/Dick, Josef/Dick, J./g' $@
 	sed -i.bak -E 's/((A.|Art) B. Owen)|(Owen, Art B)/Owen, A. B./g' $@
 	@echo "✅ refs_all.bib generated successfully."
