@@ -81,5 +81,9 @@ sc/*
 
 # Downloaded files
 raw.githubusercontent.com*
-paper/main.pdf
-paper/refs_all.bib.bak
+paper/*.pdf
+*.brf
+*.aux
+*.bbl
+*.log
+*.bak*

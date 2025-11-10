@@ -3,9 +3,19 @@
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage{xcolor}
+\usepackage{url}
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage{hyperref}
 \usepackage{geometry}
 \usepackage{authblk}
+
+\hypersetup{
+  pdfauthor={QMCPy Authors},
+  pdftitle={QMCPy: An Open-Source Python Framework},
+  pdfsubject={Quasi-Monte Carlo},
+  pdfkeywords={QMC, Monte Carlo, Python},
+  pdfproducer={Pandoc with LaTeX}
+}
 
 $if(geometry)$
 \geometry{$for(geometry)$$geometry$$sep$,$endfor$}
@@ -18,7 +28,10 @@ $if(colorlinks)$
   colorlinks=true,
   linkcolor=$if(linkcolor)$$linkcolor$$else$blue$endif$,
   citecolor=$if(citecolor)$$citecolor$$else$blue$endif$,
-  urlcolor=$if(urlcolor)$$urlcolor$$else$blue$endif$
+  urlcolor=$if(urlcolor)$$urlcolor$$else$blue$endif$,
+  filecolor=$if(filecolor)$$filecolor$$else$magenta$endif$,
+  linktoc=all,
+  breaklinks=true
 }
 $endif$
 

@@ -36,13 +36,14 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: November 8, 2025
+date: November 9, 2025
 bibliography: refs_all.bib
 csl: joss-simple.csl
 colorlinks: true
 linkcolor: blue
 citecolor: blue
 urlcolor: blue
+filecolor: magenta
 header-includes:
   # LaTeX macros and compact section spacing for PDF output (Pandoc)
   - \usepackage{xspace,titlesec}

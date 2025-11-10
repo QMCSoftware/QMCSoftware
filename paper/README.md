@@ -64,6 +64,11 @@ make
 ```
 This cleans outputs, combines bibliographies, builds `main.pdf` with Pandoc, and shows the word count.
 
+Or run the following command to produce `main.tex` (for arXiv) and compile `maintex.pdf`:
+```bash   
+make maintex_pdf
+```
+
 Other Commands:
 
 - `make clean`: Removes auxiliary files.

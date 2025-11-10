@@ -148,7 +148,7 @@ tolerance. Both methods consistently meet tolerances. The left panel shows
 sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$
 samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$
 samples, with shaded regions showing 10%-90% quantiles. The middle panel
-displays the computational time, highlighting that QMC methods are much faster than
+displays the computation time, highlighting that QMC methods are much faster than
 MC methods. The right panel presents error distributions via violin plots,
 showing that the average error performance is better for QMC methods.
 
