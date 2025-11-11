@@ -74,10 +74,10 @@ finance [@Lem04a; @wangsloan05; @giles2009multilevel; @zhang2021sentiment],
 uncertainty quantification [@MUQ; @parno2021muq; @Marzouk2016; @KaaEtal21],
 machine learning [@DICK2021101587; @pmlr-v80-chen18f], and physics [@AB02;
 @LanBin14; @bernhard2015quantifying]. `QMCPy` [@QMCPy2025] implements both MC
-methods which use independent identically distributed (IID) points as well as
+methods which use independent identically distributed (IID) sequences as well as
 QMC methods which use low-discrepancy (LD) sequences that more evenly cover the
 unit cube and therefore allow for faster rates of convergence [@Ric51].
-\autoref{fig:points} visualizes IID and LD pointsets. 
+\autoref{fig:points} visualizes IID and LD sequences. 
 
 ![IID points with gaps and clusters alongside LD pointsets which more evenly
 fill the space. IID and LD pointsets. Each of the three randomized LD sequences
@@ -118,7 +118,7 @@ provides:
 \end{equation}
 where $g$ is the **integrand** and $\lambda$ a non-negative weight. If
 $\lambda$ is the probability density for a random variable $\mathbf{T}$, then
-$\mu = \mathbb{E}[g(\mathbf{T})]$, where $\mathbf{T}$ is called the **true
+$\mu = \mathbb{E}[g(\mathbf{T})]$, where the distribution of $\mathbf{T}$ is called the **true
 measure**. Through an appropriate transformation $\boldsymbol{\psi}$, we rewrite
 $\mu$ as the expectation of a function of a standard uniform random variable
 $\mathbf{X}$ over the unit hypercube:
@@ -150,19 +150,19 @@ algorithms:
 
 <!------------------------------------------------------------------------------------>
 **Discrete Distributions** generate IID or LD sampling nodes. Available LD
-pointsets include lattices [@Ric51; @coveyou1967fourier; @WanHic02a], digital
+sequences include lattices [@Ric51; @coveyou1967fourier; @WanHic02a], digital
 nets [@Nie87; @Nie92; @DicPil10a] (including Sobol' [@Sob67]), and Halton
 sequences [@Hal60]. We also support 
 
 * robust randomization routines [@sorokin2025unified], including
  
   - **Lattices** with random shifts [@CraPat76; @HicEtal03].
-  - **Digital Nets** with digital shifts [@dick2005multivariate], linear matrix
+  - **Digital Sequences** with digital shifts [@dick2005multivariate], linear matrix
     scrambling (LMS) [@Mat98], or nested uniform scrambling (NUS, also called
     Owen scrambling) [@Owe95; @owen2003variance; @dick2011higher].
-  - **Halton Pointsets** with digital shifts [@WanHic00], permutation scrambling
+  - **Halton Sequences** with digital shifts [@WanHic00], permutation scrambling
     [@MorCaf94], LMS [@Mat98; @owen2024gain], or NUS [@owen2024gain].
-* higher-order digital nets and higher order scrambling for integrands $f$ with
+* higher-order digital sequences and higher order scrambling for integrands $f$ with
   $\alpha$ degrees of "smoothness", enabling QMC convergence like
   $\mathcal{O}(n^{-\alpha+\delta})$ where $\delta>0$ is arbitrarily small
   [@dick2011higher]. 
@@ -170,13 +170,13 @@ sequences [@Hal60]. We also support
   nets, available from the growing collection in the `LDData` repository
   [@LDData], which standardizes data from the Magic Point Shop [@KuoNuy16a] and
   Kuo's websites on lattices [@cools2006constructing; @nuyens2006fast;
-  @KuoGenerators] and Sobol' points [@JoeKuo03; @joe2008constructing;
+  @KuoGenerators] and Sobol' sequences [@JoeKuo03; @joe2008constructing;
   @SobolDirection]. 
 
 Internally, our LD generators call our C package `QMCToolsCL` [@QMCToolsCL].
 
 <!------------------------------------------------------------------------------------>
-**True Measures** $\mathbf{T}$ come with default transformations
+**True Measures** come with default transformations
 $\boldsymbol{\psi}$ satisfying $\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}$
 where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. For example, suppose $\mathbf{T}
 \sim \mathcal{N}(\mathbf{m},\Sigma)$ is a $d$-dimensional Gaussian random
@@ -200,7 +200,7 @@ estimates satisfy user-defined error tolerances [@HicEtal18a; @TonEtAl22a;
 @owen2024error]. SC vary depending on properties of $f$, and can include
 guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
 
-1. multiple randomizations of LD pointsets [@l2023confidence], 
+1. multiple randomizations of LD sequences [@l2023confidence], 
 2. quickly tracking the decay of Fourier coefficients [@HicRazYun15a; @HicJim16a; 
   @JimHic16a; @HicEtal17a; @DinHic20a], or
 3. efficient Bayesian cubature by inducing structured Gram matrices

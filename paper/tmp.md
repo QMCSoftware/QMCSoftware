@@ -57,7 +57,7 @@ provides:
 \end{equation}
 where $g$ is the **integrand** and $\lambda$ a non-negative weight. If
 $\lambda$ is the probability density for a random variable $\mathbf{T}$, then
-$\mu = \mathbb{E}[g(\mathbf{T})]$, where $\mathbf{T}$ is called the **true
+$\mu = \mathbb{E}[g(\mathbf{T})]$, where the distribution of $\mathbf{T}$ is called the **true
 measure**. Through an appropriate transformation $\boldsymbol{\psi}$, we rewrite
 $\mu$ as the expectation of a function of a standard uniform random variable
 $\mathbf{X}$ over the unit hypercube:
@@ -110,7 +110,7 @@ sequences. We also support
 
 Internally, our LD generators call our C package `QMCToolsCL`.
 
-**True Measures** $\mathbf{T}$ come with default transformations
+**True Measures** come with default transformations
 $\boldsymbol{\psi}$ satisfying $\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}$
 where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. For example, suppose $\mathbf{T}
 \sim \mathcal{N}(\mathbf{m},\Sigma)$ is a $d$-dimensional Gaussian random
