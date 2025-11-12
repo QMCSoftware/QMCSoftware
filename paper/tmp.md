@@ -15,10 +15,10 @@ High-dimensional integration and simulation are essential for computational
 finance,
 uncertainty quantification,
 machine learning, and physics. `QMCPy`  implements both MC
-methods which use independent identically distributed (IID) points as well as
+methods which use independent identically distributed (IID) sequences as well as
 QMC methods which use low-discrepancy (LD) sequences that more evenly cover the
 unit cube and therefore allow for faster rates of convergence.
-\autoref{fig:points} visualizes IID and LD pointsets. 
+\autoref{fig:points} visualizes IID and LD sequences. 
 
  IID points with gaps and clusters alongside LD pointsets which more evenly
 fill the space. IID and LD pointsets. Each of the three randomized LD sequences
@@ -87,26 +87,26 @@ tolerance $\varepsilon>0$, either deterministically or with high probability.
 algorithms:
 
 **Discrete Distributions** generate IID or LD sampling nodes. Available LD
-pointsets include lattices, digital
+sequences include lattices, digital
 nets  (including Sobol' ), and Halton
 sequences. We also support 
 
 * robust randomization routines, including
  
   - **Lattices** with random shifts.
-  - **Digital Nets** with digital shifts, linear matrix
+  - **Digital Sequences** with digital shifts, linear matrix
     scrambling (LMS), or nested uniform scrambling (NUS, also called
     Owen scrambling).
-  - **Halton Pointsets** with digital shifts, permutation scrambling
+  - **Halton Sequences** with digital shifts, permutation scrambling
    , LMS, or NUS.
-* higher-order digital nets and higher order scrambling for integrands $f$ with
+* higher-order digital sequences and higher order scrambling for integrands $f$ with
   $\alpha$ degrees of "smoothness", enabling QMC convergence like
   $\mathcal{O}(n^{-\alpha+\delta})$ where $\delta>0$ is arbitrarily small
  . 
 * custom generating vectors for lattices and generating matrices for digital
   nets, available from the growing collection in the `LDData` repository
  , which standardizes data from the Magic Point Shop  and
-  Kuo's websites on lattices  and Sobol' points. 
+  Kuo's websites on lattices  and Sobol' sequences. 
 
 Internally, our LD generators call our C package `QMCToolsCL`.
 
@@ -131,7 +131,7 @@ and $\mathbf{T}$.
 estimates satisfy user-defined error tolerances. SC vary depending on properties of $f$, and can include
 guaranteed MC algorithms  or QMC algorithms based on:
 
-1. multiple randomizations of LD pointsets, 
+1. multiple randomizations of LD sequences, 
 2. quickly tracking the decay of Fourier coefficients, or
 3. efficient Bayesian cubature by inducing structured Gram matrices
  . 

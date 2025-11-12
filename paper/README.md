@@ -3,10 +3,7 @@
 **Authors:** Aleksei G. Sorokin, Fred J. Hickernell, Sou-Cheng T. Choi, Jagadeeswaaran Rathinavel, Pieterjan Robbe, and Aadit Jain
  
 * The folder `paper` in the branch `joss` of GitHub repository [QMCSoftware](https://github.com/QMCSoftware/QMCSoftware/tree/joss) contains the source files for the QMCPy paper to be submitted to the [Journal of Open Source Software (JOSS)](https://joss.theoj.org).
-<!-- 
-The GitHub repository [`qmcpy_joss`](https://github.com/sou-cheng-choi/qmcpy_joss) contains the source files for the QMCPy paper to be submitted to the [Journal of Open Source Software (JOSS)](https://joss.theoj.org).
-- The paper is also hosted on [Overleaf](https://www.overleaf.com/project/677ca1b09ea39e406392e350).
--->
+
 - For internal discussions, join the QMCPy [Slack channel](https://speedyreliabl-dvj5497.slack.com/archives/C07PNS0DMDX).
 
 ---
