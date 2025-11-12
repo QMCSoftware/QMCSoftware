@@ -1,10 +1,10 @@
 ---
-title: '**`QMCPy`**: An Open-Source Python Framework for (Quasi-)Monte Carlo Algorithms'
+title: '**`QMCPy` version 2.0**: An Open-Source Python Framework for (Quasi-)Monte Carlo Algorithms'
 tags:
   - Python
   - open-source
   - object oriented
-  - (quasi-)monte carlo
+  - (quasi-)Monte Carlo
   - numerical integration
 authors:
   - name: Aleksei G. Sorokin
@@ -61,12 +61,18 @@ header-includes:
 `QMCPy` is an open-source Python package for high-dimensional numerical
 integration using Monte Carlo (MC) and quasi-Monte Carlo (QMC)
 methods—collectively "(Q)MC." Its object-oriented (OO) design enables
-researchers to easily implement novel algorithms. The framework offers
+researchers to easily implement novel (Q)MC algorithms. The framework offers
 user-friendly APIs, diverse (Q)MC algorithms, reliable adaptive error
 estimation, and integration with scientific libraries following reproducible
-research practices.
+research practices. Compared to previous versions of `QMCPy`, version 2.0 contains:
+
+- improved documentation,
+- expanded support for randomized LD sequences,
+- enhanced option pricing capabilities, and
+- new utilities for fast QMC-based kernel methods.
 
 <!--================================================================================-->
+
 # Statement of Need
 
 High-dimensional integration and simulation are essential for computational
@@ -74,16 +80,16 @@ finance [@Lem04a; @wangsloan05; @giles2009multilevel; @zhang2021sentiment],
 uncertainty quantification [@MUQ; @parno2021muq; @Marzouk2016; @KaaEtal21],
 machine learning [@DICK2021101587; @pmlr-v80-chen18f], and physics [@AB02;
 @LanBin14; @bernhard2015quantifying]. `QMCPy` [@QMCPy2025] implements both MC
-methods which use independent identically distributed (IID) sequences as well as
+methods which use independent identically distributed (IID) sequences and
 QMC methods which use low-discrepancy (LD) sequences that more evenly cover the
-unit cube and therefore allow for faster rates of convergence [@Ric51].
-\autoref{fig:points} visualizes IID and LD sequences. 
+unit cube and thus enable faster convergence [@Ric51].
+\autoref{fig:points} visualizes IID and LD sequences.
 
-![IID points with gaps and clusters alongside LD pointsets which more evenly
-fill the space. IID and LD pointsets. Each of the three randomized LD sequences
+![An IID sequence with gaps and clusters alongside LD sequences which more evenly
+fill the space. Each of the three randomized LD sequences
 contain purple stars (initial 32 points), green triangles (next 32), and blue
-circles (subsequent 64). The lattice was randomly shifted; the digital net was
-randomized with nested uniform scrambling (Owen scrambling); the Halton pointset
+circles (subsequent 64). The lattice was randomly shifted; the digital sequence was
+randomized with nested uniform scrambling (Owen scrambling); the Halton sequence
 was randomized with linear matrix scrambling and permutation
 scrambling.\label{fig:points}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/points.png){width=100%}
 
@@ -106,26 +112,23 @@ Unlike other (Q)MC modules such as  `SciPy`'s `scipy.stats.qmc`
 provides:
 
 - customizable LD sequences with diverse randomization techniques, 
-- rigorous adaptive error estimation algorithms, and 
-- automatic variable transformations for (Q)MC compatibility.
+- automatic variable transformations for (Q)MC compatibility, and 
+- rigorous adaptive error estimation algorithms. 
 
 <!--================================================================================-->
 # Components
 
 (Q)MC methods approximate the multivariate integral 
 \begin{equation}\label{eq:mu-general}
-\mu := \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t},
+\mu := \mathbb{E}[g(\mathbf{T})] = \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t}, \qquad \mathbf{T} \sim \lambda,
 \end{equation}
-where $g$ is the **integrand** and $\lambda$ a non-negative weight. If
-$\lambda$ is the probability density for a random variable $\mathbf{T}$, then
-$\mu = \mathbb{E}[g(\mathbf{T})]$, where the distribution of $\mathbf{T}$ is called the **true
+where $g$ is the **integrand** and $\lambda$ is the probability density of a random variable $\mathbf{T}$ whose distribution we call the **true
 measure**. Through an appropriate transformation $\boldsymbol{\psi}$, we rewrite
 $\mu$ as the expectation of a function of a standard uniform random variable
 $\mathbf{X}$ over the unit hypercube:
 \begin{equation}\label{eq:mu-uniform}
 \mu = \mathbb{E}[f(\mathbf{X})] = \int_{[0,1]^d} f(\mathbf{x}) \, d\mathbf{x}, \qquad \mathbf{X} \sim \mathcal{U}[0,1]^d.
 \end{equation}
-
 If $\boldsymbol{\psi}$ satisfies $\mathbf{T} \sim
 \boldsymbol{\psi}(\mathbf{X})$, then $f = g \circ \boldsymbol{\psi}$. This
 transformation accommodates IID and LD samples which are approximately uniform
@@ -136,7 +139,6 @@ the sample mean
 \begin{equation}\label{eq:mu-hat}
 \widehat{\mu} := \frac{1}{n} \sum_{i=1}^{n} f(\mathbf{X}_i).
 \end{equation}
-
 MC methods choose IID sampling nodes $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have
 error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods
 choose dependent LD nodes that fill $[0,1]^d$ more evenly, achieving errors like
@@ -149,34 +151,18 @@ tolerance $\varepsilon>0$, either deterministically or with high probability.
 algorithms:
 
 <!------------------------------------------------------------------------------------>
-**Discrete Distributions** generate IID or LD sampling nodes. Available LD
-sequences include lattices [@Ric51; @coveyou1967fourier; @WanHic02a], digital
-nets [@Nie87; @Nie92; @DicPil10a] (including Sobol' [@Sob67]), and Halton
-sequences [@Hal60]. We also support 
+1. **Discrete Distributions** generate IID or LD sequences. Available LD
+sequences and randomization routines [@sorokin2025unified] include
 
-* robust randomization routines [@sorokin2025unified], including
- 
-  - **Lattices** with random shifts [@CraPat76; @HicEtal03].
-  - **Digital Sequences** with digital shifts [@dick2005multivariate], linear matrix
-    scrambling (LMS) [@Mat98], or nested uniform scrambling (NUS, also called
-    Owen scrambling) [@Owe95; @owen2003variance; @dick2011higher].
-  - **Halton Sequences** with digital shifts [@WanHic00], permutation scrambling
-    [@MorCaf94], LMS [@Mat98; @owen2024gain], or NUS [@owen2024gain].
-* higher-order digital sequences and higher order scrambling for integrands $f$ with
-  $\alpha$ degrees of "smoothness", enabling QMC convergence like
-  $\mathcal{O}(n^{-\alpha+\delta})$ where $\delta>0$ is arbitrarily small
-  [@dick2011higher]. 
-* custom generating vectors for lattices and generating matrices for digital
-  nets, available from the growing collection in the `LDData` repository
-  [@LDData], which standardizes data from the Magic Point Shop [@KuoNuy16a] and
-  Kuo's websites on lattices [@cools2006constructing; @nuyens2006fast;
-  @KuoGenerators] and Sobol' sequences [@JoeKuo03; @joe2008constructing;
-  @SobolDirection]. 
+    - **Lattices** with random shifts [@CraPat76; @HicEtal03; @Ric51; @coveyou1967fourier; @WanHic02a].
+    - **Digital Sequences** (including Sobol' sequences) with digital shifts, linear matrix
+      scrambling (LMS), or nested uniform scrambling (NUS, also called
+      Owen scrambling) [@Sob67; @dick2005multivariate; @Mat98; @Owe95; @owen2003variance; @dick2011higher; @Nie87; @Nie92; @DicPil10a].
+    - **Halton Sequences** with digital shifts, permutation scrambling, LMS, or NUS [@Hal60; @WanHic00; @Mat98; @owen2024gain; @MorCaf94; @owen2024gain].
 
-Internally, our LD generators call our C package `QMCToolsCL` [@QMCToolsCL].
+    We support higher-order digital sequences and higher order scrambling for integrands $f$ with $\alpha$ degrees of "smoothness", enabling QMC convergence like $\mathcal{O}(n^{-\alpha+\delta})$ where $\delta>0$ is arbitrarily small [@dick2011higher]. Internally, our LD generators call our C package `QMCToolsCL` [@QMCToolsCL]. `QMCPy` also integrates with the `LDData` repository [@LDData] which stores generating vectors for lattices and generating matrices for digital sequences, primarily drawing from the Magic Point Shop [@KuoNuy16a] and Kuo's websites on lattices [@cools2006constructing; @nuyens2006fast; @KuoGenerators] and Sobol' sequences [@JoeKuo03; @joe2008constructing; @SobolDirection].
 
-<!------------------------------------------------------------------------------------>
-**True Measures** come with default transformations
+2. **True Measures** come with default transformations
 $\boldsymbol{\psi}$ satisfying $\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}$
 where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. For example, suppose $\mathbf{T}
 \sim \mathcal{N}(\mathbf{m},\Sigma)$ is a $d$-dimensional Gaussian random
@@ -186,42 +172,25 @@ variable with mean $\mathbf{m}$ and covariance $\Sigma =
 distribution function of a standard normal applied elementwise. We support many
 measures, including those from `SciPy`'s `scipy.stats` [@2020SciPy-NMeth].
 
-<!------------------------------------------------------------------------------------>
-**Integrands** $g$, given a true measure $\mathbf{T}$ and transformation
+3. **Integrands** $g$, given a true measure $\mathbf{T}$ and transformation
 $\boldsymbol{\psi}$, define the transformed integrand $f = g \circ
 \boldsymbol{\psi}$ so that $\mu = \mathbb{E}[g(\mathbf{T})] =
 \mathbb{E}[f(\mathbf{X})]$ where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. This
 change of variables is performed automatically. Users only need to specify $g$
 and $\mathbf{T}$.
 
-<!------------------------------------------------------------------------------------>
-**Stopping Criteria (SC)** adaptively increase the sample size until (Q)MC
+4. **Stopping Criteria (SC)** adaptively increase the sample size $n$ until (Q)MC
 estimates satisfy user-defined error tolerances [@HicEtal18a; @TonEtAl22a;
 @owen2024error]. SC vary depending on properties of $f$, and can include
 guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
 
-1. multiple randomizations of LD sequences [@l2023confidence], 
-2. quickly tracking the decay of Fourier coefficients [@HicRazYun15a; @HicJim16a; 
-  @JimHic16a; @HicEtal17a; @DinHic20a], or
-3. efficient Bayesian cubature by inducing structured Gram matrices
-  [@Jag19a; @RatHic19a; @JagHic22a]. 
+    -  multiple randomizations of LD sequences [@l2023confidence], 
+    -  quickly tracking the decay of Fourier coefficients [@HicRazYun15a; @HicJim16a; - @JimHic16a; @HicEtal17a; @DinHic20a], or
+    -  efficient Bayesian cubature by inducing structured Gram matrices [@Jag19a; @RatHic19a; @JagHic22a]. 
 
-`QMCPy` is also capable of simultaneously approximating functions of multiple
-integrands [@sorokin2022bounding]. Inspired by Julia's `MultilevelEstimators.jl`
-[@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC
-[@giles2009multilevel; @giles2015multilevel] which exploit cheaper low-fidelity
-surrogates to accelerate estimates of expensive integrands, often in high or
-infinite dimensions.
+    `QMCPy` is also capable of simultaneously approximating functions of multiple integrands [@sorokin2022bounding]. Inspired by Julia's `MultilevelEstimators.jl` [@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC [@giles2009multilevel; @giles2015multilevel] which exploit cheaper low-fidelity surrogates to accelerate estimates of expensive integrands, often in high or infinite dimensions.
 
-\autoref{fig:stopping_crit} compares MC and QMC SC performance for adaptively
-estimating the fair price of an Asian option across 100 trials per error
-tolerance. Both methods consistently meet tolerances. The left panel shows
-sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$
-samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$
-samples, with shaded regions showing 10%-90% quantiles. The middle panel
-displays the computation time, highlighting that QMC methods are much faster than
-MC methods. The right panel presents error distributions via violin plots,
-showing that the average error performance is better for QMC methods.
+    \autoref{fig:stopping_crit} compares MC and QMC SC performance for adaptively estimating the fair price of an Asian option across 100 trials per error tolerance. Both methods consistently meet tolerances. The left panel shows sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$ samples, with shaded regions showing 10%-90% quantiles. The middle panel displays the computation time, highlighting that QMC methods are much faster than MC methods. The right panel presents error distributions via violin plots, showing that the average error performance is better for QMC methods. 
 
 ![MC and QMC SC comparison for pricing of an Asian option.
 \label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){

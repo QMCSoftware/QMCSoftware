@@ -1,4 +1,5 @@
 # General Python
+.pdm-python
 packages.svg
 .pypirc
 test_readme.py
