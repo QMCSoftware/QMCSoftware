@@ -36,7 +36,7 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: November 9, 2025
+date: November 11, 2025
 bibliography: refs_all.bib
 csl: joss-simple.csl
 colorlinks: true
