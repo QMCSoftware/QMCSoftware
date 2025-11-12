@@ -1,5 +1,5 @@
 ---
-title: '**`QMCPy` version 2.0**: An Open-Source Python Framework for (Quasi-)Monte Carlo Algorithms'
+title: '**`QMCPy` Version 2.0**: An Open-Source Python Framework for (Quasi-)Monte Carlo Algorithms'
 tags:
   - Python
   - open-source
@@ -62,9 +62,9 @@ header-includes:
 integration using Monte Carlo (MC) and quasi-Monte Carlo (QMC)
 methods—collectively "(Q)MC." Its object-oriented (OO) design enables
 researchers to easily implement novel (Q)MC algorithms. The framework offers
-user-friendly APIs, diverse (Q)MC algorithms, reliable adaptive error
+user-friendly APIs, diverse (Q)MC algorithms, adaptive error
 estimation, and integration with scientific libraries following reproducible
-research practices. Compared to previous versions of `QMCPy`, version 2.0 contains:
+research practices. Compared to previous versions, `QMCPy` 2.0 contains:
 
 - improved documentation,
 - expanded support for randomized LD sequences,
@@ -216,13 +216,6 @@ The authors acknowledge support from the U.S. National Science Foundation grant
 DMS-231601 and Department of Energy Office of Science Graduate Student Research
 Program. We thank the international (Q)MC research community for invaluable
 feedback and support.
-
-#### Sign off here when you are satisfied with our manuscript: 
- 
-- Aleksei G. Sorokin 
-- Aadit Jain
-- Pieterjan Robbe
-- Sou-Cheng T. Choi
 
 <!--================================================================================-->
 # References
