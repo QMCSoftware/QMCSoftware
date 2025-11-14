@@ -21,9 +21,10 @@ authors:
     affiliation: "3"
   - name: Pieterjan Robbe
     orcid: 0000-0002-6254-8245
+    affiliation: "4"
   - name: Aadit Jain
     orcid: 0009-0002-4805-3665
-    affiliation: "4"
+    affiliation: "5"
 affiliations:
  - name: Illinois Institute of Technology, USA
    index: 1
@@ -31,8 +32,10 @@ affiliations:
    index: 2
  - name: Torc Robotics, USA
    index: 3
- - name: University of California San Diego, USA
+ - name: Independent reseacher, USA
    index: 4
+ - name: University of California San Diego, USA
+   index: 5
 date: November 14, 2025
 bibliography: refs_all.bib
 csl: joss-simple.csl
