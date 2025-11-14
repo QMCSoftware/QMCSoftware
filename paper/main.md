@@ -36,7 +36,7 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: November 11, 2025
+date: November 14, 2025
 bibliography: refs_all.bib
 csl: joss-simple.csl
 colorlinks: true
@@ -64,10 +64,11 @@ methods—collectively "(Q)MC." Its object-oriented (OO) design enables
 researchers to easily implement novel (Q)MC algorithms. The framework offers
 user-friendly APIs, diverse (Q)MC algorithms, adaptive error
 estimation, and integration with scientific libraries following reproducible
-research practices. Compared to previous versions, `QMCPy` 2.0 contains:
+research practices. Compared to previous versions, `QMCPy` 2.0 includes:
 
 - improved documentation,
-- expanded support for randomized LD sequences,
+- expanded tests and demos,
+- expanded support for randomized low-discrepancy (LD) sequences,
 - enhanced option pricing capabilities, and
 - new utilities for fast QMC-based kernel methods.
 
@@ -81,7 +82,7 @@ uncertainty quantification [@MUQ; @parno2021muq; @Marzouk2016; @KaaEtal21],
 machine learning [@DICK2021101587; @pmlr-v80-chen18f], and physics [@AB02;
 @LanBin14; @bernhard2015quantifying]. `QMCPy` [@QMCPy2025] implements both MC
 methods which use independent identically distributed (IID) sequences and
-QMC methods which use low-discrepancy (LD) sequences that more evenly cover the
+QMC methods which use LD sequences that more evenly cover the
 unit cube and thus enable faster convergence [@Ric51].
 \autoref{fig:points} visualizes IID and LD sequences.
 
@@ -96,7 +97,7 @@ scrambling.\label{fig:points}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outpu
 While (Q)MC methods are well established [@dick2010digital; @dick2013high],
 practical implementation demands numerical and algorithmic expertise. Our
 `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library
-(GAIL) [@ChoEtal21a2; @TonEtAl22a], with both softwares adhering to reproducible
+(GAIL) [@ChoEtal21a2; @TonEtAl22a], with both software adhering to reproducible
 research practices [@Cho14a2; @ChoEtal22a]. However, `QMCPy` consolidates a substantially
 broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a; @ChoEtal24a;
 @sorokin2022bounding; @sorokin2025unified; @HicKirSor26a] into a unified
@@ -188,11 +189,11 @@ guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
     -  quickly tracking the decay of Fourier coefficients [@HicRazYun15a; @HicJim16a; - @JimHic16a; @HicEtal17a; @DinHic20a], or
     -  efficient Bayesian cubature by inducing structured Gram matrices [@Jag19a; @RatHic19a; @JagHic22a]. 
 
-    `QMCPy` is also capable of simultaneously approximating functions of multiple integrands [@sorokin2022bounding]. Inspired by Julia's `MultilevelEstimators.jl` [@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC [@giles2009multilevel; @giles2015multilevel] which exploit cheaper low-fidelity surrogates to accelerate estimates of expensive integrands, often in high or infinite dimensions.
+    `QMCPy` is also capable of simultaneously approximating functions of multiple integrands [@sorokin2022bounding]. Inspired by `MultilevelEstimators.jl` [@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC [@giles2009multilevel; @giles2015multilevel] that exploit cheaper, low-fidelity surrogates to accelerate  expensive integrand estimates in high or infinite dimensions.
 
     \autoref{fig:stopping_crit} compares MC and QMC SC performance for adaptively estimating the fair price of an Asian option across 100 trials per error tolerance. Both methods consistently meet tolerances. The left panel shows sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$ samples, with shaded regions showing 10%-90% quantiles. The middle panel displays the computation time, highlighting that QMC methods are much faster than MC methods. The right panel presents error distributions via violin plots, showing that the average error performance is better for QMC methods. 
 
-![MC and QMC SC comparison for pricing of an Asian option.
+![MC and QMC SC comparison for pricing an Asian option.
 \label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
 width=100% }
 
