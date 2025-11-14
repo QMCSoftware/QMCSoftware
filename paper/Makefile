@@ -91,10 +91,10 @@ refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	@echo "✅ refs_all.bib generated successfully."
 
 clean:
-	find . -type f \( -name '*.aux' -o -name '*.fdb_latexmk' -o -name '*.fls' -o -name '*.log' -o -name '*.out' -o -name '*.synctex.gz' -o -name '*.toc' -o -name '*.bbl' -o -name '*.blg' -o -name '*.awk' -o -name '*.pyg' \) -delete
+	find . -type f \( -name '*.aux' -o -name '*.fdb_latexmk' -o -name '*.fls' -o -name '*.log' -o -name '*.out' -o -name '*.synctex.gz' -o -name '*.toc' -o -name '*.bbl' -o -name '*.blg' -o -name '*.awk' -o -name '*.pyg' -o -name '*.bak*' -o -name '*.brf' \) -delete
 
 cleanall: clean
-	rm -f $(OUTPUT) $(OUT) $(OUT2) main.pdf refs_all.bib*
+	rm -f $(OUTPUT) $(OUT) $(OUT2) main.pdf refs_all.bib* tmp.md
 
 install-mac:
 	@echo "Installing dependencies (Pandoc, pandoc-crossref, TeX Live)..."
