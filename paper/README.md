@@ -8,7 +8,7 @@
 
 ---
 
-<!-->
+<!--
 ## Submission Guidelines
 - [JOSS Paper Format](https://joss.readthedocs.io/en/latest/paper.html): Only markdown format is supported
 - 250 to 1000 words (excluding references)
