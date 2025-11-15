@@ -81,15 +81,15 @@ finance [@Lem04a; @wangsloan05; @giles2009multilevel; @zhang2021sentiment],
 uncertainty quantification [@MUQ; @parno2021muq; @Marzouk2016; @KaaEtal21],
 machine learning [@DICK2021101587; @pmlr-v80-chen18f], and physics [@AB02;
 @LanBin14; @bernhard2015quantifying]. `QMCPy` [@QMCPy2025] implements both MC
-methods which use independent identically distributed (IID) sequences and
-QMC methods which use LD sequences that more evenly cover the
-unit cube, enabling faster convergence [@Ric51].
-\autoref{fig:points} visualizes IID and LD sequences.
+methods which use independent identically distributed (IID) sequences and QMC
+methods which use LD sequences that more evenly cover the unit cube, enabling
+faster convergence [@Ric51]. \autoref{fig:points} visualizes IID and LD
+sequences.
 
-![An IID sequence with gaps and clusters alongside LD sequences which more evenly
-fill the space. Each of the three randomized LD sequences
-contains purple stars (initial 32 points), green triangles (next 32), and blue
-circles (subsequent 64). The lattice was randomly shifted; the digital sequence was
+![An IID sequence with gaps and clusters alongside LD sequences which more
+evenly fill the space. Each of the three randomized LD sequences contains purple
+stars (initial 32 points), green triangles (next 32), and blue circles
+(subsequent 64). The lattice was randomly shifted; the digital sequence was
 randomized with nested uniform scrambling (Owen scrambling); the Halton sequence
 was randomized with linear matrix scrambling and permutation
 scrambling.\label{fig:points}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/points.png){width=100%}
@@ -97,8 +97,8 @@ scrambling.\label{fig:points}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outpu
 While (Q)MC methods are well established [@dick2010digital; @dick2013high],
 practical implementation demands numerical and algorithmic expertise. Our
 `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library
-(GAIL) [@ChoEtal21a2; @TonEtAl22a], with both adhering to reproducible
-research practices [@Cho14a2; @ChoEtal22a]. However, `QMCPy` consolidates a substantially
+(GAIL) [@ChoEtal21a2; @TonEtAl22a], with both adhering to reproducible research
+practices [@Cho14a2; @ChoEtal22a]. However, `QMCPy` consolidates a substantially
 broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a; @ChoEtal24a;
 @sorokin2022bounding; @sorokin2025unified; @HicKirSor26a] into a unified
 framework, bridging theory and practice, with the following features:
@@ -109,8 +109,8 @@ framework, bridging theory and practice, with the following features:
 - **Extensible OO components** enabling researchers to implement and test new algorithms.
 
 Unlike other (Q)MC modules such as `SciPy`'s `scipy.stats.qmc`
-[@2020SciPy-NMeth] or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015], `QMCPy`
-provides:
+[@2020SciPy-NMeth] or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015],
+`QMCPy` provides:
 
 - customizable LD sequences with diverse randomization techniques, 
 - automatic variable transformations for (Q)MC compatibility, and 
@@ -123,10 +123,11 @@ provides:
 \begin{equation}\label{eq:mu-general}
 \mu := \mathbb{E}[g(\mathbf{T})] = \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t}, \qquad \mathbf{T} \sim \lambda,
 \end{equation}
-where $g$ is the **integrand** and $\lambda$ is the probability density of a random variable $\mathbf{T}$ whose distribution we call the **true
-measure**. Through an appropriate transformation $\boldsymbol{\psi}$, we rewrite
-$\mu$ as the expectation of a function of a standard uniform random variable
-$\mathbf{X}$ over the unit hypercube:
+where $g$ is the **integrand** and $\lambda$ is the probability density of a
+random variable $\mathbf{T}$ whose distribution we call the **true measure**.
+Through an appropriate transformation $\boldsymbol{\psi}$, we rewrite $\mu$ as
+the expectation of a function of a standard uniform random variable $\mathbf{X}$
+over the unit hypercube:
 \begin{equation}\label{eq:mu-uniform}
 \mu = \mathbb{E}[f(\mathbf{X})] = \int_{[0,1]^d} f(\mathbf{x}) \, d\mathbf{x}, \qquad \mathbf{X} \sim \mathcal{U}[0,1]^d.
 \end{equation}
@@ -155,13 +156,25 @@ algorithms:
 1. **Discrete Distributions** generate IID or LD sequences. Available LD
 sequences and randomization routines [@sorokin2025unified] include
 
-    - **Lattices** with random shifts [@CraPat76; @HicEtal03; @Ric51; @coveyou1967fourier; @WanHic02a].
-    - **Digital Sequences** (including Sobol' sequences) with digital shifts, linear matrix
-      scrambling (LMS), or nested uniform scrambling (NUS, also called
-      Owen scrambling) [@Sob67; @dick2005multivariate; @Mat98; @Owe95; @owen2003variance; @dick2011higher; @Nie87; @Nie92; @DicPil10a].
-    - **Halton Sequences** with digital shifts, permutation scrambling, LMS, or NUS [@Hal60; @WanHic00; @Mat98; @owen2024gain; @MorCaf94; @owen2024gain].
+    - **Lattices** with random shifts [@CraPat76; @HicEtal03; @Ric51;
+      @coveyou1967fourier; @WanHic02a].
+    - **Digital Sequences** (including Sobol' sequences) with digital shifts,
+      linear matrix scrambling (LMS), or nested uniform scrambling (NUS, also
+      called Owen scrambling) [@Sob67; @dick2005multivariate; @Mat98; @Owe95;
+      @owen2003variance; @dick2011higher; @Nie87; @Nie92; @DicPil10a].
+    - **Halton Sequences** with digital shifts, permutation scrambling, LMS, or
+      NUS [@Hal60; @WanHic00; @Mat98; @owen2024gain; @MorCaf94; @owen2024gain].
 
-    We support higher-order digital sequences and higher order scrambling for integrands $f$ with $\alpha$ degrees of "smoothness", enabling QMC convergence like $\mathcal{O}(n^{-\alpha+\delta})$ where $\delta>0$ is arbitrarily small [@dick2011higher]. Internally, our LD generators call our C package `QMCToolsCL` [@QMCToolsCL]. `QMCPy` also integrates with the `LDData` repository [@LDData] which stores generating vectors for lattices and generating matrices for digital sequences, primarily drawing from the Magic Point Shop [@KuoNuy16a] and Kuo's websites on lattices [@cools2006constructing; @nuyens2006fast; @KuoGenerators] and Sobol' sequences [@JoeKuo03; @joe2008constructing; @SobolDirection].
+    We support higher-order digital sequences and higher order scrambling for
+    integrands $f$ with $\alpha$ degrees of "smoothness", enabling QMC
+    convergence like $\mathcal{O}(n^{-\alpha+\delta})$ where $\delta>0$ is
+    arbitrarily small [@dick2011higher]. Internally, our LD generators call our
+    C package `QMCToolsCL` [@QMCToolsCL]. `QMCPy` also integrates with the
+    `LDData` repository [@LDData] which stores generating vectors for lattices
+    and generating matrices for digital sequences, primarily drawing from the
+    Magic Point Shop [@KuoNuy16a] and Kuo's websites on lattices
+    [@cools2006constructing; @nuyens2006fast; @KuoGenerators] and Sobol'
+    sequences [@JoeKuo03; @joe2008constructing; @SobolDirection].
 
 2. **True Measures** come with default transformations
 $\boldsymbol{\psi}$ satisfying $\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}$
@@ -186,12 +199,28 @@ estimates satisfy user-defined error tolerances [@HicEtal18a; @TonEtAl22a;
 guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
 
     -  multiple randomizations of LD sequences [@l2023confidence], 
-    -  quickly tracking the decay of Fourier coefficients [@HicRazYun15a; @HicJim16a; @JimHic16a; @HicEtal17a; @DinHic20a], or
-    -  efficient Bayesian cubature by inducing structured Gram matrices [@Jag19a; @RatHic19a; @JagHic22a]. 
+    -  quickly tracking the decay of Fourier coefficients [@HicRazYun15a;
+       @HicJim16a; @JimHic16a; @HicEtal17a; @DinHic20a], or
+    -  efficient Bayesian cubature by inducing structured Gram matrices
+       [@Jag19a; @RatHic19a; @JagHic22a]. 
 
-    `QMCPy` is also capable of simultaneously approximating functions of multiple integrands [@sorokin2022bounding]. Inspired by `MultilevelEstimators.jl` [@MultilevelEstimators], `QMCPy` is expanding support for multilevel (Q)MC SC [@giles2009multilevel; @giles2015multilevel] that exploit cheaper, low-fidelity surrogates to accelerate expensive integrand estimates in high or infinite dimensions.
+    `QMCPy` is also capable of simultaneously approximating functions of
+    multiple integrands [@sorokin2022bounding]. Inspired by
+    `MultilevelEstimators.jl` [@MultilevelEstimators], `QMCPy` is expanding
+    support for multilevel (Q)MC SC [@giles2009multilevel; @giles2015multilevel]
+    that exploit cheaper, low-fidelity surrogates to accelerate expensive
+    integrand estimates in high or infinite dimensions.
 
-    \autoref{fig:stopping_crit} compares MC and QMC SC performance for adaptively estimating the fair price of an Asian option across 100 trials per error tolerance. Both methods consistently meet tolerances. The left panel shows sample complexity: MC algorithms require $n = \mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n = \mathcal{O}(1/\varepsilon)$ samples, with shaded regions showing 10%-90% quantiles. The middle panel displays the computation time, highlighting that QMC methods are much faster than MC methods. The right panel presents error distributions via violin plots, showing that the average error performance is better for QMC methods. 
+    \autoref{fig:stopping_crit} compares MC and QMC SC performance for
+    adaptively estimating the fair price of an Asian option across 100 trials
+    per error tolerance. Both methods consistently meet tolerances. The left
+    panel shows sample complexity: MC algorithms require $n =
+    \mathcal{O}(1/\varepsilon^2)$ samples while QMC algorithms require only $n =
+    \mathcal{O}(1/\varepsilon)$ samples, with shaded regions showing 10%-90%
+    quantiles. The middle panel displays the computation time, highlighting that
+    QMC methods are much faster than MC methods. The right panel presents error
+    distributions via violin plots, showing that the average error performance
+    is better for QMC methods. 
 
 ![MC and QMC SC comparison for pricing an Asian option.
 \label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
@@ -206,9 +235,9 @@ width=100% }
 Jupyter Notebook [@QMCPyJOSS2025Notebook]. Our project website [@QMCBlog]
 features publications, presentations, blogs, documentation [@QMCPyDocs], and
 demos. Our GitHub repository [@choi2023qmcpy] contains open-source code with
-continuous integration, tests, and issue tracking [@ChoEtal22a; @sorokin2025unified]. 
-`QMCPy` is distributed under the Apache (v2.0) license. Community feedback and
-engagement are welcome.
+continuous integration, tests, and issue tracking [@ChoEtal22a;
+@sorokin2025unified]. `QMCPy` is distributed under the Apache (v2.0) license.
+Community feedback and engagement are welcome.
 
 <!--================================================================================-->
 # Acknowledgements
