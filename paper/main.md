@@ -32,7 +32,7 @@ affiliations:
    index: 2
  - name: Torc Robotics, USA
    index: 3
- - name: Independent reseacher, USA
+ - name: Independent researcher, USA
    index: 4
  - name: University of California San Diego, USA
    index: 5
