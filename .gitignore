@@ -88,3 +88,6 @@ paper/*.pdf
 *.bbl
 *.log
 *.bak*
+*.fdb_latexmk
+*.fls
+*.synctex.gz
