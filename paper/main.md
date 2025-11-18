@@ -200,8 +200,8 @@ estimates satisfy user-defined error tolerances [@HicEtal18a; @TonEtAl22a;
 guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
 
     -  multiple randomizations of LD sequences [@l2023confidence], 
-    -  quickly tracking the decay of Fourier coefficients [@HicRazYun15a;
-       @HicJim16a; @JimHic16a; @HicEtal17a; @DinHic20a], or
+    -  quickly tracking the decay of Fourier coefficients [ @HicJim16a;
+       @JimHic16a; @HicEtal17a; @DinHic20a], or
     -  efficient Bayesian cubature by inducing structured Gram matrices
        [@Jag19a; @RatHic19a; @JagHic22a]. 
 
