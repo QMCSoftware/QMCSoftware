@@ -1,6 +1,6 @@
 ---
 title: |
-  `QMCPy` 2.0: An Open-Source Python Framework for <br> (Quasi-)Monte Carlo Algorithms
+  QMCPy 2.0: An Open-Source Python Framework for <br> (Quasi-)Monte Carlo Algorithms
 tags:
   - Python
   - open-source
