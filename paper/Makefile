@@ -62,10 +62,19 @@ maintex_pdf: refs_all.bib $(MD_SRC) $(LUA_FILTER)
 	@echo "✅ Done: $(OUT) generated successfully."
 	open $(OUT) &
 
-main_pdf: maintex_pdf
-	@echo "Using LaTeX+BibTeX build for bibliography (handles crossref)."
-	cp -f maintex.pdf main.pdf
-	@echo "✅ Done: main.pdf generated from maintex.pdf."
+main_pdf: cleanall refs_all.bib $(MD_SRC) $(LUA_FILTER)
+	@echo "Building main.pdf from $(MD_SRC) with Pandoc and Lua filter..."
+	@if command -v $(CROSSREF) >/dev/null 2>&1; then \
+	  EXTRA_FILTER="--filter $(CROSSREF)"; \
+	  echo "Using pandoc-crossref"; \
+	else \
+	  EXTRA_FILTER=""; \
+	  echo "pandoc-crossref not found; proceeding without it"; \
+	fi; \
+	$(PANDOC) $(MD_SRC) -o main.pdf --template=template.latex --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=refs_all.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
+	@echo "✅ Done: main.pdf generated successfully."
+	open main.pdf &
+
 
 refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	@echo "Generating refs_all.bib..."
