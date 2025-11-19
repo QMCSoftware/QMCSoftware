@@ -62,18 +62,10 @@ maintex_pdf: refs_all.bib $(MD_SRC) $(LUA_FILTER)
 	@echo "✅ Done: $(OUT) generated successfully."
 	open $(OUT) &
 
-main_pdf: cleanall refs_all.bib $(MD_SRC) $(LUA_FILTER)
-	@echo "Building main.pdf from $(MD_SRC) with Pandoc and Lua filter..."
-	@if command -v $(CROSSREF) >/dev/null 2>&1; then \
-	  EXTRA_FILTER="--filter $(CROSSREF)"; \
-	  echo "Using pandoc-crossref"; \
-	else \
-	  EXTRA_FILTER=""; \
-	  echo "pandoc-crossref not found; proceeding without it"; \
-	fi; \
-	$(PANDOC) $(MD_SRC) -o main.pdf --template=template.latex --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=refs_all.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
-	@echo "✅ Done: main.pdf generated successfully."
-	open main.pdf &
+main_pdf: maintex_pdf
+	@echo "Using LaTeX+BibTeX build for bibliography (handles crossref)."
+	cp -f maintex.pdf main.pdf
+	@echo "✅ Done: main.pdf generated from maintex.pdf."
 
 refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	@echo "Generating refs_all.bib..."
@@ -81,7 +73,7 @@ refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	@echo "Cleaning LaTeX commands from refs_all.bib..."
 	@grep -v '^[[:space:]]*\\(def\|providecommand\|newcommand)' $@ > $@.tmp && mv $@.tmp $@
 	sed -i.bak '79,$$s/\\HickernellFJ/Hickernell/g' $@
-	sed -i.bak -E 's/@(online|software|url)\{/@misc{/g; s/@inproceedings\{/@article{/g' $@
+	sed -i.bak -E 's/@(online|software|url)\{/@misc{/g' $@
 	@echo "Adding author field to @proceedings entries for natbib compatibility..."
 	@perl -i.bak2 -pe 'if (/^\@proceedings/) {$$in_proc=1} if ($$in_proc && /^(\s*)editor\s*=\s*\{([^}]+)\},?$$/) {$$ed=$$2; $$sp=$$1; $$_=$$_ . "$${sp}author = {$$ed},\n"; $$in_proc=0}' $@
 	sed -i.bak -E 's/Choi, Sou[- ]?Cheng( T\.?)?/Choi, S.-C. T./g' $@
