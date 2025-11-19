@@ -61,7 +61,7 @@
 % Suppress pandoc's automatic reference section heading
 \renewcommand{\refname}{}
 
-\title{\textbf{\texttt{QMCPy}}: An Open-Source Python Framework for
+\title{\texttt{QMCPy} 2.0: An Open-Source Python Framework for
 (Quasi-)Monte Carlo Algorithms}
 
 \author[1]{Aleksei G. Sorokin}
@@ -74,10 +74,10 @@
 \affil[1]{Illinois Institute of Technology, USA}
 \affil[2]{SouLab LLC, USA}
 \affil[3]{Torc Robotics, USA}
-\affil[4]{Sandia National Laboratories, USA}
+\affil[4]{Independent researcher, USA}
 \affil[5]{University of California San Diego, USA}
 
-\date{November 9, 2025}
+\date{November 18, 2025}
 
 \begin{document}
 
@@ -88,10 +88,25 @@
 \texttt{QMCPy} is an open-source Python package for high-dimensional
 numerical integration using Monte Carlo (MC) and quasi-Monte Carlo (QMC)
 methods---collectively ``(Q)MC.'' Its object-oriented (OO) design
-enables researchers to easily implement novel algorithms. The framework
-offers user-friendly APIs, diverse (Q)MC algorithms, reliable adaptive
+enables researchers to easily implement novel (Q)MC algorithms. The
+framework offers user-friendly APIs, diverse (Q)MC algorithms, adaptive
 error estimation, and integration with scientific libraries following
-reproducible research practices.
+reproducible research practices. Compared to previous versions,
+\texttt{QMCPy} 2.0 includes:
+
+\begin{itemize}
+\tightlist
+\item
+  improved documentation,
+\item
+  expanded tests and demos,
+\item
+  expanded support for randomized low-discrepancy (LD) sequences,
+\item
+  enhanced option pricing capabilities, and
+\item
+  new utilities for fast QMC-based kernel methods.
+\end{itemize}
 
 \section{Statement of Need}\label{statement-of-need}
 
@@ -103,20 +118,20 @@ uncertainty quantification
 \citep{DICK2021101587, pmlr-v80-chen18f}, and physics
 \citep{AB02, LanBin14, bernhard2015quantifying}. \texttt{QMCPy}
 \citep{QMCPy2025} implements both MC methods which use independent
-identically distributed (IID) points as well as QMC methods which use
-low-discrepancy (LD) sequences that more evenly cover the unit cube and
-therefore allow for faster rates of convergence \citep{Ric51}.
-\autoref{fig:points} visualizes IID and LD pointsets.
+identically distributed (IID) sequences and QMC methods which use LD
+sequences that more evenly cover the unit cube, enabling faster
+convergence \citep{Ric51}. \autoref{fig:points} visualizes IID and LD
+sequences.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={IID points with gaps and clusters alongside LD pointsets which more evenly fill the space. IID and LD pointsets. Each of the three randomized LD sequences contain purple stars (initial 32 points), green triangles (next 32), and blue circles (subsequent 64). The lattice was randomly shifted; the digital net was randomized with nested uniform scrambling (Owen scrambling); the Halton pointset was randomized with linear matrix scrambling and permutation scrambling.}]{../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/points.png}
-\caption{IID points with gaps and clusters alongside LD pointsets which
-more evenly fill the space. IID and LD pointsets. Each of the three
-randomized LD sequences contain purple stars (initial 32 points), green
-triangles (next 32), and blue circles (subsequent 64). The lattice was
-randomly shifted; the digital net was randomized with nested uniform
-scrambling (Owen scrambling); the Halton pointset was randomized with
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={An IID sequence with gaps and clusters alongside LD sequences which more evenly fill the space. Each of the three randomized LD sequences contains purple stars (initial 32 points), green triangles (next 32), and blue circles (subsequent 64). The lattice was randomly shifted; the digital sequence was randomized with nested uniform scrambling (Owen scrambling); the Halton sequence was randomized with linear matrix scrambling and permutation scrambling.}]{../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/points.png}
+\caption{An IID sequence with gaps and clusters alongside LD sequences
+which more evenly fill the space. Each of the three randomized LD
+sequences contains purple stars (initial 32 points), green triangles
+(next 32), and blue circles (subsequent 64). The lattice was randomly
+shifted; the digital sequence was randomized with nested uniform
+scrambling (Owen scrambling); the Halton sequence was randomized with
 linear matrix scrambling and permutation scrambling.\label{fig:points}}
 \end{figure}
 
@@ -124,10 +139,10 @@ While (Q)MC methods are well established
 \citep{dick2010digital, dick2013high}, practical implementation demands
 numerical and algorithmic expertise. Our \texttt{QMCPy} implementation
 follows MATLAB's Guaranteed Automatic Integration Library (GAIL)
-\citep{ChoEtal21a2, TonEtAl22a}, with both softwares adhering to
-reproducible research practices \citep{Cho14a2, ChoEtal22a}. However,
-\texttt{QMCPy} consolidates a substantially broader range of
-cutting-edge (Q)MC algorithms
+\citep{ChoEtal21a2, TonEtAl22a}, with both adhering to reproducible
+research practices \citep{Cho14a2, ChoEtal22a}. However, \texttt{QMCPy}
+consolidates a substantially broader range of cutting-edge (Q)MC
+algorithms
 \citep{ChoEtal22a, ChoEtal24a, sorokin2022bounding, sorokin2025unified, HicKirSor26a}
 into a unified framework, bridging theory and practice, with the
 following features:
@@ -158,28 +173,25 @@ provides:
 \item
   customizable LD sequences with diverse randomization techniques,
 \item
-  rigorous adaptive error estimation algorithms, and
+  automatic variable transformations for (Q)MC compatibility, and
 \item
-  automatic variable transformations for (Q)MC compatibility.
+  rigorous adaptive error estimation algorithms.
 \end{itemize}
 
 \section{Components}\label{components}
 
 (Q)MC methods approximate the multivariate integral
 \begin{equation}\label{eq:mu-general}
-\mu := \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t},
-\end{equation} where \(g\) is the \textbf{integrand} and \(\lambda\) a
-non-negative weight. If \(\lambda\) is the probability density for a
-random variable \(\mathbf{T}\), then
-\(\mu = \mathbb{E}[g(\mathbf{T})]\), where \(\mathbf{T}\) is called the
-\textbf{true measure}. Through an appropriate transformation
-\(\boldsymbol{\psi}\), we rewrite \(\mu\) as the expectation of a
-function of a standard uniform random variable \(\mathbf{X}\) over the
-unit hypercube: \begin{equation}\label{eq:mu-uniform}
+\mu := \mathbb{E}[g(\mathbf{T})] = \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t}, \qquad \mathbf{T} \sim \lambda,
+\end{equation} where \(g\) is the \textbf{integrand} and \(\lambda\) is
+the probability density of a random variable \(\mathbf{T}\) whose
+distribution we call the \textbf{true measure}. Through an appropriate
+transformation \(\boldsymbol{\psi}\), we rewrite \(\mu\) as the
+expectation of a function of a standard uniform random variable
+\(\mathbf{X}\) over the unit hypercube:
+\begin{equation}\label{eq:mu-uniform}
 \mu = \mathbb{E}[f(\mathbf{X})] = \int_{[0,1]^d} f(\mathbf{x}) \, d\mathbf{x}, \qquad \mathbf{X} \sim \mathcal{U}[0,1]^d.
-\end{equation}
-
-If \(\boldsymbol{\psi}\) satisfies \(\mathbf{T} \sim
+\end{equation} If \(\boldsymbol{\psi}\) satisfies \(\mathbf{T} \sim
 \boldsymbol{\psi}(\mathbf{X})\), then \(f = g \circ \boldsymbol{\psi}\).
 This transformation accommodates IID and LD samples which are
 approximately uniform on \([0,1]^d\).
@@ -188,128 +200,123 @@ approximately uniform on \([0,1]^d\).
 \eqref{eq:mu-uniform} via the sample mean
 \begin{equation}\label{eq:mu-hat}
 \widehat{\mu} := \frac{1}{n} \sum_{i=1}^{n} f(\mathbf{X}_i).
-\end{equation}
-
-MC methods choose IID sampling nodes \(\mathbf{X}_1,\dots,\mathbf{X}_n\)
-and have error \(|\widehat{\mu}-\mu|\) like \(\mathcal{O}(n^{-1/2})\)
-\citep{Nie78}. QMC methods choose dependent LD nodes that fill
-\([0,1]^d\) more evenly, achieving errors like
-\(\mathcal{O}(n^{-1+\delta})\) where \(\delta>0\) is arbitrarily small
-\citep{WanHic00b, Wan03a}. A key feature of \texttt{QMCPy} is
-\textbf{stopping criteria} that automatically determine \(n\) so
-\(|\mu - \widehat{\mu}| \le \varepsilon\) for a user-specified tolerance
-\(\varepsilon>0\), either deterministically or with high probability.
+\end{equation} MC methods choose IID sampling nodes
+\(\mathbf{X}_1,\dots,\mathbf{X}_n\) and have error
+\(|\widehat{\mu}-\mu|\) like \(\mathcal{O}(n^{-1/2})\) \citep{Nie78}.
+QMC methods choose dependent LD nodes that fill \([0,1]^d\) more evenly,
+achieving errors like \(\mathcal{O}(n^{-1+\delta})\) where \(\delta>0\)
+is arbitrarily small \citep{WanHic00b, Wan03a}. A key feature of
+\texttt{QMCPy} is \textbf{stopping criteria} that automatically
+determine \(n\) so \(|\mu - \widehat{\mu}| \le \varepsilon\) for a
+user-specified tolerance \(\varepsilon>0\), either deterministically or
+with high probability.
 
 \texttt{QMCPy} contains four main abstract classes which are extensible
 for new (Q)MC algorithms:
 
-\textbf{Discrete Distributions} generate IID or LD sampling nodes.
-Available LD pointsets include lattices
-\citep{Ric51, coveyou1967fourier, WanHic02a}, digital nets
-\citep{Nie87, Nie92, DicPil10a} (including Sobol' \citep{Sob67}), and
-Halton sequences \citep{Hal60}. We also support
-
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
 \item
-  robust randomization routines \citep{sorokin2025unified}, including
+  \textbf{Discrete Distributions} generate IID or LD sequences.
+  Available LD sequences and randomization routines
+  \citep{sorokin2025unified} include
 
   \begin{itemize}
   \tightlist
   \item
-    \textbf{Lattices} with random shifts \citep{CraPat76, HicEtal03}.
+    \textbf{Lattices} with random shifts
+    \citep{CraPat76, HicEtal03, Ric51, coveyou1967fourier, WanHic02a}.
   \item
-    \textbf{Digital Nets} with digital shifts
-    \citep{dick2005multivariate}, linear matrix scrambling (LMS)
-    \citep{Mat98}, or nested uniform scrambling (NUS, also called Owen
-    scrambling) \citep{Owe95, owen2003variance, dick2011higher}.
+    \textbf{Digital Sequences} (including Sobol' sequences) with digital
+    shifts, linear matrix scrambling (LMS), or nested uniform scrambling
+    (NUS, also called Owen scrambling)
+    \citep{Sob67, dick2005multivariate, Mat98, Owe95, owen2003variance, dick2011higher, Nie87, Nie92, DicPil10a}.
   \item
-    \textbf{Halton Pointsets} with digital shifts \citep{WanHic00},
-    permutation scrambling \citep{MorCaf94}, LMS
-    \citep{Mat98, owen2024gain}, or NUS \citep{owen2024gain}.
+    \textbf{Halton Sequences} with digital shifts, permutation
+    scrambling, LMS, or NUS
+    \citep{Hal60, WanHic00, Mat98, owen2024gain, MorCaf94, owen2024gain}.
   \end{itemize}
-\item
-  higher-order digital nets and higher order scrambling for integrands
-  \(f\) with \(\alpha\) degrees of ``smoothness'', enabling QMC
-  convergence like \(\mathcal{O}(n^{-\alpha+\delta})\) where
-  \(\delta>0\) is arbitrarily small \citep{dick2011higher}.
-\item
-  custom generating vectors for lattices and generating matrices for
-  digital nets, available from the growing collection in the
-  \texttt{LDData} repository \citep{LDData}, which standardizes data
-  from the Magic Point Shop \citep{KuoNuy16a} and Kuo's websites on
-  lattices \citep{cools2006constructing, nuyens2006fast, KuoGenerators}
-  and Sobol' points
+
+  We support higher-order digital sequences and higher order scrambling
+  for integrands \(f\) with \(\alpha\) degrees of ``smoothness'',
+  enabling QMC convergence like \(\mathcal{O}(n^{-\alpha+\delta})\)
+  where \(\delta>0\) is arbitrarily small \citep{dick2011higher}.
+  Internally, our LD generators call our C package \texttt{QMCToolsCL}
+  \citep{QMCToolsCL}. \texttt{QMCPy} also integrates with the
+  \texttt{LDData} repository \citep{LDData} which stores generating
+  vectors for lattices and generating matrices for digital sequences,
+  primarily drawing from the Magic Point Shop \citep{KuoNuy16a} and
+  Kuo's websites on lattices
+  \citep{cools2006constructing, nuyens2006fast, KuoGenerators} and
+  Sobol' sequences
   \citep{JoeKuo03, joe2008constructing, SobolDirection}.
-\end{itemize}
-
-Internally, our LD generators call our C package \texttt{QMCToolsCL}
-\citep{QMCToolsCL}.
-
-\textbf{True Measures} \(\mathbf{T}\) come with default transformations
-\(\boldsymbol{\psi}\) satisfying
-\(\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}\) where
-\(\mathbf{X} \sim \mathcal{U}[0,1]^d\). For example, suppose
-\(\mathbf{T}
-\sim \mathcal{N}(\mathbf{m},\Sigma)\) is a \(d\)-dimensional Gaussian
-random variable with mean \(\mathbf{m}\) and covariance \(\Sigma =
-\mathbf{A}\mathbf{A}^T\). Then
-\(\boldsymbol{\psi}(\mathbf{X}) = \mathbf{A}
-\Phi^{-1}(\mathbf{X}) + \mathbf{m}\) where \(\Phi^{-1}\) is the inverse
-distribution function of a standard normal applied elementwise. We
-support many measures, including those from \texttt{SciPy}'s
-\texttt{scipy.stats} \citep{2020SciPy-NMeth}.
-
-\textbf{Integrands} \(g\), given a true measure \(\mathbf{T}\) and
-transformation \(\boldsymbol{\psi}\), define the transformed integrand
-\(f = g \circ
-\boldsymbol{\psi}\) so that \(\mu = \mathbb{E}[g(\mathbf{T})] =
-\mathbb{E}[f(\mathbf{X})]\) where
-\(\mathbf{X} \sim \mathcal{U}[0,1]^d\). This change of variables is
-performed automatically. Users only need to specify \(g\) and
-\(\mathbf{T}\).
-
-\textbf{Stopping Criteria (SC)} adaptively increase the sample size
-until (Q)MC estimates satisfy user-defined error tolerances
-\citep{HicEtal18a, TonEtAl22a, owen2024error}. SC vary depending on
-properties of \(f\), and can include guaranteed MC algorithms
-\citep{HicEtal14a} or QMC algorithms based on:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
-  multiple randomizations of LD pointsets \citep{l2023confidence},
+  \textbf{True Measures} come with default transformations
+  \(\boldsymbol{\psi}\) satisfying
+  \(\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}\) where
+  \(\mathbf{X} \sim \mathcal{U}[0,1]^d\). For example, suppose
+  \(\mathbf{T}
+  \sim \mathcal{N}(\mathbf{m},\Sigma)\) is a \(d\)-dimensional Gaussian
+  random variable with mean \(\mathbf{m}\) and covariance \(\Sigma =
+  \mathbf{A}\mathbf{A}^T\). Then
+  \(\boldsymbol{\psi}(\mathbf{X}) = \mathbf{A}
+  \Phi^{-1}(\mathbf{X}) + \mathbf{m}\) where \(\Phi^{-1}\) is the
+  inverse distribution function of a standard normal applied
+  elementwise. We support many measures, including those from
+  \texttt{SciPy}'s \texttt{scipy.stats} \citep{2020SciPy-NMeth}.
 \item
-  quickly tracking the decay of Fourier coefficients
-  \citep{HicRazYun15a, HicJim16a, JimHic16a, HicEtal17a, DinHic20a}, or
+  \textbf{Integrands} \(g\), given a true measure \(\mathbf{T}\) and
+  transformation \(\boldsymbol{\psi}\), define the transformed integrand
+  \(f = g \circ
+  \boldsymbol{\psi}\) so that \(\mu = \mathbb{E}[g(\mathbf{T})] =
+  \mathbb{E}[f(\mathbf{X})]\) where
+  \(\mathbf{X} \sim \mathcal{U}[0,1]^d\). This change of variables is
+  performed automatically. Users only need to specify \(g\) and
+  \(\mathbf{T}\).
 \item
-  efficient Bayesian cubature by inducing structured Gram matrices
-  \citep{Jag19a, RatHic19a, JagHic22a}.
+  \textbf{Stopping Criteria (SC)} adaptively increase the sample size
+  \(n\) until (Q)MC estimates satisfy user-defined error tolerances
+  \citep{HicEtal18a, TonEtAl22a, owen2024error}. SC vary depending on
+  properties of \(f\), and can include guaranteed MC algorithms
+  \citep{HicEtal14a} or QMC algorithms based on:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    multiple randomizations of LD sequences \citep{l2023confidence},
+  \item
+    quickly tracking the decay of Fourier coefficients
+    \citep{HicJim16a, JimHic16a, HicEtal17a, DinHic20a}, or
+  \item
+    efficient Bayesian cubature by inducing structured Gram matrices
+    \citep{Jag19a, RatHic19a, JagHic22a}.
+  \end{itemize}
+
+  \texttt{QMCPy} is also capable of simultaneously approximating
+  functions of multiple integrands \citep{sorokin2022bounding}. Inspired
+  by \texttt{MultilevelEstimators.jl} \citep{MultilevelEstimators},
+  \texttt{QMCPy} is expanding support for multilevel (Q)MC SC
+  \citep{giles2009multilevel, giles2015multilevel} that exploit cheaper,
+  low-fidelity surrogates to accelerate expensive integrand estimates in
+  high or infinite dimensions.
+
+  \autoref{fig:stopping_crit} compares MC and QMC SC performance for
+  adaptively estimating the fair price of an Asian option across 100
+  trials per error tolerance. Both methods consistently meet tolerances.
+  The left panel shows sample complexity: MC algorithms require \(n =
+   \mathcal{O}(1/\varepsilon^2)\) samples while QMC algorithms require
+  only \(n =
+   \mathcal{O}(1/\varepsilon)\) samples, with shaded regions showing
+  10\%-90\% quantiles. The middle panel displays the computation time,
+  highlighting that QMC methods are much faster than MC methods. The
+  right panel presents error distributions via violin plots, showing
+  that the average error performance is better for QMC methods.
 \end{enumerate}
-
-\texttt{QMCPy} is also capable of simultaneously approximating functions
-of multiple integrands \citep{sorokin2022bounding}. Inspired by Julia's
-\texttt{MultilevelEstimators.jl} \citep{MultilevelEstimators},
-\texttt{QMCPy} is expanding support for multilevel (Q)MC SC
-\citep{giles2009multilevel, giles2015multilevel} which exploit cheaper
-low-fidelity surrogates to accelerate estimates of expensive integrands,
-often in high or infinite dimensions.
-
-\autoref{fig:stopping_crit} compares MC and QMC SC performance for
-adaptively estimating the fair price of an Asian option across 100
-trials per error tolerance. Both methods consistently meet tolerances.
-The left panel shows sample complexity: MC algorithms require
-\(n = \mathcal{O}(1/\varepsilon^2)\) samples while QMC algorithms
-require only \(n = \mathcal{O}(1/\varepsilon)\) samples, with shaded
-regions showing 10\%-90\% quantiles. The middle panel displays the
-computation time, highlighting that QMC methods are much faster than MC
-methods. The right panel presents error distributions via violin plots,
-showing that the average error performance is better for QMC methods.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={MC and QMC SC comparison for pricing of an Asian option. }]{../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png}
-\caption{MC and QMC SC comparison for pricing of an Asian option.
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={MC and QMC SC comparison for pricing an Asian option. }]{../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png}
+\caption{MC and QMC SC comparison for pricing an Asian option.
 \label{fig:stopping_crit}}
 \end{figure}
 
@@ -321,10 +328,11 @@ and \autoref{fig:stopping_crit} are reproducible via the Jupyter
 Notebook \citep{QMCPyJOSS2025Notebook}. Our project website
 \citep{QMCBlog} features publications, presentations, blogs,
 documentation \citep{QMCPyDocs}, and demos. Our GitHub repository
-\citep{choi2023qmcpy} contains open-source code, tests, and issue
-tracking \citep{ChoEtal22a, sorokin2025unified}. \texttt{QMCPy} is
-distributed under the Apache (v2.0) license. Community feedback and
-engagement are welcome.
+\citep{choi2023qmcpy} contains open-source code with continuous
+integration, tests, and issue tracking
+\citep{ChoEtal22a, sorokin2025unified}. \texttt{QMCPy} is distributed
+under the Apache (v2.0) license. Community feedback and engagement are
+welcome.
 
 \section{Acknowledgements}\label{acknowledgements}
 
@@ -332,21 +340,6 @@ The authors acknowledge support from the U.S. National Science
 Foundation grant DMS-231601 and Department of Energy Office of Science
 Graduate Student Research Program. We thank the international (Q)MC
 research community for invaluable feedback and support.
-
-\paragraph{Sign off here when you are satisfied with our
-manuscript:}\label{sign-off-here-when-you-are-satisfied-with-our-manuscript}
-
-\begin{itemize}
-\tightlist
-\item
-  Aleksei G. Sorokin
-\item
-  Aadit Jain
-\item
-  Pieterjan Robbe
-\item
-  Sou-Cheng T. Choi
-\end{itemize}
 
 \bibliographystyle{abbrvnat}
 \bibliography{refs_all}
