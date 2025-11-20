@@ -37,7 +37,7 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: November 19, 2025
+date: November 20, 2025
 bibliography: refs_all.bib
 csl: joss-simple.csl
 colorlinks: true
@@ -68,7 +68,7 @@ estimation, and integration with scientific libraries following reproducible
 research practices. Compared to previous versions, `QMCPy` 2.0 includes:
 
 - improved documentation,
-- expanded tests and demos,
+- strengthened tests and demos,
 - expanded support for randomized low-discrepancy (LD) sequences,
 - enhanced option pricing capabilities, and
 - new utilities for fast QMC-based kernel methods.
@@ -105,22 +105,22 @@ broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a; @ChoEtal24a;
 framework, bridging theory and practice, with the following features:
 
 - **Intuitive APIs** for problem specification and accessing (Q)MC methods,
-- **Flexible integrations** with `NumPy` [@harris2020array] and `SciPy` [@2020SciPy-NMeth], 
-- **Robust and adaptive sampling** with theoretically grounded error estimation, and 
+- **Flexible integrations** with `NumPy` [@harris2020array] and `SciPy` [@2020SciPy-NMeth],
+- **Robust and adaptive sampling** with theoretically grounded error estimation, and
 - **Extensible OO components** enabling researchers to implement and test new algorithms.
 
 Unlike other (Q)MC modules such as `SciPy`'s `scipy.stats.qmc`
 [@2020SciPy-NMeth] or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015],
 `QMCPy` provides:
 
-- customizable LD sequences with diverse randomization techniques, 
-- automatic variable transformations for (Q)MC compatibility, and 
+- customizable LD sequences with diverse randomization techniques,
+- automatic variable transformations for (Q)MC compatibility, and
 - rigorous adaptive error estimation algorithms.
 
 <!--================================================================================-->
 # Components
 
-(Q)MC methods approximate the multivariate integral 
+(Q)MC methods approximate the multivariate integral
 \begin{equation}\label{eq:mu-general}
 \mu := \mathbb{E}[g(\mathbf{T})] = \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t}, \qquad \mathbf{T} \sim \lambda,
 \end{equation}
@@ -187,7 +187,7 @@ variable with mean $\mathbf{m}$ and covariance $\Sigma =
 distribution function of a standard normal applied elementwise. We support many
 measures, including those from `SciPy`'s `scipy.stats` [@2020SciPy-NMeth].
 
-3. **Integrands** $g$, given a true measure $\mathbf{T}$ and transformation
+3. **Integrands** $g$, given a transformation
 $\boldsymbol{\psi}$, define the transformed integrand $f = g \circ
 \boldsymbol{\psi}$ so that $\mu = \mathbb{E}[g(\mathbf{T})] =
 \mathbb{E}[f(\mathbf{X})]$ where $\mathbf{X} \sim \mathcal{U}[0,1]^d$. This
@@ -199,11 +199,11 @@ estimates satisfy user-defined error tolerances [@HicEtal18a; @TonEtAl22a;
 @owen2024error]. SC vary depending on properties of $f$, and can include
 guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
 
-    -  multiple randomizations of LD sequences [@l2023confidence], 
-    -  quickly tracking the decay of Fourier coefficients [@HicJim16a;
+    - multiple randomizations of LD sequences [@l2023confidence],
+    - quickly tracking the decay of Fourier coefficients [@HicJim16a;
        @JimHic16a; @HicEtal17a; @DinHic20a], or
-    -  efficient Bayesian cubature by inducing structured Gram matrices
-       [@Jag19a; @RatHic19a; @JagHic22a]. 
+    - efficient Bayesian cubature by inducing structured Gram matrices
+       [@Jag19a; @RatHic19a; @JagHic22a].
 
     `QMCPy` is also capable of simultaneously approximating functions of
     multiple integrands [@sorokin2022bounding]. Inspired by
@@ -220,13 +220,12 @@ guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
     \mathcal{O}(1/\varepsilon)$ samples, with shaded regions showing 10%-90%
     quantiles. The middle panel displays the computation time, highlighting that
     QMC methods are much faster than MC methods. The right panel presents error
-    distributions via violin plots, showing that the average error performance
-    is better for QMC methods. 
+    distributions via violin plots for a single error tolerance, showing that the average error performance
+    is better for QMC methods.
 
 ![MC and QMC SC comparison for pricing an Asian option.
 \label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
 width=100% }
-
 
 <!--================================================================================-->
 # Distribution and Resources
