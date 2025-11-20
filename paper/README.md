@@ -24,7 +24,7 @@
 
 ## Contents
 ### Main File
-- [**`main.md`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/main.md): Main paper source (Markdown format)
+- [**`paper.md`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/paper.md): Main paper source (Markdown format)
 
 ### Bibliography Files
 - [**`FJH25.bib`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/FJH25.bib): Fred J. Hickernell bibliography (2025)
@@ -40,7 +40,7 @@
 ### Build System
 - [**`joss.yml`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/.github/workflows/joss.yml): GitHub Actions CI/CD configuration
 - [**`Makefile`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/Makefile): Build system for Markdown and LaTeX workflows
-- [**`include-code-files.lua`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/include-code-files.lua): Pandoc Lua filter of lines for inline inclusion of Python or text files in `main.md`
+- [**`include-code-files.lua`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/include-code-files.lua): Pandoc Lua filter of lines for inline inclusion of Python or text files in `paper.md`
 - [**`joss-simple.csl`**](https://github.com/QMCSoftware/QMCSoftware/blob/joss/paper/joss-simple.csl): Citation Style Language file for local compilation using make
 
 --- 
@@ -71,5 +71,5 @@ Other Commands:
 - `make clean`: Removes auxiliary files.
 - `make cleanall`: Deletes all outputs, including PDFs.
 - `make refs_all.bib`: Combines bibliography files.
-- `make wordcount`: Counts words in `main.md` (excludes metadata/references).
+- `make wordcount`: Counts words in `paper.md` (excludes metadata/references).
 - `make install-mac`:  Install required tools on macOS using Homebrew.

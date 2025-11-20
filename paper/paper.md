@@ -93,7 +93,7 @@ stars (initial 32 points), green triangles (next 32), and blue circles
 (subsequent 64). The lattice was randomly shifted; the digital sequence was
 randomized with nested uniform scrambling (Owen scrambling); the Halton sequence
 was randomized with linear matrix scrambling and permutation
-scrambling.\label{fig:points}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/points.png){width=100%}
+scrambling.\label{fig:points}](./figs/points.png){width=100%}
 
 While (Q)MC methods are well established [@dick2010digital; @dick2013high],
 practical implementation demands numerical and algorithmic expertise. Our
@@ -224,7 +224,7 @@ guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
     is better for QMC methods.
 
 ![MC and QMC SC comparison for pricing an Asian option.
-\label{fig:stopping_crit}](../demos/talk_paper_demos/JOSS2025/JOSS2025.outputs/stopping_crit.png){
+\label{fig:stopping_crit}](./figs/stopping_crit.png){
 width=100% }
 
 <!--================================================================================-->

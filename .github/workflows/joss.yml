@@ -6,7 +6,7 @@ on:
       - develop
       - joss
     paths:
-      - 'paper/main.md'
+      - 'paper/paper.md'
       - '.github/workflows/joss.yml'
       - 'paper/choi2025.bib'
       - 'paper/FJH25.bib'
@@ -35,7 +35,7 @@ jobs:
         uses: openjournals/openjournals-draft-action@master
         with:
           journal: joss
-          paper-path: paper/main.md
+          paper-path: paper/paper.md
 
       - name: Find generated PDF and set output
         id: find-pdf

@@ -15,7 +15,7 @@ BIBTEX     := $(TEX_BIN)/bibtex
 # File definitions
 PAPER      := paper.md
 BIB        := paper.bib
-MD_SRC     := main.md
+MD_SRC     := paper.md
 SRC        := main.tex
 LUA_FILTER := include-code-files.lua
 
@@ -47,7 +47,7 @@ $(OUTPUT): $(PAPER) $(BIB)
 	@echo "✅ Done: $(OUTPUT) generated successfully."
 
 maintex_pdf: refs_all.bib $(MD_SRC) $(LUA_FILTER)
-	@echo "Generating main.tex from main.md with natbib..."
+	@echo "Generating main.tex from paper.md with natbib..."
 	pandoc $(MD_SRC) -o $(SRC) --template=template.latex --lua-filter=include-code-files.lua --natbib --bibliography=refs_all.bib -M colorlinks=true -M linkcolor=blue -M citecolor=blue -M urlcolor=blue -M filecolor=magenta
 	@echo "Adding bibliography commands to main.tex..."
 	@if ! grep -q '\\bibliography{' $(SRC); then \
@@ -153,4 +153,3 @@ wordcount:
 	# applying the same filtering rules as the word count.
 	@echo "Generating tmp.md for verification..."
 	@awk 'BEGIN{in_comment=0; in_yaml=1} /^---$$/ && in_yaml && NR>1{in_yaml=0; next} in_yaml{next} /^[[:space:]]*<!--/{ if ($$0 ~ /-->/) next; in_comment=1; next } in_comment{ if ($$0 ~ /-->/) in_comment=0; next } /^# (Acknowledgements|References)$$/{ exit } { print }' $(MD_SRC) | tr '\n' '\r' | sed -E 's/!\[/ /g; s/\]\([^)]*\)\{[^}]*\}//g; s/\[@[^]]*\]//g; s/\\label\{[^}]*\}//g; s/ ([,.])/\1/g; s/\r([,.])/\1/g' | tr '\r' '\n' > tmp.md
-
