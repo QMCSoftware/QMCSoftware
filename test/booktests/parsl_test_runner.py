@@ -56,7 +56,13 @@ def execute_parallel_tests():
         except Exception as e:
             print(f"Test {module} failed once with error: {e}. Retrying...")
             try:
-                future.result()  # Retry once
+                # Resubmit the test for retry
+                retry_future = run_single_test(
+                    module,
+                    stdout=f'logs/test_{index}_{module}.out',
+                    stderr=f'logs/test_{index}_{module}.err'
+                )
+                retry_future.result()  # Wait for retry completion
             except Exception as e2:
                 results.append((module, f'FAILED after retry: {e2}', 0))
                 status = 'FAILED'
