@@ -72,8 +72,9 @@ def execute_parallel_tests():
                 status = 'FAILED'
                 completed += 1
                 print(f"[{completed}/{len(futures)}] {module}: {status}")
-                continue
+                continue  # Skip to next test - don't mark this as PASSED
 
+        # Only reached if test passed (either on first attempt or after retry)
         # Read the output file to check for skipped tests
         # Use retry output file if test was retried
         if was_retried:
