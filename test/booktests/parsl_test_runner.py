@@ -57,7 +57,9 @@ def execute_parallel_tests():
         except Exception as e:
             print(f"Test {module} failed once with error: {e}. Retrying...")
             try:
-                # Resubmit the test for retry (use _retry suffix for log files)
+                # Resubmit the test for retry
+                # Use _retry suffix for log files to preserve original failed test logs
+                # for debugging purposes while capturing retry output separately
                 retry_future = run_single_test(
                     module,
                     stdout=f'logs/test_{index}_{module}_retry.out',
