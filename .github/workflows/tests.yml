@@ -21,7 +21,7 @@ jobs:
       - run: pip install -e .[test]
       - run: pip freeze
       - run: make doctests_minimal
-      #- run: pip install -e .[test_torch] 
+      - run: pip install -e .[test_torch] 
       - run: make doctests_torch 
       - run: pip install -e .[test_gpytorch]
       - run: make doctests_gpytorch
