@@ -72,7 +72,7 @@ test = [
     "pytest-accept == 0.1.10",
     ]
 test_torch = [
-    "torch == 2.7.0",
+    "torch >= 2.0.0",
     ]
 test_gpytorch = [
     "gpytorch == 1.11",
