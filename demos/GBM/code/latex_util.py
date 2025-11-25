@@ -7,7 +7,7 @@ def format_number(x):
         return '-'
     try:
         num = float(x)
-        formatted = f"{num:.4f}"
+        formatted = f"{num:.8f}"
         if '.' not in formatted and abs(num) < 1 and num != 0:
             formatted += '.0'
         return formatted

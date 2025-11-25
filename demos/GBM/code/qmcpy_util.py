@@ -1,15 +1,15 @@
 import qmcpy as qp
 
-def create_qmcpy_sampler(sampler_type, dimension, seed=42):
+def create_qmcpy_sampler(sampler_type, dimension, seed=42, replications):
     """Create a sampler instance based on type and dimension"""
     if sampler_type == 'IIDStdUniform':
-        return qp.IIDStdUniform(dimension, seed=seed)
+        return qp.IIDStdUniform(dimension, seed=seed,replications)
     elif sampler_type == 'Sobol':
-        return qp.Sobol(dimension, seed=seed)
+        return qp.Sobol(dimension, seed=seed,replications)
     elif sampler_type == 'Lattice':
-        return qp.Lattice(dimension, seed=seed)
+        return qp.Lattice(dimension, seed=seed,replications)
     elif sampler_type == 'Halton':
-        return qp.Halton(dimension, seed=seed)
+        return qp.Halton(dimension, seed=seed,replications)
     else:
         raise ValueError(f"Unsupported sampler type: {sampler_type}")
     
