@@ -41,7 +41,7 @@ unittests:
 	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
 check_booktests:
-
+	rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
 	find demos -name '*.ipynb' | while read nb; do \
 		base=$$(basename "$$nb" .ipynb); \
 		test_base=$$(echo "$$base" | sed 's/[-.]/_/g'); \
