@@ -80,6 +80,7 @@ jobs:
           pip install -e .[test_gpytorch]
           pip install -e .[test_botorch]
           pip install -e .[test_umbridge]
+          pip install scikit-optimize  # skopt
           conda clean --all --yes
 
       # -----------------------------------------------------------
