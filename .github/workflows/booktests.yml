@@ -35,8 +35,7 @@ jobs:
         run: pip install -e .[test]
       - name: Install LaTeX
         run: |    
-          sudo apt update
-          sudo apt install texlive texlive-science texlive-latex-extra latexmk
+          sudo apt update  &&  sudo apt install texlive texlive-science texlive-latex-extra latexmk   &&  sudo apt-get install -y texlive-fonts-recommended
       - name: Check for missing booktest files
         run: make check_booktests
       - name: Generate missing booktest files
