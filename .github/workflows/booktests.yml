@@ -18,35 +18,73 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
+
     steps:
       - uses: actions/checkout@v4
+
+      # -----------------------------------------------------------
+      # Add swap space (prevents out-of-memory errors)
+      # -----------------------------------------------------------
+      - name: Add 6GB swap
+        run: |
+          sudo fallocate -l 6G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
+      # -----------------------------------------------------------
+      # Install Miniconda with Mamba (lower memory footprint)
+      # -----------------------------------------------------------
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-activate-base: true
-      - name: Free up space before install
+          mamba-version: "latest"
+          use-mamba: true
+
+      - name: Free space before environment setup
         run: |
           sudo apt-get clean
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
           df -h
           conda clean --all --yes
           pip cache purge || true
+
       - name: Install base dependencies
-        run: pip install -e .[test]
-      - name: Install LaTeX
-        run: |    
+        run: mamba install pip && pip install -e .[test]
+
+      # -----------------------------------------------------------
+      # Install minimal TeX (avoid full texlive: too big)
+      # -----------------------------------------------------------
+      - name: Install minimal LaTeX
+        run: |
           sudo apt update
-          sudo apt install texlive texlive-science texlive-latex-extra texlive-fonts-extra latexmk
+          sudo apt install -y texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-extra latexmk
+          df -h
+
       - name: Check for missing booktest files
         run: make check_booktests
+
       - name: Generate missing booktest files
         run: make generate_booktests
+
+      # -----------------------------------------------------------
+      # Install additional dependencies (Torch, GP, etc.)
+      # -----------------------------------------------------------
       - name: Install additional test dependencies
         run: |
           pip install -e .[test_torch]
           pip install -e .[test_gpytorch]
           pip install -e .[test_botorch]
           pip install -e .[test_umbridge]
+          conda clean --all --yes
+
+      # -----------------------------------------------------------
+      # Run notebook tests sequentially (-j1)
+      # -----------------------------------------------------------
       - name: Run notebook tests
         shell: bash -l {0}
-        run: make -j2 booktests_no_docker TESTS="tb_quickstart"
+        env:
+          MPLBACKEND: Agg   # ensures headless, low-memory matplotlib
+        run: make -j1 booktests_no_docker TESTS="tb_quickstart"
