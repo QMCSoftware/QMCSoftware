@@ -5,38 +5,35 @@ on:
   push:
     paths:
       - 'demos/**/*.ipynb'
-      - '.github/workflows/booktests.yml'
   pull_request:
     paths:
       - 'demos/**/*.ipynb'
-      - '.github/workflows/booktests.yml'
 
 jobs:
   booktests:
-    timeout-minutes: 120
-    name: Notebook Tests
+    name: Notebook Tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: ["ubuntu-latest", "macos-latest"]
     steps:
       - uses: actions/checkout@v4
-      - name: Install LaTeX
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y texlive-full
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install --cask mactex
-          fi
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-activate-base: true
       - name: Install base dependencies
-        run: pip install -e ".[test]"
-      - name: Install Jupyter kernel
-        run: python -m ipykernel install --user --name=qmcpy
+        run: pip install -e .[test]
+      - name: Check for missing booktest files
+        run: make check_booktests
+      - name: Generate missing booktest files
+        run: make generate_booktests
+      - name: Install additional test dependencies
+        run: |
+          pip install -e .[test_torch]
+          pip install -e .[test_gpytorch]
+          pip install -e .[test_botorch]
+          pip install -e .[test_umbridge]
       - name: Run notebook tests
         shell: bash -l {0}
-        run: make booktests_parallel_no_docker TESTS="tb_dakota_genz"
+        run: make booktests_parallel_no_docker
