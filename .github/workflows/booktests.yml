@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        os: ["ubuntu-latest"]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -26,6 +26,10 @@ jobs:
           auto-activate-base: true
       - name: Install base dependencies
         run: pip install -e .[test]
+      - name: Install LaTeX
+        run: |    
+          sudo apt update
+          sudo apt install texlive-full latexmk
       - name: Check for missing booktest files
         run: make check_booktests
       - name: Generate missing booktest files
