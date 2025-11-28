@@ -13,7 +13,8 @@ on:
 jobs:
   booktests:
     runs-on: ubuntu-latest
-
+    env:
+      ACTIONS_STEP_DEBUG: true   # enable debug logging
     steps:
       - uses: actions/checkout@v4
 
@@ -29,9 +30,9 @@ jobs:
       # -----------------------------------------------------------
       # 2. Add swap space
       # -----------------------------------------------------------
-      - name: Add 6GB swap (safe, after conda)
+      - name: Add 12GB swap
         run: |
-          sudo fallocate -l 6G /swapfile
+          sudo fallocate -l 12G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
