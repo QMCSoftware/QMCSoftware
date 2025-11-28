@@ -5,10 +5,12 @@ on:
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
+      - 'tests/booktests/**'
   pull_request:
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
+      - 'tests/booktests/**'
 
 jobs:
   booktests:
