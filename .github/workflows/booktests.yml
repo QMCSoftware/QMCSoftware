@@ -90,8 +90,10 @@ jobs:
         shell: bash -l {0}
         env:
           MPLBACKEND: Agg   # ensures headless, low-memory matplotlib
-        run: make -j2 booktests_no_docker  # TESTS="tb_quickstart"
+        run: make booktests_parallel_no_docker  # TESTS="tb_quickstart"
 
 
 # Filter for GitHub Actions runs: 
 #     branch:booktests_choi workflow:Booktests is:success
+#
+# e.g., https://github.com/QMCSoftware/QMCSoftware/actions/runs/19772814355
