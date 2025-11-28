@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["ubuntu-latest"]
+        os: ["ubuntu-latest-xl"]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -49,4 +49,4 @@ jobs:
           pip install -e .[test_umbridge]
       - name: Run notebook tests
         shell: bash -l {0}
-        run: make booktests_no_docker
+        run: make -j2 booktests_no_docker
