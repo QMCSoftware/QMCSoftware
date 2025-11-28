@@ -41,6 +41,7 @@ unittests:
 	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
 check_booktests:
+	rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
 	find demos -name '*.ipynb' | while read nb; do \
 		base=$$(basename "$$nb" .ipynb); \
 		test_base=$$(echo "$$base" | sed 's/[-.]/_/g'); \
@@ -55,12 +56,12 @@ check_booktests:
 # This helps locate generated or local-only folders like build, .pytest_cache, etc.
 find_local_only_files:
 	chmod +x scripts/find_local_only_folders.sh
-	./scripts/find_local_only_folders.sh
+	./scripts/find_local_only_folders.sh 
 
 clean_local_only_files:
-	chmod +x scripts/find_local_only_folders.sh
-	for f in $(shell ./scripts/find_local_only_folders.sh); do \
-		rm -f "$$f"; \
+	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
+	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
+		rm -f "$$f"; > /dev/null 2>&1; \
 	done
 
 generate_booktests:
