@@ -5,9 +5,11 @@ on:
   push:
     paths:
       - 'demos/**/*.ipynb'
+      - '.github/workflows/booktests.yml'
   pull_request:
     paths:
       - 'demos/**/*.ipynb'
+      - '.github/workflows/booktests.yml'
 
 jobs:
   booktests:
