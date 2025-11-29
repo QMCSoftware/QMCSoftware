@@ -51,6 +51,12 @@ jobs:
           pip cache purge || true
           df -h
 
+      - name: Show runner resources
+        run: |
+          echo "CPUs: $(nproc)"
+          free -h
+          df -h
+
       # -----------------------------------------------------------
       # 4. Install dependencies
       # -----------------------------------------------------------
