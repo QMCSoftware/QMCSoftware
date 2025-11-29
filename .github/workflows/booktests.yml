@@ -2,21 +2,23 @@ name: Booktests
 
 on:
   push:
+    branches: [ booktests_choi ]
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
-      - 'tests/booktests/**'
+      - 'tests/booktests/**.py'
   pull_request:
+    branches: [ develop ]
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
-      - 'tests/booktests/**'
+      - 'tests/booktests/**.py'
 
 jobs:
   booktests:
     runs-on: ubuntu-latest
     env:
-      ACTIONS_STEP_DEBUG: true   # enable debug logging
+      ACTIONS_STEP_DEBUG: false   # true to enable debug logging
     steps:
       - uses: actions/checkout@v4
 
