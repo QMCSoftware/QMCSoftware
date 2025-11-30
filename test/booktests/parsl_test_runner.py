@@ -5,6 +5,9 @@ import os
 import re
 import time
 from pathlib import Path
+import time
+import parsl as pl
+from parsl.configs.htex_local import config
 
 @bash_app
 def run_single_test(test_file, stdout='test_output.txt', stderr='test_error.txt'):
@@ -155,6 +158,198 @@ def generate_summary_report(results, execution_time=0.0):
                 print("-" * 70)
                 print(f"Error: {status}")
                 print()
+
+def reload_parsl_config(max_workers=None, wait=1):
+    """Safely reload Parsl with an updated config.
+
+    - If a Parsl DFK exists, try to cleanup/shutdown it first.
+    - Call `pl.clear()` to reset Parsl state.
+    - Optionally set `config.max_workers` before loading.
+    - Load the (possibly modified) config and wait briefly.
+    """
+    import os
+    import signal
+    import subprocess
+    import time as _time
+
+    def kill_interchange_processes(retries=3, delay=0.5):
+        """Kill any running 'interchange.py' processes using multiple strategies."""
+        for attempt in range(retries):
+            killed_any = False
+            # Try pkill first (simpler)
+            try:
+                subprocess.run(['pkill', '-f', 'interchange.py'], check=False)
+            except Exception:
+                pass
+
+            # Try pgrep -> kill
+            try:
+                p = subprocess.run(['pgrep', '-f', 'interchange.py'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+                if p.stdout:
+                    for line in p.stdout.splitlines():
+                        try:
+                            pid = int(line.strip())
+                            try:
+                                os.kill(pid, signal.SIGTERM)
+                                killed_any = True
+                            except ProcessLookupError:
+                                pass
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
+            # Wait a bit for processes to die
+            _time.sleep(delay)
+
+            # Force kill remaining
+            try:
+                p = subprocess.run(['pgrep', '-f', 'interchange.py'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+                if p.stdout:
+                    for line in p.stdout.splitlines():
+                        try:
+                            pid = int(line.strip())
+                            try:
+                                os.kill(pid, signal.SIGKILL)
+                                killed_any = True
+                            except ProcessLookupError:
+                                pass
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
+            # If none found/killed, we're done
+            p_check = subprocess.run(['pgrep', '-f', 'interchange.py'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+            if not p_check.stdout:
+                return True
+            # otherwise retry
+            _time.sleep(delay)
+        # after retries, return False if still present
+        final_check = subprocess.run(['pgrep', '-f', 'interchange.py'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        return not bool(final_check.stdout)
+
+    # Attempt graceful DFK cleanup if present
+    try:
+        dfk = pl.dfk()  # may raise if no DFK
+        if dfk is not None:
+            try:
+                dfk.cleanup()
+            except Exception:
+                pass
+            try:
+                # some Parsl versions expose shutdown
+                getattr(dfk, "shutdown", lambda: None)()
+            except Exception:
+                pass
+    except Exception:
+        # no active DFK or older/newer API — continue
+        pass
+
+    # Clear Parsl global state
+    try:
+        pl.clear()
+    except Exception:
+        pass
+
+    # Ensure any leftover interchange processes are killed before loading
+    try:
+        kill_interchange_processes()
+    except Exception:
+        pass
+
+    # Apply requested changes
+    if max_workers is not None:
+        config.max_workers = max_workers
+
+    # Attempt to load the (possibly updated) config, retrying if we detect leftover interchange processes
+    last_exc = None
+    for attempt in range(3):
+        try:
+            pl.load(config)
+            break
+        except AssertionError as ae:
+            last_exc = ae
+            # Often caused by existing interchange process; try killing and retry
+            try:
+                kill_interchange_processes()
+            except Exception:
+                pass
+            _time.sleep(0.5)
+        except Exception as e:
+            last_exc = e
+            # For other errors, try once more after a small delay
+            _time.sleep(0.5)
+    else:
+        # Failed after retries; raise the last exception so caller can see details
+        raise last_exc
+
+    # Small pause to let executors start
+    _time.sleep(wait)
+
+    # Report status
+    try:
+        mw = getattr(config, "max_workers", None)
+        print(f"Parsl loaded (max_workers={mw})")
+        # show configured executors
+        if hasattr(pl, "config") and pl.config is not None:
+            try:
+                exe_names = [type(e).__name__ for e in pl.config.executors]
+                print("Executors:", exe_names)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    return pl
+    """Safely reload Parsl with an updated config.
+
+    - If a Parsl DFK exists, try to cleanup/shutdown it first.
+    - Call `pl.clear()` to reset Parsl state.
+    - Optionally set `config.max_workers` before loading.
+    - Load the (possibly modified) config and wait briefly.
+    """
+    # Attempt graceful DFK cleanup if present
+    try:
+        dfk = pl.dfk()  # may raise if no DFK
+        if dfk is not None:
+            try:
+                dfk.cleanup()
+            except Exception:
+                pass
+    except Exception:
+        # no active DFK or older/newer API — continue
+        pass
+
+    # Clear Parsl global state
+    try:
+        pl.clear()
+    except Exception:
+        pass
+
+    # Apply requested changes
+    if max_workers is not None:
+        config.max_workers = max_workers
+
+    # Load the (possibly updated) config
+    pl.load(config)
+
+    # Small pause to let executors start
+    time.sleep(wait)
+
+    # Report status
+    try:
+        mw = getattr(config, "max_workers", None)
+        print(f"Parsl loaded (max_workers={mw})")
+        # show configured executors
+        if hasattr(pl, "config") and pl.config is not None:
+            exe_names = [type(e).__name__ for e in pl.config.executors]
+            print("Executors:", exe_names)
+    except Exception:
+        pass
+
+    return pl
+
 
 def main():
     """Main function to run parallel tests"""

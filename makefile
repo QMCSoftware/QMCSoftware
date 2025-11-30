@@ -59,6 +59,7 @@ find_local_only_files:
 	./scripts/find_local_only_folders.sh 
 
 clean_local_only_files:
+	rm -fr test/booktests/.ipynb_checkpoints/
 	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
 	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
 		rm -f "$$f"; > /dev/null 2>&1; \
