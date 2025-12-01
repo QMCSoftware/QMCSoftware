@@ -1,12 +1,12 @@
-# ParslFest 2025: Accelerating QMCpy Notebook Tests with Parsl
+# ParslFest 2025: Accelerating QMCPy Notebook Tests with Parsl
 
-This directory contains demonstration notebooks for the ParslFest 2025 presentation on using Parsl to parallelize QMCpy notebook tests.
+This directory contains demonstration notebooks for the ParslFest 2025 presentation on using Parsl to parallelize QMCPy notebook tests.
 
-**Presentation**: [Accelerating QMCpy Notebook Tests with Parsl](https://www.figma.com/slides/k7EUosssNluMihkYTLuh1F/Parsl-Testbook-Speedup?node-id=1-37&t=WnKcu2QYO8JXvtpP-0)
+**Presentation**: [Accelerating QMCPy Notebook Tests with Parsl](https://www.figma.com/slides/k7EUosssNluMihkYTLuh1F/Parsl-Testbook-Speedup?node-id=1-37&t=WnKcu2QYO8JXvtpP-0)
 
 ## Files
 
-- **`01_sequential.ipynb`** - Runs all QMCpy notebook tests sequentially without parallelization to establish a baseline execution time
+- **`01_sequential.ipynb`** - Runs all QMCPy notebook tests sequentially without parallelization to establish a baseline execution time
 - **`02_parallel.ipynb`** - Runs the same notebook tests in parallel using Parsl with configurable worker count to measure speedup
 - **`03_visualize_speedup.ipynb`** - Visualizes and analyzes the speedup achieved by parallel execution across different worker configurations
 - **`.gitignore`** - Git ignore rules for output files and temporary data
