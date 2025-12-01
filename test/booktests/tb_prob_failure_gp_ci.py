@@ -4,7 +4,7 @@ import shutil
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-@unittest.skip("Skipping due to docker dependency")
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
 
     def setUp(self):
@@ -12,7 +12,7 @@ class NotebookTests(BaseNotebookTest):
         # Create outputs directory
         os.makedirs('outputs', exist_ok=True)
 
-    @testbook('../../demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb', execute=False, timeout=TB_TIMEOUT)
+    @testbook('../../demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb', execute=True, timeout=TB_TIMEOUT)
     def test_prob_failure_gp_ci_notebook(self, tb):
         # Execute cells manually, skipping problematic ones
         for i, cell in enumerate(self.cells):
@@ -26,7 +26,7 @@ class NotebookTests(BaseNotebookTest):
                     print(f"Skipping cell {i}: {source[:50]}...")
                     print(f"Stopping execution at cell {i} (docker dependency)")
                     break
-                    
+                    s
                 try:
                     self.execute_cell(i)
                 except Exception as e:

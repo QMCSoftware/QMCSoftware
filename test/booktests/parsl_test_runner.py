@@ -54,21 +54,36 @@ def execute_parallel_tests():
     results = []
     completed = 0
     for module, future, index in futures:
+        was_retried = False
         try:
             future.result()  # Wait for completion
         except Exception as e:
             print(f"Test {module} failed once with error: {e}. Retrying...")
             try:
-                future.result()  # Retry once
+                # Resubmit the test for retry
+                # Use _retry suffix for log files to preserve original failed test logs
+                # for debugging purposes while capturing retry output separately
+                retry_future = run_single_test(
+                    module,
+                    stdout=f'logs/test_{index}_{module}_retry.out',
+                    stderr=f'logs/test_{index}_{module}_retry.err'
+                )
+                retry_future.result()  # Wait for retry completion
+                was_retried = True
             except Exception as e2:
                 results.append((module, f'FAILED after retry: {e2}', 0))
                 status = 'FAILED'
                 completed += 1
                 print(f"[{completed}/{len(futures)}] {module}: {status}")
-                continue
+                continue  # Skip to next test - don't mark this as PASSED
 
+        # Only reached if test passed (either on first attempt or after retry)
         # Read the output file to check for skipped tests
-        output_file = f'logs/test_{index}_{module}.out'
+        # Use retry output file if test was retried
+        if was_retried:
+            output_file = f'logs/test_{index}_{module}_retry.out'
+        else:
+            output_file = f'logs/test_{index}_{module}.out'
         skip_count = 0
         if os.path.exists(output_file):
             with open(output_file, 'r') as f:
