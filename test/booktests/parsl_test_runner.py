@@ -9,6 +9,13 @@ import time
 import parsl as pl
 from parsl.configs.htex_local import config
 
+# Import runtime estimates for load balancing
+try:
+    from test_runtimes import sort_by_runtime, get_runtime, print_schedule, optimal_schedule
+    HAS_RUNTIME_ESTIMATES = True
+except ImportError:
+    HAS_RUNTIME_ESTIMATES = False
+
 @bash_app
 def run_single_test(test_file, stdout='test_output.txt', stderr='test_error.txt'):
     """Run a single test file using bash"""
@@ -47,6 +54,20 @@ def execute_parallel_tests():
         print(f"Note: Removed {len(test_modules) - len(unique_test_modules)} duplicate test module(s)")
     test_modules = unique_test_modules
 
+    # Apply optimal scheduling for better load balancing
+    if HAS_RUNTIME_ESTIMATES:
+        # Try to get the number of workers from Parsl config
+        try:
+            num_workers = config.executors[0].max_workers if config.executors else 8
+        except:
+            num_workers = 8
+        
+        # Use optimal bin-packing schedule
+        test_modules, assignments, est_makespan = optimal_schedule(test_modules, num_workers)
+        total_seq = sum(get_runtime(m) for m in test_modules)
+        print(f"Applied optimal LPT scheduling for {num_workers} workers")
+        print(f"Estimated makespan: {est_makespan:.1f}s (speedup: {total_seq/est_makespan:.2f}x)")
+    
     print(f"Found {len(test_modules)} test modules to execute in parallel...")
     
     # Submit all jobs
