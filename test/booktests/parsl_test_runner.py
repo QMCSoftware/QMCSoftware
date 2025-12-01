@@ -35,6 +35,17 @@ def execute_parallel_tests():
     if not test_modules:
         test_files = glob.glob('tb_*.py')
         test_modules = [os.path.basename(f).replace('.py', '') for f in test_files]
+    
+    # De-duplicate test modules while preserving order
+    seen = set()
+    unique_test_modules = []
+    for module in test_modules:
+        if module not in seen:
+            seen.add(module)
+            unique_test_modules.append(module)
+    if len(unique_test_modules) < len(test_modules):
+        print(f"Note: Removed {len(test_modules) - len(unique_test_modules)} duplicate test module(s)")
+    test_modules = unique_test_modules
 
     print(f"Found {len(test_modules)} test modules to execute in parallel...")
     
@@ -53,39 +64,69 @@ def execute_parallel_tests():
     # Wait for completion and collect results
     results = []
     completed = 0
+    processed_modules = set()  # Track which modules we've already processed
     for module, future, index in futures:
+        if module in processed_modules:
+            print(f"WARNING: Module {module} already processed - skipping duplicate!")
+            continue
+        processed_modules.add(module)
         was_retried = False
+        exit_code_5_first_attempt = False
         try:
             future.result()  # Wait for completion
         except Exception as e:
-            print(f"Test {module} failed once with error: {e}. Retrying...")
-            try:
-                # Resubmit the test for retry
-                # Use _retry suffix for log files to preserve original failed test logs
-                # for debugging purposes while capturing retry output separately
-                retry_future = run_single_test(
-                    module,
-                    stdout=f'logs/test_{index}_{module}_retry.out',
-                    stderr=f'logs/test_{index}_{module}_retry.err'
-                )
-                retry_future.result()  # Wait for retry completion
-                was_retried = True
-            except Exception as e2:
-                results.append((module, f'FAILED after retry: {e2}', 0))
-                status = 'FAILED'
-                completed += 1
-                print(f"[{completed}/{len(futures)}] {module}: {status}")
-                continue  # Skip to next test - don't mark this as PASSED
+            # Check if this is exit code 5 (NO TESTS RAN - all skipped)
+            # Exit code 5 means all tests were skipped, which is success, not failure
+            error_str = str(e)
+            if 'unix exit code 5' in error_str:
+                exit_code_5_first_attempt = True
+                # Don't retry - exit code 5 is expected for skipped tests
+            else:
+                print(f"Test {module} failed once with error: {e}. Retrying...")
+                try:
+                    # Resubmit the test for retry
+                    # Use _retry suffix for log files to preserve original failed test logs
+                    # for debugging purposes while capturing retry output separately
+                    retry_future = run_single_test(
+                        module,
+                        stdout=f'logs/test_{index}_{module}_retry.out',
+                        stderr=f'logs/test_{index}_{module}_retry.err'
+                    )
+                    retry_future.result()  # Wait for retry completion
+                    was_retried = True
+                except Exception as e2:
+                    # Check retry for exit code 5 as well
+                    if 'unix exit code 5' in str(e2):
+                        was_retried = True
+                        # Treat as passed (skipped)
+                    else:
+                        results.append((module, f'FAILED after retry: {e2}', 0))
+                        status = 'FAILED'
+                        completed += 1
+                        print(f"[{completed}/{len(futures)}] {module}: {status}")
+                        continue  # Skip to next test - don't mark this as PASSED
 
         # Only reached if test passed (either on first attempt or after retry)
         # Read the output file to check for skipped tests
         # Use retry output file if test was retried
         if was_retried:
             output_file = f'logs/test_{index}_{module}_retry.out'
+            error_file = f'logs/test_{index}_{module}_retry.err'
         else:
             output_file = f'logs/test_{index}_{module}.out'
+            error_file = f'logs/test_{index}_{module}.err'
+        
         skip_count = 0
-        if os.path.exists(output_file):
+        if os.path.exists(error_file):
+            # Check the error file for NO TESTS RAN message (exit code 5)
+            with open(error_file, 'r') as f:
+                error_content = f.read()
+                if 'NO TESTS RAN' in error_content and 'skipped=' in error_content:
+                    match = re.search(r'NO TESTS RAN \(skipped=(\d+)\)', error_content)
+                    if match:
+                        skip_count = int(match.group(1))
+        
+        if skip_count == 0 and os.path.exists(output_file):
             with open(output_file, 'r') as f:
                 output_content = f.read()
                 match = re.search(r'OK \(skipped=(\d+)\)', output_content)
@@ -115,7 +156,7 @@ def execute_parallel_tests():
             mem_used = match.group("mem")
             test_time = match.group("time")
             print(f"{test_name} ({test_case}) ...     Memory used: {mem_used} GB.  Test time: {test_time} s\n{ok_status}")
-        print(output_content)
+        # Note: output_content already printed above via regex match, no need to print again
 
         error_file = f'logs/test_{index}_{module}.err'
         try:
