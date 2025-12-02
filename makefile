@@ -57,13 +57,29 @@ check_booktests:
 			skipped_notebooks=$$((skipped_notebooks+1)); \
 			continue; \
 		fi; \
-		if [ "$$base" = "parsl_fest_2025" ]; then \
-			echo "    Skipping $$nb (demo orchestrates booktests, not itself a booktest)"; \
+		if [ "$$base" = "Argonne_2023_Talk_Figures" ]; then \
+			echo "    Skipping $$nb (heavy LaTeX + many figures; skipped in booktests_no_docker)"; \
 			skipped_notebooks=$$((skipped_notebooks+1)); \
 			continue; \
 		fi; \
-		if [ "$$base" = "Argonne_2023_Talk_Figures" ]; then \
-			echo "    Skipping $$nb (heavy LaTeX + many figures; skipped in booktests_no_docker)"; \
+		# ---- talk_paper_demos notebooks that have @unittest.skip in tb_* ---- \
+		if echo "$$nb" | grep -q "talk_paper_demos/MCQMC2022_Article_Figures/"; then \
+			echo "    Skipping $$nb (MCQMC 2022 article figures; not run in CI)"; \
+			skipped_notebooks=$$((skipped_notebooks+1)); \
+			continue; \
+		fi; \
+		if echo "$$nb" | grep -q "talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb"; then \
+			echo "    Skipping $$nb (prob_failure_gp_ci talk demo; heavy GP / prob. failure example)"; \
+			skipped_notebooks=$$((skipped_notebooks+1)); \
+			continue; \
+		fi; \
+		if echo "$$nb" | grep -q "talk_paper_demos/Purdue_Talk_2023_March/"; then \
+			echo "    Skipping $$nb (Purdue 2023 talk figures; not a CI booktest target)"; \
+			skipped_notebooks=$$((skipped_notebooks+1)); \
+			continue; \
+		fi; \
+		if echo "$$nb" | grep -q "talk_paper_demos/pydata_chi_2023.ipynb"; then \
+			echo "    Skipping $$nb (PyData Chicago 2023 talk notebook; demo-only)"; \
 			skipped_notebooks=$$((skipped_notebooks+1)); \
 			continue; \
 		fi; \
@@ -81,7 +97,7 @@ check_booktests:
 		fi; \
 	done; \
 	echo "Total notebooks found:        $$total_notebooks"; \
-	echo "Total skipped explicitly:     $$skipped_notebooks"; \
+	echo "Total skipped explicitly (from .py creation):     $$skipped_notebooks"; \
 	echo "Total notebooks WITH tests:   $$run_notebooks"; \
 	echo "Total notebooks MISSING tests:$$missing_notebooks"; \
 	echo "Booktests will be run for $$run_notebooks notebooks."
@@ -113,11 +129,12 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	set -e && \
 	cd test/booktests/ && \
 	if [ -z "$(TESTS)" ]; then \
-		TOTAL_NOTEBOOK_TESTS=$$(find . -maxdepth 1 -name 'tb_*.py' | wc -l) \
+		# Count ONLY non-skipped tb_*.py modules \
+		TOTAL_NOTEBOOK_TESTS=$$(grep -L '@unittest.skip("Skipping NotebookTests class")' tb_*.py | wc -l); \
 		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 		TOTAL_NOTEBOOK_TESTS=$$TOTAL_NOTEBOOK_TESTS python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast; \
 	else \
-		TOTAL_NOTEBOOK_TESTS=$$(echo "$(TESTS)" | wc -w) \
+		TOTAL_NOTEBOOK_TESTS=$$(echo "$(TESTS)" | wc -w); \
 		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 		TOTAL_NOTEBOOK_TESTS=$$TOTAL_NOTEBOOK_TESTS python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest $(TESTS) -v --failfast; \
 	fi && \
