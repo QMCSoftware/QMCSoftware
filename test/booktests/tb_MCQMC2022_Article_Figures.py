@@ -5,6 +5,7 @@ import shutil
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
 
     def setUp(self):

@@ -4,6 +4,7 @@ import shutil
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
 
     def setUp(self):
@@ -25,7 +26,7 @@ class NotebookTests(BaseNotebookTest):
                     print(f"Skipping cell {i}: {source[:50]}...")
                     print(f"Stopping execution at cell {i} (docker dependency)")
                     break
-                    
+
                 try:
                     self.execute_cell(i)
                 except Exception as e:

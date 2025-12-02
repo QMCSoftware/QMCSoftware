@@ -5,6 +5,7 @@ import numpy as np
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
 
     def setUp(self):
@@ -28,7 +29,7 @@ class NotebookTests(BaseNotebookTest):
         else:
             self._created_dummy_file = None
 
-    @testbook('../../demos/DAKOTA_Genz/dakota_genz.ipynb', execute=True, timeout=TB_TIMEOUT)
+    @testbook('../../demos/DAKOTA_Genz/dakota_genz.ipynb', execute=False, timeout=TB_TIMEOUT)
     def test_dakota_genz_notebook(self, tb):
         pass
 

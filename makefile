@@ -42,6 +42,7 @@ unittests:
 
 check_booktests:
 	@echo "Checking notebook ↔ booktest coverage..."
+	@rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb || true
 	@total_notebooks=0; \
 	skipped_notebooks=0; \
 	run_notebooks=0; \
@@ -51,8 +52,23 @@ check_booktests:
 		base=$$(basename "$$nb" .ipynb); \
 		test_base=$$(echo "$$base" | sed 's/[-.]/_/g'); \
 		# ---------- explicit skip list ---------- \
+		if [ "$$base" = "dakota_genz" ]; then \
+			echo "    Skipping $$nb (requires large manual file / heavy memory use)"; \
+			skipped_notebooks=$$((skipped_notebooks+1)); \
+			continue; \
+		fi; \
 		if [ "$$base" = "parsl_fest_2025" ]; then \
 			echo "    Skipping $$nb (demo orchestrates booktests, not itself a booktest)"; \
+			skipped_notebooks=$$((skipped_notebooks+1)); \
+			continue; \
+		fi; \
+		if [ "$$base" = "Argonne_2023_Talk_Figures" ]; then \
+			echo "    Skipping $$nb (heavy LaTeX + many figures; skipped in booktests_no_docker)"; \
+			skipped_notebooks=$$((skipped_notebooks+1)); \
+			continue; \
+		fi; \
+		if [ "$$base" = "01_sequential" ] || [ "$$base" = "02_parallel" ] || [ "$$base" = "03_visualize_speedup" ]; then \
+			echo "    Skipping $$nb (helper notebook for parsl_fest_2025; not a standalone booktest)"; \
 			skipped_notebooks=$$((skipped_notebooks+1)); \
 			continue; \
 		fi; \
@@ -65,7 +81,7 @@ check_booktests:
 		fi; \
 	done; \
 	echo "Total notebooks found:        $$total_notebooks"; \
-	echo "Total skipped explicitly (from .py creation):     $$skipped_notebooks"; \
+	echo "Total skipped explicitly:     $$skipped_notebooks"; \
 	echo "Total notebooks WITH tests:   $$run_notebooks"; \
 	echo "Total notebooks MISSING tests:$$missing_notebooks"; \
 	echo "Booktests will be run for $$run_notebooks notebooks."
@@ -77,10 +93,11 @@ find_local_only_files:
 	@./scripts/find_local_only_folders.sh
 
 clean_local_only_files:
+	@rm -fr test/booktests/.ipynb_checkpoints/
 	@chmod +x scripts/find_local_only_folders.sh
 	@./scripts/find_local_only_folders.sh | while read f; do \
 		if [ -n "$$f" ]; then \
-			rm -f "$$f"; \
+			rm -f "$$f" > /dev/null 2>&1; \
 		fi; \
 	done
 

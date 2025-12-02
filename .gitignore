@@ -58,8 +58,6 @@ sphinx/*.jpg
 demos/**.png
 demos/**.eps
 
-
-
 # release
 /build/
 dist/
@@ -77,6 +75,8 @@ _ags/*
 
 # SC Choi's file exclusion
 .vscode/settings.json
+/sc
+
 
 # Downloaded files
 raw.githubusercontent.com*

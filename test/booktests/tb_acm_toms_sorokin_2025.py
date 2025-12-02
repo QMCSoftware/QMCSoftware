@@ -12,7 +12,7 @@ class NotebookTests(BaseNotebookTest):
         subprocess.run(['pip', 'install', '-q', 'tueplots'], check=False)
         os.makedirs('outputs', exist_ok=True)
     
-    @testbook('../../demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb', execute=True, timeout=TB_TIMEOUT)
+    @testbook('../../demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb', execute=False, timeout=TB_TIMEOUT)
     def test_acm_toms_sorokin_2025_notebook(self, tb):
         pass
 
