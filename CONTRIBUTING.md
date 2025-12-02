@@ -41,6 +41,16 @@ Optionally, you may install [Docker](https://www.docker.com/products/docker-desk
 make tests
 ~~~
 
+## System Dependencies for Booktests (Developers Only)
+
+Some demonstration notebooks use LaTeX-based rendering (e.g., Matplotlib with `text.usetex=True`), which requires certain **OS-level LaTeX font packages**. These are *not* Python dependencies and therefore cannot be installed via `pip` or listed in `pyproject.toml`.
+
+If you plan to run the full booktest suite (`make booktests_no_docker`), please install the following system packages:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y cm-super texlive-latex-recommended
+
 Please see the targets in the makefile for more granular control over tests.
 
 ## Documentation
