@@ -80,3 +80,8 @@ _ags/*
 
 # Downloaded files
 raw.githubusercontent.com*
+
+
+# Disregard venv
+.venv
+venv

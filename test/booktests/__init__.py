@@ -12,15 +12,44 @@ subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=Fa
 import psutil
 import gc
 import time
+import matplotlib.pyplot as plt
+import os
+import glob
+
+# Simple global counters for progress display
+_NOTEBOOK_TEST_INDEX = 0
+_TOTAL_NOTEBOOK_TESTS = int(os.environ.get("TOTAL_NOTEBOOK_TESTS", "0") or "0")
+
 
 class BaseNotebookTest(unittest.TestCase):
     """Base class for notebook tests with automatic memory cleanup"""
     
     def get_memory_usage(self):
-        """Get current memory usage in GB"""
-        process = psutil.Process()
-        memory_info = process.memory_info()
-        self.memory_gb = memory_info.rss / (1024**3)  # Convert bytes to GB
+        """
+        Approximate memory usage as RSS of this process plus all children.
+        Stores result in self.memory_gb (GB).
+        """
+        try:
+            proc = psutil.Process(os.getpid())
+        except psutil.Error:
+            self.memory_gb = 0.0
+            return
+
+        rss = 0
+        try:
+            rss += proc.memory_info().rss
+        except psutil.Error:
+            pass
+
+        # Include all child processes (e.g., the Jupyter kernel testbook uses)
+        for child in proc.children(recursive=True):
+            try:
+                rss += child.memory_info().rss
+            except psutil.Error:
+                continue
+
+        # Convert bytes → GB
+        self.memory_gb = rss / (1024 ** 3)
 
     def setUp(self):
         """Clean up before each test"""
@@ -29,9 +58,39 @@ class BaseNotebookTest(unittest.TestCase):
     
     def tearDown(self):
         """Clean up after each test"""
-        end_time = time.time()  
+        global _NOTEBOOK_TEST_INDEX, _TOTAL_NOTEBOOK_TESTS
+        end_time = time.time()
         self.get_memory_usage()
-        print(f"    Memory used: {self.memory_gb:.2f} GB.  Test time: {end_time - self.start_time:.2f} s")
-        gc.collect()
 
- 
+        # Increment index
+        _NOTEBOOK_TEST_INDEX += 1
+
+        # Use "?" if TOTAL is not known for some reason
+        total = _TOTAL_NOTEBOOK_TESTS or "?"
+
+        print(
+            f"    [{_NOTEBOOK_TEST_INDEX}/{total}] "
+            f"Memory used: {self.memory_gb:.2f} GB.  "
+            f"Test time: {end_time - self.start_time:.2f} s"
+        )
+
+        # --- New cleanup logic to reduce memory / disk usage ---
+
+        # Close all matplotlib figures so they don't accumulate in memory
+        plt.close('all')
+
+        # Remove temporary figure / log files created by notebooks in this dir
+        patterns = [
+            "*.eps", "*.pdf", "*.png", "*.jpg", "*.jpeg",
+            "*.svg", "*.log", "*.txt"
+        ]
+        for pattern in patterns:
+            for path in glob.glob(pattern):
+                try:
+                    os.remove(path)
+                except OSError:
+                    # Ignore files we can't delete (permissions, race conditions, etc.)
+                    pass
+
+        # Existing GC call
+        gc.collect()
