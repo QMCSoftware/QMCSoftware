@@ -85,3 +85,6 @@ raw.githubusercontent.com*
 # Disregard venv
 .venv
 venv
+
+# Disregard runinfo 
+/runinfo

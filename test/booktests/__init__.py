@@ -29,6 +29,9 @@ class BaseNotebookTest(unittest.TestCase):
         Approximate memory usage as RSS of this process plus all children.
         Stores result in self.memory_gb (GB).
         """
+        import os
+        import psutil
+
         try:
             proc = psutil.Process(os.getpid())
         except psutil.Error:
@@ -36,19 +39,19 @@ class BaseNotebookTest(unittest.TestCase):
             return
 
         rss = 0
+        # main process
         try:
             rss += proc.memory_info().rss
         except psutil.Error:
             pass
 
-        # Include all child processes (e.g., the Jupyter kernel testbook uses)
+        # all child processes (this should include the testbook kernel if it's still alive)
         for child in proc.children(recursive=True):
             try:
                 rss += child.memory_info().rss
             except psutil.Error:
                 continue
 
-        # Convert bytes → GB
         self.memory_gb = rss / (1024 ** 3)
 
     def setUp(self):

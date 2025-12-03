@@ -1,8 +1,6 @@
 import glob
 import os
 import re
-import subprocess
-import signal
 import time
 from pathlib import Path
 
@@ -13,214 +11,127 @@ from parsl.configs.htex_local import config
 
 # Import runtime estimates for load balancing (LPT scheduling)
 try:
-    from test_runtimes import sort_by_runtime, get_runtime, print_schedule, optimal_schedule
+    from test_runtimes import optimal_schedule, get_runtime
     HAS_RUNTIME_ESTIMATES = True
 except ImportError:
     HAS_RUNTIME_ESTIMATES = False
 
-
 # ---------------------------------------------------------------------------
-# EXPLICIT MODULE SKIP LIST
+# SINGLE SOURCE OF TRUTH FOR SKIPS
 #
-# These are tb_*.py modules that we DO NOT want Parsl to execute in parallel.
-# Typically they correspond to notebooks that are:
-#   - heavy LaTeX / many figures,
-#   - orchestration-only demos,
-#   - or otherwise excluded from CI booktests.
-#
-# To skip a new tb_*.py module from Parsl runs, ADD ITS MODULE NAME HERE.
-# Example: to skip test/booktests/tb_new_heavy_demo.py, add "tb_new_heavy_demo".
+# These are the NOTEBOOKS we explicitly skip (with reasons).
+# tb_*.py modules are derived from these paths automatically, so there is
+# NO separate SKIP_MODULES list anymore.
 # ---------------------------------------------------------------------------
-SKIP_MODULES = {
-    "tb_dakota_genz",
-    "tb_Argonne_2023_Talk_Figures",
-    "tb_MCQMC2022_Article_Figures",
-    "tb_prob_failure_gp_ci",
-    "tb_Purdue_Talk_Figures",
-    "tb_pydata_chi_2023",
+SKIPPED_NOTEBOOKS = {
+    "demos/DAKOTA_Genz/dakota_genz.ipynb":
+        "requires large manual file / heavy memory use",
+    "demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb":
+        "heavy LaTeX + many figures; skipped in booktests_no_docker",
+    "demos/talk_paper_demos/MCQMC2022_Article_Figures/MCQMC2022_Article_Figures.ipynb":
+        "MCQMC 2022 article figures; not run in CI",
+    "demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb":
+        "prob_failure_gp_ci talk demo; heavy GP / prob. failure example",
+    "demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb":
+        "Purdue 2023 talk figures; not a CI booktest target",
+    "demos/talk_paper_demos/parsel_fest_2025/01_sequential.ipynb":
+        "helper notebook for parsl_fest_2025; not a standalone booktest",
+    "demos/talk_paper_demos/parsel_fest_2025/02_parallel.ipynb":
+        "helper notebook for parsl_fest_2025; not a standalone booktest",
+    "demos/talk_paper_demos/parsel_fest_2025/03_visualize_speedup.ipynb":
+        "helper notebook for parsl_fest_2025; not a standalone booktest",
+    "demos/talk_paper_demos/pydata_chi_2023.ipynb":
+        "PyData Chicago 2023 talk notebook; demo-only",
 }
 # ---------------------------------------------------------------------------
 
 
+def _derive_skipped_modules_from_notebooks():
+    """
+    Derive tb_*.py module names from SKIPPED_NOTEBOOKS keys.
+
+    For a notebook path with filename base 'foo-bar.ipynb', the corresponding
+    tb module is 'tb_foo_bar', mirroring the generate_test.py naming logic.
+    """
+    skipped_modules = set()
+    for rel_path in SKIPPED_NOTEBOOKS.keys():
+        base = Path(rel_path).stem                 # e.g. 'dakota_genz'
+        test_base = re.sub(r"[-.]", "_", base)     # e.g. 'dakota_genz' or 'foo_bar'
+        skipped_modules.add(f"tb_{test_base}")     # e.g. 'tb_dakota_genz'
+    return skipped_modules
+
+
+def print_notebook_booktest_coverage():
+    """
+    Print notebook ↔ booktest coverage and explicit skip list.
+
+    This mirrors the Makefile `check_booktests` logic:
+    - lists explicitly skipped demos/*.ipynb and reasons
+    - counts total notebooks, skipped, with tests, and missing tests
+    - reports how many notebooks will have booktests run
+    """
+    # parsl_test_runner.py lives in test/booktests → repo root is two levels up
+    repo_root = Path(__file__).resolve().parents[2]
+    demos_root = repo_root / "demos"
+    booktests_root = repo_root / "test" / "booktests"
+
+    print("Checking notebook ↔ booktest coverage...")
+
+    total_notebooks = 0
+    skipped_explicit = 0
+    with_tests = 0
+    missing_tests = 0
+
+    for nb_path in sorted(demos_root.rglob("*.ipynb")):
+        rel = nb_path.relative_to(repo_root).as_posix()
+        total_notebooks += 1
+
+        base = nb_path.stem
+        test_base = re.sub(r"[-.]", "_", base)
+        tb_path = booktests_root / f"tb_{test_base}.py"
+
+        # Explicit skip list with reasons
+        if rel in SKIPPED_NOTEBOOKS:
+            skipped_explicit += 1
+            reason = SKIPPED_NOTEBOOKS[rel]
+            print(f"    Skipping {rel} ({reason})")
+            continue
+
+        # Check if a tb_*.py exists
+        if tb_path.exists():
+            with_tests += 1
+        else:
+            missing_tests += 1
+            print(
+                f"    Missing test for: {rel} -> "
+                f"Expected: test/booktests/tb_{test_base}.py"
+            )
+
+    print(f"Total notebooks found:        {total_notebooks}")
+    print(f"Total skipped explicitly (from .py creation):     {skipped_explicit}")
+    print(f"Total notebooks WITH tests:   {with_tests}")
+    print(f"Total notebooks MISSING tests:{missing_tests}")
+    print(f"Booktests will be run for {with_tests} notebooks.\n")
+
+
 @bash_app
-def run_single_test(test_module, stdout='test_output.txt', stderr='test_error.txt'):
+def run_single_test(test_module, stdout="test_output.txt", stderr="test_error.txt"):
     """Run a single tb_*.py unittest module via bash."""
-    # We run `python -m unittest <module>` where <module> is e.g. tb_qmcpy_intro
-    # NOTE: no .py extension here.
     return f"""
     PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
     python -m unittest {test_module}
     """
 
 
-def _kill_interchange_processes(retries=3, delay=0.5):
-    """Best-effort cleanup of any lingering Parsl 'interchange.py' processes."""
-    for attempt in range(retries):
-        # Try pkill first
-        try:
-            subprocess.run(['pkill', '-f', 'interchange.py'], check=False)
-        except Exception:
-            pass
-
-        # Try pgrep -> kill
-        try:
-            p = subprocess.run(
-                ['pgrep', '-f', 'interchange.py'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True,
-            )
-            if p.stdout:
-                for line in p.stdout.splitlines():
-                    try:
-                        pid = int(line.strip())
-                        try:
-                            os.kill(pid, signal.SIGTERM)
-                        except ProcessLookupError:
-                            pass
-                    except Exception:
-                        pass
-        except Exception:
-            pass
-
-        time.sleep(delay)
-
-        # Force kill remaining
-        try:
-            p = subprocess.run(
-                ['pgrep', '-f', 'interchange.py'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True,
-            )
-            if p.stdout:
-                for line in p.stdout.splitlines():
-                    try:
-                        pid = int(line.strip())
-                        try:
-                            os.kill(pid, signal.SIGKILL)
-                        except ProcessLookupError:
-                            pass
-                    except Exception:
-                        pass
-        except Exception:
-            pass
-
-        # If none found, we’re done
-        p_check = subprocess.run(
-            ['pgrep', '-f', 'interchange.py'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            text=True,
-        )
-        if not p_check.stdout:
-            return True
-
-        time.sleep(delay)
-
-    # Final check
-    final_check = subprocess.run(
-        ['pgrep', '-f', 'interchange.py'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-    )
-    return not bool(final_check.stdout)
-
-
-def reload_parsl_config(max_workers=None, wait=1.0):
-    """Safely reload Parsl with an updated config.
-
-    - Clean up any existing DFK (DataFlowKernel).
-    - Kill lingering interchange processes.
-    - Optionally set executor max_workers.
-    - Load htex_local config fresh.
-    """
-    # Attempt graceful DFK cleanup if present
-    try:
-        dfk = pl.dfk()
-        if dfk is not None:
-            try:
-                dfk.cleanup()
-            except Exception:
-                pass
-            try:
-                getattr(dfk, "shutdown", lambda: None)()
-            except Exception:
-                pass
-    except Exception:
-        # No active DFK or incompatible API — continue
-        pass
-
-    # Clear Parsl global state
-    try:
-        pl.clear()
-    except Exception:
-        pass
-
-    # Ensure any leftover interchange processes are dead
-    try:
-        _kill_interchange_processes()
-    except Exception:
-        pass
-
-    # Apply requested worker count
-    if max_workers is not None:
-        # Set top-level max_workers for logging
-        config.max_workers = max_workers
-        # Also set max_workers on each executor (this is what htex actually uses)
-        if getattr(config, "executors", None):
-            for ex in config.executors:
-                if hasattr(ex, "max_workers"):
-                    ex.max_workers = max_workers
-
-    # Load the (possibly updated) config, with a couple of retries
-    last_exc = None
-    for _ in range(3):
-        try:
-            pl.load(config)
-            break
-        except AssertionError as ae:
-            last_exc = ae
-            try:
-                _kill_interchange_processes()
-            except Exception:
-                pass
-            time.sleep(0.5)
-        except Exception as e:
-            last_exc = e
-            time.sleep(0.5)
-    else:
-        # Failed after retries
-        raise last_exc
-
-    time.sleep(wait)
-
-    try:
-        mw = getattr(config, "max_workers", None)
-        print(f"Parsl loaded (max_workers={mw})")
-        if getattr(pl, "config", None) is not None:
-            try:
-                exe_names = [type(e).__name__ for e in pl.config.executors]
-                print("Executors:", exe_names)
-            except Exception:
-                pass
-    except Exception:
-        pass
-
-    return pl
-
-
 def execute_parallel_tests():
     """Execute all tb_*.py booktests in parallel using Parsl."""
     start_time = time.time()
 
-    # Ensure logs directory exists
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
 
     # ------------------------------------------------------------------
-    # Discover test modules from CLI args or from tb_*.py files.
+    # Discover test modules from CLI args or tb_*.py files
     # ------------------------------------------------------------------
     import sys
 
@@ -231,7 +142,6 @@ def execute_parallel_tests():
         test_modules.append(arg)
 
     if not test_modules:
-        # No explicit modules passed; run all tb_*.py files
         test_files = glob.glob("tb_*.py")
         test_modules = [os.path.basename(f).replace(".py", "") for f in test_files]
 
@@ -247,45 +157,46 @@ def execute_parallel_tests():
     test_modules = unique_test_modules
 
     # ------------------------------------------------------------------
-    # APPLY MODULE-LEVEL SKIPS (SKIP_MODULES)
-    #
-    # This is where we keep tb_*.py modules that should NOT run in Parsl,
-    # even though they may exist and contain only skipped tests.
-    #
-    # To add new skips, edit SKIP_MODULES above.
+    # Drop modules derived from SKIPPED_NOTEBOOKS
     # ------------------------------------------------------------------
-    before_skip = len(test_modules)
-    test_modules = [m for m in test_modules if m not in SKIP_MODULES]
-    after_skip = len(test_modules)
-    if after_skip != before_skip:
-        print(f"Skipping {before_skip - after_skip} module(s) from Parsl runs via SKIP_MODULES.")
-
+    skip_modules = _derive_skipped_modules_from_notebooks()
+    test_modules = [m for m in test_modules if m not in skip_modules]
     # ------------------------------------------------------------------
-    # Optional: LPT-based scheduling using runtime estimates.
+    # LPT scheduling using runtime estimates (optional)
     # ------------------------------------------------------------------
-    if HAS_RUNTIME_ESTIMATES:
-        # First try to read worker count from environment (source of truth)
-        env_workers = os.environ.get("QMC_PARSL_WORKERS")
-        if env_workers is not None:
-            try:
-                num_workers = int(env_workers)
-            except ValueError:
-                num_workers = None
-        else:
-            num_workers = None
+    if HAS_RUNTIME_ESTIMATES and test_modules:
+        try:
+            if getattr(config, "executors", None) and hasattr(config.executors[0], "max_workers"):
+                num_workers = config.executors[0].max_workers
+            elif hasattr(config, "max_workers"):
+                num_workers = config.max_workers
+            else:
+                num_workers = 1
+        except Exception:
+            num_workers = 1
 
-        # Fallback: try to get it from Parsl config if env is missing/invalid
-        if num_workers is None:
-            try:
-                num_workers = config.executors[0].max_workers if config.executors else 8
-            except Exception:
-                num_workers = 8
+        if num_workers < 1:
+            num_workers = 1
 
-        # Use optimal bin-packing schedule
         test_modules, assignments, est_makespan = optimal_schedule(test_modules, num_workers)
         total_seq = sum(get_runtime(m) for m in test_modules)
+
+        # Fallback if est_makespan is 0 / None
+        if not est_makespan or est_makespan <= 0:
+            longest = max((get_runtime(m) for m in test_modules), default=0.0)
+            if longest > 0 and total_seq > 0:
+                est_makespan = max(longest, total_seq / num_workers)
+            else:
+                est_makespan = total_seq
+
+        if est_makespan > 0 and total_seq > 0:
+            est_speedup = total_seq / est_makespan
+            est_speedup_str = f"{est_speedup:.2f}x"
+        else:
+            est_speedup_str = "1.00x"
+
         print(f"Applied optimal LPT scheduling for {num_workers} workers")
-        print(f"Estimated makespan: {est_makespan:.1f}s (speedup: {total_seq / est_makespan:.2f}x)")
+        print(f"Estimated makespan: {est_makespan:.1f}s (speedup: {est_speedup_str})")
 
     print(f"Found {len(test_modules)} test modules to execute in parallel...")
 
@@ -308,7 +219,7 @@ def execute_parallel_tests():
     # ------------------------------------------------------------------
     results = []
     completed = 0
-    processed_modules = set()  # Track which modules we've already processed
+    processed_modules = set()
 
     for module, future, index in futures:
         if module in processed_modules:
@@ -319,11 +230,11 @@ def execute_parallel_tests():
         was_retried = False
 
         try:
-            future.result()  # Wait for completion
+            future.result()
         except Exception as e:
             error_str = str(e)
             if "unix exit code 5" in error_str:
-                # Exit code 5 => "NO TESTS RAN", which is OK for skip-only modules
+                # NO TESTS RAN (all skipped) is fine
                 pass
             else:
                 print(f"Test {module} failed once with error: {e}. Retrying...")
@@ -353,8 +264,8 @@ def execute_parallel_tests():
             output_file = f"logs/test_{index}_{module}.out"
             error_file = f"logs/test_{index}_{module}.err"
 
-        # Count skipped tests
         skip_count = 0
+        error_content = ""
         if os.path.exists(error_file):
             with open(error_file, "r") as f:
                 error_content = f.read()
@@ -364,41 +275,41 @@ def execute_parallel_tests():
                         skip_count = int(match.group(1))
 
         output_content = ""
-        if os.path.exists(output_file) and skip_count == 0:
+        if os.path.exists(output_file):
             with open(output_file, "r") as f:
                 output_content = f.read()
-                match = re.search(r"OK \(skipped=(\d+)\)", output_content)
-                if match:
-                    skip_count = int(match.group(1))
-                elif "skipped" in output_content.lower():
-                    skip_count = output_content.lower().count("skipped")
+                if skip_count == 0:
+                    match = re.search(r"OK \(skipped=(\d+)\)", output_content)
+                    if match:
+                        skip_count = int(match.group(1))
+                    elif "skipped" in output_content.lower():
+                        skip_count = output_content.lower().count("skipped")
 
         results.append((module, "PASSED", skip_count))
         status = f"PASSED (skipped={skip_count})" if skip_count > 0 else "PASSED"
         completed += 1
         print(f"[{completed}/{len(futures)}] {module}: {status}")
 
-        # Extract memory/time from output if present
-        test_name = module
-        test_case = ""
-        mem_used = ""
-        test_time_val = ""
-        ok_status = "ok"
 
-        match = re.search(
-            r"(?P<test_case>[\w\.]+)\s+\.\.\.\s+Memory used:\s+(?P<mem>[\d\.]+)\s+GB\.\s+Test time:\s+(?P<time>[\d\.]+)\s+s",
-            output_content,
-        )
-        if match:
-            test_case = match.group("test_case")
-            mem_used = match.group("mem")
-            test_time_val = match.group("time")
-            print(
-                f"{test_name} ({test_case}) ...     Memory used: {mem_used} GB.  "
-                f"Test time: {test_time_val} s\n{ok_status}"
+        # Echo memory + time if we can parse it from BaseNotebookTest.tearDown()
+        # We only care about the "Memory used: X GB.  Test time: Y s" line, e.g.:
+        #     [i/n] Memory used: 0.16 GB.  Test time: 384.70 s
+        if output_content:
+            mem_match = re.search(
+                r"Memory used:\s+(?P<mem>[\d\.]+)\s+GB\.\s+Test time:\s+(?P<time>[\d\.]+)\s+s",
+                output_content,
             )
-
-        # Clean up log files
+            if mem_match:
+                mem_used = mem_match.group("mem")
+                test_time_val = mem_match.group("time")
+                # Use module name as the identifier; ordering may differ from sequential,
+                # but we still get per-test memory + time in the parallel log.
+                print(
+                    f"{module} ...     Memory used: {mem_used} GB.  Test time: {test_time_val} s"
+                )
+                print("ok")
+                
+        # Clean up logs
         try:
             if os.path.exists(output_file):
                 os.remove(output_file)
@@ -407,9 +318,7 @@ def execute_parallel_tests():
         except Exception:
             pass
 
-    end_time = time.time()
-    execution_time = end_time - start_time
-
+    execution_time = time.time() - start_time
     return results, execution_time
 
 
@@ -420,9 +329,8 @@ def generate_summary_report(results, execution_time=0.0):
     failed_modules = total_modules - passed_modules
     total_skipped = sum(skip_count for _, status, skip_count in results if status == "PASSED")
 
-    # Build unittest-style status line
     status_line = ""
-    for module, status, skip_count in results:
+    for _, status, skip_count in results:
         if status == "PASSED":
             if skip_count > 0:
                 status_line += "s" * skip_count + "."
@@ -457,47 +365,86 @@ def generate_summary_report(results, execution_time=0.0):
 
 
 def main():
-    """Main entry point for Parsl booktest execution.
-
-    Worker count is controlled by the environment variable QMC_PARSL_WORKERS.
-    If not set or invalid, we default to 8.
     """
-    # Read desired worker count from environment
-    desired_workers = os.environ.get("QMC_PARSL_WORKERS")
-    if desired_workers is not None:
-        try:
-            desired_workers = int(desired_workers)
-        except ValueError:
-            print(f"WARNING: Invalid QMC_PARSL_WORKERS={desired_workers!r}, falling back to default.")
-            desired_workers = None
+    CLI entry point for Parsl booktest execution.
 
-    if desired_workers is None:
-        desired_workers = 8
+    - Supports existing usage from Makefile:
+        python parsl_test_runner.py tb_foo tb_bar -v --failfast
 
-    # Configure Parsl with this worker count
+    - Supports notebook / demo usage:
+        python parsl_test_runner.py --workers 4 --print-coverage
+
+    Coverage printing (skipped notebooks, totals, etc.) only happens when
+    --print-coverage is passed, so it does NOT duplicate Makefile output.
+    """
+    import argparse
+    import parsl as pl
+    from parsl.configs.htex_local import config
+
+    parser = argparse.ArgumentParser(
+        description="Run QMCPy booktests in parallel using Parsl."
+    )
+
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="Number of Parsl workers (htex_local max_workers).",
+    )
+
+    parser.add_argument(
+        "--print-coverage",
+        action="store_true",
+        help="Print notebook ↔ booktest coverage summary before running tests.",
+    )
+
+    # Keep unknown args (tb_*.py, -v, --failfast) for unittest
+    args, unknown = parser.parse_known_args()
+
+    # Optional coverage block (used from demo notebook)
+    if args.print_coverage:
+        print_notebook_booktest_coverage()
+
+    # Configure workers in Parsl config (if provided)
+    if args.workers is not None:
+        w = max(1, args.workers)
+        setattr(config, "max_workers", w)
+        if getattr(config, "executors", None):
+            for ex in config.executors:
+                if hasattr(ex, "max_workers"):
+                    ex.max_workers = w
+        print(f"Configuring Parsl with max_workers={w}")
+    else:
+        w = getattr(config, "max_workers", None)
+        if w is not None:
+            print(f"Using existing Parsl config max_workers={w}")
+        else:
+            print("Using Parsl default worker configuration")
+
+    # Load Parsl once for this process
     try:
-        reload_parsl_config(max_workers=desired_workers)
+        pl.load(config)
+        print("Parsl configuration loaded successfully.")
+    except AssertionError as ae:
+        msg = str(ae)
+        if "Already exists!" in msg:
+            print("Parsl already configured; reusing existing DFK.")
+        else:
+            print(f"Error loading Parsl configuration: {ae}")
+            return
     except Exception as e:
         print(f"Error loading Parsl configuration: {e}")
-        return None
+        return
 
-    print(f"Parsl configuration loaded successfully (max_workers={desired_workers}).")
-
+    # Run the tests
     try:
         results, execution_time = execute_parallel_tests()
         generate_summary_report(results, execution_time)
-        return results
     except Exception as e:
         print(f"Error during parallel execution: {e}")
-        return None
     finally:
-        # Clean up Parsl
         try:
-            parsl.clear()
-        except Exception:
-            pass
-        try:
-            dfk = parsl.dfk()
+            dfk = pl.dfk()
             dfk.cleanup()
             dfk.shutdown()
         except Exception:
