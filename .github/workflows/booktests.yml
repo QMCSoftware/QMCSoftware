@@ -2,13 +2,19 @@ name: Booktests
 
 on:
   push:
-    branches: [ booktests_choi ]
+  branches:
+    - master
+    - develop
+    - booktests_choi
+    - brandon-fix-dakota-parallel
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
       - 'tests/booktests/**.py'
   pull_request:
-    branches: [ develop ]
+    branches:
+      - master
+      - develop
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
