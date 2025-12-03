@@ -28,6 +28,13 @@ class MPMC(AbstractLDDiscreteDistribution):
     """
     Low-discrepancy generator trained by MPMC. Produces nbatch independent pointsets of size n in [0,1]^d.
     
+    Requires PyTorch and PyTorch Geometric. Install with:
+    
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        pip install torch-geometric torch-scatter torch-cluster
+    
+    For GPU support or platform-specific details, see https://pytorch.org/get-started/locally/
+    
     Examples:    
         >>> mpmc = MPMC(dimension=2, loss_fn='L2dis', epochs=100)
         >>> points = mpmc.gen_samples(n=50)  # doctest: +SKIP
@@ -101,7 +108,10 @@ class MPMC(AbstractLDDiscreteDistribution):
             warnings.warn("Product coordinate weights are recommended for dimension > 5.", stacklevel=1)
 
         # init AbstractLDDiscreteDistribution base class (sets self.rng, self.d, etc.)
-        super(MPMC, self).__init__(dimension=self.dim, seed=seed)
+        # AbstractDiscreteDistribution.__init__ signature is
+        #   __init__(self, dimension, replications, seed, d_limit, n_limit)
+        # so pass the number of replications (nbatch) and reasonable limits.
+        super(MPMC, self).__init__(int(self.dim), self.nbatch, seed, d_limit=np.inf, n_limit=np.inf)
 
         # randomization mode
         rnd = str(randomize).strip().upper()

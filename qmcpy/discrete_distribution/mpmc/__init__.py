@@ -3,6 +3,21 @@ Message Passing Monte Carlo (MPMC) discrete distribution.
 
 This module implements MPMC using PyTorch and PyTorch Geometric for 
 generating low-discrepancy point sets through neural message passing.
+
+Installation Requirements
+--------------------------
+MPMC requires PyTorch and PyTorch Geometric. Install with:
+
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+    pip install torch-geometric torch-scatter torch-cluster
+
+For GPU support (NVIDIA CUDA), see https://pytorch.org/get-started/locally/
+For torch-geometric wheels, see https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html
+
+If these dependencies are not installed, attempting to use MPMC will raise an ImportError
+with installation instructions. You can check availability by running:
+
+    python -c "import torch; import torch_geometric; print('MPMC dependencies ready')"
 """
 
 try: 
@@ -10,9 +25,21 @@ try:
     import torch_cluster
     import torch_geometric
     from .mpmc import MPMC
-except ImportError:
+except ImportError as e:
+    _missing_dep = str(e)
+    
     class MPMC(object):
+        """Placeholder MPMC class shown when PyTorch dependencies are missing."""
         def __init__(self, *args, **kwargs):
-            raise Exception("MPMC requires torch, torch_cluster, and torch_geometric but no installations found")
+            raise ImportError(
+                f"MPMC requires PyTorch and PyTorch Geometric, but they are not installed.\n"
+                f"Original error: {_missing_dep}\n\n"
+                f"To use MPMC, install dependencies with:\n"
+                f"  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu\n"
+                f"  pip install torch-geometric torch-scatter torch-cluster\n\n"
+                f"For GPU support, see: https://pytorch.org/get-started/locally/\n"
+                f"For torch-geometric installation details, see: "
+                f"https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html"
+            )
 
 __all__ = ['MPMC']
