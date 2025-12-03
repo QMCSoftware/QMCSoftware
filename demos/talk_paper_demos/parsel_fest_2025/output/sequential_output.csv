@@ -1,0 +1,41 @@
+rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
+	find demos -name '*.ipynb' | while read nb; do \
+		base=$(basename "$nb" .ipynb); \
+		test_base=$(echo "$base" | sed 's/[-.]/_/g'); \
+		if [ "$base" != "parsl_fest_2025" ] && [ "$base" != "01_sequential" ] && [ "$base" != "02_parallel" ] && [ "$base" != "03_visualize_speedup" ] && ! ls test/booktests/tb_"$test_base".py > /dev/null 2>&1; then \
+			echo "    Missing test for: $nb -> Expected: test/booktests/tb_$test_base.py"; \
+		fi; \
+	done
+Total notebooks:        35
+Total test files:       32
+
+Generating missing booktest files...
+cd test/booktests/ && python generate_test.py --check-missing
+No missing test files found.
+rm -fr test/booktests/.ipynb_checkpoints/
+chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
+for f in ; do \
+		rm -f "$f"; > /dev/null 2>&1; \
+	done
+
+Notebook tests
+pip install -q -e ".[test]"  && \
+	set -e && \
+	cd test/booktests/ && \
+	if [ -z "tb_quickstart tb_qmcpy_intro" ]; then \
+		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast; \
+	else \
+		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest tb_quickstart tb_qmcpy_intro -v --failfast; \
+	fi && \
+	cd ../..
+test_quickstart_notebook (tb_quickstart.NotebookTests.test_quickstart_notebook) ...     Memory used: 0.11 GB.  Test time: 2.12 s
+ok
+test_qmcpy_intro_notebook (tb_qmcpy_intro.NotebookTests.test_qmcpy_intro_notebook) ...     Memory used: 0.11 GB.  Test time: 1.86 s
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 4.029s
+
+OK
