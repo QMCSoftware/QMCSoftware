@@ -114,8 +114,10 @@ jobs:
         shell: pwsh
         run: |
           choco install miktex -y
+          refreshenv
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          miktex --admin packages install latexmk dvipng
+          initexmf --admin --set-config-value=[MPM]AutoInstall=1
+          mpm --admin --install=latexmk --install=dvipng
 
       - name: Check for missing booktest files
         run: make check_booktests
