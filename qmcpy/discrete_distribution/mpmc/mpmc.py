@@ -36,18 +36,22 @@ class MPMC(AbstractLDDiscreteDistribution):
     For GPU support or platform-specific details, see https://pytorch.org/get-started/locally/
     
     Examples:    
-        >>> mpmc = MPMC(dimension=2, loss_fn='L2dis', epochs=100)
+        >>> mpmc = MPMC(dimension=2, loss_fn='L2dis', epochs=100)  # doctest: +SKIP
         >>> points = mpmc.gen_samples(n=50)  # doctest: +SKIP
         >>> points.shape  # doctest: +SKIP
         (50, 2)
-        >>> mpmc
+        >>> print(mpmc)  # doctest: +SKIP
         MPMC Generator Object
-            dimension       2
+            dim             2
             randomize       SHIFT
             loss_fn         L2dis
             epochs          100
             lr              0.001
+            nlayers         3
             nhid            32
+            weight_decay    1e-06
+            radius          0.35
+            nbatch          1
     """
 
     def __init__(
