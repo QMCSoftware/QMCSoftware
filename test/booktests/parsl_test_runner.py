@@ -4,10 +4,19 @@ import glob
 import os
 import re
 import time
+import platform
 from pathlib import Path
 import time
 import parsl as pl
-from parsl.configs.htex_local import config
+
+# Use ThreadPoolExecutor on macOS (avoids interchange.py spawn issue)
+# Use HighThroughputExecutor on Linux for better performance
+if platform.system() == 'Darwin':
+    from parsl.config import Config
+    from parsl.executors import ThreadPoolExecutor
+    config = Config(executors=[ThreadPoolExecutor(max_threads=8, label="local_threads")])
+else:
+    from parsl.configs.htex_local import config
 
 # Import runtime estimates for load balancing
 try:
@@ -56,11 +65,19 @@ def execute_parallel_tests():
 
     # Apply optimal scheduling for better load balancing
     if HAS_RUNTIME_ESTIMATES:
-        # Try to get the number of workers from Parsl config
+        # Try to get the number of workers from environment or Parsl config
         try:
-            num_workers = config.executors[0].max_workers if config.executors else 8
-        except:
-            num_workers = 8
+            num_workers = int(os.environ.get('PARSL_MAX_WORKERS'))
+        except Exception:
+            try:
+                exec_obj = config.executors[0] if config.executors else None
+                if exec_obj:
+                    # ThreadPoolExecutor uses max_threads, HTEX uses max_workers
+                    num_workers = getattr(exec_obj, 'max_threads', None) or getattr(exec_obj, 'max_workers', None) or 8
+                else:
+                    num_workers = 8
+            except:
+                num_workers = 8
         
         # Use optimal bin-packing schedule
         test_modules, assignments, est_makespan = optimal_schedule(test_modules, num_workers)
@@ -85,6 +102,7 @@ def execute_parallel_tests():
     # Wait for completion and collect results
     results = []
     completed = 0
+    total_test_time = 0.0  # Track sum of individual test execution times
     processed_modules = set()  # Track which modules we've already processed
     for module, future, index in futures:
         if module in processed_modules:
@@ -138,6 +156,9 @@ def execute_parallel_tests():
             error_file = f'logs/test_{index}_{module}.err'
         
         skip_count = 0
+        output_content = ""
+        
+        # Read output and error files once
         if os.path.exists(error_file):
             # Check the error file for NO TESTS RAN message (exit code 5)
             with open(error_file, 'r') as f:
@@ -147,53 +168,49 @@ def execute_parallel_tests():
                     if match:
                         skip_count = int(match.group(1))
         
-        if skip_count == 0 and os.path.exists(output_file):
+        if os.path.exists(output_file):
             with open(output_file, 'r') as f:
                 output_content = f.read()
-                match = re.search(r'OK \(skipped=(\d+)\)', output_content)
-                if match:
-                    skip_count = int(match.group(1))
-                elif 'skipped' in output_content.lower():
-                    skip_count = output_content.lower().count('skipped')
+                if skip_count == 0:
+                    match = re.search(r'OK \(skipped=(\d+)\)', output_content)
+                    if match:
+                        skip_count = int(match.group(1))
+                    elif 'skipped' in output_content.lower():
+                        skip_count = output_content.lower().count('skipped')
 
         results.append((module, 'PASSED', skip_count))
         status = f'PASSED (skipped={skip_count})' if skip_count > 0 else 'PASSED'
         
         completed += 1
-        print(f"[{completed}/{len(futures)}] {module}: {status}")
-        # Print output for successful tests and remove log files
+        
+        # Read error file content for test details
+        error_content = ""
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as f:
+                error_content = f.read()
+        
+        # Extract memory and time from stdout, test case name from module
         test_name = module
-        test_case = ""
-        mem_used = ""
-        test_time = ""
         ok_status = "ok"
-        # Example regex for extracting info
-        match = re.search(
-            r"(?P<test_case>[\w\.]+)\s+\.\.\.\s+Memory used:\s+(?P<mem>[\d\.]+)\s+GB\.\s+Test time:\s+(?P<time>[\d\.]+)\s+s", 
-            output_content
-        )
-        if match:
-            test_case = match.group("test_case")
-            mem_used = match.group("mem")
-            test_time = match.group("time")
-            print(f"{test_name} ({test_case}) ...     Memory used: {mem_used} GB.  Test time: {test_time} s\n{ok_status}")
-        # Note: output_content already printed above via regex match, no need to print again
-
-        error_file = f'logs/test_{index}_{module}.err'
-        try:
-            os.remove(output_file)
-            if os.path.exists(error_file):
-                os.remove(error_file)
-        except Exception:
-            pass
+        mem_match = re.search(r"Memory used:\s*(?P<mem>[\d\.]+)\s*GB\.\s*Test time:\s*(?P<time>[\d\.]+)\s*s", output_content)
+        if mem_match:
+            mem_used = mem_match.group("mem")
+            test_time = mem_match.group("time")
+            total_test_time += float(test_time)  # Accumulate individual test times
+            print(f"[{completed}/{len(futures)}] {module}: {status}")
+            print(f"{test_name} ...     Memory used: {mem_used} GB.  Test time: {test_time} s\n{ok_status}")
+        else:
+            print(f"[{completed}/{len(futures)}] {module}: {status}")
+        
+        # Note: Keep log files for debugging (don't delete them)
     
     end_time = time.time()
     execution_time = end_time - start_time
     
-    return results, execution_time
+    return results, execution_time, total_test_time
 
 
-def generate_summary_report(results, execution_time=0.0):
+def generate_summary_report(results, execution_time=0.0, total_test_time=0.0):
     """Generate a summary report of test execution in unittest style"""
     total_modules = len(results)
     passed_modules = sum(1 for _, status, _ in results if status == 'PASSED')
@@ -214,6 +231,8 @@ def generate_summary_report(results, execution_time=0.0):
     print(status_line)
     print("-" * 70)
     print(f"Ran {total_modules} test modules in {execution_time:.3f}s")
+    if total_test_time > 0:
+        print(f"Total test time: {total_test_time:.3f}s (overhead: {execution_time - total_test_time:.3f}s)")
     print()
     
     if failed_modules == 0:
@@ -432,6 +451,8 @@ def main():
     """Main function to run parallel tests"""
     # Load Parsl configuration if not already loaded
     import parsl as pl
+    import platform
+    import os
     try:
         # Check if Parsl is already configured
         pl.dfk()  # DataFlowKernel
@@ -439,8 +460,19 @@ def main():
     except:
         # Parsl not configured, so load a configuration
         try:
-            from parsl.configs.htex_local import config
-            config.max_workers = 8  # processors
+            # Read max workers from environment if provided
+            try:
+                max_workers = int(os.environ.get('PARSL_MAX_WORKERS'))
+            except Exception:
+                max_workers = 8  # default
+            
+            if platform.system() == 'Darwin':
+                from parsl.config import Config
+                from parsl.executors import ThreadPoolExecutor
+                config = Config(executors=[ThreadPoolExecutor(max_threads=max_workers, label="local_threads")])
+            else:
+                from parsl.configs.htex_local import config
+                config.max_workers = max_workers
             pl.load(config)
             print("Parsl configuration loaded successfully.")
         except Exception as e:
@@ -448,8 +480,8 @@ def main():
             return
     
     try:
-        results, execution_time = execute_parallel_tests()
-        generate_summary_report(results, execution_time)
+        results, execution_time, total_test_time = execute_parallel_tests()
+        generate_summary_report(results, execution_time, total_test_time)
         return results
     except Exception as e:
         print(f"Error during parallel execution: {e}")

@@ -6,30 +6,63 @@ This directory contains demonstration notebooks for the ParslFest 2025 presentat
 
 ## Files
 
-- **`01_sequential.ipynb`** - Runs all QMCPy notebook tests sequentially without parallelization to establish a baseline execution time
+- **`01_sequential.ipynb`** - Runs QMCPy notebook tests sequentially without parallelization to establish a baseline execution time
 - **`02_parallel.ipynb`** - Runs the same notebook tests in parallel using Parsl with configurable worker count to measure speedup
+- **`02_parallel_mac.ipynb`** - macOS-specific version using ThreadPoolExecutor for compatibility
 - **`03_visualize_speedup.ipynb`** - Visualizes and analyzes the speedup achieved by parallel execution across different worker configurations
+- **`Makefile`** - Automates execution of all notebooks sequentially with multiple worker configurations
 - **`.gitignore`** - Git ignore rules for output files and temporary data
-- **`output/`** - Directory containing execution timing results and speedup metrics (CSV files)
+- **`output/`** - Directory containing execution timing results, speedup metrics (CSV files), and plots (PNG files)
 - **`runinfo/`** - Directory containing Parsl execution logs and runtime information
 
-## Usage
+## Quick Start
+
+### Automated Execution (Recommended)
+
+Run all notebooks automatically with different worker configurations:
+
+```bash
+make clean && make all
+```
+
+This will:
+1. Clean previous outputs
+2. Run `01_sequential.ipynb` to establish baseline
+3. Run `02_parallel.ipynb` with 2, 4, 8, and 16 workers using `PARSL_MAX_WORKERS` environment variable
+4. Run `03_visualize_speedup.ipynb` to generate plots and analysis
+
+**Individual targets:**
+```bash
+make sequential   # Run only sequential baseline
+make parallel     # Run parallel tests with 2,4,8,16 workers
+make visualize    # Generate plots from existing data
+make clean        # Remove all output files
+```
+
+### Manual Execution
 
 **Important**: Run the notebooks in order (01 → 02 → 03).
 
-### 1. Sequential Baseline
-Run `01_sequential.ipynb` first to establish the sequential execution time baseline. This will generate `output/sequential_time.csv`.
+#### 1. Sequential Baseline
+Run `01_sequential.ipynb` to establish the sequential execution time baseline. This generates:
+- `output/sequential_time.csv` - Total execution time
+- `output/sequential_output_time.csv` - Individual test times
+- `output/sequential_output_memory.csv` - Memory usage per test
 
-### 2. Parallel Execution
+#### 2. Parallel Execution
 Run `02_parallel.ipynb` to execute tests in parallel with Parsl. 
 
-**To test different worker counts:**
-- Modify `config.max_workers = 2` (line 65) to different values: 2, 4, 8, etc.
-- Re-run the notebook for each worker count to generate separate timing files
-- Each run creates `output/parallel_times_{N}.csv` where N is the number of workers
+**Environment variable control:**
+```python
+# Set PARSL_MAX_WORKERS before running:
+import os
+os.environ['PARSL_MAX_WORKERS'] = '4'  # Use 4 workers
+```
 
-### 3. Visualization
-Run `03_visualize_speedup.ipynb` to:
+Each run creates `output/parallel_times_{N}.csv` and `output/parallel_output_{N}.txt`.
+
+#### 3. Visualization
+Run `03_visualize_speedup.ipynb` to generate plots comparing sequential vs parallel execution times and compute speedup ratios.
 
 
 ## Load Balancing with LPT Scheduling

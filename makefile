@@ -45,7 +45,10 @@ check_booktests:
 	find demos -name '*.ipynb' | while read nb; do \
 		base=$$(basename "$$nb" .ipynb); \
 		test_base=$$(echo "$$base" | sed 's/[-.]/_/g'); \
-		if [ "$$base" != "parsl_fest_2025" ] && [ "$$base" != "01_sequential" ] && [ "$$base" != "02_parallel" ] && [ "$$base" != "03_visualize_speedup" ] && ! ls test/booktests/tb_"$$test_base".py > /dev/null 2>&1; then \
+		if echo "$$nb" | grep -q "parsl_fest_2025"; then \
+			continue; \
+		fi; \
+		if ! ls test/booktests/tb_"$$test_base".py > /dev/null 2>&1; then \
 			echo "    Missing test for: $$nb -> Expected: test/booktests/tb_$$test_base.py"; \
 		fi; \
 	done

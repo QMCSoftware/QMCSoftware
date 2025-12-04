@@ -99,19 +99,9 @@ def generate_missing_tests(demos_dir="../../demos", output_dir=None):
     for notebook_path in demos_path.glob("**/*.ipynb"):
         notebook_name = notebook_path.stem
         
-        # Skip parsl_fest_2025 as mentioned in the Makefile
-        if notebook_name == "parsl_fest_2025":
-            continue
-
-        # Also skip the split notebooks for the ParslFest demo (we'll keep
-        # those as presentation/demo notebooks and not auto-generate tests
-        # for them). They live under demos/talk_paper_demos/parsel_fest_2025/.
-        try:
-            parent_dir = notebook_path.parent.name
-        except Exception:
-            parent_dir = None
-
-        if parent_dir == "parsel_fest_2025" and notebook_name in {"01_sequential", "02_parallel", "03_visualize_speedup"}:
+        # Skip all notebooks in demos/talk_paper_demos/parsl_fest_2025/
+        # These are presentation/demo notebooks and should not have tests generated
+        if "parsl_fest_2025" in str(notebook_path):
             continue
             
         # Convert notebook name to test file name
