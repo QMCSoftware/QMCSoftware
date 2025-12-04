@@ -54,7 +54,7 @@ dependencies = [
 
 [project.optional-dependencies]
 torch = [
-    "torch >= 2.0.0",
+    "torch >= 2.8.0",
     ]
 gpytorch = [
     "gpytorch >= 1.7.0",
