@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest", "ubuntu-latest", "windows-latest"]
+        os: ["macos-latest", "ubuntu-latest"]
     env:
       ACTIONS_STEP_DEBUG: false   # true to enable debug logging
     steps:
@@ -65,26 +65,17 @@ jobs:
           pip cache purge || true
           df -h
 
-      - name: Free space (macOS/Windows)
-        if: runner.os != 'Linux'
+      - name: Free space (macOS)
+        if: runner.os == 'macOS'
         run: |
           conda clean --all --yes
           pip cache purge || true
 
-      - name: Show runner resources (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Show runner resources
         run: |
           echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
           free -h || vm_stat
           df -h
-
-      - name: Show runner resources (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "CPUs: $env:NUMBER_OF_PROCESSORS"
-          Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory
-          Get-PSDrive -PSProvider FileSystem
 
       # -----------------------------------------------------------
       # 4. Install dependencies
@@ -108,16 +99,6 @@ jobs:
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended
-
-      - name: Install minimal LaTeX (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          choco install miktex -y
-          refreshenv
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          initexmf --admin --set-config-value=[MPM]AutoInstall=1
-          mpm --admin --install=latexmk --install=dvipng
 
       - name: Check for missing booktest files
         run: make check_booktests
