@@ -108,6 +108,25 @@ dev = [ # brew install weasyprint
     "scikit-optimize >= 0.10.2",
 ]
 
+class = [
+    "jupyterlab >= 4.0.0",
+    "matplotlib >= 3.9.0",
+    "seaborn >= 0.13.0",
+    "tueplots >= 0.2.0",
+    "pandas >= 2.0.0",
+    "scikit-learn >= 1.0.0",
+    "scikit-optimize >= 0.10.2",
+    "ipynbname",
+    "jupyterlab_execute_time",
+    "ipywidgets",
+    "statsmodels",
+    "tqdm",
+    "sympy >= 1.12",
+    "arviz >= 0.17",
+    "plotly >= 5.0",
+    "networkx >= 3.0",
+]
+
 [tool.pdm.build]
 run-setuptools = true
 includes = [
