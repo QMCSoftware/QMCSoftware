@@ -9,10 +9,13 @@ To update these values, run the sequential tests and extract timing info:
 Tests are sorted by runtime (longest first) for optimal load balancing.
 """
 import heapq
+import os
+import pandas as pd
 
 # Estimated runtimes in seconds (from sequential run on 2025-12-01)
 # Sorted from longest to shortest for easy reference
-TEST_RUNTIMES = {
+# These are fallback values if CSV file is not available
+TEST_RUNTIMES_FALLBACK = {
     # Long-running tests (> 60s) - these are the bottleneck
     'tb_iris': 138.10,
     'tb_elliptic_pde': 96.12,
@@ -48,37 +51,36 @@ TEST_RUNTIMES = {
     # Skipped tests (assigned small default time)
     'tb_Argonne_2023_Talk_Figures': 1.0,
     'tb_MCQMC2022_Article_Figures': 1.0,
-    'tb_Purdue_Talk_Figures': 1.0,
-    'tb_dakota_genz': 1.0,
-    'tb_prob_failure_gp_ci': 1.0,
     'tb_pydata_chi_2023': 1.0,
 }
 
 # Default runtime for unknown tests (assume medium-length)
 DEFAULT_RUNTIME = 30.0
 
+# Try to load runtimes from CSV file
+TEST_RUNTIMES = {}
+csv_path = os.path.join(os.path.dirname(__file__), '../../demos/talk_paper_demos/parsl_fest_2025/output/sequential_output_time.csv')
+if os.path.exists(csv_path):
+    try:
+        df = pd.read_csv(csv_path)
+        # Convert from test_name to tb_name format
+        for _, row in df.iterrows():
+            notebook = row['Notebook']
+            time_s = float(row['Time_s'])
+            # Convert test_xxx to tb_xxx format
+            tb_name = notebook.replace('test_', 'tb_')
+            TEST_RUNTIMES[tb_name] = time_s
+        print(f"Loaded {len(TEST_RUNTIMES)} test runtimes from {csv_path}")
+    except Exception as e:
+        print(f"Warning: Failed to load runtimes from CSV: {e}")
+        TEST_RUNTIMES = TEST_RUNTIMES_FALLBACK.copy()
+else:
+    # Fall back to hardcoded values
+    TEST_RUNTIMES = TEST_RUNTIMES_FALLBACK.copy()
 
 def get_runtime(test_name: str) -> float:
     """Get estimated runtime for a test module."""
     return TEST_RUNTIMES.get(test_name, DEFAULT_RUNTIME)
-
-
-def sort_by_runtime(test_modules: list, longest_first: bool = True) -> list:
-    """
-    Sort test modules by estimated runtime (simple LJF).
-    
-    Args:
-        test_modules: List of test module names
-        longest_first: If True, sort longest jobs first (LJF scheduling)
-        
-    Returns:
-        Sorted list of test module names
-    """
-    return sorted(
-        test_modules,
-        key=lambda m: get_runtime(m),
-        reverse=longest_first
-    )
 
 
 def optimal_schedule(test_modules: list, num_workers: int) -> tuple:
@@ -100,7 +102,7 @@ def optimal_schedule(test_modules: list, num_workers: int) -> tuple:
         raise ValueError("num_workers must be positive")
     
     # Sort by runtime (longest first) - LPT heuristic
-    sorted_modules = sort_by_runtime(test_modules, longest_first=True)
+    sorted_modules = sorted(test_modules, key=lambda m: get_runtime(m), reverse=True)
     
     # Min-heap of (current_load, worker_id, [assigned_tests])
     workers = [(0.0, i, []) for i in range(num_workers)]
@@ -132,90 +134,3 @@ def optimal_schedule(test_modules: list, num_workers: int) -> tuple:
                 ordered_modules.append(q.pop(0))
     
     return ordered_modules, worker_assignments, estimated_makespan
-
-
-def print_schedule(test_modules: list, num_workers: int = None) -> None:
-    """Print the scheduled order with estimated runtimes."""
-    if num_workers is None:
-        # Just print LJF order
-        sorted_modules = sort_by_runtime(test_modules, longest_first=True)
-        print("\nScheduled test order (Longest Job First):")
-        print("-" * 50)
-        total_time = 0
-        for i, module in enumerate(sorted_modules, 1):
-            runtime = get_runtime(module)
-            total_time += runtime
-            print(f"{i:3}. {module:45} {runtime:7.2f}s")
-        print("-" * 50)
-        print(f"Total estimated sequential time: {total_time:.2f}s")
-    else:
-        # Print optimal schedule for given workers
-        ordered, assignments, makespan = optimal_schedule(test_modules, num_workers)
-        total_seq = sum(get_runtime(m) for m in test_modules)
-        
-        print(f"\n{'='*60}")
-        print(f"OPTIMAL SCHEDULE FOR {num_workers} WORKERS")
-        print(f"{'='*60}")
-        print(f"Total sequential time: {total_seq:.2f}s")
-        print(f"Estimated parallel time (makespan): {makespan:.2f}s")
-        print(f"Theoretical speedup: {total_seq/makespan:.2f}x")
-        print(f"Efficiency: {(total_seq/makespan)/num_workers*100:.1f}%")
-        print(f"{'='*60}")
-        
-        for worker_id, tests in assignments:
-            load = sum(get_runtime(t) for t in tests)
-            print(f"\nWorker {worker_id} (load: {load:.2f}s, {len(tests)} tests):")
-            for t in tests:
-                print(f"  - {t}: {get_runtime(t):.2f}s")
-        
-        print(f"\n{'='*60}")
-
-
-def analyze_scalability(test_modules: list, max_workers: int = 16) -> dict:
-    """
-    Analyze how speedup scales with different worker counts.
-    
-    Args:
-        test_modules: List of test module names  
-        max_workers: Maximum number of workers to analyze
-        
-    Returns:
-        dict: Scalability analysis results
-    """
-    total_seq = sum(get_runtime(m) for m in test_modules)
-    longest_job = max(get_runtime(m) for m in test_modules)
-    
-    print(f"\n{'='*70}")
-    print("SCALABILITY ANALYSIS")
-    print(f"{'='*70}")
-    print(f"Total sequential time: {total_seq:.2f}s")
-    print(f"Longest single job: {longest_job:.2f}s (hard floor for parallel time)")
-    print(f"{'='*70}")
-    print(f"{'Workers':>8} | {'Makespan':>10} | {'Speedup':>8} | {'Efficiency':>10} | {'vs Ideal':>10}")
-    print(f"{'-'*8}-+-{'-'*10}-+-{'-'*8}-+-{'-'*10}-+-{'-'*10}")
-    
-    results = {}
-    for n in range(1, max_workers + 1):
-        _, _, makespan = optimal_schedule(test_modules, n)
-        speedup = total_seq / makespan
-        efficiency = speedup / n * 100
-        ideal_speedup = min(n, total_seq / longest_job)
-        vs_ideal = speedup / ideal_speedup * 100
-        print(f"{n:>8} | {makespan:>10.2f} | {speedup:>8.2f} | {efficiency:>9.1f}% | {vs_ideal:>9.1f}%")
-        results[n] = {'makespan': makespan, 'speedup': speedup, 'efficiency': efficiency}
-    
-    print(f"{'='*70}")
-    print(f"Note: Maximum theoretical speedup = {total_seq/longest_job:.2f}x (limited by longest job)")
-    print()
-    
-    return results
-
-
-if __name__ == '__main__':
-    # Demo: analyze scalability for all tests
-    all_tests = list(TEST_RUNTIMES.keys())
-    analyze_scalability(all_tests, max_workers=12)
-    
-    # Show optimal schedule for 4 and 8 workers
-    print_schedule(all_tests, num_workers=4)
-    print_schedule(all_tests, num_workers=8)

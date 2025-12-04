@@ -65,29 +65,7 @@ Each run creates `output/parallel_times_{N}.csv` and `output/parallel_output_{N}
 Run `03_visualize_speedup.ipynb` to generate plots comparing sequential vs parallel execution times and compute speedup ratios.
 
 
-## Load Balancing with LPT Scheduling
 
-The parallel test runner uses the **Longest Processing Time (LPT)** algorithm (also known as Longest Job First) to optimize load balancing across Parsl workers.
-
-### How It Works
-
-1. **Runtime Estimates**: `test_runtimes.py` stores measured execution times for each notebook test from sequential runs.
-
-2. **Optimal Bin Packing**: Before submitting jobs, tests are sorted by estimated runtime (longest first) and assigned to the least-loaded worker using a min-heap.
-
-3. **Balanced Workloads**: This ensures all workers finish at approximately the same time, maximizing parallelism.
-
-### Scalability Analysis
-
-Based on measured runtimes (total sequential time: ~759s):
-
-| Workers | Estimated Makespan | Speedup | Efficiency |
-|---------|-------------------|---------|------------|
-| 1 | 759s | 1.0x | 100% |
-| 2 | 379s | 2.0x | 100% |
-| 4 | 190s | 4.0x | 100% |
-| 6 | 138s | 5.5x | 92% |
-| 8 | 138s | 5.5x | 69% |
 
 **Maximum theoretical speedup: 5.5x** (limited by the longest single test: `tb_iris` at 138s).
 

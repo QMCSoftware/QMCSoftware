@@ -9,7 +9,7 @@ rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
 			echo "    Missing test for: $nb -> Expected: test/booktests/tb_$test_base.py"; \
 		fi; \
 	done
-Total notebooks:        36
+Total notebooks:        35
 Total test files:       32
 
 Generating missing booktest files...
@@ -67,32 +67,32 @@ test_vectorized_qmc_bayes_notebook (tb_vectorized_qmc_bayes.NotebookTests.test_v
 test_why_add_q_to_mc_blog_notebook (tb_why_add_q_to_mc_blog.NotebookTests.test_why_add_q_to_mc_blog_notebook) ... ok
 
 ----------------------------------------------------------------------
-Ran 32 tests in 446.124s
+Ran 32 tests in 468.655s
 
 OK (skipped=6)
-    Memory used: 0.19 GB.  Test time: 6.97 s
-    Memory used: 0.19 GB.  Test time: 0.88 s
-    Memory used: 0.19 GB.  Test time: 35.67 s
-    Memory used: 0.19 GB.  Test time: 4.83 s
-    Memory used: 0.19 GB.  Test time: 14.68 s
-    Memory used: 0.19 GB.  Test time: 23.16 s
-    Memory used: 0.20 GB.  Test time: 11.45 s
-    Memory used: 0.20 GB.  Test time: 1.03 s
-    Memory used: 0.20 GB.  Test time: 56.90 s
-    Memory used: 0.20 GB.  Test time: 162.16 s
-    Memory used: 0.20 GB.  Test time: 6.87 s
-    Memory used: 0.20 GB.  Test time: 1.92 s
-    Memory used: 0.20 GB.  Test time: 5.98 s
-    Memory used: 0.20 GB.  Test time: 3.21 s
-    Memory used: 0.20 GB.  Test time: 5.83 s
-    Memory used: 0.20 GB.  Test time: 5.12 s
-    Memory used: 0.20 GB.  Test time: 36.29 s
-    Memory used: 0.20 GB.  Test time: 2.01 s
-    Memory used: 0.20 GB.  Test time: 1.97 s
-    Memory used: 0.20 GB.  Test time: 15.72 s
-    Memory used: 0.20 GB.  Test time: 3.23 s
-    Memory used: 0.20 GB.  Test time: 3.35 s
-    Memory used: 0.20 GB.  Test time: 0.78 s
-    Memory used: 0.20 GB.  Test time: 6.03 s
-    Memory used: 0.20 GB.  Test time: 27.34 s
-    Memory used: 0.20 GB.  Test time: 2.12 s
+    Memory used: 0.22 GB.  Test time: 7.35 s
+    Memory used: 0.22 GB.  Test time: 0.96 s
+    Memory used: 0.22 GB.  Test time: 42.01 s
+    Memory used: 0.22 GB.  Test time: 5.67 s
+    Memory used: 0.22 GB.  Test time: 16.60 s
+    Memory used: 0.22 GB.  Test time: 22.91 s
+    Memory used: 0.22 GB.  Test time: 13.10 s
+    Memory used: 0.23 GB.  Test time: 1.20 s
+    Memory used: 0.23 GB.  Test time: 63.24 s
+    Memory used: 0.23 GB.  Test time: 170.63 s
+    Memory used: 0.23 GB.  Test time: 6.48 s
+    Memory used: 0.23 GB.  Test time: 1.81 s
+    Memory used: 0.23 GB.  Test time: 6.04 s
+    Memory used: 0.23 GB.  Test time: 3.31 s
+    Memory used: 0.23 GB.  Test time: 5.02 s
+    Memory used: 0.23 GB.  Test time: 4.76 s
+    Memory used: 0.23 GB.  Test time: 34.79 s
+    Memory used: 0.23 GB.  Test time: 2.03 s
+    Memory used: 0.23 GB.  Test time: 1.87 s
+    Memory used: 0.23 GB.  Test time: 15.39 s
+    Memory used: 0.23 GB.  Test time: 3.27 s
+    Memory used: 0.23 GB.  Test time: 3.28 s
+    Memory used: 0.23 GB.  Test time: 0.77 s
+    Memory used: 0.23 GB.  Test time: 6.19 s
+    Memory used: 0.24 GB.  Test time: 27.12 s
+    Memory used: 0.24 GB.  Test time: 2.12 s

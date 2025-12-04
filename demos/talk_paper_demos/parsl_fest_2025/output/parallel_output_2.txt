@@ -9,7 +9,7 @@ rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
 			echo "    Missing test for: $nb -> Expected: test/booktests/tb_$test_base.py"; \
 		fi; \
 	done
-Total notebooks:        38
+Total notebooks:        36
 Total test files:       32
 
 Generating missing booktest files...
@@ -29,97 +29,95 @@ pip install -q -e ".[test]"  && \
 	python parsl_test_runner.py  -v --failfast && \
 	cd ../.. 
 Parsl configuration loaded successfully.
-Applied optimal LPT scheduling for 2 workers
-Estimated makespan: 379.4s (speedup: 2.00x)
 Found 32 test modules to execute in parallel...
 All tests submitted to Parsl executor...
-[1/32] tb_iris: PASSED
-tb_iris ...     Memory used: 0.10 GB.  Test time: 63.90 s
+[1/32] tb_elliptic_pde: PASSED
+tb_elliptic_pde ...     Memory used: 0.11 GB.  Test time: 28.54 s
 ok
-[2/32] tb_elliptic_pde: PASSED
-tb_elliptic_pde ...     Memory used: 0.10 GB.  Test time: 32.59 s
+[2/32] tb_vectorized_qmc: PASSED
+tb_vectorized_qmc ...     Memory used: 0.09 GB.  Test time: 6.92 s
 ok
-[3/32] tb_asian_option_mlqmc: PASSED
-tb_asian_option_mlqmc ...     Memory used: 0.10 GB.  Test time: 42.12 s
+[3/32] tb_pricing_options: PASSED
+tb_pricing_options ...     Memory used: 0.10 GB.  Test time: 5.64 s
 ok
-[4/32] tb_qei_demo_for_blog: PASSED
-tb_qei_demo_for_blog ...     Memory used: 0.10 GB.  Test time: 38.51 s
+[4/32] tb_plot_proj_function: PASSED
+tb_plot_proj_function ...     Memory used: 0.11 GB.  Test time: 5.75 s
 ok
-[5/32] tb_digital_net_b2: PASSED
-tb_digital_net_b2 ...     Memory used: 0.10 GB.  Test time: 16.88 s
+[5/32] tb_asian_option_mlqmc: PASSED
+tb_asian_option_mlqmc ...     Memory used: 0.10 GB.  Test time: 42.18 s
 ok
-[6/32] tb_vectorized_qmc_bayes: PASSED
-tb_vectorized_qmc_bayes ...     Memory used: 0.09 GB.  Test time: 28.73 s
+[6/32] tb_Purdue_Talk_Figures: PASSED
+[7/32] tb_sample_scatter_plots: PASSED
+tb_sample_scatter_plots ...     Memory used: 0.10 GB.  Test time: 3.92 s
 ok
-[7/32] tb_gaussian_diagnostics_demo: PASSED
-tb_gaussian_diagnostics_demo ...     Memory used: 0.14 GB.  Test time: 12.42 s
+[8/32] tb_gaussian_diagnostics_demo: PASSED
+tb_gaussian_diagnostics_demo ...     Memory used: 0.13 GB.  Test time: 13.22 s
 ok
-[8/32] tb_ray_tracing: PASSED
-tb_ray_tracing ...     Memory used: 0.10 GB.  Test time: 15.92 s
+[9/32] tb_qmcpy_intro: PASSED
+tb_qmcpy_intro ...     Memory used: 0.10 GB.  Test time: 2.48 s
 ok
-[9/32] tb_linear_scrambled_halton: PASSED
-tb_linear_scrambled_halton ...     Memory used: 0.10 GB.  Test time: 6.49 s
+[10/32] tb_qei_demo_for_blog: PASSED
+tb_qei_demo_for_blog ...     Memory used: 0.10 GB.  Test time: 37.71 s
 ok
-[10/32] tb_lattice_random_generator: PASSED
-tb_lattice_random_generator ...     Memory used: 0.10 GB.  Test time: 7.27 s
+[11/32] tb_digital_net_b2: PASSED
+tb_digital_net_b2 ...     Memory used: 0.10 GB.  Test time: 16.61 s
 ok
-[11/32] tb_vectorized_qmc: PASSED
-tb_vectorized_qmc ...     Memory used: 0.09 GB.  Test time: 6.68 s
+[12/32] tb_joss2025: PASSED
+tb_joss2025 ...     Memory used: 0.09 GB.  Test time: 5.65 s
 ok
-[12/32] tb_MCQMC_2020_QMC_Software_Tutorial: PASSED
-tb_MCQMC_2020_QMC_Software_Tutorial ...     Memory used: 0.10 GB.  Test time: 7.14 s
+[13/32] tb_lebesgue_integration: PASSED
+tb_lebesgue_integration ...     Memory used: 0.10 GB.  Test time: 2.31 s
 ok
-[13/32] tb_joss2025: PASSED
-tb_joss2025 ...     Memory used: 0.09 GB.  Test time: 182.61 s
+[14/32] tb_gbm_demo: PASSED
+tb_gbm_demo ...     Memory used: 0.09 GB.  Test time: 1.23 s
 ok
-[14/32] tb_plot_proj_function: PASSED
-tb_plot_proj_function ...     Memory used: 0.10 GB.  Test time: 5.67 s
+[15/32] tb_pydata_chi_2023: PASSED
+[16/32] tb_nei_demo: PASSED
+tb_nei_demo ...     Memory used: 0.10 GB.  Test time: 3.70 s
 ok
-[15/32] tb_pricing_options: PASSED
-tb_pricing_options ...     Memory used: 0.10 GB.  Test time: 5.71 s
+[17/32] tb_iris: PASSED
+tb_iris ...     Memory used: 0.10 GB.  Test time: 62.13 s
 ok
-[16/32] tb_control_variates: PASSED
-tb_control_variates ...     Memory used: 0.09 GB.  Test time: 5.86 s
+[18/32] tb_quickstart: PASSED
+tb_quickstart ...     Memory used: 0.09 GB.  Test time: 2.20 s
 ok
-[17/32] tb_nei_demo: PASSED
-tb_nei_demo ...     Memory used: 0.10 GB.  Test time: 3.78 s
+[19/32] tb_vectorized_qmc_bayes: PASSED
+tb_vectorized_qmc_bayes ...     Memory used: 0.09 GB.  Test time: 28.60 s
 ok
-[18/32] tb_sample_scatter_plots: PASSED
-tb_sample_scatter_plots ...     Memory used: 0.10 GB.  Test time: 3.77 s
+[20/32] tb_ray_tracing: PASSED
+tb_ray_tracing ...     Memory used: 0.10 GB.  Test time: 17.14 s
 ok
-[19/32] tb_why_add_q_to_mc_blog: PASSED
-tb_why_add_q_to_mc_blog ...     Memory used: 0.09 GB.  Test time: 2.51 s
+[21/32] tb_acm_toms_sorokin_2025: PASSED
+tb_acm_toms_sorokin_2025 ...     Memory used: 0.10 GB.  Test time: 1.27 s
 ok
-[20/32] tb_some_true_measures: PASSED
-tb_some_true_measures ...     Memory used: 0.10 GB.  Test time: 3.75 s
+[22/32] tb_some_true_measures: PASSED
+tb_some_true_measures ...     Memory used: 0.10 GB.  Test time: 4.06 s
 ok
-[21/32] tb_lebesgue_integration: PASSED
-tb_lebesgue_integration ...     Memory used: 0.10 GB.  Test time: 2.26 s
+[23/32] tb_Argonne_2023_Talk_Figures: PASSED
+[24/32] tb_linear_scrambled_halton: PASSED
+tb_linear_scrambled_halton ...     Memory used: 0.10 GB.  Test time: 6.95 s
 ok
-[22/32] tb_qmcpy_intro: PASSED
-tb_qmcpy_intro ...     Memory used: 0.10 GB.  Test time: 2.26 s
-ok
-[23/32] tb_quickstart: PASSED
-tb_quickstart ...     Memory used: 0.09 GB.  Test time: 2.23 s
-ok
-[24/32] tb_gbm_demo: PASSED
-tb_gbm_demo ...     Memory used: 0.09 GB.  Test time: 1.24 s
-ok
-[25/32] tb_Purdue_Talk_Figures: PASSED
-[26/32] tb_acm_toms_sorokin_2025: PASSED
-tb_acm_toms_sorokin_2025 ...     Memory used: 0.10 GB.  Test time: 1.22 s
-ok
-[27/32] tb_Argonne_2023_Talk_Figures: PASSED
-[28/32] tb_pydata_chi_2023: PASSED
-[29/32] tb_dakota_genz: PASSED
-[30/32] tb_MCQMC2022_Article_Figures: PASSED
-[31/32] tb_umbridge: PASSED
+[25/32] tb_umbridge: PASSED
 tb_umbridge ...     Memory used: 0.09 GB.  Test time: 0.93 s
 ok
-[32/32] tb_prob_failure_gp_ci: PASSED
+[26/32] tb_lattice_random_generator: PASSED
+tb_lattice_random_generator ...     Memory used: 0.10 GB.  Test time: 7.86 s
+ok
+[27/32] tb_why_add_q_to_mc_blog: PASSED
+tb_why_add_q_to_mc_blog ...     Memory used: 0.09 GB.  Test time: 2.74 s
+ok
+[28/32] tb_control_variates: PASSED
+tb_control_variates ...     Memory used: 0.10 GB.  Test time: 5.81 s
+ok
+[29/32] tb_MCQMC2022_Article_Figures: PASSED
+[30/32] tb_dakota_genz: PASSED
+[31/32] tb_prob_failure_gp_ci: PASSED
+[32/32] tb_MCQMC_2020_QMC_Software_Tutorial: PASSED
+tb_MCQMC_2020_QMC_Software_Tutorial ...     Memory used: 0.10 GB.  Test time: 7.28 s
+ok
 ................................
 ----------------------------------------------------------------------
-Ran 32 test modules in 325.899s
-Total test time: 502.450s (overhead: -176.551s)
+Ran 32 test modules in 179.495s
+Total test time: 322.830s (overhead: -143.335s)
 
 OK

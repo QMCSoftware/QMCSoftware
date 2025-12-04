@@ -15,10 +15,10 @@ sequential:
 		--output-dir=$(OUTDIR) --output=01_sequential_output.ipynb
 
 parallel:
-	@echo "Running 02_parallel.ipynb (parallel) for workers 1,2,4,8,16"
-	@for w in 1 2 4 8 16; do \
+	@echo "Running 02_parallel.ipynb (parallel) for workers  2" 
+	@for w in  2 ; do \
 		 echo " -> running with $$w workers"; \
-		 PARSL_MAX_WORKERS=$$w $(PYTHON) -m nbconvert --to notebook --execute 02_parallel_mac.ipynb \
+		 PARSL_MAX_WORKERS=$$w $(PYTHON) -m nbconvert --to notebook --execute 02_parallel.ipynb \
 		 --ExecutePreprocessor.kernel_name=$(KERNEL) --ExecutePreprocessor.timeout=$(TIMEOUT) \
 		 --output-dir=$(OUTDIR) --output=02_parallel_workers_$$w.ipynb; \
 		done
