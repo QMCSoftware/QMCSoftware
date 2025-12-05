@@ -40,5 +40,5 @@ To execute say two testbook files in parallel, run the following command in a te
     make booktests_parallel_no_docker TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
 ```
 
-For a demo, see the Jupyter notebook, `demos/talk_paper_demos/ParslFest_2025/`.
+For a demo, see the Jupyter notebook, `demos/talk_paper_demos/Parslfest_2025/`.
 
