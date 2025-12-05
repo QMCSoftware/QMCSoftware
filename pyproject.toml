@@ -80,7 +80,7 @@ test = [
     "matplotlib >= 3.9.0",
     ]
 test_torch = [
-    "torch >= 2.0.0",
+    "torch >= 2.7.0",
     ]
 test_gpytorch = [
     "gpytorch == 1.11",
@@ -114,6 +114,25 @@ dev = [ # brew install weasyprint
     "pandas >= 2.0.0",
     "scikit-learn >= 1.0.0",
     "scikit-optimize >= 0.10.2",
+]
+
+class = [
+    "jupyterlab >= 4.0.0",
+    "matplotlib >= 3.9.0",
+    "seaborn >= 0.13.0",
+    "tueplots >= 0.2.0",
+    "pandas >= 2.0.0",
+    "scikit-learn >= 1.0.0",
+    "scikit-optimize >= 0.10.2",
+    "ipynbname >= 2023.2.0.0",
+    "jupyterlab_execute_time >= 3.1.2",
+    "ipywidgets >= 8.1.0",
+    "statsmodels >= 0.14.3",
+    "tqdm >= 4.66.0",
+    "sympy >= 1.12",
+    "arviz >= 0.17",
+    "plotly >= 5.0",
+    "networkx >= 3.0",
 ]
 
 [tool.pdm.build]

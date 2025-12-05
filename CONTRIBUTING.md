@@ -27,6 +27,24 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
+### 📚 Using `qmcpy` in courses (`class` extra)
+
+`qmcpy` provides a `class` optional dependency group that installs a
+complete teaching environment (JupyterLab, plotting, statistics, and utilities)
+in addition to `qmcpy` itself.
+
+For a typical course setup, you can do:
+```bash
+git clone https://github.com/QMCSoftware/QMCSoftware.git
+cd QMCSoftware
+pip install -e ".[class]"
+```
+
+or for a heavy-duty version
+```bash
+pip install -e ".[class,dev]"
+```
+
 ## Tests
 
 Doctests and unittests take a few minute to run with
