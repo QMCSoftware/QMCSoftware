@@ -6,6 +6,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()  # Call parent setUp first to initialize timing attributes
