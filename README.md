@@ -26,24 +26,6 @@ pip install qmcpy
 
 To install from source, please see the [contributing guidelines](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/).
 
-## 📚 Using `qmcpy` in courses (`class` extra)
-
-`qmcpy` provides a `class` optional dependency group that installs a
-complete teaching environment (JupyterLab, plotting, statistics, and utilities)
-in addition to `qmcpy` itself.
-
-For a typical course setup, you can do:
-```bash
-git clone https://github.com/QMCSoftware/QMCSoftware.git
-cd QMCSoftware
-pip install -e ".[class]"
-```
-
-or for a heavy-duty version
-```bash
-pip install -e ".[class,dev]"
-``` 
-
 ## Citation
 
 If you find QMCPy helpful in your work, please support us by citing the following work, which is also available as a [QMCPy BibTex citation](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
