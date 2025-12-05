@@ -59,7 +59,7 @@ DEFAULT_RUNTIME = 30.0
 
 # Try to load runtimes from CSV file
 TEST_RUNTIMES = {}
-csv_path = os.path.join(os.path.dirname(__file__), '../../demos/talk_paper_demos/ParslFest_2025/output/sequential_output_time.csv')
+csv_path = os.path.join(os.path.dirname(__file__), '../../demos/talk_paper_demos/Parslfest_2025/output/sequential_output_time.csv')
 if os.path.exists(csv_path):
     try:
         df = pd.read_csv(csv_path)
