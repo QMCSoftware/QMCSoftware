@@ -80,7 +80,7 @@ test = [
     "matplotlib >= 3.9.0",
     ]
 test_torch = [
-    "torch == 2.7.0",
+    "torch == 2.9.1",
     ]
 test_gpytorch = [
     "gpytorch == 1.11",
