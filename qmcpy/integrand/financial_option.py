@@ -29,7 +29,7 @@ class FinancialOption(AbstractIntegrand):
     
     where the payoff function $P$ will be defined depending on the option.
     
-    Below we wil use $S_{-1}$ to denote the final element of $\boldsymbol{S}$, the value of the path at exercise time. 
+    Below we will use $S_{-1}$ to denote the final element of $\boldsymbol{S}$, the value of the path at exercise time. 
     
     # European Options
     
