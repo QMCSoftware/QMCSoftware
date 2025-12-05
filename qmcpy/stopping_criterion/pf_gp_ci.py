@@ -341,8 +341,24 @@ class PFGPCIData(Data):
                 training_iter = self.gpytorch_train_iter,
                 verbose = self.verbose)
         else:
-            self.gpyt_model = self.gpyt_model.add_data(xdraw,ydrawtf)
-            torch.cuda.empty_cache()          
+            try:
+                self.gpyt_model = self.gpyt_model.add_data(xdraw,ydrawtf)
+                torch.cuda.empty_cache()
+            except Exception as e:
+                # If adding data fails (e.g., NotPSDError), refit the entire model
+                if self.verbose: print(f"\tFalling back to full refit due to: {type(e).__name__}")
+                self.gpyt_model = ExactGPyTorchRegressionModel(
+                    x_t = self.x, y_t = self.y,
+                    prior_mean = self.gpytorch_prior_mean,
+                    prior_cov = self.gpytorch_prior_cov,
+                    likelihood = self.gpytorch_likelihood,
+                    use_gpu = self.gpytorch_use_gpu)
+                self.gpyt_model.fit(
+                    optimizer = self.torch_optimizer_func(self.gpyt_model),
+                    mll = self.gpytorch_marginal_log_likelihood_func(self.gpyt_model.likelihood,self.gpyt_model),
+                    training_iter = self.gpytorch_train_iter,
+                    verbose = self.verbose)
+                torch.cuda.empty_cache()          
         self.saved_gps.append(self.gpyt_model.state_dict())
         phi = _get_phi(self.gpyt_model,self.qmc_pts)
         self.solutions.append(np.mean(phi>=.5))

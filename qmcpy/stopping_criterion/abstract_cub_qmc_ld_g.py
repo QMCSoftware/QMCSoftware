@@ -25,6 +25,21 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         self.n_init = int(n_init)
         self.m_init = int(np.log2(n_init))
         self.n_limit = int(n_limit)
+        # Ensure integrator n_limit does not exceed the discrete distribution's n_limit.
+        # The discrete distribution (e.g., Lattice) may enforce a smaller maximum number
+        # of samples; request to generate more samples than the distribution supports
+        # will raise a ParameterError when calling the distribution. Cap the integrator
+        # n_limit to avoid that situation.
+        try:
+            dd_n_limit = int(self.integrand.discrete_distrib.n_limit)
+        except Exception:
+            dd_n_limit = None
+        if dd_n_limit is not None and self.n_limit > dd_n_limit:
+            warnings.warn(
+                f"Integrator n_limit ({self.n_limit}) exceeds discrete distribution n_limit ({dd_n_limit}). Using {dd_n_limit} instead.",
+                ParameterWarning,
+            )
+            self.n_limit = dd_n_limit
         assert isinstance(error_fun,str) or callable(error_fun)
         if isinstance(error_fun,str):
             if error_fun.upper()=="EITHER":
