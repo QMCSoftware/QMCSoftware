@@ -1,4 +1,6 @@
 # General Python
+.pdm-python
+*raw.githubusercontent.com*
 packages.svg
 .pypirc
 test_readme.py
@@ -76,5 +78,3 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 /sc
-
-
