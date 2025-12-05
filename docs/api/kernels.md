@@ -16,13 +16,13 @@
 
 ::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvar
 
+## `KernelShiftInvarCombined` 
+
+::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvarCombined
+
 ## `KernelDigShiftInvar` 
 
 ::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvar
-
-## `KernelDigShiftInvarCombined` 
-
-::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvarCombined
 
 ## `KernelDigShiftInvarAdaptiveAlpha` 
 
