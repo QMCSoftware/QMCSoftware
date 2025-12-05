@@ -80,3 +80,5 @@ _ags/*
 
 # Downloaded files
 raw.githubusercontent.com*
+.venv/
+.venv/
