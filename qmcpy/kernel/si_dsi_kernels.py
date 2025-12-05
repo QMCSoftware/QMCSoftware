@@ -238,7 +238,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
         >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
         >>> yhat
-        tensor([ 3003.7946, -1517.1557,   701.6692,  1470.4242], dtype=torch.float64)
+        tensor([ 3003.7946, -1517.1557,   701.6692,  1470.4241], dtype=torch.float64)
         >>> torch.allclose(y,yhat)
         True
         >>> kernel = KernelShiftInvar(
