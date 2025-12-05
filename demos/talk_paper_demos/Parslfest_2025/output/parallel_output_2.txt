@@ -2,7 +2,7 @@ rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
 	find demos -name '*.ipynb' | while read nb; do \
 		base=$(basename "$nb" .ipynb); \
 		test_base=$(echo "$base" | sed 's/[-.]/_/g'); \
-		if echo "$nb" | grep -q "parsl_fest_2025"; then \
+		if echo "$nb" | grep -q "ParslFest_2025"; then \
 			continue; \
 		fi; \
 		if ! ls test/booktests/tb_"$test_base".py > /dev/null 2>&1; then \
