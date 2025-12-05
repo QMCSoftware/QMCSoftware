@@ -78,3 +78,4 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 /sc
+.github/*/sc_*
