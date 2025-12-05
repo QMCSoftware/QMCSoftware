@@ -14,6 +14,8 @@ This directory contains demonstration notebooks for the ParslFest 2025 presentat
 - **`.gitignore`** - Git ignore rules for output files and temporary data
 - **`output/`** - Directory containing execution timing results, speedup metrics (CSV files), and plots (PNG files)
 - **`runinfo/`** - Directory containing Parsl execution logs and runtime information
+- **`ParslFest_2025.deck`** -  presentation deck 
+- **`ParslFest_2025.pdf`** - Exported PDF of the presentation slides
 
 ## Quick Start
 
