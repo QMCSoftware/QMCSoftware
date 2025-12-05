@@ -73,7 +73,7 @@ test = [
     "testbook == 0.4.2",
     "psutil == 5.9.5",
     "parsl == 2025.7.28",
-    "seaborn == 0.8",
+    "seaborn >= 0.8",
     "scikit-learn >= 1.0.0",
     "scikit-optimize",
     "ipykernel",
@@ -83,13 +83,13 @@ test_torch = [
     "torch >= 2.7.0",
     ]
 test_gpytorch = [
-    "gpytorch == 1.11",
+    "gpytorch >= 1.11",
     ]
 test_botorch = [
-    "botorch == 0.10.0",
+    "botorch >= 0.10.0",
     ]
 test_umbridge = [
-    "umbridge == 1.2.4",
+    "umbridge >= 1.2.4",
     ]
 docs = [
     "nbval >= 0.10.0",
@@ -109,6 +109,9 @@ docs = [
 dev = [ # brew install weasyprint
     "qmcpy[docs,test,test_gpytorch,test_botorch,test_umbridge]",
     "jupyterlab >= 4.0.0",
+    "jupyterlab_execute_time >= 3.2.0",
+    "ipynbname >= 2025.8.0.0",
+    "sympy >= 1.14.0",
     "matplotlib >= 3.9.0",
     "tueplots >= 0.2.0",
     "pandas >= 2.0.0",

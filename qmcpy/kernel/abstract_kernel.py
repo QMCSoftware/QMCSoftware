@@ -61,7 +61,7 @@ class AbstractKernel(object):
     def get_batch_params(self, ndim):
         return {pname: insert_batch_dims(batch_param,ndim,-1) for pname,batch_param in self.batch_params.items()}
     
-    def __call__(self, x0, x1, beta0=None, beta1=None, c=None):
+    def __call__(self, x0, x1, beta0=None, beta1=None, c=None, **kwargs):
         r"""
         Evaluate the kernel with (optional) partial derivatives 
 
@@ -73,6 +73,7 @@ class AbstractKernel(object):
             beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
             beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
             c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
+            kwargs (dict): keyword arguments to parsed call
         Returns:
             k (Union[np.ndarray,torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations. 
         """
@@ -104,11 +105,11 @@ class AbstractKernel(object):
         assert c.shape==(p,), "expected c.shape=(%d,) but got c.shape=%s"%(p,str(tuple(c.shape)))
         if not self.AUTOGRADKERNEL:
             batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
-            k = self.compiled_parsed___call__(x0,x1,beta0,beta1,c,batch_params)
+            k = self.compiled_parsed___call__(x0,x1,beta0,beta1,c,batch_params,**kwargs)
         else:
             if (beta0==0).all() and (beta1==0).all():
                 batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
-                k = c.sum()*self.compiled_parsed___call__(x0,x1,batch_params)
+                k = c.sum()*self.compiled_parsed___call__(x0,x1,batch_params,**kwargs)
             else: # requires autograd, so self.npt=torch
                 assert self.torchify, "autograd requires torchify=True"
                 import torch
@@ -134,7 +135,7 @@ class AbstractKernel(object):
                     x1g = x1
                 batch_params = self.get_batch_params(max(x0.ndim-1,x1.ndim-1))
                 k = 0.
-                k_base = self.compiled_parsed___call__(x0g,x1g,batch_params)
+                k_base = self.compiled_parsed___call__(x0g,x1g,batch_params,**kwargs)
                 for l in range(p):
                     if (beta0[l]>0).any() or (beta1[l]>0).any():
                         k_part = k_base.clone()
@@ -178,7 +179,7 @@ class AbstractKernel(object):
         batch_params = self.get_batch_params(x.ndim-1)
         return self.parsed_single_integral_01d(x,batch_params)
     
-    def parsed_single_integral_01d(self, x):
+    def parsed_single_integral_01d(self, x, batch_params):
         raise MethodImplementationError(self, 'parsed_single_integral_01d')
     
     def double_integral_01d(self):
@@ -249,7 +250,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
         super().__init__(d=d,torchify=torchify,device=device,compile_call=compile_call,comiple_call_kwargs=comiple_call_kwargs)
-        self.raw_scale,self.tf_scale = self.parse_assign_param(
+        self.raw_scale= self.parse_assign_param(
             pname = "scale",
             param = scale, 
             shape_param = shape_scale,
@@ -257,8 +258,9 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_scale,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
+        self.tfs_scale = tfs_scale
         self.batch_param_names.append("scale")
-        self.raw_lengthscales,self.tf_lengthscales = self.parse_assign_param(
+        self.raw_lengthscales = self.parse_assign_param(
             pname = "lengthscales",
             param = lengthscales, 
             shape_param = [self.d] if shape_lengthscales is None else shape_lengthscales,
@@ -266,13 +268,14 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             tfs_param = tfs_lengthscales,
             endsize_ops = [1,self.d],
             constraints = ["POSITIVE"])
+        self.tfs_lengthscales = tfs_lengthscales
         self.batch_param_names.append("lengthscales")
 
     @property
     def scale(self):
-        return self.tf_scale(self.raw_scale)
+        return self.tfs_scale[1](self.raw_scale)
     
     @property
     def lengthscales(self):
-        return self.tf_lengthscales(self.raw_lengthscales)
+        return self.tfs_lengthscales[1](self.raw_lengthscales)
         

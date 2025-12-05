@@ -9,7 +9,7 @@ class GeometricBrownianMotion(BrownianMotion):
     r"""
     A Geometric Brownian Motion (GBM) with initial value $S_0$, drift $\gamma$, and diffusion $\sigma^2$ is 
 
-    $$\mathrm{GBM}(t) = S_0 \exp[(\gamma - \sigma/2) t + \sigma \mathrm{BM}(t)]$$
+    $$\mathrm{GBM}(t) = S_0 \exp[(\gamma - \sigma^2/2) t + \sigma \mathrm{BM}(t)]$$
 
     where BM is a Brownian Motion drift $\gamma$ and diffusion $\sigma^2$. 
     
