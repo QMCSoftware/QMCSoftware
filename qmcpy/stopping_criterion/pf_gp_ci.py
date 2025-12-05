@@ -382,23 +382,24 @@ class PFGPCIData(Data):
             fig = pyplot.figure(constrained_layout=False,figsize=(8,4))
             gs = gridspec.GridSpec(1,2,figure=fig)
         axtrace = fig.add_subplot(gs[-1,:])
-        if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.solutions_ref,color='c',label=r'$P(g)$')
-        axtrace.plot(.5+np.arange(len(self.n_batch)),self.solutions,'-o',color='k',label=r'$\hat{P}_n^\mathrm{QMC}$')
-        axtrace.fill_between(.5+np.arange(len(self.n_batch)),self.ci_low,self.ci_high,color='k',alpha=.15)
-        axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\mathrm{QMC}}$')
-        if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\mathrm{QMC}} - P(g) \vert$')
-        axtrace.set_xlim([0,len(self.n_batch)])
-        axtrace.set_xticks([])
+        if self.approx_true_solution: axtrace.plot(self.n_sum,self.solutions_ref,color='c',label=r'$P(g)$')
+        axtrace.plot(self.n_sum,self.solutions,'-o',color='k',label=r'$\hat{P}_n^\mathrm{QMC}$')
+        axtrace.fill_between(self.n_sum,self.ci_low,self.ci_high,color='k',alpha=.15)
+        axtrace.plot(self.n_sum,self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\text{QMC}}$')
+        if self.approx_true_solution: axtrace.plot(self.n_sum,self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\text{QMC}} - P(g) \vert$')
+        axtrace.set_xlim([self.n_sum[0]-self.n_batch[1]/2,self.n_sum[-1]+self.n_batch[1]/2])
+        # axtrace.set_xticks(self.n_sum)
+        # axtrace.set_xticklabels(self.n_sum)
         axtrace.set_yscale('log',base=10)
         #axtrace.set_ylim([0,1]); axtrace.set_yticks([0,1])
-        for spine in ['top','right','bottom']: axtrace.spines[spine].set_visible(False)
-        axtrace.legend(loc='lower left',bbox_to_anchor=(0.05, -.2, .9, .102),mode='expand',ncol=4,prop={'size':18},frameon=False)
+        for spine in ['top','right']: axtrace.spines[spine].set_visible(False)
+        axtrace.legend(loc='lower center',bbox_to_anchor=(0.05, -.5, .9, .102),mode='expand',ncol=4,frameon=False)
         return fig
     def plot_1d(self, meshticks=1025, ci_percentage=.95, **kwargs):
         from matplotlib import pyplot,gridspec
         beta = norm.ppf(np.mean([ci_percentage,1]))
         n_batches = len(self.n_batch)
-        fig = pyplot.figure(constrained_layout=False,figsize=(4*n_batches,4*3))
+        fig = pyplot.figure(constrained_layout=False,figsize=(5*n_batches,5*3))
         gs = gridspec.GridSpec(3,n_batches,figure=fig)
         xticks = np.linspace(0,1,meshticks)[1:-1]
         if self.approx_true_solution: 
@@ -416,7 +417,7 @@ class PFGPCIData(Data):
             ax0j = fig.add_subplot(gs[0,j])
             mr_udens = _error_udens(gpyt_model,xticks[:,None])
             ax0j.fill_between(xticks,mr_udens,color='k',alpha=.5)
-            ax0j.scatter(self.x[i0:i1].squeeze(),np.zeros(i1-i0)+.015,color='r',s=25)
+            ax0j.scatter(self.x[i0:i1].squeeze(),np.zeros(i1-i0)+.015,color='r')
             ax0j.set_ylim([0,1])
             ax0j.set_yticks([0,1])
             gpyt_model = ExactGPyTorchRegressionModel(
@@ -427,25 +428,27 @@ class PFGPCIData(Data):
                 use_gpu = self.gpytorch_use_gpu)
             gpyt_model.load_state_dict(self.saved_gps[j+1])
             ax1j = fig.add_subplot(gs[1,j],sharey=None if j==0 else ax1j)
-            if self.approx_true_solution: ax1j.plot(xticks,ytickstf,color='c',label=r'f(x)',linewidth=2)
+            if self.approx_true_solution: ax1j.plot(xticks,ytickstf,color='c',label=r'f(x)')
             gp_mean,gp_std = gpyt_model.predict(xticks[:,None])
             ax1j.plot(xticks,gp_mean,color='k',label='gp')
             ax1j.fill_between(xticks,gp_mean-beta*gp_std,gp_mean+beta*gp_std,color='k',alpha=.25)
             ax1j.axhline(y=0,color='lightgreen')
             ax1j.scatter(self.x[:i0].squeeze(),self.y[:i0],color='b',label='old pts')
             ax1j.scatter(self.x[i0:i1].squeeze(),self.y[i0:i1],color='r',label='new pts')
-            ax1j.set_xlabel(r'$u$')
+            # ax1j.set_xlabel(r'$u$')
             if j==0:
                 #ax1j.set_ylabel(r'$y$')
                 ax0j.set_ylabel(r'$2\mathrm{ERR}_n(u)$')
+                ax1j.set_ylabel('GP Regression')
         for ax in fig.axes:
             ax.set_xlim([0,1])
             ax.set_xticks([0,1])
+            ax.xaxis.set_visible(False)
         return fig,gs
     def plot_2d(self, meshticks=257, clevels=32, **kwargs):
         from matplotlib import pyplot,gridspec,cm
         n_batches = len(self.n_batch)
-        fig = pyplot.figure(constrained_layout=False,figsize=(4*n_batches,4*5))
+        fig = pyplot.figure(constrained_layout=False,figsize=(5*n_batches,5*5))
         gs = gridspec.GridSpec(5 if self.approx_true_solution else 4,n_batches,figure=fig)
         x0mesh,x1mesh = np.meshgrid(np.linspace(0,1,meshticks)[1:-1],np.linspace(0,1,meshticks)[1:-1])
         xquery = np.vstack([x0mesh.flatten(),x1mesh.flatten()]).T
@@ -458,8 +461,10 @@ class PFGPCIData(Data):
             if self.approx_true_solution:
                 ax0j = fig.add_subplot(gs[row_idx,j])
                 ax0j.contourf(x0mesh,x1mesh,ymeshtf,cmap=cm.Greys,vmin=ymeshtf.min(),vmax=ymeshtf.max(),levels=clevels)
-                ax0j.contour(x0mesh,x1mesh,ymeshtf,colors='lightgreen',levels=[0],linewidths=5)
-                ax0j.set_title(r'$g(\mathbf{u})$')
+                ax0j.contour(x0mesh,x1mesh,ymeshtf,colors='lightgreen',levels=[0])
+                # ax0j.set_title(r'$g(\boldsymbol{u})$')
+                if j==0:
+                    ax0j.set_ylabel(r'$g(\boldsymbol{u})$')
                 row_idx += 1
             gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x[:i0], y_t = self.y[:i0],
@@ -472,7 +477,9 @@ class PFGPCIData(Data):
             udens_mr = _error_udens(gpyt_model,xquery).reshape(x0mesh.shape)
             ax1j.contourf(x0mesh,x1mesh,udens_mr,cmap=cm.Greys,levels=clevels,vmin=0,vmax=1)
             ax1j.scatter(self.x[i0:i1,0],self.x[i0:i1,1],color='r')
-            ax1j.set_title(r'$2\mathrm{ERR}_n(\mathbf{u})$')
+            # ax1j.set_title(r'$2\mathrm{ERR}_n(\boldsymbol{u})$')
+            if j==0:
+                ax1j.set_ylabel(r'$2\mathrm{ERR}_n(\boldsymbol{u})$')
             row_idx += 1
             gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x[:i0], y_t = self.y[:i0],
@@ -487,21 +494,28 @@ class PFGPCIData(Data):
             ax2j.contourf(x0mesh,x1mesh,gp_mean_mesh,cmap=cm.Greys,vmin=gp_mean.min(),vmax=gp_mean.max(),levels=clevels)
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
-                ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0],linewidths=5)
-            ax2j.set_title(r'$m_n(\mathbf{u})$')
+                ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0])
+            # ax2j.set_title(r'$M_n(\boldsymbol{u})$')
+            if j==0:
+                ax2j.set_ylabel(r'$M_n(\boldsymbol{u})$')
             row_idx += 1
             ax3j = fig.add_subplot(gs[row_idx,j])            
             ax3j.contourf(x0mesh,x1mesh,gp_std_mesh,cmap=cm.Greys,levels=clevels)
-            ax3j.set_title(r'$\sigma_n(\mathbf{u})$')
+            # ax3j.set_title(r'$\sigma_n(\boldsymbol{u})$')
+            if j==0:
+                ax3j.set_ylabel(r'$\sigma_n(\boldsymbol{u})$')
             for ax in [ax2j,ax3j]:
                 ax.scatter(self.x[:i0,0],self.x[:i0,1],color='b')
                 ax.scatter(self.x[i0:i1,0],self.x[i0:i1,1],color='r')
         for ax in fig.axes:
             ax.set_xlim([0,1])
             ax.set_ylim([0,1])
-            ax.set_xlabel(r'$u_1$')
+            # ax.set_xlabel(r'$u_1$')
             ax.set_aspect(1)
-            ax.set_xticks([0,1])
-            ax.set_yticks([0,1])
-            ax.set_ylabel(r'$u_2$')
+            ax.xaxis.set_visible(False)
+            ax.yaxis.set_tick_params(top=False, bottom=False, left=False, right=False,
+                labelleft=True, labelbottom=False)
+            # ax.set_xticks([0,1])
+            # ax.set_yticks([0,1])
+            # ax.set_ylabel(r'$u_2$')
         return fig,gs
