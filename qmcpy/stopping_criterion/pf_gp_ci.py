@@ -341,8 +341,24 @@ class PFGPCIData(Data):
                 training_iter = self.gpytorch_train_iter,
                 verbose = self.verbose)
         else:
-            self.gpyt_model = self.gpyt_model.add_data(xdraw,ydrawtf)
-            torch.cuda.empty_cache()          
+            try:
+                self.gpyt_model = self.gpyt_model.add_data(xdraw,ydrawtf)
+                torch.cuda.empty_cache()
+            except Exception as e:
+                # If adding data fails (e.g., NotPSDError), refit the entire model
+                if self.verbose: print(f"\tFalling back to full refit due to: {type(e).__name__}")
+                self.gpyt_model = ExactGPyTorchRegressionModel(
+                    x_t = self.x, y_t = self.y,
+                    prior_mean = self.gpytorch_prior_mean,
+                    prior_cov = self.gpytorch_prior_cov,
+                    likelihood = self.gpytorch_likelihood,
+                    use_gpu = self.gpytorch_use_gpu)
+                self.gpyt_model.fit(
+                    optimizer = self.torch_optimizer_func(self.gpyt_model),
+                    mll = self.gpytorch_marginal_log_likelihood_func(self.gpyt_model.likelihood,self.gpyt_model),
+                    training_iter = self.gpytorch_train_iter,
+                    verbose = self.verbose)
+                torch.cuda.empty_cache()          
         self.saved_gps.append(self.gpyt_model.state_dict())
         phi = _get_phi(self.gpyt_model,self.qmc_pts)
         self.solutions.append(np.mean(phi>=.5))
@@ -369,8 +385,8 @@ class PFGPCIData(Data):
         if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.solutions_ref,color='c',label=r'$P(g)$')
         axtrace.plot(.5+np.arange(len(self.n_batch)),self.solutions,'-o',color='k',label=r'$\hat{P}_n^\mathrm{QMC}$')
         axtrace.fill_between(.5+np.arange(len(self.n_batch)),self.ci_low,self.ci_high,color='k',alpha=.15)
-        axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\text{QMC}}$')
-        if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\text{QMC}} - P(g) \vert$')
+        axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_bounds,'-o',color='m',label=r'$\hat{\gamma}_n^{\mathrm{QMC}}$')
+        if self.approx_true_solution: axtrace.plot(.5+np.arange(len(self.n_batch)),self.error_ref,'-o',color='b',label=r'$\vert \hat{P}_n^{\mathrm{QMC}} - P(g) \vert$')
         axtrace.set_xlim([0,len(self.n_batch)])
         axtrace.set_xticks([])
         axtrace.set_yscale('log',base=10)
@@ -443,7 +459,7 @@ class PFGPCIData(Data):
                 ax0j = fig.add_subplot(gs[row_idx,j])
                 ax0j.contourf(x0mesh,x1mesh,ymeshtf,cmap=cm.Greys,vmin=ymeshtf.min(),vmax=ymeshtf.max(),levels=clevels)
                 ax0j.contour(x0mesh,x1mesh,ymeshtf,colors='lightgreen',levels=[0],linewidths=5)
-                ax0j.set_title(r'$g(\boldsymbol{u})$')
+                ax0j.set_title(r'$g(\mathbf{u})$')
                 row_idx += 1
             gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x[:i0], y_t = self.y[:i0],
@@ -456,7 +472,7 @@ class PFGPCIData(Data):
             udens_mr = _error_udens(gpyt_model,xquery).reshape(x0mesh.shape)
             ax1j.contourf(x0mesh,x1mesh,udens_mr,cmap=cm.Greys,levels=clevels,vmin=0,vmax=1)
             ax1j.scatter(self.x[i0:i1,0],self.x[i0:i1,1],color='r')
-            ax1j.set_title(r'$2\mathrm{ERR}_n(\boldsymbol{u})$')
+            ax1j.set_title(r'$2\mathrm{ERR}_n(\mathbf{u})$')
             row_idx += 1
             gpyt_model = ExactGPyTorchRegressionModel(
                 x_t = self.x[:i0], y_t = self.y[:i0],
@@ -472,11 +488,11 @@ class PFGPCIData(Data):
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
                 ax2j.contour(x0mesh,x1mesh,gp_mean_mesh,colors='lightgreen',levels=[0],linewidths=5)
-            ax2j.set_title(r'$m_n(\boldsymbol{u})$')
+            ax2j.set_title(r'$m_n(\mathbf{u})$')
             row_idx += 1
             ax3j = fig.add_subplot(gs[row_idx,j])            
             ax3j.contourf(x0mesh,x1mesh,gp_std_mesh,cmap=cm.Greys,levels=clevels)
-            ax3j.set_title(r'$\sigma_n(\boldsymbol{u})$')
+            ax3j.set_title(r'$\sigma_n(\mathbf{u})$')
             for ax in [ax2j,ax3j]:
                 ax.scatter(self.x[:i0,0],self.x[:i0,1],color='b')
                 ax.scatter(self.x[i0:i1,0],self.x[i0:i1,1],color='r')
