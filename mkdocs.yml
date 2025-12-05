@@ -19,6 +19,7 @@ nav:
       - Pricing Options: demos/pricing_options.ipynb 
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
     - Publication Notebooks:
+      - 2025 Sorokin Thesis: demos/talk_paper_demos/SorokinThesis2025/sorokin_thesis_2025.ipynb
       - 2025 JOSS Paper: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
       - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
       - 2023 Argonne Talk: demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb
@@ -62,7 +63,6 @@ plugins:
       ignore_h1_titles: true    # Include H1 from notebooks
       execute: false              # Execute notebooks during build
       include_source: true       # Add download link for source notebooks
-      remove_empty_cells: true
       # theme: dark               # Use dark theme for code cells
       # include: ["*.ipynb"]  # File patterns to include
       # execute_ignore: []  # Skip certain files
