@@ -99,9 +99,9 @@ def generate_missing_tests(demos_dir="../../demos", output_dir=None):
     for notebook_path in demos_path.glob("**/*.ipynb"):
         notebook_name = notebook_path.stem
         
-        # Skip all notebooks in demos/talk_paper_demos/parsl_fest_2025/
+        # Skip all notebooks in demos/talk_paper_demos/ParslFest_2025/
         # These are presentation/demo notebooks and should not have tests generated
-        if "parsl_fest_2025" in str(notebook_path):
+        if "ParslFest_2025" in str(notebook_path):
             continue
             
         # Convert notebook name to test file name
