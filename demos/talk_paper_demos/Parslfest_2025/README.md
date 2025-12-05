@@ -65,8 +65,6 @@ Each run creates `output/parallel_times_{N}.csv` and `output/parallel_output_{N}
 Run `03_visualize_speedup.ipynb` to generate plots comparing sequential vs parallel execution times and compute speedup ratios.
 
 
-
-
 **Maximum theoretical speedup: 5.5x** (limited by the longest single test: `tb_iris` at 138s).
 
 ### Assumptions
