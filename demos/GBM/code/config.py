@@ -10,7 +10,7 @@ def get_experiment_configurations():
         },
         'paths': {
             'fixed_steps':  2**5 if is_debug else 252,
-            'range': [2**i for i in range(6, 9)] if is_debug else [2**i for i in range(9, 18)],  # [256, ..., 131072]
+            'range': [2**i for i in range(6, 9)] if is_debug else [2**i for i in range(9, 15)],  # [256, ..., 131072]
             'series_name': 'Paths'
         }
     }
