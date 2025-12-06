@@ -68,30 +68,6 @@ def plot_performance_comparison(ax, samplers, qmcpy_times, quantlib_times):
     ax.set_title('Performance Comparison', fontsize=16, fontweight='bold')
 
 
-def get_clean_plotting_configuration():
-    """Define clear, meaningful colors and styling - no mysterious hex codes"""
-    library_colors = {
-        'quantlib': {'primary': mcolors.CSS4_COLORS['navy'], 'secondary': mcolors.CSS4_COLORS['darkred']},
-        'qmcpy': {'primary': mcolors.CSS4_COLORS['royalblue'], 'secondary': mcolors.CSS4_COLORS['orangered'], 
-                 'tertiary': mcolors.CSS4_COLORS['forestgreen'], 'quaternary': mcolors.CSS4_COLORS['purple']}
-    }
-    
-    sampler_color_mapping = {
-        'IIDStdUniform': {'quantlib': library_colors['quantlib']['primary'], 'qmcpy': library_colors['qmcpy']['primary']},
-        'Sobol': {'quantlib': library_colors['quantlib']['secondary'], 'qmcpy': library_colors['qmcpy']['secondary']},
-        'Lattice': {'qmcpy': library_colors['qmcpy']['tertiary']},
-        'Halton': {'qmcpy': library_colors['qmcpy']['quaternary']}
-    }
-    
-    plot_formatting = {
-        'figure_width': 16, 'figure_height': 6, 'line_thickness': 2, 'marker_size': 6,
-        'label_font_size': 14, 'title_font_size': 16, 'legend_font_size': 11, 'grid_transparency': 0.3
-    }
-    
-    return sampler_color_mapping, {'quantlib': 'o', 'qmcpy': 's'}, plot_formatting
-
-
-
 def get_plot_styling():
     """Define colors and markers for plotting"""
     return {
