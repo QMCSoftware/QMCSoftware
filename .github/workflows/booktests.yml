@@ -3,11 +3,7 @@ name: Booktests
 on:
   push:
     branches:
-      - master
-      - develop
-      - booktests_choi
-      - brandon-fix-dakota-parallel
-      - aleksei_thesis
+      - '**'
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
