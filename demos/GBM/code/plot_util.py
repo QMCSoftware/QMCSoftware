@@ -164,7 +164,7 @@ def create_parameter_sweep_plots(df):
     # Create figure with 2x2 subplots
     _, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
     # Panel 1: Mean Error vs n_steps (upper left)
-    plot_single_series(ax1, plot_data, 'Time Steps', 'n_steps', 'Mean Error',
+    plot_single_series(ax1, plot_data, 'Time Steps', 'n_steps', 'Mean Absolute Error',
                       'Mean Error vs Number of Time Steps\n(n_paths = 4,096)',
                       'Number of Time Steps', 'Mean Error', log_scale=True, is_legend=True)
         
@@ -174,7 +174,7 @@ def create_parameter_sweep_plots(df):
                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
     
     # Panel 3: Mean Error vs n_paths (lower left)
-    plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Error',
+    plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
                       'Mean Error vs Number of Paths\n(n_steps = 252)',
                       'Number of Paths', 'Mean Error', log_scale=True)
 
