@@ -6,24 +6,29 @@ from scipy.stats import multivariate_normal, norm
 
 
 class GeometricBrownianMotion(BrownianMotion):
-    """
-    Geometric Brownian Motion.
+    r"""
+    A Geometric Brownian Motion (GBM) with initial value $S_0$, drift $\gamma$, and diffusion $\sigma^2$ is 
 
-    >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
-    >>> gbm.gen_samples(2)
-    array([[0.92343761, 1.42069027, 1.30851806, 0.99133819],
-           [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
-    >>> gbm
-    GeometricBrownianMotion (AbstractTrueMeasure)
-        time_vec        [0.5 1.  1.5 2. ]
-        drift           0.100
-        diffusion       0.200
-        mean_gbm        [1.051 1.105 1.162 1.221]
-        covariance_gbm  [[0.116 0.122 0.128 0.135]
-                         [0.122 0.27  0.284 0.299]
-                         [0.128 0.284 0.472 0.496]
-                         [0.135 0.299 0.496 0.734]]
-        decomp_type     PCA
+    $$\mathrm{GBM}(t) = S_0 \exp[(\gamma - \sigma^2/2) t + \sigma \mathrm{BM}(t)]$$
+
+    where BM is a Brownian Motion drift $\gamma$ and diffusion $\sigma^2$. 
+    
+    Examples:
+        >>> gbm = GeometricBrownianMotion(DigitalNetB2(4,seed=7), t_final=2, drift=0.1, diffusion=0.2)
+        >>> gbm.gen_samples(2)
+        array([[0.92343761, 1.42069027, 1.30851806, 0.99133819],
+               [0.7185916 , 0.42028013, 0.42080335, 0.4696196 ]])
+        >>> gbm
+        GeometricBrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.5 1.  1.5 2. ]
+            drift           0.100
+            diffusion       0.200
+            mean_gbm        [1.051 1.105 1.162 1.221]
+            covariance_gbm  [[0.116 0.122 0.128 0.135]
+                             [0.122 0.27  0.284 0.299]
+                             [0.128 0.284 0.472 0.496]
+                             [0.135 0.299 0.496 0.734]]
+            decomp_type     PCA
     """
 
     def __init__(self, sampler, t_final=1, initial_value=1, drift=0, diffusion=1, decomp_type='PCA', 

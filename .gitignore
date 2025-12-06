@@ -1,4 +1,6 @@
 # General Python
+.pdm-python
+*raw.githubusercontent.com*
 packages.svg
 .pypirc
 test_readme.py
@@ -58,8 +60,6 @@ sphinx/*.jpg
 demos/**.png
 demos/**.eps
 
-
-
 # release
 /build/
 dist/
@@ -77,7 +77,6 @@ _ags/*
 
 # SC Choi's file exclusion
 .vscode/settings.json
-
-# Downloaded files
-raw.githubusercontent.com*
+/sc
+sc_*
 

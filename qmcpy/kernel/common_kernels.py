@@ -358,7 +358,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
     r"""
     Rational Quadratic kernel 
 
-    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\frac{d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})}{\alpha}\left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2^2\right)^{-\alpha}, \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
+    $$K(\boldsymbol{x},\boldsymbol{z}) = S \left(1+\frac{d_{\boldsymbol{\gamma}}^2(\boldsymbol{x},\boldsymbol{z})}{\alpha}\right)^{-\alpha}, \qquad d_{\boldsymbol{\gamma}}(\boldsymbol{x},\boldsymbol{z}) = \left\lVert\frac{\boldsymbol{x}-\boldsymbol{z}}{\sqrt{2}\boldsymbol{\gamma}}\right\rVert_2.$$
 
     Examples:
         >>> rng = np.random.Generator(np.random.PCG64(7))
@@ -495,7 +495,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             compile_call = compile_call,
             comiple_call_kwargs = comiple_call_kwargs,
         )
-        self.raw_alpha,self.tf_alpha = self.parse_assign_param(
+        self.raw_alpha = self.parse_assign_param(
             pname = "alpha",
             param = alpha, 
             shape_param = shape_alpha,
@@ -503,11 +503,12 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             tfs_param = tfs_alpha,
             endsize_ops = [1],
             constraints = ["POSITIVE"])
+        self.tfs_alpha = tfs_alpha
         self.batch_param_names.append("alpha")
     
     @property
     def alpha(self):
-        return self.tf_alpha(self.raw_alpha)
+        return self.tfs_alpha[1](self.raw_alpha)
     
     def parsed___call__(self, x0, x1, batch_params):
         scale = batch_params["scale"][...,0]

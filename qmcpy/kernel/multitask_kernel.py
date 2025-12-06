@@ -101,6 +101,71 @@ class KernelMultiTask(AbstractKernel):
         >>> kmt.single_integral_01d(task0=task[:,None,None,None],task1=task[None,:,None,None],x=x).shape
         (6, 3, 5, 5, 7, 4)
 
+        Cholesky Construction 
+
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     )
+        >>> kmt.taskmat
+        array([[ 2.25,  3.  ,  3.  ],
+               [ 3.  ,  6.25,  7.  ],
+               [ 3.  ,  7.  , 10.25]])
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     shape_factor = [2,3*(1+3)//2-3],
+        ...     shape_diag = [3],
+        ...     )
+        >>> kmt.taskmat
+        array([[[ 2.25,  3.  ,  3.  ],
+                [ 3.  ,  6.25,  7.  ],
+                [ 3.  ,  7.  , 10.25]],
+        <BLANKLINE>
+               [[ 2.25,  3.  ,  3.  ],
+                [ 3.  ,  6.25,  7.  ],
+                [ 3.  ,  7.  , 10.25]]])
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     shape_factor = [3*(1+3)//2-3],
+        ...     shape_diag = [2,3],
+        ...     )
+        >>> kmt.taskmat
+        array([[[ 2.25,  3.  ,  3.  ],
+                [ 3.  ,  6.25,  7.  ],
+                [ 3.  ,  7.  , 10.25]],
+        <BLANKLINE>
+               [[ 2.25,  3.  ,  3.  ],
+                [ 3.  ,  6.25,  7.  ],
+                [ 3.  ,  7.  , 10.25]]])
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     shape_factor = [2,3*(1+3)//2-3],
+        ...     shape_diag = [2,3],
+        ...     )
+        >>> kmt.taskmat
+        array([[[ 2.25,  3.  ,  3.  ],
+                [ 3.  ,  6.25,  7.  ],
+                [ 3.  ,  7.  , 10.25]],
+        <BLANKLINE>
+               [[ 2.25,  3.  ,  3.  ],
+                [ 3.  ,  6.25,  7.  ],
+                [ 3.  ,  7.  , 10.25]]])
+
         PyTorch
         
         >>> import torch 
@@ -193,6 +258,71 @@ class KernelMultiTask(AbstractKernel):
         torch.Size([6, 3, 5, 7, 4])
         >>> kmt.single_integral_01d(task0=task[:,None,None,None],task1=task[None,:,None,None],x=x).shape
         torch.Size([6, 3, 5, 5, 7, 4])
+
+        Cholesky Construction 
+
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5,torchify=True),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     )
+        >>> kmt.taskmat
+        tensor([[ 2.2500,  3.0000,  3.0000],
+                [ 3.0000,  6.2500,  7.0000],
+                [ 3.0000,  7.0000, 10.2500]], grad_fn=<ViewBackward0>)
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5,torchify=True),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     shape_factor = [2,3*(1+3)//2-3],
+        ...     shape_diag = [3],
+        ...     )
+        >>> kmt.taskmat
+        tensor([[[ 2.2500,  3.0000,  3.0000],
+                 [ 3.0000,  6.2500,  7.0000],
+                 [ 3.0000,  7.0000, 10.2500]],
+        <BLANKLINE>
+                [[ 2.2500,  3.0000,  3.0000],
+                 [ 3.0000,  6.2500,  7.0000],
+                 [ 3.0000,  7.0000, 10.2500]]], grad_fn=<ViewBackward0>)
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5,torchify=True),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     shape_factor = [3*(1+3)//2-3],
+        ...     shape_diag = [2,3],
+        ...     )
+        >>> kmt.taskmat
+        tensor([[[ 2.2500,  3.0000,  3.0000],
+                 [ 3.0000,  6.2500,  7.0000],
+                 [ 3.0000,  7.0000, 10.2500]],
+        <BLANKLINE>
+                [[ 2.2500,  3.0000,  3.0000],
+                 [ 3.0000,  6.2500,  7.0000],
+                 [ 3.0000,  7.0000, 10.2500]]], grad_fn=<ViewBackward0>)
+        >>> kmt = KernelMultiTask(
+        ...     KernelGaussian(5,torchify=True),
+        ...     num_tasks = 3,
+        ...     method = "CHOLESKY",
+        ...     factor = 2,
+        ...     diag = 1.5,
+        ...     shape_factor = [2,3*(1+3)//2-3],
+        ...     shape_diag = [2,3],
+        ...     )
+        >>> kmt.taskmat
+        tensor([[[ 2.2500,  3.0000,  3.0000],
+                 [ 3.0000,  6.2500,  7.0000],
+                 [ 3.0000,  7.0000, 10.2500]],
+        <BLANKLINE>
+                [[ 2.2500,  3.0000,  3.0000],
+                 [ 3.0000,  6.2500,  7.0000],
+                 [ 3.0000,  7.0000, 10.2500]]], grad_fn=<ViewBackward0>)
     """
 
     def __init__(self,
@@ -206,7 +336,8 @@ class KernelMultiTask(AbstractKernel):
             tfs_diag = (tf_exp_eps_inv,tf_exp_eps),
             requires_grad_factor = True, 
             requires_grad_diag = True,
-            rank_factor = 1
+            rank_factor = 1,
+            method = "LOW RANK"
             ):
         r"""
         Args:
@@ -220,6 +351,7 @@ class KernelMultiTask(AbstractKernel):
             tfs_diag (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
             requires_grad_factor (bool): If `True` and `torchify`, set `requires_grad=True` for `factor`.
             requires_grad_diag (bool): If `True` and `torchify`, set `requires_grad=True` for `diag`.
+            method (str): `"LOW RANK"` or "CHOLESKY"
         """
         assert isinstance(base_kernel,AbstractKernel)
         super().__init__(
@@ -233,23 +365,43 @@ class KernelMultiTask(AbstractKernel):
         assert np.isscalar(num_tasks) and num_tasks%1==0
         self.num_tasks = num_tasks
         assert np.isscalar(rank_factor) and rank_factor%1==0 and 0<=rank_factor<=self.num_tasks
-        self.raw_factor,self.tf_factor = self.parse_assign_param(
+        self.method = str(method).upper().replace("_"," ").strip()
+        if self.method=="LOW RANK":
+            if shape_factor is None:
+                shape_factor = [self.num_tasks,rank_factor]
+            factor_endsize_ops = list(range(self.num_tasks+1))
+            diag_endsize_ops = [1,self.num_tasks]
+        elif self.method=="CHOLESKY":
+            if self.torchify:
+                self.lti0,self.lti1 = self.npt.tril_indices(num_tasks,num_tasks,-1)
+            else:
+                self.lti0,self.lti1 = self.npt.tril_indices(num_tasks,-1)
+            if shape_factor is None:
+                shape_factor = [len(self.lti0)]
+            factor_endsize_ops = [len(self.lti0)]
+            diag_endsize_ops = [self.num_tasks]
+        else:
+            raise Exception("invalid method = %s, must be in ['LOW RANK','CHOLESKY']"%self.method)
+        self.raw_factor = self.parse_assign_param(
             pname = "factor",
             param = factor,
-            shape_param = [self.num_tasks,rank_factor] if shape_factor is None else shape_factor,
+            shape_param = shape_factor,
             requires_grad_param = requires_grad_factor,
             tfs_param = tfs_factor,
-            endsize_ops = list(range(self.num_tasks+1)),
+            endsize_ops = factor_endsize_ops,
             constraints = [])
-        assert self.raw_factor.shape[-2]==self.num_tasks
-        self.raw_diag,self.tf_diag = self.parse_assign_param(
+        self.tfs_factor = tfs_factor
+        if self.method=="LOW RANK":
+            assert self.raw_factor.shape[-2]==self.num_tasks
+        self.raw_diag = self.parse_assign_param(
             pname = "diag",
             param = diag, 
             shape_param = [self.num_tasks] if shape_diag is None else shape_diag,
             requires_grad_param = requires_grad_diag,
             tfs_param = tfs_diag,
-            endsize_ops = [1,self.num_tasks],
+            endsize_ops = diag_endsize_ops,
             constraints = ["NON-NEGATIVE"])
+        self.tfs_diag = tfs_diag
         self.eye_num_tasks = self.npt.eye(self.num_tasks,**self.nptkwargs)
         self.batch_param_names.append("taskmat")
         self._nbdim_base = None
@@ -262,17 +414,24 @@ class KernelMultiTask(AbstractKernel):
     
     @property
     def factor(self):
-        return self.tf_factor(self.raw_factor)
+        return self.tfs_factor[1](self.raw_factor)
     
     @property
     def diag(self):
-        return self.tf_diag(self.raw_diag)
+        return self.tfs_diag[1](self.raw_diag)
 
     @property
     def taskmat(self):
         factor = self.factor
         diag = self.diag
-        taskmat = self.npt.einsum("...ij,...kj->...ik",factor,factor)+diag[...,None]*self.eye_num_tasks
+        if self.method=="LOW RANK":
+            taskmat = self.npt.einsum("...ij,...kj->...ik",factor,factor)+diag[...,None]*self.eye_num_tasks
+        elif self.method=="CHOLESKY":
+            L = diag[...,None]*self.eye_num_tasks+self.npt.zeros(list(self.factor.shape[:-1])+[1,1],**self.nptkwargs)
+            L[...,self.lti0,self.lti1] = self.factor
+            taskmat = self.npt.einsum("...ij,...kj->...ik",L,L)
+        else:
+            raise Exception("invalid method = %s, must be in ['LOW RANK','CHOLESKY']"%self.method)
         return taskmat
     
     def _parsed__call__(self, task0, task1, k_x):
