@@ -51,47 +51,6 @@ def compute_mae_vs_paths(sampler_type='Sobol',
 
     return n_paths_range, mean_errors
 
-# def plot_mae_vs_paths(replications):
-#     samplers = cf.get_sampler_configurations()['all_samplers']
-#     styling = pu.get_plot_styling()
-#     colors = styling['colors']['QMCPy']
-#     markers = styling['markers']['QMCPy']
-
-#     plt.figure(figsize=(9,5))
-#     for sampler in samplers:
-#         n_paths_range, mean_errors = compute_mae_vs_paths(
-#         sampler_type=sampler,
-#         replications=replications
-#         )
-#         plt.loglog(
-#         n_paths_range,
-#         mean_errors,
-#         marker=markers.get(sampler),
-#         color=colors.get(sampler),
-#         linewidth=2,
-#         markersize=6,
-#         label=sampler
-#         )   
-#     plt.xlabel("Number of Paths", fontsize=14)
-#     plt.ylabel("Mean Absolute Error", fontsize=14)
-#     plt.title(f"MAE vs Number of Paths across {replications} replications (n_steps = 252)", fontsize=16)
-#     plt.legend(fontsize=10)
-#     plt.grid(alpha=0.3)
-#     plt.show()
-
-# def format_plot(ax,n_paths_range):
-#     ax.xaxis.set_major_locator(FixedLocator(n_paths_range))
-#     ax.xaxis.set_major_formatter(FixedFormatter([str(int(x)) for x in n_paths_range]))
-#     ax.xaxis.set_minor_locator(FixedLocator([]))  
-
-#     ax.set_xlabel("Number of Paths", fontsize=12, fontweight='bold')
-#     ax.set_ylabel("Mean Absolute Error", fontsize=12, fontweight='bold')
-#     ax.set_title(f"MAE vs Number of Paths across {replications} replications (n_steps = 252)", fontsize=14, fontweight='bold')
-#     ax.grid(True, alpha=0.3)
-#     ax.legend(fontsize=10)
-
-#     plt.show()
-
 def plot_mae_vs_paths(replications):
 
     styling = pu.get_plot_styling()
