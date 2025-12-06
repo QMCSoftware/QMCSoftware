@@ -198,6 +198,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
 
         Derivatives 
 
+        >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> scale = rng.uniform(low=0,high=1,size=(1,))
         >>> lengthscales = rng.uniform(low=0,high=1,size=(3,))
         >>> kernel = KernelShiftInvar(
@@ -225,7 +226,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         ...     y = kernel(x,z,beta0,beta1,c)
         >>> with np.printoptions(formatter={"float": lambda x: "%.3f"%x}):
         ...     y.numpy()
-        array([3003.794, -1517.156, 701.669, 1470.424])
+        array([1455.140, 9475.570, 7807.076, 2785.473])
         >>> y_no_deriv = kernel(x,z)
         >>> y_first = y_no_deriv.clone()
         >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
@@ -240,7 +241,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
         >>> with np.printoptions(formatter={"float": lambda x: "%.3f"%x}):
         ...     yhat.numpy()
-        array([3003.795, -1517.156, 701.669, 1470.424])
+        array([1455.140, 9475.570, 7807.076, 2785.473])
         >>> torch.allclose(y,yhat)
         True
         >>> kernel = KernelShiftInvar(
@@ -251,7 +252,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> ynp = kernel(x.detach().numpy(),z.detach().numpy(),beta0.numpy(),beta1.numpy(),c.numpy())
         >>> with np.printoptions(formatter={"float": lambda x: "%.3f"%x}):
         ...     ynp
-        array([3003.799, -1517.158, 701.670, 1470.426])
+        array([1455.142, 9475.585, 7807.089, 2785.477])
         >>> np.allclose(ynp,y.numpy())
         True
 
