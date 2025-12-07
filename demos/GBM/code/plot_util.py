@@ -4,9 +4,6 @@ from matplotlib.ticker import FixedLocator, FixedFormatter
 import os
 import scipy.stats as sc
 import qmcpy as qp
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FixedLocator, FixedFormatter
 
 
 def plot_error_comparison(ax, samplers, qmcpy_errors, quantlib_errors):

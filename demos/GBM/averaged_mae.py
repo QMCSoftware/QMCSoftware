@@ -99,7 +99,6 @@ def plot_mae_vs_paths(replications=5):
     fig, ax = plt.subplots(figsize=(10, 6))
     for method, sampler in all_pairs:
         n_paths_range, mean_errors = compute_mae_vs_paths(method, sampler, replications)
-        n_paths_range, mean_errors = compute_mae_vs_paths(method, sampler, replications)
 
         colors = styling['colors'][method]
         markers = styling['markers'][method]
