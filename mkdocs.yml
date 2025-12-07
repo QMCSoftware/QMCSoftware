@@ -50,7 +50,7 @@ nav:
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
-      - Geometric Brownian Motion: demos/gbm_demo.ipynb
+      - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
@@ -60,24 +60,24 @@ nav:
 plugins:
   - search
   - mkdocs-jupyter:
-      ignore_h1_titles: true    # Include H1 from notebooks
+      ignore_h1_titles: true      # Include H1 from notebooks
       execute: false              # Execute notebooks during build
-      include_source: true       # Add download link for source notebooks
+      include_source: true        # Add download link for source notebooks
       # theme: dark               # Use dark theme for code cells
       # include: ["*.ipynb"]  # File patterns to include
       # execute_ignore: []  # Skip certain files
       # allow_errors: false        # Fail build on notebook errors
       # kernel_name: python3       # Specify kernel to use
-      # show_input: true          # Show input cells by default
-      # no_input: false           # Don't hide all inputs
+      # show_input: true           # Show input cells by default
+      # no_input: false            # Don't hide all inputs
       # remove_tag_config:
       #   remove_cell_tags:
-      #     - "hide"              # Hide cells with these tags
+      #     - "hide"               # Hide cells with these tags
       #     - "hide-cell"
       #   remove_all_outputs_tags:
-      #     - "hide-output"       # Hide outputs for tagged cells
+      #     - "hide-output"        # Hide outputs for tagged cells
       #   remove_input_tags:
-      #     - "hide-input"        # Hide input for tagged cells
+      #     - "hide-input"         # Hide input for tagged cells
   - mkdocstrings:
       #enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
       #custom_templates: templates
