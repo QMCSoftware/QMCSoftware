@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, FixedFormatter
@@ -15,7 +14,8 @@ def plot_error_comparison(ax, samplers, qmcpy_errors, quantlib_errors):
             ql_x.append(i)
             ql_errors.append(error)
     if ql_errors:
-        ax.bar([x - width/2 for x in ql_x], ql_errors, width, label='QuantLib', color='blue', alpha=0.8)
+        ax.bar([x - width/2 for x in ql_x], ql_errors, width,
+               label='QuantLib', color='blue', alpha=0.8)
     # Plot QMCPy data second (right side)
     ax.bar(x + width/2, qmcpy_errors, width, label='QMCPy', color='red', alpha=0.8)
 
@@ -40,21 +40,23 @@ def plot_performance_comparison(ax, samplers, qmcpy_times, quantlib_times):
                 ql_x.append(i)
                 ql_times.append(time)
         if ql_times:
-            ax.bar([x - width/2 for x in ql_x], ql_times, width, label='QuantLib', color='blue', alpha=0.8)
+            ax.bar([x - width/2 for x in ql_x], ql_times, width,
+                   label='QuantLib', color='blue', alpha=0.8)
         # Plot QMCPy data second (right side)
         ax.bar(x + width/2, qmcpy_times, width, label='QMCPy', color='red', alpha=0.8)
-        # Add speedup annotations where QuantLib data is available, positioned at center of QMCPy bars
+        # Add speedup annotations where QuantLib data is available, at center of QMCPy bars
         if len(ql_times) > 0:
             for i, (qmc_time, ql_time) in enumerate(zip(qmcpy_times, quantlib_times)):
                 if ql_time is not None:
                     speedup = ql_time / qmc_time
                     annotation_height = qmc_time + max(qmcpy_times) * 0.3
                     # Position arrow at center of QMCPy bar (i + width/2)
-                    ax.annotate(f'{speedup:.1f}x faster', 
-                               xy=(i + width/2, qmc_time), xytext=(i + width/2, annotation_height),
-                               ha='center', va='bottom', fontsize=9, fontweight='bold',
-                               arrowprops=dict(arrowstyle='->', color='blue', lw=1))
-        
+                    ax.annotate(f'{speedup:.1f}x faster',
+                                xy=(i + width/2, qmc_time),
+                                xytext=(i + width/2, annotation_height),
+                                ha='center', va='bottom', fontsize=9,
+                                fontweight='bold',
+                                arrowprops=dict(arrowstyle='->', color='blue', lw=1))
         ax.set_xlabel('Sampler Type')
         ax.set_ylabel('Execution Time (s)')
         ax.set_xticks(x)
@@ -62,7 +64,8 @@ def plot_performance_comparison(ax, samplers, qmcpy_times, quantlib_times):
         ax.legend()
         ax.grid(True, alpha=0.3)
     else:
-        ax.text(0.5, 0.5, 'Timing data not available\nRun previous cells to generate data', ha='center', va='center', transform=ax.transAxes, fontsize=12)
+        ax.text(0.5, 0.5, 'Timing data not available\nRun previous cells to generate data',
+                ha='center', va='center', transform=ax.transAxes, fontsize=12)
     
     ax.set_title('Performance Comparison', fontsize=16, fontweight='bold')
 
@@ -82,7 +85,8 @@ def get_plot_styling():
         }
     }
 
-def plot_single_series(ax, plot_data, series_name, x_col, y_col, title, xlabel, ylabel, log_scale=False, is_legend=False):
+def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
+                       xlabel, ylabel, log_scale=False, is_legend=False):
     """Plot a single series (runtime or error) for one experimental series"""
     series_data = plot_data[plot_data['Series'] == series_name]
     styling = get_plot_styling()
@@ -105,11 +109,11 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title, xlabel, 
                 
                 # Plot with connecting lines for trend visualization
                 if log_scale:
-                    ax.loglog(x_vals, y_vals, marker=marker, color=color, 
-                            linewidth=2, markersize=8, label=f'{method} - {sampler}')
+                    ax.loglog(x_vals, y_vals, marker=marker, color=color,
+                              linewidth=2, markersize=8, label=f'{method} - {sampler}')
                 else:
                     ax.semilogy(x_vals, y_vals, marker=marker, color=color,
-                              linewidth=2, markersize=8, label=f'{method} - {sampler}')
+                                linewidth=2, markersize=8, label=f'{method} - {sampler}')
     
     # Set x-axis ticks to show only exact experimental values
     ax.set_xticks(all_x_values)
@@ -121,7 +125,8 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title, xlabel, 
     # For log plots, we need to explicitly control the x-axis formatter
     if log_scale:
         ax.xaxis.set_major_locator(FixedLocator(all_x_values))
-        ax.xaxis.set_major_formatter(FixedFormatter([str(int(x)) for x in all_x_values]))
+        ax.xaxis.set_major_formatter(
+            FixedFormatter([str(int(x)) for x in all_x_values]))
         ax.xaxis.set_minor_locator(FixedLocator([]))  # Remove minor ticks
     
     ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')
@@ -140,23 +145,24 @@ def create_parameter_sweep_plots(df):
     _, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
     # Panel 1: Mean Absolute Error vs n_steps (upper left)
     plot_single_series(ax1, plot_data, 'Time Steps', 'n_steps', 'Mean Absolute Error',
-                      'Mean Absolute Error vs Number of Time Steps\n(n_paths = 4,096)',
-                      'Number of Time Steps', 'Mean Absolute Error', log_scale=True, is_legend=True)
-        
+                       'Mean Absolute Error vs Number of Time Steps\n(n_paths = 4,096)',
+                       'Number of Time Steps', 'Mean Absolute Error',
+                       log_scale=True, is_legend=True)
+
     # Panel 2: Runtime vs n_steps (upper right)
     plot_single_series(ax2, plot_data, 'Time Steps', 'n_steps', 'Runtime (s)',
-                      'Runtime vs Number of Time Steps\n(n_paths = 4,096)',
-                      'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
+                       'Runtime vs Number of Time Steps\n(n_paths = 4,096)',
+                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
     
     # Panel 3: Mean Absolute Error vs n_paths (lower left)
-    plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
-                      'Mean Absolute Error vs Number of Paths\n(n_steps = 252)',
-                      'Number of Paths', 'Mean Absolute Error', log_scale=True)
+    plot_single_series(x3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
+                       'Mean Absolute Error vs Number of Paths\n(n_steps = 252)',
+                       'Number of Paths', 'Mean Absolute Error', log_scale=True)
 
     # Panel 4: Runtime vs n_paths (lower right)
     plot_single_series(ax4, plot_data, 'Paths', 'n_paths', 'Runtime (s)',
-                      'Runtime vs Number of Paths\n(n_steps = 252)',
-                      'Number of Paths', 'Runtime (seconds)', log_scale=True)
+                       'Runtime vs Number of Paths\n(n_steps = 252)',
+                       'Number of Paths', 'Runtime (seconds)', log_scale=True)
     
     plt.tight_layout()
     plt.savefig('images/figure_7.png', bbox_inches='tight', dpi=150)

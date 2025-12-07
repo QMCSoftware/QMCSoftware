@@ -1,5 +1,5 @@
-
 import pandas as pd
+
 
 def format_number(x):
     """Custom formatting function to avoid unnecessary trailing zeros"""
@@ -14,6 +14,7 @@ def format_number(x):
     except (ValueError, TypeError):
         return str(x)
 
+
 def format_results_dataframe(df, numeric_columns):
     """Apply custom formatting to numeric columns in results dataframe"""
     results_formatted = df.copy()
@@ -25,14 +26,18 @@ def format_results_dataframe(df, numeric_columns):
 def generate_latex_table(df, caption, label):
     """Generate LaTeX table with booktabs formatting"""
     # Create custom header
-    header = "Method & Sampler & Mean & Std Dev & Mean Absolute & Std Dev  & Mean Time (s)  & Std Dev (s) & Speedup \\\\\n &  &  &   &  Error &  Error &   & &  \\\\"
+    header = ("Method & Sampler & Mean & Std Dev & Mean Absolute & Std Dev  & "
+              "Mean Time (s)  & Std Dev (s) & Speedup \\\\\n &  &  &   &  "
+              "Error &  Error &   & &  \\\\")
     
     latex_table = df.style.hide(axis='index').to_latex(
         caption=caption,
         label=label,
         position="tbp",
         hrules=True,
-        column_format="ll@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r"
+        column_format=("ll@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}"
+                       "r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}"
+                       "r@{\hspace{0.4em}}r")
     )
     # Replace default LaTeX table environment with booktabs format
     latex_table = latex_table.replace("\\begin{table}[H]", "\\begin{table}[btp]\\centering")

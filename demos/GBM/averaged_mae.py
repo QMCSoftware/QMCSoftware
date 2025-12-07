@@ -97,8 +97,8 @@ def plot_mae_vs_paths(replications=5):
     all_pairs = [("QuantLib", s) for s in ql_samplers] + [("QMCPy", s) for s in qmcpy_samplers]
 
     fig, ax = plt.subplots(figsize=(10, 6))
-
     for method, sampler in all_pairs:
+        n_paths_range, mean_errors = compute_mae_vs_paths(method, sampler, replications)
         n_paths_range, mean_errors = compute_mae_vs_paths(method, sampler, replications)
 
         colors = styling['colors'][method]
@@ -113,7 +113,6 @@ def plot_mae_vs_paths(replications=5):
             markersize=6,
             label=f"{method} - {sampler}"
         )
-
     ax.xaxis.set_major_locator(FixedLocator(n_paths_range))
     ax.xaxis.set_major_formatter(FixedFormatter([str(int(x)) for x in n_paths_range]))
     ax.xaxis.set_minor_locator(FixedLocator([]))

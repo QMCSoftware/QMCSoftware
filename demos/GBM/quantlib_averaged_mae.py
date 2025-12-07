@@ -6,15 +6,12 @@ import plot_util as pu
 from matplotlib.ticker import FixedLocator, FixedFormatter
 
 
-def compute_ql_mae_vs_paths(
-        sampler_type='Sobol',
-        replications=5,
-        ql_seed=7): 
+def compute_ql_mae_vs_paths(sampler_type='Sobol', replications=5,
+                            ql_seed=7):
     """
     Compute averaged MAE vs number of paths for QuantLib samplers.
     """
-
-   # Get experiment configuration 
+    # Get experiment configuration
     exp_cfg = cf.get_experiment_configurations()['paths']
     n_paths_range = exp_cfg['range']
     n_steps = exp_cfg['fixed_steps']
@@ -34,7 +31,6 @@ def compute_ql_mae_vs_paths(
     for n_paths in n_paths_range:
         errors = []
 
-        
         for r in range(replications):
             seed = ql_seed + r
 

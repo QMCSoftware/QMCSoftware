@@ -51,7 +51,8 @@ def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretic
     if sampler_type in ['IIDStdUniform', 'Sobol']:
         quantlib_paths, ql_gbm = qlu.generate_quantlib_paths(**params_ql)
         quantlib_final = quantlib_paths[:, -1]
-    else: quantlib_paths, ql_gbm = None, None
+    else:
+        quantlib_paths, ql_gbm = None, None
         
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
 
