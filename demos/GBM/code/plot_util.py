@@ -21,8 +21,8 @@ def plot_error_comparison(ax, samplers, qmcpy_errors, quantlib_errors):
     ax.bar(x + width/2, qmcpy_errors, width, label='QMCPy', color='red', alpha=0.8)
 
     ax.set_xlabel('Sampler Type')
-    ax.set_ylabel('Mean Error (log scale)')
-    ax.set_title('Mean Error Comparison', fontsize=16, fontweight='bold')
+    ax.set_ylabel('Mean Absolute Error (log scale)')
+    ax.set_title('Mean Absolute Error Comparison', fontsize=16, fontweight='bold')
     ax.set_yscale('log')
     ax.set_xticks(x)
     ax.set_xticklabels(samplers, rotation=45, ha='right')
@@ -139,20 +139,20 @@ def create_parameter_sweep_plots(df):
     
     # Create figure with 2x2 subplots
     _, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
-    # Panel 1: Mean Error vs n_steps (upper left)
+    # Panel 1: Mean Absolute Error vs n_steps (upper left)
     plot_single_series(ax1, plot_data, 'Time Steps', 'n_steps', 'Mean Absolute Error',
-                      'Mean Error vs Number of Time Steps\n(n_paths = 4,096)',
-                      'Number of Time Steps', 'Mean Error', log_scale=True, is_legend=True)
+                      'Mean Absolute Error vs Number of Time Steps\n(n_paths = 4,096)',
+                      'Number of Time Steps', 'Mean Absolute Error', log_scale=True, is_legend=True)
         
     # Panel 2: Runtime vs n_steps (upper right)
     plot_single_series(ax2, plot_data, 'Time Steps', 'n_steps', 'Runtime (s)',
                       'Runtime vs Number of Time Steps\n(n_paths = 4,096)',
                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
     
-    # Panel 3: Mean Error vs n_paths (lower left)
+    # Panel 3: Mean Absolute Error vs n_paths (lower left)
     plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
-                      'Mean Error vs Number of Paths\n(n_steps = 252)',
-                      'Number of Paths', 'Mean Error', log_scale=True)
+                      'Mean Absolute Error vs Number of Paths\n(n_steps = 252)',
+                      'Number of Paths', 'Mean Absolute Error', log_scale=True)
 
     # Panel 4: Runtime vs n_paths (lower right)
     plot_single_series(ax4, plot_data, 'Paths', 'n_paths', 'Runtime (s)',
