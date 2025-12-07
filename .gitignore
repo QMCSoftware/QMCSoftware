@@ -1,4 +1,6 @@
 # General Python
+.pdm-python
+*raw.githubusercontent.com*
 packages.svg
 .pypirc
 test_readme.py
@@ -27,6 +29,7 @@ qmcpy.egg-info/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
+.venv
 
 # tests
 .coverage
@@ -58,8 +61,6 @@ sphinx/*.jpg
 demos/**.png
 demos/**.eps
 
-
-
 # release
 /build/
 dist/
@@ -77,8 +78,5 @@ _ags/*
 
 # SC Choi's file exclusion
 .vscode/settings.json
-
-# Downloaded files
-raw.githubusercontent.com*
-.venv/
-.venv/
+/sc
+sc_*
