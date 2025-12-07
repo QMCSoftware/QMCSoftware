@@ -50,7 +50,6 @@ def compute_mae_vs_paths(sampler_type='Sobol', replications=5):
 
     return n_paths_range, mean_errors
 
-
 def plot_mae_vs_paths(replications):
     styling = pu.get_plot_styling()
     colors = styling['colors']['QMCPy']
@@ -81,7 +80,6 @@ def plot_mae_vs_paths(replications):
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=10)
     plt.show()
-
 
 # old version
 def compute_mean_error_vs_paths(n_paths_list, sampler_type='Sobol', n_steps=252,

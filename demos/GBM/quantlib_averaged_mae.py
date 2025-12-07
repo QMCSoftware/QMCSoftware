@@ -56,7 +56,6 @@ def compute_ql_mae_vs_paths(sampler_type='Sobol', replications=5,
 
     return n_paths_range, mean_errors
 
-
 def plot_ql_mae_vs_paths(replications):
     styling = pu.get_plot_styling()
     colors = styling['colors']['QuantLib']
