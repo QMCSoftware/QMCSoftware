@@ -160,7 +160,7 @@ def create_parameter_sweep_plots(df):
                        'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
     
     # Panel 3: Mean Absolute Error vs n_paths (lower left)
-    plot_single_series(x3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
+    plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
                        'Mean Absolute Error vs Number of Paths\n(n_steps = 252)',
                        'Number of Paths', 'Mean Absolute Error', log_scale=True)
 
