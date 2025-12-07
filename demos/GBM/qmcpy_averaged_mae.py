@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 from qmcpy_util_replications import generate_qmcpy_paths
 import config as cf
 import plot_util as pu

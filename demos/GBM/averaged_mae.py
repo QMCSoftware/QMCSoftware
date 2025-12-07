@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import quantlib_util as qlu
 import qmcpy_util_replications as qpru
 import qmcpy_util as qpu

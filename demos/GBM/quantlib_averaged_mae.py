@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 from quantlib_util import generate_quantlib_paths
 import config as cf
 import plot_util as pu
