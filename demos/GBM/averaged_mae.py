@@ -95,7 +95,7 @@ def plot_mae_vs_paths(replications=5):
     ql_samplers = sampler_cfg['quantlib_samplers']
 
     # list of (method, sample) pairs to plot
-    all_pairs = [("QMCPy", s) for s in qmcpy_samplers] + [("QuantLib", s) for s in ql_samplers]
+    all_pairs = [("QuantLib", s) for s in ql_samplers] + [("QMCPy", s) for s in qmcpy_samplers]
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
