@@ -132,8 +132,9 @@ def plot_mae_vs_paths(replications=5):
                  fontsize=14, fontweight='bold')
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=10)
-
     plt.show()
+
+    
 
 
 
@@ -234,12 +235,12 @@ def plot_mae_vs_steps(replications=5):
                  fontsize=14, fontweight='bold')
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=10)
-    plt.savefig('images/figure_8.png', bbox_inches='tight', dpi=150)
     plt.show()
+
 
 def update_sweep_df(df, replications=5):
     """
-    Replace values in 'Mean Absolute Error' from sweep_results_df with averaged MAE values computed
+    Replace values in 'Mean Absolute Error' column from sweep_results_df with averaged MAE values computed
     using compute_mae_vs_paths and compute_mae_vs_steps.
     """
     df = df.copy()
@@ -276,13 +277,13 @@ def update_sweep_df(df, replications=5):
         method = row["Method"]
         sampler = row["Sampler"]
 
-    # Update MAEs for chaning number of paths
+    # Update MAEs for changing number of paths
         if row["Series"] == "Paths":
             lookup_key = (method, sampler, "paths")
             if lookup_key in mae_vals:
                 df.loc[idx, "Mean Absolute Error"] = mae_vals[lookup_key][row["n_paths"]]
 
-     # Update MAEs for chaning number of time steps
+     # Update MAEs for changing number of time steps
         elif row["Series"] == "Time Steps":
             lookup_key = (method, sampler, "steps")
             if lookup_key in mae_vals:
