@@ -12,7 +12,7 @@ The Steering Council is responsible for the overall direction and governance of 
 * Foster collaboration and communication between community members
 * Represent the community to external stakeholders
 
-The current council members are as following (listed in alphabetical order of last names):
+The current council members are as follows (listed in alphabetical order of last names):
 
 * Sou-Cheng T. Choi
 * Fred J. Hickernell

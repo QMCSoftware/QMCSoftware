@@ -5,10 +5,11 @@
 *.out
 *.synctex*
 *.bak
-gbm*.md
-gbm.pdf
-gbm.tex
+*.md
+*.pdf
+*.tex
 sc_*.
 * copy*
 .DS_Store
 __pycache__/
+*/*.png
