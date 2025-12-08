@@ -205,8 +205,8 @@ class TestGaussian(unittest.TestCase):
         # Both should produce valid samples (different due to decomposition method)
         self.assertEqual(samples_chol.shape, (2, 2))
         self.assertEqual(samples_pca.shape, (2, 2))
-        self.assertTrue(samples_chol.dtype == np.float64)
-        self.assertTrue(samples_pca.dtype == np.float64)
+        self.assertEqual(samples_chol.dtype, np.float64)
+        self.assertEqual(samples_pca.dtype, np.float64)
     
     def test_gaussian_mean_covariance_properties(self):
         """Test that Gaussian maintains correct mean and covariance properties."""
