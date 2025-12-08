@@ -1,7 +1,7 @@
 from .brownian_motion import BrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
-from numpy  import exp, zeros, minimum, array, sqrt, log, pi, linalg, eye, cumsum, add, multiply
+from numpy import exp, zeros, minimum, array, sqrt, log, pi, linalg, eye, cumsum, add, multiply
 from scipy.stats import multivariate_normal, norm
 
 
