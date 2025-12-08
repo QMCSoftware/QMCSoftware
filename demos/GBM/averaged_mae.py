@@ -2,14 +2,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import quantlib_util as qlu
 import qmcpy_util_replications as qpru
-import qmcpy_util as qpu
 import config as cf
 import plot_util as pu
 from matplotlib.ticker import FixedLocator, FixedFormatter
 
-def compute_mae_vs_paths(method, sampler, replications=5, qp_seed = 42, ql_seed=7):
+def compute_mae_vs_paths(method, sampler, replications=5, qp_seed=42, ql_seed=7):
     """
-    Compute averaged MAE vs number of paths for all samplers
+    Compute averaged MAE vs number of paths for all samplers.
+    
+    Args:
+        method: Either "QMCPy" or "QuantLib"
+        sampler: Sampler type (e.g., 'IIDStdUniform', 'Sobol', 'Lattice', 'Halton')
+        replications: Number of independent replications to average over
+        qp_seed: Random seed for QMCPy samplers
+        ql_seed: Random seed for QuantLib samplers
+        
+    Returns:
+        tuple: (n_paths_range, mean_errors) - path counts and corresponding errors
     """
     # Experiment configuration
     exp_cfg = cf.get_experiment_configurations()['paths']
@@ -46,7 +55,7 @@ def compute_mae_vs_paths(method, sampler, replications=5, qp_seed = 42, ql_seed=
             #     )
             #     final_vals = paths[:, -1]
             #     errors.append(np.abs(final_vals.mean() - theoretical_mean))
-
+            seed = qp_seed
             paths, _ = qpru.generate_qmcpy_paths(
                 initial_value=initial_value,
                 mu=mu,
@@ -55,7 +64,8 @@ def compute_mae_vs_paths(method, sampler, replications=5, qp_seed = 42, ql_seed=
                 n_steps=n_steps,
                 n_paths=n_paths,
                 sampler_type=sampler,
-                replications=replications
+                replications=replications,
+                seed=seed
             )
             # Extract values at the final time
             final_vals = paths[:, :, -1]  
