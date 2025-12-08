@@ -165,10 +165,6 @@ def create_parameter_sweep_plots(df):
     plot_single_series(ax4, plot_data, 'Paths', 'n_paths', 'Runtime (s)',
                        'Runtime vs Number of Paths\n(n_steps = 252)',
                        'Number of Paths', 'Runtime (seconds)', log_scale=True)
-    
-    plt.tight_layout()
-    plt.savefig('images/figure_7.png', bbox_inches='tight', dpi=150)
-    plt.show()
 
 def plot_paths(motion_type, sampler, t_final, initial_value, drift, diffusion,
                n, png_filename=None):
