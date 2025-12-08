@@ -66,7 +66,7 @@ nav:
 plugins:
   - search
   - mkdocs-jupyter:
-      ignore_h1_titles: true      # Include H1 from notebooks
+      ignore_h1_titles: true      # Ignore H1 titles from notebooks
       execute: false              # Execute notebooks during build
       include_source: true        # Add download link for source notebooks
       # theme: dark               # Use dark theme for code cells
