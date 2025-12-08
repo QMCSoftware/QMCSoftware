@@ -80,3 +80,5 @@ _ags/*
 .vscode/settings.json
 /sc
 sc_*
+/sc_*
+sc_*

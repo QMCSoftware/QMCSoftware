@@ -44,17 +44,18 @@ class CubMCCLT(AbstractStoppingCriterion):
             interest_rate   0
             t_final         1
             asian_mean      ARITHMETIC
-        BrownianMotion (AbstractTrueMeasure)
+        GeometricBrownianMotion (AbstractTrueMeasure)
             time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
             drift           0
-            mean            [0. 0. 0. ... 0. 0. 0.]
-            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                             [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                             [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+            diffusion       2^(-2)
+            mean_gbm        [30. 30. 30. ... 30. 30. 30.]
+            covariance_gbm  [[  4.337   4.337   4.337 ...   4.337   4.337   4.337]
+                             [  4.337   8.696   8.696 ...   8.696   8.696   8.696]
+                             [  4.337   8.696  13.075 ...  13.075  13.075  13.075]
                              ...
-                             [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                             [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                             [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+                             [  4.337   8.696  13.075 ... 244.564 244.564 244.564]
+                             [  4.337   8.696  13.075 ... 244.564 250.08  250.08 ]
+                             [  4.337   8.696  13.075 ... 244.564 250.08  255.623]]
             decomp_type     PCA
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               52
@@ -104,17 +105,18 @@ class CubMCCLT(AbstractStoppingCriterion):
             interest_rate   0
             t_final         1
             asian_mean      ARITHMETIC
-        BrownianMotion (AbstractTrueMeasure)
+        GeometricBrownianMotion (AbstractTrueMeasure)
             time_vec        [0.019 0.038 0.058 ... 0.962 0.981 1.   ]
             drift           0
-            mean            [0. 0. 0. ... 0. 0. 0.]
-            covariance      [[0.019 0.019 0.019 ... 0.019 0.019 0.019]
-                             [0.019 0.038 0.038 ... 0.038 0.038 0.038]
-                             [0.019 0.038 0.058 ... 0.058 0.058 0.058]
+            diffusion       2^(-2)
+            mean_gbm        [30. 30. 30. ... 30. 30. 30.]
+            covariance_gbm  [[  4.337   4.337   4.337 ...   4.337   4.337   4.337]
+                             [  4.337   8.696   8.696 ...   8.696   8.696   8.696]
+                             [  4.337   8.696  13.075 ...  13.075  13.075  13.075]
                              ...
-                             [0.019 0.038 0.058 ... 0.962 0.962 0.962]
-                             [0.019 0.038 0.058 ... 0.962 0.981 0.981]
-                             [0.019 0.038 0.058 ... 0.962 0.981 1.   ]]
+                             [  4.337   8.696  13.075 ... 244.564 244.564 244.564]
+                             [  4.337   8.696  13.075 ... 244.564 250.08  250.08 ]
+                             [  4.337   8.696  13.075 ... 244.564 250.08  255.623]]
             decomp_type     PCA
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               52
