@@ -147,7 +147,7 @@ The [Developers Tools](https://qmcpy.org/references-for-python-and-mathematical-
 - Run `CMD`+`p` then `> Python: Select Interpreter` then select the `('qmcpy')` choice from the dropdown to link the qmcpy environment into your workspace. Now when you open a terminal, your command line should read `(qmcpy) username@...` which indicates the qmcpy environment has been automatically activated. Also, when debugging the qmcpy environment will be automatically used.
 - Go to `File` and click `Save Workspace as...` to save a `qmcpy` workspace for future development.
 
-Some VSCode extension we found useful include
+Some VSCode extensions we found useful include
 
 - Python
 - Jupyter

@@ -69,10 +69,12 @@ class Gaussian(AbstractTrueMeasure):
         super(Gaussian,self).__init__()
         assert self.mu.shape==(self.d,) and self.a.shape==(self.d,self.d)
     
-    def _parse_gaussian_params(self, mean, covariance, decomp_type):
+    def _parse_gaussian_params(self, mean, covariance, decomp_type, lazy_decomp=False):
         self.decomp_type = decomp_type.upper()
         self.mean = mean
         self.covariance = covariance
+        self.lazy_decomp = lazy_decomp
+        
         if np.isscalar(mean):
             mean = np.tile(mean,self.d)
         if np.isscalar(covariance):
@@ -86,16 +88,59 @@ class Gaussian(AbstractTrueMeasure):
             raise DimensionError('''
                     mean must have length d and
                     covariance must be of shape d x d''')
+        
+        # Cache for lazy loading
+        self._a_cache = None
+        self._mvn_scipy_cache = None
+        
+        if not lazy_decomp:
+            # Compute immediately (backward compatibility)
+            self._compute_decomposition()
+            self._setup_scipy_mvn()
+        
+    def _compute_decomposition(self):
+        """Compute matrix decomposition (PCA or Cholesky)."""
+        if self._a_cache is not None:
+            return self._a_cache
+            
         if self.decomp_type == 'PCA':
             evals,evecs = eigh(self.sigma) # get eigenvectors and eigenvalues for
             evecs = evecs*(1-2*(evecs[0]<0)) # force first entries of eigenvectors to be positive
             order = np.argsort(-evals)
-            self.a = np.dot(evecs[:,order],np.diag(np.sqrt(evals[order])))
+            self._a_cache = np.dot(evecs[:,order],np.diag(np.sqrt(evals[order])))
         elif self.decomp_type == 'CHOLESKY':
-            self.a = cholesky(self.sigma)
+            self._a_cache = cholesky(self.sigma)
         else:
-            raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'") 
-        self.mvn_scipy = multivariate_normal(mean=self.mu,cov=self.sigma, allow_singular=True)
+            raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'")
+        return self._a_cache
+    
+    def _setup_scipy_mvn(self):
+        """Setup scipy multivariate normal distribution."""
+        if self._mvn_scipy_cache is None:
+            self._mvn_scipy_cache = multivariate_normal(mean=self.mu, cov=self.sigma, allow_singular=True)
+        return self._mvn_scipy_cache
+    
+    @property
+    def a(self):
+        """Lazy-loaded decomposition matrix."""
+        if self._a_cache is None:
+            self._compute_decomposition()
+        return self._a_cache
+    
+    @a.setter
+    def a(self, value):
+        self._a_cache = value
+    
+    @property 
+    def mvn_scipy(self):
+        """Lazy-loaded scipy multivariate normal."""
+        if self._mvn_scipy_cache is None:
+            self._setup_scipy_mvn()
+        return self._mvn_scipy_cache
+    
+    @mvn_scipy.setter
+    def mvn_scipy(self, value):
+        self._mvn_scipy_cache = value
 
     def _transform(self, x):
         return self.mu+np.einsum("...ij,kj->...ik",norm.ppf(x),self.a)
