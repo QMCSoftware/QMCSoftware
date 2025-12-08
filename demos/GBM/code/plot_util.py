@@ -149,12 +149,12 @@ def create_parameter_sweep_plots(df):
     plot_single_series(ax1, plot_data, 'Time Steps', 'n_steps', 'Mean Absolute Error',
                        'Mean Absolute Error vs Number of Time Steps\n(n_paths = 4,096)',
                        'Number of Time Steps', 'Mean Absolute Error',
-                       log_scale=True, is_legend=True)
+                       log_scale=True)
 
     # Panel 2: Runtime vs n_steps (upper right)
     plot_single_series(ax2, plot_data, 'Time Steps', 'n_steps', 'Runtime (s)',
                        'Runtime vs Number of Time Steps\n(n_paths = 4,096)',
-                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
+                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True, is_legend=True)
     
     # Panel 3: Mean Absolute Error vs n_paths (lower left)
     plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',

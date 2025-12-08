@@ -236,3 +236,56 @@ def plot_mae_vs_steps(replications=5):
     ax.legend(fontsize=10)
     plt.savefig('images/figure_8.png', bbox_inches='tight', dpi=150)
     plt.show()
+
+def update_sweep_df(df, replications=5):
+    """
+    Replace values in 'Mean Absolute Error' from sweep_results_df with averaged MAE values computed
+    using compute_mae_vs_paths and compute_mae_vs_steps.
+    """
+    df = df.copy()
+    
+    # Get sampler configurations
+    exp_cfg = cf.get_experiment_configurations()
+    ql_samplers = cf.get_sampler_configurations()['quantlib_samplers']
+    qp_samplers = cf.get_sampler_configurations()['all_samplers']
+
+    # Compute MAE for all (method, sampler) pairs
+    mae_vals = {}
+
+    # Compute MAE vs number of paths
+    for method in ["QMCPy", "QuantLib"]:
+        samplers_to_loop = qp_samplers if method == "QMCPy" else ql_samplers
+        for sampler in samplers_to_loop:
+            x, y = compute_mae_vs_paths(method, sampler, replications=replications)
+            mae_vals[(method, sampler, "paths")] = dict(zip(x, y))
+
+    # Compute MAE vs number of time steps
+    for method in ["QMCPy", "QuantLib"]:
+        samplers_to_loop = qp_samplers if method == "QMCPy" else ql_samplers
+        for sampler in samplers_to_loop:
+            x, y = compute_mae_vs_steps(method, sampler, replications=replications)
+            mae_vals[(method, sampler, "steps")] = dict(zip(x, y))
+
+    # Update the dataframe
+
+    # Keep theoretical values
+    for idx, row in df.iterrows():
+        if row["Method"] == "Theoretical":
+            continue
+
+        method = row["Method"]
+        sampler = row["Sampler"]
+
+    # Update MAEs for chaning number of paths
+        if row["Series"] == "Paths":
+            lookup_key = (method, sampler, "paths")
+            if lookup_key in mae_vals:
+                df.loc[idx, "Mean Absolute Error"] = mae_vals[lookup_key][row["n_paths"]]
+
+     # Update MAEs for chaning number of time steps
+        elif row["Series"] == "Time Steps":
+            lookup_key = (method, sampler, "steps")
+            if lookup_key in mae_vals:
+                df.loc[idx, "Mean Absolute Error"] = mae_vals[lookup_key][row["n_steps"]]
+
+    return df
