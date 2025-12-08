@@ -241,9 +241,18 @@ class GeometricBrownianMotion(BrownianMotion):
         
         return normal_pdf * jacobian
 
-    def gen_samples(self, n):
-        """
-        Generate GBM samples using the working _transform method.
-        """
-        uniform_samples = self.discrete_distrib.gen_samples(n)
-        return self._transform(uniform_samples)
+    def gen_samples(self, n=None, n_min=None, n_max=None, return_weights=False, warn=True):
+            """
+            Generate GBM samples using the parent's transform pipeline.
+            
+            Args:
+                n (int): number of samples to generate
+                n_min (int): minimum index of sequence
+                n_max (int): maximum index of sequence  
+                return_weights (bool): whether to return Jacobian weights
+                warn (bool): whether to warn about sample generation
+                
+            Returns:
+                ndarray or tuple: GBM samples, optionally with weights if return_weights=True
+            """
+            return super().gen_samples(n=n, n_min=n_min, n_max=n_max, return_weights=return_weights, warn=warn)
