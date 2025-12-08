@@ -63,13 +63,70 @@ Please see the targets in the makefile for more granular control over tests.
 
 ## Documentation
 
-To compile documentation, run
+~~~bash
+pip install -e ".[doc]"
+~~~
 
-```bash 
+This installs the documentation extras, including `pylint`.
+
+### Ensure `pyreverse` is on your PATH
+
+`pyreverse` must be available as a command-line tool. If it is not, verify your PATH as below.
+
+* MacOS / Linux 
+
+~~~bash
+conda activate qmcpy
+# check that pyreverse is found
+which pyreverse || echo "pyreverse not found"
+pyreverse --help
+~~~
+
+Alternative:
+	
+~~~bash
+	# add user scripts dir to PATH (zsh example; use ~/.bashrc for bash)
+	echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+	# preferred: open a new terminal so the new PATH is picked up
+	source ~/.zshrc
+~~~
+
+* Windows (cmd or PowerShell)
+
+~~~powershell
+conda activate qmcpy
+# check that pyreverse is found
+where pyreverse
+pyreverse --help
+~~~
+
+If `where pyreverse` cannot find the command, ensure your Python Scripts directory is on your `PATH`. A common way to locate it is:
+
+~~~powershell
+python -m site --user-base
+# then add "<that-path>\Scripts" to your PATH
+~~~
+
+You can update PATH via System settings or in your PowerShell profile (`$PROFILE`).
+
+### Build the documentation
+
+On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `make`):
+
+~~~bash
 make doc
-```
+~~~
 
-To download PDF documentation, go to the "Printable Docs" header in the documentation, press Ctrl-p to print, and then choose to save the PDF to your preferred location.
+### Download PDF documentation
+
+In the built HTML documentation:
+
+1. Navigate to the **“Printable Docs”** section.
+2. Use your browser’s print dialog:
+   - **Windows / Linux:** `Ctrl+P`  
+   - **MacOS:** `Cmd+P`
+3. Choose **“Save as PDF”** and save to your preferred location.
+
 
 ## Demos
 
