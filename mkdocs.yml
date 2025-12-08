@@ -23,8 +23,8 @@ nav:
       - 2025 JOSS Paper: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
       - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
       - 2025 ParslFest:
-        - Sequential Implementation: demos/talk_paper_demos/ParslFest_2025/01_sequential.ipynb
         - Parallel Implementation: demos/talk_paper_demos/ParslFest_2025/02_parallel.ipynb
+        - Sequential Implementation: demos/talk_paper_demos/ParslFest_2025/01_sequential.ipynb
         - Speedup Visualization: demos/talk_paper_demos/ParslFest_2025/03_visualize_speedup.ipynb
         - Sequential Output: demos/talk_paper_demos/ParslFest_2025/output/01_sequential_output.ipynb
       - 2023 Argonne Talk: demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb
