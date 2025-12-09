@@ -16,7 +16,23 @@ def create_qmcpy_sampler(sampler_type, dimension, seed=42):
 
 def generate_qmcpy_paths(initial_value, mu, diffusion, maturity, n_steps,
                          n_paths, sampler_type='IIDStdUniform', seed=42):
-    """Generate GBM paths using QMCPy with configurable sampler."""
+    """
+    Generate Geometric Brownian Motion paths using QMCPy.
+    
+    Args:
+        initial_value: Initial value of the GBM process (S_0)
+        mu: Drift parameter
+        diffusion: Diffusion coefficient (sigma^2)
+        maturity: Final time T
+        n_steps: Number of discretization time steps
+        n_paths: Number of paths to generate
+        sampler_type: Type of sampler ('IIDStdUniform', 'Sobol', 'Lattice', 'Halton')
+        seed: Random seed for reproducibility
+        
+    Returns:
+        tuple: (paths, gbm) where paths has shape (n_paths, n_steps)
+               and gbm is the GeometricBrownianMotion object
+    """
     sampler = create_qmcpy_sampler(sampler_type, n_steps, seed)
     gbm = qp.GeometricBrownianMotion(sampler, t_final=maturity, initial_value=initial_value,
                                      drift=mu, diffusion=diffusion)

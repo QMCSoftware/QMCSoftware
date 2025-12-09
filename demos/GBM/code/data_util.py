@@ -5,7 +5,14 @@ import qmcpy_util as qpu
 import config as cf
 
 def add_theoretical_results(results_data, theoretical_mean, theoretical_std):
-    """Add theoretical values to results data"""
+    """
+    Add theoretical benchmark values to results data.
+    
+    Args:
+        results_data: List to append theoretical results to
+        theoretical_mean: Theoretical expected value E[S_T]
+        theoretical_std: Theoretical standard deviation of S_T
+    """
     results_data.append({
         'Method': 'Theoretical',
         'Sampler': '-',
@@ -16,7 +23,16 @@ def add_theoretical_results(results_data, theoretical_mean, theoretical_std):
     })
 
 def add_quantlib_results(results_data, sampler_type, quantlib_final, theoretical_mean, theoretical_std):
-    """Add QuantLib results to results data"""
+    """
+    Compute and add QuantLib simulation results to results data.
+    
+    Args:
+        results_data: List to append results to
+        sampler_type: Name of the sampler used
+        quantlib_final: Array of final values S_T from QuantLib simulation
+        theoretical_mean: Theoretical expected value for error computation
+        theoretical_std: Theoretical standard deviation for error computation
+    """
     ql_emp_mean = np.mean(quantlib_final)
     ql_emp_std = np.std(quantlib_final, ddof=1)
     results_data.append({
@@ -29,7 +45,17 @@ def add_quantlib_results(results_data, sampler_type, quantlib_final, theoretical
     })
 
 def add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theoretical_mean, theoretical_std):
-    """Add QMCPy results to results data"""
+    """
+    Compute and add QMCPy simulation results to results data.
+    
+    Args:
+        results_data: List to append results to
+        sampler_type: Name of the sampler used
+        qmcpy_final: Array of final values S_T from QMCPy simulation
+        qp_emp_mean: Empirical mean already computed from qmcpy_final
+        theoretical_mean: Theoretical expected value for error computation
+        theoretical_std: Theoretical standard deviation for error computation
+    """
     qp_emp_std = np.std(qmcpy_final, ddof=1)
     results_data.append({
         'Method': 'QMCPy',
@@ -41,7 +67,20 @@ def add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theo
     })
 
 def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretical_std, params_ql, params_qp):
-    """Process data for a single sampler type"""
+    """
+    Process and compare data for a single sampler type across both libraries.
+    
+    Args:
+        sampler_type: Type of sampler to test
+        results_data: List to append comparison results to
+        theoretical_mean: Theoretical expected value
+        theoretical_std: Theoretical standard deviation
+        params_ql: Dictionary of QuantLib parameters
+        params_qp: Dictionary of QMCPy parameters
+        
+    Returns:
+        tuple: (quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp)
+    """
     # Initialize quantlib_paths to None
     params_ql['sampler_type'] = sampler_type
     params_qp['sampler_type'] = sampler_type
@@ -69,7 +108,17 @@ def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretic
 
 
 def create_timing_dataframe(quantlib_results, qmcpy_results, baseline_sampler):
-    """Create comprehensive timing table from benchmark results"""
+    """
+    Create comprehensive timing comparison table from benchmark results.
+    
+    Args:
+        quantlib_results: Dictionary mapping sampler names to timing results
+        qmcpy_results: Dictionary mapping sampler names to timing results
+        baseline_sampler: Sampler to use as baseline for speedup calculation
+        
+    Returns:
+        DataFrame with timing statistics and speedup comparisons
+    """
     timing_data = []
     
     # Add QuantLib data
@@ -97,7 +146,16 @@ def create_timing_dataframe(quantlib_results, qmcpy_results, baseline_sampler):
     return pd.DataFrame(timing_data)
 
 def extract_comparison_data(results_df):
-    """Extract data for comparison plotting from results dataframe"""
+    """
+    Extract data for comparison plotting from results dataframe.
+    
+    Args:
+        results_df: DataFrame containing results from both libraries
+        
+    Returns:
+        tuple: (samplers, qmcpy_errors, qmcpy_times, quantlib_errors,
+                quantlib_times, theoretical_mean)
+    """
     qmcpy_data = results_df[results_df['Method'] == 'QMCPy'].copy()
     quantlib_data = results_df[results_df['Method'] == 'QuantLib'].copy()
     theoretical_data = results_df[results_df['Method'] == 'Theoretical'].copy()
@@ -106,18 +164,15 @@ def extract_comparison_data(results_df):
     qmcpy_errors = qmcpy_data['Mean Absolute Error'].values
     qmcpy_times = qmcpy_data['Mean Time (s)'].values if 'Mean Time (s)' in qmcpy_data.columns else None
     
-    # Get QuantLib data (only available for some samplers)
-    quantlib_errors = []
-    quantlib_times = []
-    for sampler in samplers:
-        ql_row = quantlib_data[quantlib_data['Sampler'] == sampler]
-        if not ql_row.empty:
-            quantlib_errors.append(ql_row['Mean Absolute Error'].iloc[0])
-            if 'Mean Time (s)' in ql_row.columns:
-                quantlib_times.append(ql_row['Mean Time (s)'].iloc[0])
-        else:
-            quantlib_errors.append(None)
-            quantlib_times.append(None)
+    # Get QuantLib data (only available for some samplers
+    ql_error_dict = dict(zip(quantlib_data['Sampler'], quantlib_data['Mean Absolute Error']))
+    quantlib_errors = [ql_error_dict.get(s) for s in samplers]
+    
+    if 'Mean Time (s)' in quantlib_data.columns:
+        ql_time_dict = dict(zip(quantlib_data['Sampler'], quantlib_data['Mean Time (s)']))
+        quantlib_times = [ql_time_dict.get(s) for s in samplers]
+    else:
+        quantlib_times = [None] * len(samplers)
     
     # Handle case where theoretical data might be missing
     if not theoretical_data.empty:

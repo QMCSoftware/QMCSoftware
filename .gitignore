@@ -9,7 +9,7 @@ api.github.com/
 coverage.json
 *.ckpt
 *.npz
-*.csv 
+*.csv
 *hparams.yaml
 *.ipynb_checkpoints/
 demos/fgpr_figs/
@@ -40,7 +40,7 @@ demos/.jupyter
 *.pyd
 
 # R
-*.Rhistory 
+*.Rhistory
 
 # Website
 docs/_site
@@ -67,15 +67,24 @@ dist/
 # blogs
 blogs/why_q_in_mc/*.png
 
+# Quarto / Jupyter artifacts
+**/*.quarto_ipynb
+*_files/
+*_cache/
+*.ipynb_checkpoints/
+
+## --- User-specific  file exclusions ---
 # alegresor
 *.vscode
-_ags* 
+_ags*
 _ags/*
 
-# Fred's private stuff, not for tracking
+# Fred
 *Fred*
 
-# SC Choi's file exclusion
+# SC Choi
 .vscode/settings.json
 /sc_*
 sc_*
+
+

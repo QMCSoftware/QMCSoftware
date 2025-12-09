@@ -98,16 +98,21 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
     
     for method in ['QuantLib', 'QMCPy']:
         method_data = series_data[series_data['Method'] == method]
+        colors = styling['colors'][method]
+        markers = styling['markers'][method]
         
-        for sampler in method_data['Sampler'].unique():
+        # Cache unique samplers to avoid recomputation
+        unique_samplers = method_data['Sampler'].unique()
+        
+        for sampler in unique_samplers:
             sampler_data = method_data[method_data['Sampler'] == sampler].sort_values(x_col)
             
             if len(sampler_data) > 0:
-                x_vals = sampler_data[x_col]
-                y_vals = sampler_data[y_col]
+                x_vals = sampler_data[x_col].values
+                y_vals = sampler_data[y_col].values
                 
-                color = styling['colors'][method].get(sampler, '#000000')
-                marker = styling['markers'][method].get(sampler, 'o')
+                color = colors.get(sampler, '#000000')
+                marker = markers.get(sampler, 'o')
                 
                 # Plot with connecting lines for trend visualization
                 if log_scale:
@@ -118,8 +123,10 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
                                 linewidth=2, markersize=8, label=f'{method} - {sampler}')
     
     # Set x-axis ticks to show only exact experimental values
+    # Pre-compute tick labels once to avoid redundant string conversions
+    tick_labels = [str(int(x)) for x in all_x_values]
     ax.set_xticks(all_x_values)
-    ax.set_xticklabels([str(int(x)) for x in all_x_values])
+    ax.set_xticklabels(tick_labels)
     
     # Disable minor ticks to prevent intermediate values from showing
     ax.tick_params(axis='x', which='minor', bottom=False)
@@ -127,8 +134,7 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
     # For log plots, we need to explicitly control the x-axis formatter
     if log_scale:
         ax.xaxis.set_major_locator(FixedLocator(all_x_values))
-        ax.xaxis.set_major_formatter(
-            FixedFormatter([str(int(x)) for x in all_x_values]))
+        ax.xaxis.set_major_formatter(FixedFormatter(tick_labels))
         ax.xaxis.set_minor_locator(FixedLocator([]))  # Remove minor ticks
     
     ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')

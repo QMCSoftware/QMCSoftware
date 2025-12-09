@@ -3,7 +3,27 @@ import numpy as np
 
 def generate_quantlib_paths(initial_value, mu, sigma, maturity, n_steps,
                             n_paths, sampler_type='IIDStdUniform', seed=7):
-    """Generate GBM paths using QuantLib with configurable sampler."""
+    """
+    Generate Geometric Brownian Motion paths using QuantLib.
+    
+    Args:
+        initial_value: Initial value of the GBM process (S_0)
+        mu: Drift parameter
+        sigma: Volatility parameter (note: NOT diffusion coefficient)
+        maturity: Final time T
+        n_steps: Number of discretization time steps
+        n_paths: Number of paths to generate
+        sampler_type: Type of sampler ('IIDStdUniform' or 'Sobol')
+        seed: Random seed for reproducibility
+        
+    Returns:
+        tuple: (paths, gbm) where paths has shape (n_paths, n_steps+1)
+               (includes initial value at t=0) and gbm is the
+               GeometricBrownianMotionProcess object
+               
+    Raises:
+        ValueError: If sampler_type is not 'IIDStdUniform' or 'Sobol'
+    """
     gbm = ql.GeometricBrownianMotionProcess(initial_value, mu, sigma)
     times = ql.TimeGrid(maturity, n_steps)
     dimension = n_steps
