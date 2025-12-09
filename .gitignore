@@ -79,3 +79,12 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
+
+# -------------------------
+# Quarto / Jupyter artifacts
+# -------------------------
+**/*.quarto_ipynb
+*_files/
+*_cache/
+*.ipynb_checkpoints/
