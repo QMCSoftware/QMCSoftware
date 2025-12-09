@@ -255,15 +255,15 @@ def update_sweep_df(df, replications=5):
 
     # Compute MAE vs number of paths
     for method in ["QMCPy", "QuantLib"]:
-        samplers_to_loop = qp_samplers if method == "QMCPy" else ql_samplers
-        for sampler in samplers_to_loop:
+        method_samplers = qp_samplers if method == "QMCPy" else ql_samplers
+        for sampler in method_samplers:
             x, y = compute_mae_vs_paths(method, sampler, replications=replications)
             mae_vals[(method, sampler, "paths")] = dict(zip(x, y))
 
     # Compute MAE vs number of time steps
     for method in ["QMCPy", "QuantLib"]:
-        samplers_to_loop = qp_samplers if method == "QMCPy" else ql_samplers
-        for sampler in samplers_to_loop:
+        method_samplers = qp_samplers if method == "QMCPy" else ql_samplers
+        for sampler in method_samplers:
             x, y = compute_mae_vs_steps(method, sampler, replications=replications)
             mae_vals[(method, sampler, "steps")] = dict(zip(x, y))
 
