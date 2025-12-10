@@ -98,16 +98,21 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
     
     for method in ['QuantLib', 'QMCPy']:
         method_data = series_data[series_data['Method'] == method]
+        colors = styling['colors'][method]
+        markers = styling['markers'][method]
         
-        for sampler in method_data['Sampler'].unique():
+        # Cache unique samplers to avoid recomputation
+        unique_samplers = method_data['Sampler'].unique()
+        
+        for sampler in unique_samplers:
             sampler_data = method_data[method_data['Sampler'] == sampler].sort_values(x_col)
             
             if len(sampler_data) > 0:
-                x_vals = sampler_data[x_col]
-                y_vals = sampler_data[y_col]
+                x_vals = sampler_data[x_col].values
+                y_vals = sampler_data[y_col].values
                 
-                color = styling['colors'][method].get(sampler, '#000000')
-                marker = styling['markers'][method].get(sampler, 'o')
+                color = colors.get(sampler, '#000000')
+                marker = markers.get(sampler, 'o')
                 
                 # Plot with connecting lines for trend visualization
                 if log_scale:
@@ -118,8 +123,10 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
                                 linewidth=2, markersize=8, label=f'{method} - {sampler}')
     
     # Set x-axis ticks to show only exact experimental values
+    # Pre-compute tick labels once to avoid redundant string conversions
+    tick_labels = [str(int(x)) for x in all_x_values]
     ax.set_xticks(all_x_values)
-    ax.set_xticklabels([str(int(x)) for x in all_x_values])
+    ax.set_xticklabels(tick_labels)
     
     # Disable minor ticks to prevent intermediate values from showing
     ax.tick_params(axis='x', which='minor', bottom=False)
@@ -127,8 +134,7 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
     # For log plots, we need to explicitly control the x-axis formatter
     if log_scale:
         ax.xaxis.set_major_locator(FixedLocator(all_x_values))
-        ax.xaxis.set_major_formatter(
-            FixedFormatter([str(int(x)) for x in all_x_values]))
+        ax.xaxis.set_major_formatter(FixedFormatter(tick_labels))
         ax.xaxis.set_minor_locator(FixedLocator([]))  # Remove minor ticks
     
     ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')
@@ -138,7 +144,7 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
     if is_legend:
         ax.legend(fontsize=10)
 
-def create_parameter_sweep_plots(df):
+def create_parameter_sweep_plots(df,replications):
     """Create 4-panel plots from parameter sweep data"""
     # Filter out theoretical data
     plot_data = df[df['Method'] != 'Theoretical'].copy()
@@ -147,23 +153,23 @@ def create_parameter_sweep_plots(df):
     _, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
     # Panel 1: Mean Absolute Error vs n_steps (upper left)
     plot_single_series(ax1, plot_data, 'Time Steps', 'n_steps', 'Mean Absolute Error',
-                       'Mean Absolute Error vs Number of Time Steps\n(n_paths = 4,096)',
+                       f'Mean Absolute Error vs Number of Time Steps across {replications} Replications\n(n_paths = 4,096)',
                        'Number of Time Steps', 'Mean Absolute Error',
-                       log_scale=True, is_legend=True)
+                       log_scale=True)
 
     # Panel 2: Runtime vs n_steps (upper right)
     plot_single_series(ax2, plot_data, 'Time Steps', 'n_steps', 'Runtime (s)',
-                       'Runtime vs Number of Time Steps\n(n_paths = 4,096)',
-                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True)
+                       f'Runtime vs Number of Time Steps\n(n_paths = 4,096)',
+                       'Number of Time Steps', 'Runtime (seconds)', log_scale=True, is_legend=True)
     
     # Panel 3: Mean Absolute Error vs n_paths (lower left)
     plot_single_series(ax3, plot_data, 'Paths', 'n_paths', 'Mean Absolute Error',
-                       'Mean Absolute Error vs Number of Paths\n(n_steps = 252)',
+                       f'Mean Absolute Error vs Number of Paths across {replications} Replications\n(n_steps = 252)',
                        'Number of Paths', 'Mean Absolute Error', log_scale=True)
 
     # Panel 4: Runtime vs n_paths (lower right)
     plot_single_series(ax4, plot_data, 'Paths', 'n_paths', 'Runtime (s)',
-                       'Runtime vs Number of Paths\n(n_steps = 252)',
+                       f'Runtime vs Number of Paths\n(n_steps = 252)',
                        'Number of Paths', 'Runtime (seconds)', log_scale=True)
 
 def plot_paths(motion_type, sampler, t_final, initial_value, drift, diffusion,
