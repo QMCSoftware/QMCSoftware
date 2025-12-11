@@ -2,59 +2,139 @@
 
 The following is a guide for those in charge of making new releases of QMCPy.
 
-## Setting Up PyPi Account
+## Setup
 
 In order to publish a release, you will need to have an account on the two websites:
 
 - https://pypi.org
 - https://test.pypi.org
 
-Note: These accounts will be different from each other.
+Note: These accounts will be different from each other. PyPI is the standard Python package index where users can `pip install qmcpy` from. TestPyPI is a seperate package index meant for developers to test their release before publishing on the actual PyPI. In order to release `qmcpy`, you will need to contact Aleksei to request access to the actual `qmcpy` project on both websites.
 
-### Getting Your API Keys
+Please setup and save your PyPI and TestPyPI API keys (do not commit to a public git repo). They should look something like the following 
+
+```
+[pypi]
+  username = __token__
+  password = ...
+
+[testpypi]
+  username = __token__
+  password = ...
+```
+
+## Sanity Checks
 
 
+```bash
+git checkout develop
+git pull 
+pip install -e .
+make doctests_no_docker
+make doc
+```
 
-## Procedure
+Ensure all tests are passing and the docs are compiling locally and look good. Again, if the GitHub actions are passing then of course everything should work locally, but it is always good to check. 
 
-### Step 1
+## TestPyPI release 
 
-1. Pull latest changes from the `develop` branch.
-2. Run `pip install -e .` to update any packages.
-3. Run `make doctests_no_docker` to run tests.
+To set the release version, edit the `__version__` attribute in `qmcpy/__init__.py`. Note that versions ending in a letter, e.g. `2.1.1a`, are alpha releases that are not automatically downloaded. Note also that the version number must be greater than the current version number. For example, if the latest version was `2.1` then you could do `2.1.1` or `2.2` but cannot go back to `2.0.1`. See [this guide of Python versioning](https://packaging.python.org/en/latest/discussions/versioning/) for more details. 
 
-### Step 2
+Please install the [PDM](https://pdm-project.org/latest/) Python package and dependency manager, the build system we use as specified in the `pyproject.toml` file.
 
-1. In the file called `__init__.py` in the `qmcpy` directory, go to the end of the file and change the `__version__` attribute to the new release number.
+With PDM installed, you can follow the [PDM publish guide](https://pdm-project.org/latest/usage/publish/). Specifically, we first publish to TestPyPI with the command 
 
-Run Step 1 again as a sanity check.
+```bash 
+pdm publish --repository testpypi
+```
 
-### Step 3 
+When prompted for a username put `__token__`, and when prompted for a password put the password for your API token for TestPyPI. If successful, you will get a link to the release on PyPI. Note that locally, your build may be found at `QMCSoftware/dist`. 
 
-In the file `pyproject.toml`, there are a number of build systems to use, we will use PDM.
+To actually test our TestPyPI release, it is a good idea to pretend you are a new user and create a fresh environment in which you try some basic QMCPy commands. Here are some commands to run to create a fresh environment and run some basic tests 
 
-### Step 4
+```bash 
+conda create --name tmp python=3.12 
+conda activate tmp 
+pip install -i https://test.pypi.org/simple/ qmcpy==???
+python
+```
 
-To make sure everything was done correctly, 
+Of course you will need to replace ??? with the version name. If the `pip install -i ...` command fails, try 
 
-### Step 5
+```bash 
+Sou-Cheng / Richard, please put the command we used to fix this yesterday here
+```
 
-After uploading the release to test.pypi.org, create a new environment with Anaconda and download the package using `pip`.
+Once in the python console in the `tmp` environment, try running some basic commands such as 
 
-### Step 6
+```python
+import qmcpy as qp 
+import numpy as np
+qp.DigitalNetB2(3)(8) 
+qp.DigitalNetB2(3,replications=2)(8) 
+qp.KernelShiftInvar(2)(np.random.rand(3,1,2),np.random.rand(1,4,2))
+exit()
+```
 
-After testing, you can run `pdm publish` to publish to PyPi
+It is also good to check things work with torch. Still in the `tmp` env, run 
 
-### Step 7
+```bash 
+pip install torch 
+python
+```
 
-Once done, commit and push your changes.
+back in the Python console, run 
 
-### Step 8
+```python
+import qmcpy as qp 
+import torch 
+qp.fwht_torch(torch.rand(8))
+qp.KernelShiftInvar(2,torchify=True)(torch.rand(3,1,2),torch.rand(1,4,2))
+```
 
-After publishing, go to GitHub, create a pull request to merge `develop` branch to `master`.
+If you find errors, please fix them and try another release on TestPyPI until everything looks good. Note that you will need to increase the version number if making a new release, so it is good practice to make only small increments, e.g., if you want to release version `2.2` but that one failed, make the next try `2.2.0.1` and the one after that `2.2.0.2` and so on. Otherwise, if you do say `2.3`, then the next time someone goes to make a release of `2.3` it will give errors because that version has already been released on TestPyPI. 
 
-Do one final sanity check on all the files before confirming the pull request.
+## PyPI Release 
 
-### Step 9
+To make the actual PyPI release that users `pip install qmcpy` with, it is as simple as running 
 
-Create a release on the GitHub repository but going to Releases, make a draft of a new release. Give it a tag, a release title, and a description.
+```bash 
+pdm publish
+```
+
+As with TestPyPI, the username is `__token__` and you will need your PyPI API password. 
+
+Back in your `tmp` environment, you may try a 
+
+```bash 
+pip install qmcpy
+python
+```
+
+just to make sure everything gets installed ok. In the Python console, you can run the same sanity checks as above, but it is probably not necessary. It is probably sufficient just to make sure the correct version is installed with 
+
+```python 
+import qmcpy as qp
+qp.__version__
+```
+
+
+## Pull `develop` branch into `master` 
+
+Make a pull request from `develop` into `master` and merge it in. 
+
+## GitHub Release 
+
+The PyPI release contains barebones tools from `QMCSoftware/qmcpy/`. The GitHub release contains additional project components such as tests and demos. To create a GitHub release, navigate to [QMCPy's GitHub release page](https://github.com/QMCSoftware/QMCSoftware/releases) and click `Draft a new release`. For `Tag:Select tag`, click `Create new tag` and enter, for example, `v2.1`. The target should be the master branch. Give the release a title like `QMCPy v2.1`. Click `Generate release notes` to automatically collect PR and other release notes. 
+
+## Cleanup 
+
+Delete the `tmp` environment with 
+
+```bash 
+conda env remove --name tmp 
+```
+
+## Advertising QMCPy
+
+Please share the QMCPy release with team members and the greater community if possible. In the past we have posted both the PyPI and GitHub release links to the group on Slack.  
