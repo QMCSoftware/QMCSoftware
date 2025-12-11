@@ -43,10 +43,10 @@ These generates IID or LD points $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$. Supp
 These define $\boldsymbol{T}$, for which `QMCPy` will automatically choose an appropriate transform $\boldsymbol{\psi}$ so that $\boldsymbol{T} \sim \boldsymbol{\psi}(\boldsymbol{X})$ with $\boldsymbol{X} \sim \mathcal{U}[0,1]^d$. Some popular true measures are
 
 - **Uniform** $\boldsymbol{T} \sim \mathcal{U}[\boldsymbol{l},\boldsymbol{u}]$ with elementwise $\boldsymbol{l} \leq \boldsymbol{u}$ for which $\boldsymbol{\psi}(\boldsymbol{x}) = \boldsymbol{l}+(\boldsymbol{u}-\boldsymbol{l}) \odot \boldsymbol{x}$ with $\odot$ the Hadamard (elementwise) product.
-- **Gaussian** $\boldsymbol{T} \sim \mathcal{N}(\boldsymbol{m},\mathsf{\Sigma})$ for which $\boldsymbol{\psi}(\boldsymbol{x}) = \boldsymbol{m}+\mathsf{A}\boldsymbol{x}$ where the covariance $\mathsf{\Sigma} = \mathsf{A} \mathsf{A}^T$ may be decomposed using either
+- **Gaussian** $\boldsymbol{T} \sim \mathcal{N}(\boldsymbol{m},\mathsf{\Sigma})$ for which $\boldsymbol{\psi}(\boldsymbol{x}) = \boldsymbol{m}+\mathsf{A}\Phi^{-1}(\boldsymbol{x})$ where $\Phi^{-1}$ is the inverse CDF of the standard Gaussian distribution applied elementwise and the covariance $\mathsf{\Sigma} = \mathsf{A} \mathsf{A}^T$ may be decomposed using either
     - the Cholesky decomposition or
     - the eigendecomposition.
-- **Brownian Motion** observed with an initial value $B_0$, drift $\gamma$, and diffusion $\sigma^2$ at times $\boldsymbol{t} := (t_1,\dots,t_d)^T$ satisfying $0 \leq t_1 < t_1 < \dots < t_d$ is a Gaussian with mean and covariance
+- **Brownian Motion** observed with an initial value $B_0$, drift $\gamma$, and diffusion $\sigma^2$ at times $\boldsymbol{t} := (t_1,\dots,t_d)^T$ satisfying $0 \leq t_1 < t_2 < \dots < t_d$ is a Gaussian with mean and covariance
 
 $$\boldsymbol{m} = B_0 + \gamma \boldsymbol{t}$$
 
@@ -66,7 +66,7 @@ These define $g$, which `QMCPy` will use to define $f = g \circ \boldsymbol{\psi
 
 | <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/stopping_crit.svg" style="width:100%; height:auto;"> |
 |:--|
-| The cost of IID-Monte Carlo algorithms is $\mathcal{O}(n^2)$ in the number of samples $n$ while Quasi-Monte Carlo algorithms only cost around $\mathcal{O}(n)$. Both IID-Monte Carlo and Quasi-Monte Carlo stopping criterion consistently determine approximations which meet the desired error tolerance. |
+| The cost of IID-Monte Carlo algorithms is $n = \mathcal{O}(1/\varepsilon^2)$ in the number of samples $n$ and error tolerance $\varepsilon$ while Quasi-Monte Carlo algorithms only cost around $n=\mathcal{O}(1/\varepsilon)$. Both IID-Monte Carlo and Quasi-Monte Carlo stopping criterion consistently determine approximations which meet the desired error tolerance. |
 
 These deploy (Quasi-)Monte Carlo methods under error tolerance and budgetary constraints by utilizing adaptive sampling schemes and efficient error estimation procedures. Common stopping criteria include
 
