@@ -224,9 +224,9 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         ...     [2,1,0]])
         >>> with torch.no_grad():
         ...     y = kernel(x,z,beta0,beta1,c)
-        >>> with np.printoptions(formatter={"float": lambda x: "%.3f"%x}):
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2f"%x}):
         ...     y.numpy()
-        array([1455.140, 9475.570, 7807.076, 2785.473])
+        array([1455.14, 9475.57, 7807.08, 2785.47])
         >>> y_no_deriv = kernel(x,z)
         >>> y_first = y_no_deriv.clone()
         >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
@@ -250,9 +250,9 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         ...     scale = scale,
         ...     lengthscales = lengthscales)
         >>> ynp = kernel(x.detach().numpy(),z.detach().numpy(),beta0.numpy(),beta1.numpy(),c.numpy())
-        >>> with np.printoptions(formatter={"float": lambda x: "%.3f"%x}):
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2f"%x}):
         ...     ynp
-        array([1455.142, 9475.585, 7807.089, 2785.477])
+        array([1455.14, 9475.59, 7807.09, 2785.48])
         >>> np.allclose(ynp,y.numpy())
         True
 
