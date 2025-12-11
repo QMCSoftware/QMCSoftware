@@ -62,7 +62,7 @@ python
 Of course you will need to replace ??? with the version name. If the `pip install -i ...` command fails, try 
 
 ```bash 
-Sou-Cheng / Richard, please put the command we used to fix this yesterday here
+pip install --index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple "qmcpy==2.1"
 ```
 
 Once in the python console in the `tmp` environment, try running some basic commands such as 
