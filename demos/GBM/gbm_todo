@@ -5,3 +5,5 @@ QMCPy 2.2 GBM To-do:
 4. Look into Sobol randomization in QuantLib
 5. Add replications to the MAE Comparison bar chart (figure_6)
 6. Add more text to the demo 
+7. Add type hints to key functions
+8. Update online blog in Overleaf and `qmcpy.org`
