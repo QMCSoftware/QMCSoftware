@@ -1,58 +1,89 @@
-from ._integrand import Integrand
+from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
-from numpy import *
+import numpy as np
 
 
-class BoxIntegral(Integrand):
-    """
-    $B_s(x) = \\left(\\sum_{j=1}^d x_j^2 \\right)^{s/2}$
-
-    >>> l1 = BoxIntegral(DigitalNetB2(2,seed=7), s=[7])
-    >>> x1 = l1.discrete_distrib.gen_samples(2**10)
-    >>> y1 = l1.f(x1)
-    >>> y1.shape
-    (1024, 1)
-    >>> y1.mean(0)
-    array([0.75156724])
-    >>> l2 = BoxIntegral(DigitalNetB2(5,seed=7), s=[-7,7])
-    >>> x2 = l2.discrete_distrib.gen_samples(2**10)
-    >>> y2 = l2.f(x2,compute_flags=[1,1])
-    >>> y2.shape
-    (1024, 2)
-    >>> y2.mean(0)
-    array([ 6.67548708, 10.52267786])
-
-    References:
-
-    [1] D.H. Bailey, J.M. Borwein, R.E. Crandall, Box integrals,
-    Journal of Computational and Applied Mathematics, Volume 206, Issue 1, 2007, Pages 196-208, ISSN 0377-0427, 
-    https://doi.org/10.1016/j.cam.2006.06.010. (https://www.sciencedirect.com/science/article/pii/S0377042706004250) 
+class BoxIntegral(AbstractIntegrand):
+    r"""
+    Box integral from [1], see also 
     
-    [2] https://www.davidhbailey.com/dhbpapers/boxintegrals.pdf
+    $$B_s(\boldsymbol{t}) = \left(\sum_{j=1}^d t_j^2 \right)^{s/2}, \qquad \boldsymbol{T} \sim \mathcal{U}[0,1]^d.$$
+
+    Examples:
+        Scalar `s` 
+        
+        >>> integrand = BoxIntegral(DigitalNetB2(2,seed=7),s=7)
+        >>> y = integrand(2**10)
+        >>> y.shape
+        (1024,)
+        >>> print("%.4f"%y.mean(0))
+        0.7519
+
+        With independent replications
+
+        >>> integrand = BoxIntegral(DigitalNetB2(2,seed=7,replications=2**4),s=7)
+        >>> y = integrand(2**10)
+        >>> y.shape
+        (16, 1024)
+        >>> muhats = y.mean(1) 
+        >>> muhats.shape 
+        (16,)
+        >>> print("%.4f"%muhats.mean(0))
+        0.7518
+
+        Array `s`
+
+        >>> integrand = BoxIntegral(DigitalNetB2(5,seed=7),s=np.arange(6).reshape((2,3)))
+        >>> y = integrand(2**10)
+        >>> y.shape
+        (2, 3, 1024)
+        >>> y.mean(-1)
+        array([[1.        , 1.26234461, 1.66666661],
+               [2.28201516, 3.22195096, 4.67188113]])
+
+        With independent replications
+
+        >>> integrand = BoxIntegral(DigitalNetB2(2,seed=7,replications=2**4),s=np.arange(6).reshape((2,3)))
+        >>> y = integrand(2**10)
+        >>> y.shape
+        (2, 3, 16, 1024)
+        >>> muhats = y.mean(-1) 
+        >>> muhats.shape 
+        (2, 3, 16)
+        >>> muhats.mean(-1)
+        array([[1.        , 0.76519118, 0.66666666],
+               [0.62718785, 0.62224086, 0.64273341]])
+
+    **References:**
+
+    1.  D.H. Bailey, J.M. Borwein, R.E. Crandall, Box integrals.  
+        Journal of Computational and Applied Mathematics, Volume 206, Issue 1, 2007, Pages 196-208, ISSN 0377-0427.  
+        [https://doi.org/10.1016/j.cam.2006.06.010](https://doi.org/10.1016/j.cam.2006.06.010).  
+        [https://www.sciencedirect.com/science/article/pii/S0377042706004250](https://www.sciencedirect.com/science/article/pii/S0377042706004250).  
+        [https://www.davidhbailey.com/dhbpapers/boxintegrals.pdf](https://www.davidhbailey.com/dhbpapers/boxintegrals.pdf)
     """
 
-    def __init__(self, sampler, s=array([1,2])):
-        """
+    def __init__(self, sampler, s=1):
+        r"""
         Args:
-            sampler (DiscreteDistribution/TrueMeasure): A 
-                discrete distribution from which to transform samples or a
-                true measure by which to compose a transform
-            s (list or ndarray): vectorized s parameter, len(s) is the number of vectorized integrals to evaluate.
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
+                
+                - a discrete distribution from which to transform samples, or
+                - a true measure by which to compose a transform.
+            s (Union[float,np.ndarray]): `s` parameter or parameters. The output shape of `g` is the shape of `s`. 
         """
         self.parameters = ['s']
-        self.s = array([s]) if isscalar(s) else array(s)
+        self.s = np.array(s)
+        assert self.s.size>0
         self.sampler = sampler
-        self.true_measure = Uniform(self.sampler, lower_bound=0., upper_bound=1.)
-        super(BoxIntegral,self).__init__(dimension_indv=len(self.s),dimension_comb=len(self.s),parallel=False) # output dimensions per sample
+        self.true_measure = Uniform(self.sampler)
+        self.s_over_2 = self.s/2
+        super(BoxIntegral,self).__init__(dimension_indv=self.s.shape,dimension_comb=self.s.shape,parallel=False)
 
     def g(self, t, **kwargs):
-        compute_flags = kwargs['compute_flags'] if 'compute_flags' in kwargs else ones(self.d_indv,dtype=int)
-        n,d = t.shape
-        y = zeros((n,)+self.d_indv,dtype=float)
-        for j in range(len(self.s)):
-            if compute_flags[j] == 1: 
-                y[:,j] = (t**2).sum(1)**(self.s[j]/2)
+        sum_squares = (t**2).sum(-1)
+        y = sum_squares**self.s_over_2[(...,)+(None,)*sum_squares.ndim]
         return y
     
     def _spawn(self, level, sampler):

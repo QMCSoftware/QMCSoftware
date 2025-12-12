@@ -1,4 +1,18 @@
 # General Python
+.pdm-python
+*raw.githubusercontent.com*
+packages.svg
+.pypirc
+test_readme.py
+github.com/QMCSoftware/LDData/
+api.github.com/
+coverage.json
+*.ckpt
+*.npz
+*.csv
+*hparams.yaml
+*.ipynb_checkpoints/
+demos/fgpr_figs/
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -14,6 +28,7 @@ qmcpy.egg-info/
 .pytest_cache/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
+demos/.jupyter
 
 # tests
 .coverage
@@ -25,7 +40,7 @@ raw.githubusercontent.com/*
 *.pyd
 
 # R
-*.Rhistory 
+*.Rhistory
 
 # Website
 docs/_site
@@ -42,6 +57,8 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
+demos/**.png
+demos/**.eps
 
 # release
 /build/
@@ -50,14 +67,24 @@ dist/
 # blogs
 blogs/why_q_in_mc/*.png
 
+# Quarto / Jupyter artifacts
+**/*.quarto_ipynb
+*_files/
+*_cache/
+*.ipynb_checkpoints/
+
+## --- User-specific  file exclusions ---
 # alegresor
 *.vscode
-_ags* 
+_ags*
 _ags/*
 
-# Fred's private stuff, not for tracking
+# Fred
 *Fred*
 
-# SC Choi's file exclusion
+# SC Choi
 .vscode/settings.json
+/sc_*
+sc_*
+
 
