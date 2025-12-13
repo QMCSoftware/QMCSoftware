@@ -9,7 +9,7 @@ In order to publish a release, you will need to have an account on the two websi
 - https://pypi.org
 - https://test.pypi.org
 
-Note: These accounts will be different from each other. PyPI is the standard Python package index where users can `pip install qmcpy` from. TestPyPI is a seperate package index meant for developers to test their release before publishing on the actual PyPI. In order to release `qmcpy`, you will need to contact Aleksei to request access to the actual `qmcpy` project on both websites.
+Note: These accounts will be different from each other. PyPI is the standard Python package index where users can `pip install qmcpy` from. TestPyPI is a separate package index meant for developers to test their release before publishing on the actual PyPI. In order to release `qmcpy`, you will need to contact Aleksei to request access to the actual `qmcpy` project on both websites.
 
 Please setup and save your PyPI and TestPyPI API keys (do not commit to a public git repo). They should look something like the following 
 
