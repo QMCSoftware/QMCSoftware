@@ -24,7 +24,7 @@ else:
 def run_single_test(test_file, stdout='test_output.txt', stderr='test_error.txt'):
     """Run a single test file using bash"""
     return f"""
-    PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" python -m unittest {test_file}
+    PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" python -m unittest {test_file} 2>&1
     """
 
 def execute_parallel_tests():
@@ -95,6 +95,18 @@ def execute_parallel_tests():
                 # Don't retry - exit code 5 is expected for skipped tests
             else:
                 print(f"Test {module} failed once with error: {e}. Retrying...")
+                # Read and print error log contents for debugging
+                stdout_file = f'logs/test_{index}_{module}.out'
+                print(f"\n--- Error details for {module} (first attempt) ---")
+                if os.path.exists(stdout_file):
+                    try:
+                        with open(stdout_file, 'r') as f:
+                            content = f.read()
+                            # Print last 2000 chars to avoid log overflow
+                            print(content[-2000:] if len(content) > 2000 else content)
+                    except Exception as read_err:
+                        print(f"Could not read log file: {read_err}")
+                print(f"--- End of error details for {module} ---\n")
                 try:
                     # Resubmit the test for retry
                     # Use _retry suffix for log files to preserve original failed test logs
@@ -112,6 +124,18 @@ def execute_parallel_tests():
                         was_retried = True
                         # Treat as passed (skipped)
                     else:
+                        # Read and print retry error log contents for debugging
+                        retry_stdout_file = f'logs/test_{index}_{module}_retry.out'
+                        print(f"\n--- Failure details for {module} (after retry) ---")
+                        if os.path.exists(retry_stdout_file):
+                            try:
+                                with open(retry_stdout_file, 'r') as f:
+                                    content = f.read()
+                                    # Print last 2000 chars to avoid log overflow
+                                    print(content[-2000:] if len(content) > 2000 else content)
+                            except Exception as read_err:
+                                print(f"Could not read log file: {read_err}")
+                        print(f"--- End of failure details for {module} ---\n")
                         results.append((module, f'FAILED after retry: {e2}', 0))
                         status = 'FAILED'
                         completed += 1
