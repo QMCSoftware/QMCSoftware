@@ -198,6 +198,7 @@ class KernelShiftInvar(AbstractSIDSIKernel):
 
         Derivatives 
 
+        >>> rng = np.random.Generator(np.random.PCG64(7))
         >>> scale = rng.uniform(low=0,high=1,size=(1,))
         >>> lengthscales = rng.uniform(low=0,high=1,size=(3,))
         >>> kernel = KernelShiftInvar(
@@ -223,8 +224,9 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         ...     [2,1,0]])
         >>> with torch.no_grad():
         ...     y = kernel(x,z,beta0,beta1,c)
-        >>> y
-        tensor([ 3003.7945, -1517.1556,   701.6692,  1470.4241], dtype=torch.float64)
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2f"%x}):
+        ...     y.numpy()
+        array([1455.14, 9475.57, 7807.08, 2785.47])
         >>> y_no_deriv = kernel(x,z)
         >>> y_first = y_no_deriv.clone()
         >>> y_first = torch.autograd.grad(y_first,x0,grad_outputs=torch.ones_like(y_first,requires_grad=True),create_graph=True)[0]
@@ -237,8 +239,9 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         >>> y_second = torch.autograd.grad(y_second,z0,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
         >>> y_second = torch.autograd.grad(y_second,z1,grad_outputs=torch.ones_like(y_second,requires_grad=True),create_graph=True)[0]
         >>> yhat = (y_first*c[0]+y_second*c[1]).detach()
-        >>> yhat
-        tensor([ 3003.7946, -1517.1557,   701.6692,  1470.4241], dtype=torch.float64)
+        >>> with np.printoptions(formatter={"float": lambda x: "%.3f"%x}):
+        ...     yhat.numpy()
+        array([1455.140, 9475.570, 7807.076, 2785.473])
         >>> torch.allclose(y,yhat)
         True
         >>> kernel = KernelShiftInvar(
@@ -247,8 +250,9 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         ...     scale = scale,
         ...     lengthscales = lengthscales)
         >>> ynp = kernel(x.detach().numpy(),z.detach().numpy(),beta0.numpy(),beta1.numpy(),c.numpy())
-        >>> ynp
-        array([ 3003.79938927, -1517.15808005,   701.6700331 ,  1470.42580601])
+        >>> with np.printoptions(formatter={"float": lambda x: "%.2f"%x}):
+        ...     ynp
+        array([1455.14, 9475.59, 7807.09, 2785.48])
         >>> np.allclose(ynp,y.numpy())
         True
 

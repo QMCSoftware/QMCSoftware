@@ -26,7 +26,8 @@ class IntegrationExampleTest(unittest.TestCase):
         integrand = FinancialOption(IIDStdUniform(64))
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
-        self.assertTrue(abs(solution - true_value) < abs_tol)
+        self.assertTrue(np.isclose(solution, true_value, atol=abs_tol))
+
 
     def test_lebesgue_bounded_measure(self):
         """ Mathematica: Integrate[x^3 y^3, {x, 1, 3}, {y, 3, 6}] """
