@@ -97,19 +97,12 @@ def execute_parallel_tests():
                 print(f"Test {module} failed once with error: {e}. Retrying...")
                 # Read and print error log contents for debugging
                 stdout_file = f'logs/test_{index}_{module}.out'
-                stderr_file = f'logs/test_{index}_{module}.err'
                 print(f"\n--- Error details for {module} (first attempt) ---")
                 if os.path.exists(stdout_file):
                     with open(stdout_file, 'r') as f:
                         content = f.read()
                         # Print last 2000 chars to avoid log overflow
                         print(content[-2000:] if len(content) > 2000 else content)
-                if os.path.exists(stderr_file):
-                    with open(stderr_file, 'r') as f:
-                        content = f.read()
-                        if content.strip():  # Only print if there's content
-                            print("--- stderr ---")
-                            print(content[-2000:] if len(content) > 2000 else content)
                 print(f"--- End of error details for {module} ---\n")
                 try:
                     # Resubmit the test for retry
@@ -130,19 +123,12 @@ def execute_parallel_tests():
                     else:
                         # Read and print retry error log contents for debugging
                         retry_stdout_file = f'logs/test_{index}_{module}_retry.out'
-                        retry_stderr_file = f'logs/test_{index}_{module}_retry.err'
                         print(f"\n--- Failure details for {module} (after retry) ---")
                         if os.path.exists(retry_stdout_file):
                             with open(retry_stdout_file, 'r') as f:
                                 content = f.read()
                                 # Print last 2000 chars to avoid log overflow
                                 print(content[-2000:] if len(content) > 2000 else content)
-                        if os.path.exists(retry_stderr_file):
-                            with open(retry_stderr_file, 'r') as f:
-                                content = f.read()
-                                if content.strip():  # Only print if there's content
-                                    print("--- stderr ---")
-                                    print(content[-2000:] if len(content) > 2000 else content)
                         print(f"--- End of failure details for {module} ---\n")
                         results.append((module, f'FAILED after retry: {e2}', 0))
                         status = 'FAILED'
