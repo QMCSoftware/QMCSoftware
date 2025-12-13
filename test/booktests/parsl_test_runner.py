@@ -236,6 +236,7 @@ def main():
     import parsl as pl
     import platform
     import os
+    import sys
     try:
         # Check if Parsl is already configured
         pl.dfk()  # DataFlowKernel
@@ -260,15 +261,15 @@ def main():
             print("Parsl configuration loaded successfully.")
         except Exception as e:
             print(f"Error loading Parsl configuration: {e}")
-            return
+            sys.exit(1)
     
+    results = None
     try:
         results, execution_time, total_test_time = execute_parallel_tests()
         generate_summary_report(results, execution_time, total_test_time)
-        return results
     except Exception as e:
         print(f"Error during parallel execution: {e}")
-        return None
+        sys.exit(1)
     finally:
         # Clean up Parsl
         try:
@@ -282,6 +283,12 @@ def main():
         parsl.dfk().shutdown()
     except Exception:
         pass
+    
+    # Exit with non-zero code if any tests failed
+    if results:
+        failed_modules = sum(1 for _, status, _ in results if status != 'PASSED')
+        if failed_modules > 0:
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()
