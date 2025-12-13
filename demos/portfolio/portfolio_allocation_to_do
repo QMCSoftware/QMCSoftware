@@ -1,4 +1,4 @@
-# Portfolio allocation to-do:
+# QMCPy 2.2 Portfolio allocation to-do:
 0. What are the differences between the two notebooks in `demos/portfolio`?
 1. Add Sobol and Halton samplers for weigths generation in the demo
 2. Add more text to the demo
@@ -9,3 +9,5 @@
 7. Make a function for collecting data (?)
 8. Clean up demo
 9. Add references to the demo
+10. Update poster   
+
