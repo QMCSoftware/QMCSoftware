@@ -3,7 +3,7 @@ nav:
   - Quasi Monte Carlo Software: README.md
   - Components: components.md
   - Contributing: CONTRIBUTING.md
-  - Release: RELEASE.md
+  - Release: releases/RELEASE.md
   - Community: community.md
   - News:
     - Releases:

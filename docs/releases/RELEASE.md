@@ -138,3 +138,13 @@ conda env remove --name tmp
 ## Advertising QMCPy
 
 Please share the QMCPy release with team members and the greater community if possible. In the past we have posted both the PyPI and GitHub release links to the group on Slack.  
+
+
+## Additional Post-Release Tasks
+
+- Update this document if necessary.
+- Draft an announcement in `docs/release` for NA Digest, `qmcpy.org`, etc.  Add it to `mkdocs.yml` for team to review.
+- Coordinate branch cleanup and communicate to contributors.
+- Review Release Issue; close or reassign sub‑issues to a future release as appropriate.
+- If critical issues appear, prepare and publish a patch release (e.g., vX.Y.1).
+
