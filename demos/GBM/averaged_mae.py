@@ -137,53 +137,6 @@ def compute_mae_vs_paths(
     return _compute_mae(method, sampler, "paths", replications, qp_seed, ql_seed)
 
 
-def plot_mae_vs_paths(replications: int = 5) -> None:
-    """
-    Plot averaged MAE vs number of paths for all samplers.
-    
-    Visualizes how the Mean Absolute Error of the mean estimator decreases
-    as the number of paths increases, comparing different sampling methods
-    from both QMCPy and QuantLib.
-    
-    Args:
-        replications: Number of independent replications to average over (default: 5)
-    """
-    styling = pu.get_plot_styling()
-    sampler_cfg = cf.get_sampler_configurations()
-    qmcpy_samplers = sampler_cfg['all_samplers']
-    ql_samplers = sampler_cfg['quantlib_samplers']
-
-    # list of (method, sample) pairs to plot
-    all_pairs = [("QuantLib", s) for s in ql_samplers] + [("QMCPy", s) for s in qmcpy_samplers]
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    for method, sampler in all_pairs:
-        n_paths_range, mean_errors = compute_mae_vs_paths(method, sampler, replications)
-
-        colors = styling['colors'][method]
-        markers = styling['markers'][method]
-
-        ax.loglog(
-            n_paths_range,
-            mean_errors,
-            marker=markers.get(sampler),
-            color=colors.get(sampler),
-            linewidth=2,
-            markersize=6,
-            label=f"{method} - {sampler}"
-        )
-    ax.xaxis.set_major_locator(FixedLocator(n_paths_range))
-    ax.xaxis.set_major_formatter(FixedFormatter([str(int(x)) for x in n_paths_range]))
-    ax.xaxis.set_minor_locator(FixedLocator([]))
-
-    ax.set_xlabel("Number of Paths", fontsize=12, fontweight='bold')
-    ax.set_ylabel("Mean Absolute Error", fontsize=12, fontweight='bold')
-    ax.set_title(f"MAE vs Number of Paths across {replications} replications (n_steps = 252)",
-                 fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=10)
-    plt.show();
-
 def compute_mae_vs_steps(
     method: str,
     sampler: str,
@@ -213,6 +166,90 @@ def compute_mae_vs_steps(
     return _compute_mae(method, sampler, "steps", replications, qp_seed, ql_seed)
 
 
+def _plot_mae(
+    sweep_type: str,
+    replications: int = 5) -> None:
+    """
+    Plot averaged MAE for a given sweep type (paths or steps).
+    
+    This is the unified internal function that plots MAE.
+
+    Args:
+        sweep_type: Either "paths" or "steps"
+        replications: Number of independent replications
+    """
+    styling = pu.get_plot_styling()
+    sampler_cfg = cf.get_sampler_configurations()
+    qmcpy_samplers = sampler_cfg['all_samplers']
+    ql_samplers = sampler_cfg['quantlib_samplers']
+
+    all_pairs = [("QuantLib", s) for s in ql_samplers] + [("QMCPy", s) for s in qmcpy_samplers]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    for method, sampler in all_pairs:
+        if sweep_type == "paths":
+            x_vals, mean_errors = compute_mae_vs_paths(
+                method, sampler, replications)
+        else: # steps 
+            x_vals, mean_errors = compute_mae_vs_steps(
+                method, sampler, replications)
+        
+        colors = styling['colors'][method]
+        markers = styling['markers'][method]
+
+        ax.loglog(
+            x_vals,
+            mean_errors,
+            marker=markers.get(sampler),
+            color=colors.get(sampler),
+            linewidth=2,
+            markersize=6,
+            label=f"{method} - {sampler}"
+        )
+
+    ax.xaxis.set_major_locator(FixedLocator(x_vals))
+    ax.xaxis.set_major_formatter(
+        FixedFormatter([str(int(x)) for x in x_vals])
+    )
+    ax.xaxis.set_minor_locator(FixedLocator([]))
+
+    
+    if sweep_type == "paths":
+        ax.set_xlabel("Number of Paths", fontsize=12, fontweight='bold')
+        ax.set_title(
+            f"MAE vs Number of Paths across {replications} replications (n_steps = 252)",
+            fontsize=14,
+            fontweight='bold'
+        )
+    else:
+        ax.set_xlabel("Number of Steps", fontsize=12, fontweight='bold')
+        ax.set_title(
+            f"MAE vs Number of Time Steps across {replications} replications (n_paths = 4,096)",
+            fontsize=14,
+            fontweight='bold'
+        )
+
+    ax.set_ylabel("Mean Absolute Error", fontsize=12, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=10)
+
+    plt.show()
+
+
+def plot_mae_vs_paths(replications: int = 5) -> None:
+    """
+    Plot averaged MAE vs number of paths for all samplers.
+    
+    Visualizes how the Mean Absolute Error of the mean estimator decreases
+    as the number of paths increases, comparing different sampling methods
+    from both QMCPy and QuantLib.
+    
+    Args:
+        replications: Number of independent replications to average over (default: 5)
+    """
+    _plot_mae("paths", replications)
+
 def plot_mae_vs_steps(replications: int = 5) -> None:
     """
     Plot averaged MAE vs number of time steps for all samplers.
@@ -224,42 +261,7 @@ def plot_mae_vs_steps(replications: int = 5) -> None:
     Args:
         replications: Number of independent replications to average over (default: 5)
     """
-    styling = pu.get_plot_styling()
-    sampler_cfg = cf.get_sampler_configurations()
-    qmcpy_samplers = sampler_cfg['all_samplers']
-    ql_samplers = sampler_cfg['quantlib_samplers']
-
-    all_pairs = [("QuantLib", s) for s in ql_samplers] + [("QMCPy", s) for s in qmcpy_samplers]
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    for method, sampler in all_pairs:
-        n_steps_range, mean_errors = compute_mae_vs_steps(method, sampler, replications)
-
-        colors = styling['colors'][method]
-        markers = styling['markers'][method]
-
-        ax.loglog(
-            n_steps_range,
-            mean_errors,
-            marker=markers.get(sampler),
-            color=colors.get(sampler),
-            linewidth=2,
-            markersize=6,
-            label=f"{method} - {sampler}"
-        )
-
-    ax.xaxis.set_major_locator(FixedLocator(n_steps_range))
-    ax.xaxis.set_major_formatter(FixedFormatter([str(int(x)) for x in n_steps_range]))
-    ax.xaxis.set_minor_locator(FixedLocator([]))
-
-    ax.set_xlabel("Number of Steps", fontsize=12, fontweight='bold')
-    ax.set_ylabel("Mean Absolute Error", fontsize=12, fontweight='bold')
-    ax.set_title(f"MAE vs Number of Time Steps across {replications} replications (n_paths = 4,096)",
-                 fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=10)
-    plt.show();
-
+    _plot_mae("steps", replications)
 
 def update_sweep_df(df: pd.DataFrame, replications: int = 5) -> pd.DataFrame:
     """
