@@ -7,12 +7,10 @@
 4. Update visualizations in the demo with all QMC samplers and risk categories --- DONE
 5. Implement a more optimal simplex transformation for low-discrepancy sequences --- TODO
 6. Utilize QMCPy's `replications` parameter for averaged results --- TODO
-7. Make a function for collecting data (?) --- TODO
+7. Make a function for collecting data (?) --- DONE (`evaluate_sampler_sharpe`)
 8. Update start_date and end_date --- DONE
 9. Save price datasets to `data` folder --- DONE
-10. Save figures as .png in `images` --- TODO
+10. Save figures as .png in `images` --- DONE
 11. Clean up demo --- TODO
 12. Add references to the demo --- TODO
 13. Update poster in Overleaf --- TODO
-    
-
