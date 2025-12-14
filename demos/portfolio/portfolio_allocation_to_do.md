@@ -11,7 +11,7 @@
 8. Update start_date and end_date --- DONE
 9.  Save price datasets to `data` folder --- DONE
 10. Save figures as .png in `images` --- DONE
-11. Use same colors for same samplers across all visualizations --- TODO
+11. Use same colors for same samplers across all visualizations --- DONE
 12. Clean up demo --- TODO
 13. Add references to the demo --- TODO
 14. Update poster in Overleaf --- TODO
