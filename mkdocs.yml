@@ -57,6 +57,7 @@ nav:
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - GBM Examples: demos/GBM/examples.ipynb
+      - Portfolio Allocation: demos/portfolio/portfolio_allocation_demo.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
