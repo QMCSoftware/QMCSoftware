@@ -5,6 +5,9 @@ nav:
   - Contributing: CONTRIBUTING.md
   - Release: RELEASE.md
   - Community: community.md
+  - News:
+    - Releases:
+      - QMCPy v2.1: releases/QMCPy-2.1-announcement.md
   - Package Reference:
     - Discrete Distributions: api/discrete_distributions.md
     - True Measures: api/true_measures.md
