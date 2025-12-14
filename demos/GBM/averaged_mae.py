@@ -1,34 +1,49 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import quantlib_util as qlu
-import qmcpy_util_replications as qpru
+import qmcpy_util as qpu
 import config as cf
 import plot_util as pu
 from matplotlib.ticker import FixedLocator, FixedFormatter
 
-def compute_mae_vs_paths(method, sampler, replications=5, qp_seed=42, ql_seed=7):
+
+def _compute_mae(
+    method: str,
+    sampler: str,
+    sweep_type: str,
+    replications: int = 5,
+    qp_seed: int = 42,
+    ql_seed: int = 7
+) -> tuple:
     """
-    Compute averaged MAE vs number of paths for all samplers.
+    Compute averaged MAE for a given sweep type (paths or steps).
     
-    This computes the Mean Absolute Error (MAE) of the MEAN ESTIMATOR, defined as:
+    This is the unified internal function that computes Mean Absolute Error (MAE)
+    of the MEAN ESTIMATOR, defined as:
         MAE = E[|mean(paths) - theoretical_mean|]
-    where the expectation is taken over replications. This measures how accurately
-    the (quasi) Monte Carlo mean estimator approximates the true theoretical mean.
+    where the expectation is taken over replications.
     
     Args:
         method: Either "QMCPy" or "QuantLib"
         sampler: Sampler type (e.g., 'IIDStdUniform', 'Sobol', 'Lattice', 'Halton')
+        sweep_type: Either "paths" (sweep n_paths) or "steps" (sweep n_steps)
         replications: Number of independent replications to average over
         qp_seed: Random seed for QMCPy samplers
         ql_seed: Random seed for QuantLib samplers
         
     Returns:
-        tuple: (n_paths_range, mean_errors) - path counts and corresponding MAEs
+        tuple: (sweep_range, mean_errors) - sweep values and corresponding MAEs
     """
     # Experiment configuration
-    exp_cfg = cf.get_experiment_configurations()['paths']
-    n_paths_range = exp_cfg['range']
-    n_steps = exp_cfg['fixed_steps']
+    exp_cfg = cf.get_experiment_configurations()[sweep_type if sweep_type == "paths" else "time_steps"]
+    sweep_range = exp_cfg['range']
+    
+    # Determine fixed parameter based on sweep type
+    if sweep_type == "paths":
+        fixed_steps = exp_cfg['fixed_steps']
+    else:  # steps
+        fixed_paths = exp_cfg['fixed_paths']
 
     # GBM parameters
     gbm_params = cf.get_gbm_parameters()
@@ -43,10 +58,18 @@ def compute_mae_vs_paths(method, sampler, replications=5, qp_seed=42, ql_seed=7)
 
     mean_errors = []
 
-    for n_paths in n_paths_range:
+    for sweep_val in sweep_range:
+        # Set n_paths and n_steps based on sweep type
+        if sweep_type == "paths":
+            n_paths = sweep_val
+            n_steps = fixed_steps
+        else:
+            n_paths = fixed_paths
+            n_steps = sweep_val
+
         if method == "QMCPy":
             seed = qp_seed
-            paths, _ = qpru.generate_qmcpy_paths(
+            paths, _ = qpu.generate_qmcpy_paths(
                 initial_value=initial_value,
                 mu=mu,
                 diffusion=diffusion,
@@ -83,10 +106,38 @@ def compute_mae_vs_paths(method, sampler, replications=5, qp_seed=42, ql_seed=7)
 
         mean_errors.append(errors.mean())
 
-    return n_paths_range, mean_errors
+    return sweep_range, mean_errors
 
 
-def plot_mae_vs_paths(replications=5):
+def compute_mae_vs_paths(
+    method: str,
+    sampler: str,
+    replications: int = 5,
+    qp_seed: int = 42,
+    ql_seed: int = 7
+) -> tuple:
+    """
+    Compute averaged MAE vs number of paths for all samplers.
+    
+    This computes the Mean Absolute Error (MAE) of the MEAN ESTIMATOR, defined as:
+        MAE = E[|mean(paths) - theoretical_mean|]
+    where the expectation is taken over replications. This measures how accurately
+    the (quasi) Monte Carlo mean estimator approximates the true theoretical mean.
+    
+    Args:
+        method: Either "QMCPy" or "QuantLib"
+        sampler: Sampler type (e.g., 'IIDStdUniform', 'Sobol', 'Lattice', 'Halton')
+        replications: Number of independent replications to average over
+        qp_seed: Random seed for QMCPy samplers
+        ql_seed: Random seed for QuantLib samplers
+        
+    Returns:
+        tuple: (n_paths_range, mean_errors) - path counts and corresponding MAEs
+    """
+    return _compute_mae(method, sampler, "paths", replications, qp_seed, ql_seed)
+
+
+def plot_mae_vs_paths(replications: int = 5) -> None:
     """
     Plot averaged MAE vs number of paths for all samplers.
     
@@ -133,7 +184,13 @@ def plot_mae_vs_paths(replications=5):
     ax.legend(fontsize=10)
     plt.show();
 
-def compute_mae_vs_steps(method, sampler, replications=5, qp_seed=42, ql_seed=7):
+def compute_mae_vs_steps(
+    method: str,
+    sampler: str,
+    replications: int = 5,
+    qp_seed: int = 42,
+    ql_seed: int = 7
+) -> tuple:
     """
     Compute averaged MAE vs number of time steps for all samplers.
     
@@ -153,64 +210,10 @@ def compute_mae_vs_steps(method, sampler, replications=5, qp_seed=42, ql_seed=7)
     Returns:
         tuple: (n_steps_range, mean_errors) - step counts and corresponding MAEs
     """
-    # Experiment configuration
-    exp_cfg = cf.get_experiment_configurations()['time_steps']
-    n_steps_range = exp_cfg['range']
-    n_paths = exp_cfg['fixed_paths']  # fixed number of paths
-
-    # GBM parameters
-    gbm_params = cf.get_gbm_parameters()
-    initial_value = gbm_params['initial_value']
-    mu = gbm_params['mu']
-    sigma = gbm_params['sigma']
-    diffusion = sigma**2
-    maturity = gbm_params['maturity']
-
-    # Pre-compute theoretical mean (constant across all iterations)
-    theoretical_mean = initial_value * np.exp(mu * maturity)
-
-    mean_errors = []
-
-    for n_steps in n_steps_range:
-        if method == "QMCPy":
-            paths, _ = qpru.generate_qmcpy_paths(
-                initial_value=initial_value,
-                mu=mu,
-                diffusion=diffusion,
-                maturity=maturity,
-                n_steps=n_steps,
-                n_paths=n_paths,
-                sampler_type=sampler,
-                replications=replications
-            )
-            final_vals = paths[:, :, -1]  
-            errors = np.abs(final_vals.mean(axis=1) - theoretical_mean)
-
-        elif method == "QuantLib":
-            # Pre-allocate array for better performance
-            errors = np.empty(replications)
-            for r in range(replications):
-                seed = ql_seed + r
-                paths, _ = qlu.generate_quantlib_paths(
-                    initial_value=initial_value,
-                    mu=mu,
-                    sigma=sigma,
-                    maturity=maturity,
-                    n_steps=n_steps,
-                    n_paths=n_paths,
-                    sampler_type=sampler,
-                    seed=seed
-                )
-                # Vectorized operations
-                final_vals = paths[:, -1]
-                errors[r] = np.abs(final_vals.mean() - theoretical_mean)
-
-        mean_errors.append(errors.mean())
-
-    return n_steps_range, mean_errors
+    return _compute_mae(method, sampler, "steps", replications, qp_seed, ql_seed)
 
 
-def plot_mae_vs_steps(replications=5):
+def plot_mae_vs_steps(replications: int = 5) -> None:
     """
     Plot averaged MAE vs number of time steps for all samplers.
     
@@ -255,10 +258,10 @@ def plot_mae_vs_steps(replications=5):
                  fontsize=14, fontweight='bold')
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=10)
-    plt.show()
+    plt.show();
 
 
-def update_sweep_df(df, replications=5):
+def update_sweep_df(df: pd.DataFrame, replications: int = 5) -> pd.DataFrame:
     """
     Update DataFrame with averaged MAE values across replications.
     
