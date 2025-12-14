@@ -8,6 +8,7 @@ on:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
       - 'tests/booktests/**.py'
+      - 'pyproject.toml'
   pull_request:
     branches:
       - master
@@ -16,6 +17,7 @@ on:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
       - 'tests/booktests/**.py'
+      - 'pyproject.toml'
 
 jobs:
   booktests:
