@@ -3,16 +3,14 @@ Individual notebook test modules using testbook.
 Each tb_*.py file tests a single demo notebook.
 """
 import unittest, gc
-
-TB_TIMEOUT = 3600
-
-import subprocess
-subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
-
 import psutil
 import gc
 import time
 import os
+import subprocess
+
+TB_TIMEOUT = 3600
+subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
 
 class BaseNotebookTest(unittest.TestCase):
     """Base class for notebook tests with automatic memory cleanup"""
@@ -44,34 +42,17 @@ class BaseNotebookTest(unittest.TestCase):
         notebook_path = os.path.abspath(notebook_path)
         return notebook_path, os.path.dirname(notebook_path)
 
-    def fix_gbm_symlinks(self, notebook_dir):
-        """Fix or create symlinks inside a GBM demo notebook directory."""
-        code_dir = os.path.join(notebook_dir, 'gbm_code')
-        symlinks_to_fix = ['config.py', 'data_util.py', 'latex_util.py', 'plot_util.py', 
-                          'qmcpy_util.py', 'quantlib_util.py']
+    def execute_notebook_file(self, notebook_path, timeout=TB_TIMEOUT):
+        """Execute a notebook file using nbconvert's ExecutePreprocessor."""
+        import nbformat
+        from nbconvert.preprocessors import ExecutePreprocessor
 
-        for module in symlinks_to_fix:
-            symlink_path = os.path.join(notebook_dir, module)
-            target_path = os.path.join(code_dir, module)
+        with open(notebook_path) as f:
+            nb = nbformat.read(f, as_version=4)
 
-            if os.path.islink(symlink_path):
-                link_target = os.readlink(symlink_path)
-                if link_target.startswith('code/') or not os.path.exists(symlink_path):
-                    os.remove(symlink_path)
-                    os.symlink(f'gbm_code/{module}', symlink_path)
-            elif not os.path.exists(symlink_path) and os.path.exists(target_path):
-                os.symlink(f'gbm_code/{module}', symlink_path)
+        ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
 
-    def run_notebook(self, notebook_path, notebook_dir, timeout=TB_TIMEOUT):
-        """Execute a notebook using testbook from its directory."""
-        from testbook import testbook
-
-        original_dir = os.getcwd()
         try:
-            os.chdir(notebook_dir)
-            with testbook(os.path.basename(notebook_path), execute=True, timeout=timeout):
-                pass
-        finally:
-            os.chdir(original_dir)
-
- 
+            ep.preprocess(nb, {'metadata': {'path': os.path.dirname(notebook_path)}})
+        except Exception as e:
+            raise RuntimeError(f"Error executing the notebook {notebook_path}: {e}")
