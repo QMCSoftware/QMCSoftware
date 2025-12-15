@@ -9,7 +9,10 @@ In order to publish a release, you will need to have an account on the two websi
 - https://pypi.org
 - https://test.pypi.org
 
-Note: These accounts will be different from each other. PyPI is the standard Python package index where users can `pip install qmcpy` from. TestPyPI is a separate package index meant for developers to test their release before publishing on the actual PyPI. In order to release `qmcpy`, you will need to contact Aleksei to request access to the actual `qmcpy` project on both websites.
+Notes:
+
+- These accounts will be different from each other. PyPI is the standard Python package index where users can `pip install qmcpy` from. TestPyPI is a separate package index meant for developers to test their release before publishing on the actual PyPI. In order to release `qmcpy`, you will need to contact Aleksei to request access to the actual `qmcpy` project on both websites.
+- When setting up your PyPi account, please have another team member invite you as a collaborator. However, you will need to have two factor authentication (2FA) setup for your account before you can be added. We will not go over the steps on setting up 2FA as that depends on the vendor and method (mobile app or security key) you choose. Please research on the setup procedure for the 2FA vendor and method you pick. Some common 2FA authenticators you can install on your smartphone include Google Authenticator and Microsoft Authenticator.
 
 Please setup and save your PyPI and TestPyPI API keys (do not commit to a public git repo). They should look something like the following 
 
