@@ -3,12 +3,12 @@ import sys
 import unittest
 from testbook import testbook
 
-        self.notebook_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../demos/GBM/'))
 class NotebookTests(unittest.TestCase):
     
     def test_gbm_examples_notebook(self):
         # Find the notebook path
         notebook_path = '../../demos/GBM/gbm_examples.ipynb'
+        
         if not os.path.exists(notebook_path):
             self.skipTest(f"Notebook not found at {notebook_path}")
         
