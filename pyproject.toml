@@ -82,6 +82,7 @@ test = [
     "yfinance >= 0.2.0",
     "quantlib == 1.38",
     "ipywidgets == 8.1.7",
+    "nbconvert >= 7.2.9",
     ]
 test_torch = [
     "torch >= 2.7.0",
