@@ -13,6 +13,7 @@ def fix_gbm_symlinks(notebook_dir):
         target_path = os.path.join(code_dir, module)
 
         if os.path.islink(symlink_path):
+            link_target = os.readlink(symlink_path)
             if link_target.startswith('code/') or not os.path.exists(symlink_path):
                 os.remove(symlink_path)
                 os.symlink(f'gbm_code/{module}', symlink_path)
