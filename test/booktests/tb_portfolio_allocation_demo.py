@@ -14,13 +14,17 @@ class NotebookTests(BaseNotebookTest):
     (500, 2**18),   
     (1000, 2**19)   
 ]""",
-            "n_ports = [2**13, 2**14, 2**15]"
+            "n_ports = [2**13, 2**14, 2**15]",
+            "start_date = '2014-01-01'", 
+            "dimensions = [5, 10, 20, 50, 100, 200, 500, 1000]",
         ]
         new_value = [
             """params = [
     (4, 2**7),     
     (10, 2**8)]""",
-            "n_ports = [2**7, 2**8]"
+            "n_ports = [2**7, 2**8]",
+            "start_date = '2025-01-01'", 
+            "dimensions = [5, 10]"
         ]
         run_notebook(notebook_path, notebook_dir, change_value=True, 
                      value=value, new_value=new_value, timeout=TB_TIMEOUT)
