@@ -9,3 +9,4 @@
 7. Add type hints to key functions --- DONE
 8. Update online blog in Overleaf and `qmcpy.org` --- TODO
 9. Prepare for PyData Chicago talk (title, abstract, speaker bio, and slides) --- TODO
+10. Fix tb_gbm_demo.py --- TODO
