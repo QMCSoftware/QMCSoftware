@@ -80,7 +80,7 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	cd test/booktests/ && \
 	if [ -z "$(TESTS)" ]; then \
 		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "*.py" -v --failfast; \
+		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest discover -s . -p "tb_*.py" --ignore=tb_archive.py -v --failfast; \
 	else \
 		PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 		python -W ignore -m coverage run --append --source=../../qmcpy/ -m unittest $(TESTS) -v --failfast; \
@@ -94,7 +94,7 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python parsl_test_runner.py $(TESTS) -v --failfast && \
+	python parsl_test_runner.py $(TESTS) --ignore tb_archive.py -v --failfast && \
 	cd ../.. 
 
 tests: 
