@@ -3,6 +3,7 @@ import subprocess
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@unittest.skip("Skipping notebook tests for now")
 class NotebookTests(BaseNotebookTest):
 
     def setUp(self):

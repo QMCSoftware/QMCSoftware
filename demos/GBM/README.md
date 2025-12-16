@@ -6,7 +6,7 @@ This directory contains implementations and demonstrations of Geometric Brownian
 
 - **`images/`** - Generated plots and figures saved as PNG files
 - **`outputs/`** - Output data files and results
-- **`code/`** - Additional code and utilities
+- **`gbm_code/`** - Additional code and utilities
 
 ## Files
 
