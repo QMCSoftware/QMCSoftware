@@ -3,15 +3,14 @@ Individual notebook test modules using testbook.
 Each tb_*.py file tests a single demo notebook.
 """
 import unittest, gc
-
-TB_TIMEOUT = 3600
-
-import subprocess
-subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
-
 import psutil
 import gc
 import time
+import os
+import subprocess
+
+TB_TIMEOUT = 3600
+subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
 
 class BaseNotebookTest(unittest.TestCase):
     """Base class for notebook tests with automatic memory cleanup"""
@@ -34,4 +33,26 @@ class BaseNotebookTest(unittest.TestCase):
         print(f"    Memory used: {self.memory_gb:.2f} GB.  Test time: {end_time - self.start_time:.2f} s")
         gc.collect()
 
- 
+    # -- Shared helpers for notebook tests -------------------------------------------------
+    def locate_notebook(self, rel_path):
+        """Return absolute notebook path and its directory. Skip test if missing."""
+        notebook_path = os.path.join(os.path.dirname(__file__), rel_path)
+        if not os.path.exists(notebook_path):
+            self.skipTest(f"Notebook not found at {notebook_path}")
+        notebook_path = os.path.abspath(notebook_path)
+        return notebook_path, os.path.dirname(notebook_path)
+
+    def execute_notebook_file(self, notebook_path, timeout=TB_TIMEOUT):
+        """Execute a notebook file using nbconvert's ExecutePreprocessor."""
+        import nbformat
+        from nbconvert.preprocessors import ExecutePreprocessor
+
+        with open(notebook_path) as f:
+            nb = nbformat.read(f, as_version=4)
+
+        ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
+
+        try:
+            ep.preprocess(nb, {'metadata': {'path': os.path.dirname(notebook_path)}})
+        except Exception as e:
+            raise RuntimeError(f"Error executing the notebook {notebook_path}: {e}")

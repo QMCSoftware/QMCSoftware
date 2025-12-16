@@ -97,7 +97,7 @@ jobs:
           brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
-          sudo tlmgr install latexmk dvipng collection-fontsrecommended
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
 
       - name: Check for missing booktest files
         run: make check_booktests
