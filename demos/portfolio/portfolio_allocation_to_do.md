@@ -1,6 +1,6 @@
 # QMCPy 2.2 Portfolio allocation to-do
 
-0. What are the differences between the two notebooks in `demos/portfolio`?
+0. What are the differences between the two notebooks in `demos/portfolio`? Keep `portfolio_allocation_demo` and merge content from `archive.ipynb` into it if necessary. Afterwards, delete `archive.ipynb`. --- TODO 
 1. Add Sobol and Halton samplers for weights generation in the demo --- DONE
 2. Add more text in Markdown cells before code cells to the demo --- TODO
 3. . Create a single function to generate weights for all sampler types --- DONE. See `gen_weights*()`.
@@ -12,6 +12,8 @@
 9.  Save price datasets to `data` folder --- DONE
 10. Save figures as .png in `images` --- DONE
 11. Use same colors for same samplers across all visualizations --- DONE
-12. Clean up demo --- TODO
-13. Add references to the demo --- TODO
-14. Update poster in Overleaf --- TODO
+12. Use white background for all visualizations --- TODO
+13. Stopping checking in .png or binary files into repository --- TODO
+14. Clean up demo --- TODO
+15. Add references to the demo --- TODO
+16. Update poster in Overleaf --- TODO
