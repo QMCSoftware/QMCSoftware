@@ -33,21 +33,16 @@ class GeometricBrownianMotion(BrownianMotion):
 
     def __init__(self, sampler, t_final=1, initial_value=1, drift=0, diffusion=1, decomp_type='PCA', 
                  lazy_load=True, lazy_decomp=True):
-        """
-        GeometricBrownianMotion(t) = initial_value * exp[(drift - 0.5 * diffusion) * t
-                                                         + \\sqrt{diffusion} * StandardBrownianMotion(t)]
-
+        r"""
         Args:
             sampler (DiscreteDistribution/TrueMeasure): A discrete distribution or true measure.
             t_final (float): End time for the geometric Brownian motion, non-negative.
             initial_value (float): Positive initial value of the process, $S_0$.
             drift (float): Drift coefficient $\gamma$.
-            diffusion (float): Positive diffusion coefficient $\sigma^2$.
+            diffusion (float): Positive diffusion coefficient $\sigma^2$, where $\sigma$ is volatility.
             decomp_type (str): Method of decomposition, either "PCA" or "Cholesky".
             lazy_load (bool): If True, defer GBM-specific computations until needed.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
-        
-        Note: diffusion is $\sigma^2$, where $\sigma$ is volatility. 
         """
         super().__init__(sampler, t_final=t_final, drift=0, diffusion=diffusion, 
                         decomp_type=decomp_type, lazy_decomp=lazy_decomp)
