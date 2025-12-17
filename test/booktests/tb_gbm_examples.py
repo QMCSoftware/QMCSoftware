@@ -1,7 +1,5 @@
-import unittest, os
-from testbook import testbook
+import unittest
 from __init__ import TB_TIMEOUT, BaseNotebookTest
-import nbformat
 
 
 class NotebookTests(BaseNotebookTest):
