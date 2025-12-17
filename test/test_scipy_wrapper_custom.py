@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 import scipy.stats as stats
 
@@ -172,3 +173,81 @@ def test_zero_inflated_zero_rate():
     zero_rate = np.mean(x == 0.0)
 
     assert abs(zero_rate - p_zero) < 0.05
+
+
+def test_student_t_marginals_shape():
+    tm = SciPyWrapper(
+        sampler=DigitalNetB2(2, seed=5),
+        scipy_distribs=stats.t(df=5),
+    )
+    x = tm(8)
+    assert x.shape == (8, 2)
+
+
+def test_multivariate_student_t_joint_corr_and_cov():
+    if not hasattr(stats, "multivariate_t"):
+        pytest.skip("scipy.stats.multivariate_t not available in this SciPy version")
+
+    class MultivariateStudentTJoint:
+        def __init__(self, loc, shape, df):
+            self.loc = np.asarray(loc, float)
+            self.shape = np.asarray(shape, float)
+            self.df = float(df)
+            if self.loc.ndim != 1:
+                raise ParameterError("loc must be 1D")
+            if self.shape.shape != (self.loc.size, self.loc.size):
+                raise DimensionError("shape must match loc dimension")
+            self.dim = self.loc.size
+            self._rv = stats.multivariate_t(loc=self.loc, shape=self.shape, df=self.df)
+
+        def transform(self, u):
+            # reuse your demo logic here, or import it if you moved it into a shared module
+            u = np.clip(np.asarray(u, float), np.finfo(float).eps, 1 - np.finfo(float).eps)
+            uu = u.reshape(-1, self.dim)
+            x = np.empty_like(uu)
+
+            x[:, 0] = stats.t.ppf(uu[:, 0], df=self.df, loc=self.loc[0], scale=np.sqrt(self.shape[0, 0]))
+            for i in range(1, self.dim):
+                A = slice(0, i)
+                mu_A = self.loc[A]
+                mu_B = self.loc[i]
+                Sigma_AA = self.shape[A, A]
+                Sigma_BA = self.shape[i, A]
+                Sigma_AB = self.shape[A, i]
+                Sigma_BB = self.shape[i, i]
+
+                x_A = x[:, A]
+                diff = x_A - mu_A
+                sol = np.linalg.solve(Sigma_AA, diff.T).T
+                d_A = np.sum(diff * sol, axis=1)
+
+                mu_cond = mu_B + sol @ Sigma_BA
+                schur = Sigma_BB - Sigma_BA @ np.linalg.solve(Sigma_AA, Sigma_AB)
+
+                df_cond = self.df + i
+                shape_cond = (self.df + d_A) / (self.df + i) * schur
+
+                x[:, i] = stats.t.ppf(uu[:, i], df=df_cond, loc=mu_cond, scale=np.sqrt(shape_cond))
+
+            return x.reshape(*u.shape[:-1], self.dim)
+
+        def logpdf(self, x):
+            x = np.asarray(x, float).reshape(-1, self.dim)
+            return self._rv.logpdf(x)
+
+    df = 5.0
+    rho = 0.8
+    loc = np.array([0.0, 0.0])
+    shape = np.array([[1.0, rho], [rho, 1.0]])
+
+    joint = MultivariateStudentTJoint(loc, shape, df)
+    tm = SciPyWrapper(DigitalNetB2(2, seed=123), joint)
+
+    n = 4096
+    x = tm(n)
+    emp_corr = np.corrcoef(x.T)[0, 1]
+
+    # corr should be close to rho
+    assert abs(emp_corr - rho) < 0.05
+
+

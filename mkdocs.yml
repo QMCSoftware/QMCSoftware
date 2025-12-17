@@ -62,6 +62,9 @@ nav:
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
   - Printable Docs: print_page/
+  - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
+  - SciPyWrapper blog: demos/scipywrapper_dependence_custom/blog.md
+
 
 plugins:
   - search

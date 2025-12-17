@@ -19,18 +19,19 @@ From the top level of the QMCSoftware repo, the pieces for this project are:
   - support for user defined univariate distributions that look like frozen SciPy objects,
   - light weight validation that warns when a custom distribution looks suspicious.
 
-- `demos/scipy_wrapper_dependence_custom/scipywrapper_dependence_custom.ipynb`  
+- `demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb`  
   Jupyter notebook that produces all figures and printed statistics used in the blog:
   - Example 1: independent vs dependent normals,
   - Example 2: zero inflated exponential plus uniform,
   - Example 3: acceptance rejection target with iid MC and with QMC,
   - Example 4: custom triangular marginal,
-  - Example 5: intentionally broken custom distribution to show the warnings.
+  - Example 5: intentionally broken custom distribution to show the warnings,
+  - Example 6: multivariate Student t (joint, dependent) using SciPy’s multivariate t.
 
-- `demos/scipy_wrapper_dependence_custom/README.md`  
+- `demos/scipywrapper_dependence_custom/README.md`  
   This file.
 
-- `demos/scipy_wrapper_dependence_custom/scipywrapper_dependence_custom_blog.md`  
+- `demos/scipywrapper_dependence_custom/blog.md`  
   Draft of the blog describing the project at a higher level.
 
 - `test/test_scipy_wrapper_custom.py`  
@@ -64,8 +65,8 @@ That example is only used for sampling and visualisation so weights are intentio
 3. Open the notebook
 
     ```bash
-    cd demos/scipy_wrapper_dependence_custom
-    jupyter notebook scipywrapper_dependence_custom.ipynb
+    cd demos/scipywrapper_dependence_custom
+    jupyter notebook scipywrapper_demo.ipynb
     ```
 Run all cells from top to bottom.
 You will see:
@@ -73,7 +74,8 @@ You will see:
 - histograms and scatter plots for the zero inflated exponential plus uniform joint,
 - acceptance rejection clouds for iid MC and QMC on the same triangular target,
 - a histogram of the custom triangular marginal overlaid with its analytic pdf,
-- console output with warnings for the intentionally broken custom distribution.
+- console output with warnings for the intentionally broken custom distribution,
+- a marginal histogram and joint scatter plot for a dependent multivariate Student t, along with printed checks for correlation and the theoretical covariance relationship.
 
 These are the same figures that the blog refers to.
 
@@ -115,7 +117,7 @@ If it sees that the CDF is not increasing or the density does not look normalise
 
 ---
 
-## Notes for reviewers
+## Notes
 - The behaviour for the original use case (lists of SciPy univariate frozen distributions) is unchanged.
 - Dependence is introduced only when the user passes a joint distribution object.
 - Validation is kept intentionally light so that advanced users can still experiment, but beginners are warned when their custom distributions are clearly broken.

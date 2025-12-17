@@ -1,6 +1,8 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
-from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 import scipy.stats
@@ -10,19 +12,19 @@ import warnings
 class _MVNAdapter:
     """
     Small adapter that turns a SciPy multivariate normal like object into
-    something with a simple "transform(u)" interface.
+    something with a simple ``transform(u)`` interface.
 
     Idea:
       1. Start from u in (0,1)^d.
-      2. Map to standard normals z via norm.ppf.
-      3. Apply a Cholesky factor to inject the correlation structure.
+      2. Map to standard normals z via ``norm.ppf``.
+      3. Apply Cholesky to inject the correlation structure.
     """
 
     def __init__(self, mvn_like):
-        # Keep the original object so we can still call logpdf later.
+        # Keep the original object around so that we can still call logpdf.
         self._mvn = mvn_like
 
-        # SciPy's multivariate_normal has attributes "mean" and "cov".
+        # SciPy's multivariate_normal has attributes ``mean`` and ``cov``.
         mean = np.asarray(mvn_like.mean)
         cov = np.asarray(mvn_like.cov)
 
@@ -61,7 +63,7 @@ class _MVNAdapter:
         # Map to i.i.d. standard normals.
         z = scipy.stats.norm.ppf(u_clip)
 
-        # Flatten, apply Cholesky, then reshape back.
+        # Flatten, apply Cholesky, then reshape back to original shape.
         z_flat = z.reshape(-1, self.dim)
         x_flat = z_flat @ self._chol.T + self._mean
         return x_flat.reshape(z.shape)
@@ -85,102 +87,48 @@ class SciPyWrapper(AbstractTrueMeasure):
     r"""
     True measure that wraps SciPy style distributions.
 
-    It supports two main modes:
+    This class keeps the original behaviour of SciPyWrapper with
+    independent 1D marginals and adds an optional "joint" mode for
+    dependent distributions.
 
-      1. Independent marginals (original behavior):
-         - You pass a single 1D SciPy frozen distribution, or a list of them.
-         - Each dimension is transformed independently via ppf.
+    Examples:
+        Independent marginals from ``scipy.stats``:
 
-      2. Joint distributions with dependence (new behavior):
-         - You pass a single "joint" object with a method transform(u).
-         - The transform takes u in (0,1)^d and returns x in R^d.
-         - Optional logpdf(x) lets us define weights.
+        >>> from qmcpy.discrete_distribution import DigitalNetB2
+        >>> import scipy.stats as stats
+        >>> tm = SciPyWrapper(
+        ...     sampler=DigitalNetB2(3, seed=7),
+        ...     scipy_distribs=[
+        ...         stats.uniform(loc=1, scale=2),
+        ...         stats.norm(loc=0, scale=1),
+        ...         stats.gamma(a=5, loc=0, scale=2)])
+        >>> x = tm(2)
+        >>> x.shape
+        (2, 3)
 
-    We also support user defined custom distributions that look SciPy like:
-    anything with ppf and pdf or logpdf can be plugged in. For custom
-    distributions that are not native SciPy frozen distributions, we emit
-    a warning and run light sanity checks so the user knows to double
-    check their implementation.
+        Joint multivariate normal passed as a single object:
 
-    ------------------------------------------------------------------------
-    Examples: independent marginals from scipy.stats
-    ------------------------------------------------------------------------
+        >>> mvn = stats.multivariate_normal(
+        ...     mean=[0.0, 0.0],
+        ...     cov=[[1.0, 0.8], [0.8, 1.0]])
+        >>> tm_joint = SciPyWrapper(DigitalNetB2(2, seed=7), mvn)
+        >>> tm_joint(2).shape
+        (2, 2)
+        
 
-    Examples
-    --------
-    Independent marginals with three different SciPy frozen distributions:
+        2D Student t distribution (independent marginals):
 
-    >>> true_measure = SciPyWrapper(
-    ...     sampler = DigitalNetB2(3, seed=7),
-    ...     scipy_distribs = [
-    ...         scipy.stats.uniform(loc=1, scale=2),
-    ...         scipy.stats.norm(loc=3, scale=4),
-    ...         scipy.stats.gamma(a=5, loc=6, scale=7)])
-    >>> true_measure.range
-    array([[  1.,   3.],
-           [-inf,  inf],
-           [  6.,  inf]])
-    >>> true_measure(4).shape
-    (4, 3)
-
-    A single SciPy frozen distribution broadcast across all dimensions:
-
-    >>> true_measure = SciPyWrapper(
-    ...     sampler=DigitalNetB2(2, seed=7),
-    ...     scipy_distribs=scipy.stats.beta(a=5, b=1))
-    >>> true_measure(4).shape
-    (4, 2)
-
-    With independent replications:
-
-    >>> x = SciPyWrapper(
-    ...     sampler = DigitalNetB2(3, seed=7, replications=2),
-    ...     scipy_distribs = [
-    ...         scipy.stats.uniform(loc=1, scale=2),
-    ...         scipy.stats.norm(loc=3, scale=4),
-    ...         scipy.stats.gamma(a=5, loc=6, scale=7)])(4)
-    >>> x.shape
-    (2, 4, 3)
-
-    ------------------------------------------------------------------------
-    Example: dependent joint distribution via multivariate normal
-    ------------------------------------------------------------------------
-
-    Treat a SciPy multivariate normal as a joint object, so the two
-    coordinates are correlated:
-
-    >>> mvn = scipy.stats.multivariate_normal(
-    ...     mean=[0.0, 0.0],
-    ...     cov=[[1.0, 0.8],
-    ...          [0.8, 1.0]])
-    >>> tm_joint = SciPyWrapper(
-    ...     sampler=DigitalNetB2(2, seed=13),
-    ...     scipy_distribs=mvn)
-    >>> xs = tm_joint(1000)
-    >>> xs.shape
-    (1000, 2)
-
-    ------------------------------------------------------------------------
-    Example: custom SciPy style univariate distribution
-    ------------------------------------------------------------------------
-
-    You can also plug in your own SciPy style distribution with ppf and pdf.
-    Here we mimic a triangular distribution in SciPy's parameterisation:
-
-    >>> class SimpleTriangular:
-    ...     def __init__(self, c=0.5, loc=0.0, scale=1.0):
-    ...         self.c, self.loc, self.scale = c, loc, scale
-    ...         self._base = scipy.stats.triang(c, loc=loc, scale=scale)
-    ...     def ppf(self, u):
-    ...         return self._base.ppf(u)
-    ...     def pdf(self, x):
-    ...         return self._base.pdf(x)
-    >>> tri_tm = SciPyWrapper(
-    ...     sampler=DigitalNetB2(1, seed=5),
-    ...     scipy_distribs=SimpleTriangular(c=0.3, loc=-1.0, scale=2.0))
-    >>> tri_samples = tri_tm(4)
-    >>> tri_samples.shape
-    (4, 1)
+        >>> df = 5
+        >>> true_measure = SciPyWrapper(
+        ...     sampler=DigitalNetB2(2, seed=13),
+        ...     scipy_distribs=[
+        ...         scipy.stats.t(df=df, loc=0.0, scale=1.0),
+        ...         scipy.stats.t(df=df, loc=1.0, scale=2.0),
+        ...     ],
+        ... )
+        >>> xs = true_measure(4)
+        >>> xs.shape
+        (4, 2)
     """
 
     def __init__(self, sampler, scipy_distribs):
@@ -189,17 +137,17 @@ class SciPyWrapper(AbstractTrueMeasure):
         ----------
         sampler : AbstractDiscreteDistribution
             Low discrepancy or iid sampler in dimension d, living on [0,1)^d.
-
         scipy_distribs :
             One of the following:
 
             - A single SciPy 1D continuous frozen distribution.
             - A list of such frozen distributions (independent marginals).
-            - A custom 1D distribution object with "ppf" and "pdf" or "logpdf".
+            - A custom 1D distribution object with ``ppf`` and ``pdf`` or
+              ``logpdf`` methods.
             - A joint object with:
-                * transform(u) method
-                * optional logpdf(x)
-                * dim or dimension attribute (otherwise sampler.d is used).
+                * ``transform(u)`` method
+                * optional ``logpdf(x)`` method
+                * ``dim`` or ``dimension`` attribute (otherwise ``sampler.d``).
         """
         self.domain = np.array([[0.0, 1.0]])
 
@@ -209,7 +157,7 @@ class SciPyWrapper(AbstractTrueMeasure):
             )
         self._parse_sampler(sampler)
 
-        # Remember the original argument so _spawn can reuse it.
+        # Remember what the user originally passed in so that _spawn can reuse it.
         self._user_distrib_arg = scipy_distribs
 
         # Flags and holders for the two modes.
@@ -228,7 +176,7 @@ class SciPyWrapper(AbstractTrueMeasure):
         super(SciPyWrapper, self).__init__()
 
     # ------------------------------------------------------------------
-    # Helper methods to decide joint vs marginal mode
+    # Decide joint vs marginal mode
     # ------------------------------------------------------------------
 
     def _looks_like_joint(self, obj):
@@ -236,9 +184,9 @@ class SciPyWrapper(AbstractTrueMeasure):
         Heuristic check to decide if the user passed a joint distribution.
 
         We treat it as "joint" if:
-          - it already has a transform(u) method, or
+          - it already has a ``transform(u)`` method, or
           - it looks like a SciPy multivariate_normal style object:
-            has mean, cov, logpdf, and no ppf.
+            has ``mean``, ``cov``, and ``logpdf`` attributes and no ``ppf``.
         """
         if hasattr(obj, "transform") and callable(obj.transform):
             return True
@@ -258,9 +206,9 @@ class SciPyWrapper(AbstractTrueMeasure):
         """
         Configure the wrapper in "joint" mode.
 
-        Here we either:
-          - Wrap a SciPy style multivariate normal in _MVNAdapter, or
-          - Use the object directly if it already has transform(u).
+        Either:
+          - wrap a SciPy style multivariate normal in _MVNAdapter, or
+          - use the object directly if it already has ``transform(u)``.
         """
         joint = joint_obj
 
@@ -302,7 +250,7 @@ class SciPyWrapper(AbstractTrueMeasure):
                 UserWarning,
             )
 
-        # We do not know a finite support here, so just use R^d.
+        # We do not know a finite support here, so we just say R^d.
         self.range = np.tile(np.array([-np.inf, np.inf]), (self.d, 1))
 
     def _setup_marginals(self, scipy_distribs):
@@ -326,20 +274,11 @@ class SciPyWrapper(AbstractTrueMeasure):
         checked = []
         for sd in marginals:
             if isinstance(sd, rv_cont):
-                # Native SciPy frozen distribution, nothing special to say.
+                # Native SciPy frozen distribution.
                 checked.append(sd)
                 continue
 
             # Custom 1D distribution.
-            # This is not a SciPy frozen distribution, so warn the user once.
-            warnings.warn(
-                "Using a custom univariate distribution that is not a SciPy "
-                "frozen distribution. Please double check that it defines a "
-                "valid probability law (ppf and pdf/logpdf) before relying "
-                "on the results. SciPyWrapper only performs light checks.",
-                UserWarning,
-            )
-
             if not hasattr(sd, "ppf"):
                 raise ParameterError(
                     "Custom univariate distributions must implement a 'ppf' method."
@@ -351,7 +290,14 @@ class SciPyWrapper(AbstractTrueMeasure):
                     UserWarning,
                 )
 
-            # Run a small sanity check and warn if anything smells wrong.
+            warnings.warn(
+                "SciPyWrapper received a custom univariate distribution that is "
+                "not a scipy.stats frozen distribution. Please double check "
+                "that its ppf and pdf/logpdf define a valid probability law.",
+                UserWarning,
+            )
+
+            # Run a small sanity check and warn if anything looks wrong.
             self._sanity_check_univariate(sd)
             checked.append(sd)
 
@@ -388,10 +334,10 @@ class SciPyWrapper(AbstractTrueMeasure):
         The goal is not to be perfect, just to catch obvious mistakes and
         warn the user. We never raise here, only emit warnings.
 
-        We check on a coarse grid:
-          - ppf is finite and roughly increasing.
-          - pdf/logpdf is finite and non negative.
-          - The approximate integral of the pdf is close to 1.
+        We check on a grid 0.01..0.99 that:
+          - ppf is finite and roughly increasing,
+          - pdf/logpdf is finite and non negative,
+          - the approximate integral of the pdf is close to 1.
         """
         try:
             # Grid of probabilities away from the hard edges.
@@ -453,8 +399,8 @@ class SciPyWrapper(AbstractTrueMeasure):
         """
         Map unit cube samples to the physical space.
 
-        For joint mode we just delegate to the joint object.
-        For marginal mode we call ppf dimension wise.
+        For joint mode we delegate to the joint object.
+        For marginal mode we call ``ppf`` dimension wise.
         """
         x = np.asarray(x, dtype=float)
 
@@ -510,7 +456,7 @@ class SciPyWrapper(AbstractTrueMeasure):
         Create a child true measure that shares the same distribution
         configuration but uses a new sampler.
 
-        We simply reuse the original scipy_distribs argument so the
-        behaviour is identical to the parent.
+        We simply reuse the original ``scipy_distribs`` argument so the
+        behaviour matches the parent.
         """
         return SciPyWrapper(sampler, self._user_distrib_arg)
