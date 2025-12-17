@@ -78,7 +78,7 @@ class FinancialOption(AbstractIntegrand):
 
     *Lookback Call and Put Options* have respective payoffs
 
-    $$P(\boldsymbol{S}) = S_{-1}-\min(\boldsymbol{S}), \qquad P(\boldsymbol{S}) = \max(\boldsymbol{S})-S_{-1}.$$
+    $$P(\boldsymbol{S}) = S_{-1}-\min(S_0, \ldots S_{-1}), \qquad P(\boldsymbol{S}) = \max(S_0, \ldots S_{-1})-S_{-1}.$$
     
     # Digital Option 
 
