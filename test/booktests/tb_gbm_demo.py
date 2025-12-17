@@ -9,7 +9,7 @@ class NotebookTests(BaseNotebookTest):
         symlinks_to_fix = ['config.py', 'data_util.py', 'latex_util.py', 'plot_util.py', 
                             'qmcpy_util.py', 'quantlib_util.py']
         self.fix_gbm_symlinks(notebook_path, symlinks_to_fix=symlinks_to_fix)
-        # Toggle code cell [3] cf.is_debug -> True before executing
+        # Toggle code cell [3] cf.is_debug -> True, then execute
         self.change_notebook_cells(notebook_path, 
                                    replacements={"cf.is_debug = False": "cf.is_debug = True"})
         self.run_notebook(notebook_path, timeout=TB_TIMEOUT)
