@@ -423,11 +423,13 @@ class FinancialOption(AbstractIntegrand):
         v[flag] = np.maximum(self.strike_price-v[flag],0)
         return v
     
-    def payoff_lookback_call(self, gbm):
-        return gbm[...,-1]-gbm.min(-1)
+    def payoff_lookback_call(self, gbm): #incllude start price in min
+        min_path = np.minimum(gbm.min(-1), self.start_price)
+        return gbm[..., -1] - min_path
     
-    def payoff_lookback_put(self, gbm):
-        return gbm.max(-1)-gbm[...,-1]
+    def payoff_lookback_put(self, gbm): #include start price in max
+        max_path = np.maximum(gbm.max(-1), self.start_price)
+        return max_path-gbm[..., -1]
     
     def payoff_digital_call(self, gbm):
         return np.where(gbm[...,-1]>=self.strike_price,self.digital_payout,0)
