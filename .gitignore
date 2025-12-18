@@ -91,3 +91,6 @@ sc_*
 sc_*
 
 
+
+# SciPyWrapper demo generated figures
+/demos/scipywrapper_dependence_custom/figures/*.png
