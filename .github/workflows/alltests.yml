@@ -71,6 +71,16 @@ jobs:
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+          
+      - name: Install minimal LaTeX (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install miktex -y || true
+          refreshenv || true
+          # update file name database if available
+          initexmf --update-fndb || true
+          # try to update package database (may be available as mpm)
+          mpm --admin --update-db || true
       - run: pip freeze
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
