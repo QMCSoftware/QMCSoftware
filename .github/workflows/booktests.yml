@@ -123,7 +123,7 @@ jobs:
         shell: bash -l {0}
         env:
           MPLBACKEND: Agg   # ensures headless, low-memory matplotlib
-        run: make booktests_parallel_no_docker  # TESTS="tb_quickstart"
+        run: make tests_fast  # TESTS="tb_quickstart"
 
 
 # Filter for GitHub Actions runs: 
