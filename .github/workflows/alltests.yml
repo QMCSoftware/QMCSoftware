@@ -18,7 +18,58 @@ jobs:
         with:
           miniconda-version: "latest"
           auto-activate-base: true
+      # -----------------------------------------------------------
+      # Add 12GB swap (Linux only)
+      # -----------------------------------------------------------
+      - name: Add 12GB swap
+        if: runner.os == 'Linux'
+        run: |
+          sudo fallocate -l 12G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
+      # -----------------------------------------------------------
+      # Free disk + conda cache early
+      # -----------------------------------------------------------
+      - name: Free space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+
+      - name: Free space (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          conda clean --all --yes
+          pip cache purge || true
+
+      - name: Show runner resources
+        run: |
+          echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
+          free -h || vm_stat
+          df -h
       - run: pip install -e .[test]
+      # -----------------------------------------------------------
+      # Install minimal LaTeX (OS-specific)
+      # -----------------------------------------------------------
+      - name: Install minimal LaTeX (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super ghostscript
+
+      - name: Install minimal LaTeX (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask basictex
+          eval "$(/usr/libexec/path_helper)"
+          sudo tlmgr update --self
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
       - run: pip freeze
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
@@ -38,6 +89,12 @@ jobs:
           fi
       - run: make doctests_markdown
       - run: make unittests
+      - name: Check for missing booktest files
+        run: make check_booktests
+
+      - name: Generate missing booktest files
+        run: make generate_booktests
+
       - name: Run booktests (parallel) on macOS/Ubuntu
         if: runner.os != 'Windows'
         shell: bash -l {0}
