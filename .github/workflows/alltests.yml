@@ -49,6 +49,7 @@ jobs:
           pip cache purge || true
 
       - name: Show runner resources
+        if: runner.os == 'Linux'
         run: |
           echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
           free -h || vm_stat
