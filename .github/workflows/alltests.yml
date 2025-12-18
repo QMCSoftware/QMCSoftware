@@ -9,8 +9,6 @@ jobs:
   tests:
     name: All Tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    env:
-      PYTEST_XDIST: "-n auto"
     strategy:
         matrix:
             os: ["macos-latest", "ubuntu-latest", "windows-latest"]
