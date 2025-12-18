@@ -3,7 +3,6 @@ nav:
   - Quasi Monte Carlo Software: README.md
   - Components: components.md
   - Contributing: CONTRIBUTING.md
-  - Release: releases/RELEASE.md
   - Community: community.md
   - News:
     - Releases:
@@ -65,6 +64,8 @@ nav:
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
+  - For Developers:
+    - Release Manual: releases/RELEASE.md
   - Printable Docs: print_page/
 
 plugins:
