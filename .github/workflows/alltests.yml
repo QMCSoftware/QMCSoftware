@@ -48,6 +48,6 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          python -m unittest discover -p "tb_*.py" -v
+          cd tests/booktests && python -m unittest discover -p "tb_*.py" -v
       - run: make coverage
 
