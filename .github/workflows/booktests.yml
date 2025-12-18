@@ -7,7 +7,7 @@ on:
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
-      - 'tests/booktests/**.py'
+      - 'test/booktests/*.py'
       - 'pyproject.toml'
   pull_request:
     branches:
@@ -16,7 +16,7 @@ on:
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
-      - 'tests/booktests/**.py'
+      - 'test/booktests/*.py'
       - 'pyproject.toml'
 
 jobs:
