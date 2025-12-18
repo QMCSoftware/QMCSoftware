@@ -1,13 +1,29 @@
 import numpy as np
+import numpy.typing as npt
+import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from matplotlib.ticker import FixedLocator, FixedFormatter
+from typing import Optional
 import os
 import scipy.stats as sc
 import qmcpy as qp
 
 
-def plot_error_comparison(ax, samplers, qmcpy_errors, quantlib_errors):
-    """Plot error comparison subplot"""
+def plot_error_comparison(ax: Axes, samplers: list, 
+                          qmcpy_errors: npt.NDArray[np.floating], 
+                          quantlib_errors: list, 
+                          replications: Optional[int] = None) -> None:
+    """
+    Plot error comparison subplot.
+    
+    Args:
+        ax: Matplotlib axis object
+        samplers: List of sampler names
+        qmcpy_errors: Array of QMCPy mean absolute errors
+        quantlib_errors: List of QuantLib mean absolute errors (may contain None)
+        replications: Number of replications used for averaging (optional, for title)
+    """
     x = np.arange(len(samplers))
     width = 0.35
     # Plot QuantLib data first (left side)
@@ -24,14 +40,23 @@ def plot_error_comparison(ax, samplers, qmcpy_errors, quantlib_errors):
 
     ax.set_xlabel('Sampler Type')
     ax.set_ylabel('Mean Absolute Error (log scale)')
-    ax.set_title('Mean Absolute Error Comparison', fontsize=16, fontweight='bold')
+    
+    # Add replications info to title if provided
+    if replications is not None:
+        ax.set_title(f'Mean Absolute Error Comparison\n(averaged over {replications} replications)',
+                     fontsize=16, fontweight='bold')
+    else:
+        ax.set_title('Mean Absolute Error Comparison', fontsize=16, fontweight='bold')
+    
     ax.set_yscale('log')
     ax.set_xticks(x)
     ax.set_xticklabels(samplers, rotation=45, ha='right')
     ax.legend()
     ax.grid(True, alpha=0.3)
 
-def plot_performance_comparison(ax, samplers, qmcpy_times, quantlib_times):
+def plot_performance_comparison(ax: Axes, samplers: list, 
+                                qmcpy_times: Optional[npt.NDArray[np.floating]], 
+                                quantlib_times: list) -> None:
     """Plot performance comparison subplot"""
     x = np.arange(len(samplers))
     width = 0.35
@@ -72,7 +97,7 @@ def plot_performance_comparison(ax, samplers, qmcpy_times, quantlib_times):
     
     ax.set_title('Performance Comparison', fontsize=16, fontweight='bold')
 
-def get_plot_styling():
+def get_plot_styling() -> dict:
     """Define colors and markers for plotting"""
     return {
         'colors': {
@@ -87,8 +112,10 @@ def get_plot_styling():
         }
     }
 
-def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
-                       xlabel, ylabel, log_scale=False, is_legend=False):
+def plot_single_series(ax: Axes, plot_data: pd.DataFrame, series_name: str, 
+                       x_col: str, y_col: str, title: str,
+                       xlabel: str, ylabel: str, 
+                       log_scale: bool = False, is_legend: bool = False) -> None:
     """Plot a single series (runtime or error) for one experimental series"""
     series_data = plot_data[plot_data['Series'] == series_name]
     styling = get_plot_styling()
@@ -144,7 +171,7 @@ def plot_single_series(ax, plot_data, series_name, x_col, y_col, title,
     if is_legend:
         ax.legend(fontsize=10)
 
-def create_parameter_sweep_plots(df,replications):
+def create_parameter_sweep_plots(df: pd.DataFrame, replications: int) -> None:
     """Create 4-panel plots from parameter sweep data"""
     # Filter out theoretical data
     plot_data = df[df['Method'] != 'Theoretical'].copy()
@@ -172,8 +199,9 @@ def create_parameter_sweep_plots(df,replications):
                        f'Runtime vs Number of Paths\n(n_steps = 252)',
                        'Number of Paths', 'Runtime (seconds)', log_scale=True)
 
-def plot_paths(motion_type, sampler, t_final, initial_value, drift, diffusion,
-               n, png_filename=None):
+def plot_paths(motion_type: str, sampler, t_final: float, initial_value: float, 
+               drift: float, diffusion: float,
+               n: int, png_filename: Optional[str] = None):
     """
     Plot realizations of Brownian Motion or Geometric Brownian Motion.
 
@@ -223,8 +251,8 @@ def plot_paths(motion_type, sampler, t_final, initial_value, drift, diffusion,
 
     return motion
 
-def plot_gbm_paths_with_distribution(N, sampler, t_final, initial_value,
-                                     drift, diffusion, n):
+def plot_gbm_paths_with_distribution(N: int, sampler, t_final: float, initial_value: float,
+                                     drift: float, diffusion: float, n: int) -> None:
     """
     Plot GBM paths with distribution of final values.
 
@@ -283,7 +311,8 @@ def plot_gbm_paths_with_distribution(N, sampler, t_final, initial_value,
     plt.tight_layout()
     plt.show();
 
-def compute_theoretical_covariance(S0, mu, sigma, t1, t2):
+def compute_theoretical_covariance(S0: float, mu: float, sigma: float, 
+                                   t1: float, t2: float) -> npt.NDArray[np.floating]:
     """
     Compute theoretical covariance matrix for GBM at two time points.
 
@@ -304,7 +333,7 @@ def compute_theoretical_covariance(S0, mu, sigma, t1, t2):
          S0**2 * np.exp(2*mu*t2) * (np.exp(sigma**2 * t2) - 1)]
     ])
 
-def calculate_theoretical_statistics(params):
+def calculate_theoretical_statistics(params: dict) -> tuple[float, float]:
     """
     Calculate theoretical mean and standard deviation for GBM.
 
@@ -321,7 +350,8 @@ def calculate_theoretical_statistics(params):
         (np.exp(params['sigma']**2 * params['maturity']) - 1))
     return theoretical_mean, theoretical_std
 
-def extract_covariance_samples(paths, n_steps, is_quantlib=True):
+def extract_covariance_samples(paths: npt.NDArray[np.floating], n_steps: int, 
+                               is_quantlib: bool = True) -> npt.NDArray[np.floating]:
     """
     Extract samples at two time points and compute covariance matrix.
 

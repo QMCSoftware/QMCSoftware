@@ -42,3 +42,11 @@ To execute say two testbook files in parallel, run the following command in a te
 
 For a demo, see the Jupyter notebook, `demos/talk_paper_demos/Parslfest_2025/`.
 
+
+## Design Patterns: Using `setUp/helpers` vs. `@testbook` Decorator**
+
+*   Generated files such as `tb_iris.py` uses `@testbook` for a standalone notebook, requiring no special setup.
+*   GBM notebooks such as `gbm_examples.py` rely on local modules and sometimes have broken symlinks, needing setup for correct imports.
+*   Running notebooks from their directory (via `setUp`) ensures consistent relative paths and imports, which the decorator doesn't reliably handle.
+*   `BaseNotebookTest`'s `setUp/tearDown` methods handle resource management, beneficial for long-running demos.
+*   Shared helper functions in `__init__.py` centralize complex logic (location, symlink fixing, running) for reusability and clarity.

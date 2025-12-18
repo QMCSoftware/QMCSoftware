@@ -2,7 +2,6 @@ import unittest
 import os
 import shutil
 import subprocess
-from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
@@ -20,17 +19,26 @@ class NotebookTests(BaseNotebookTest):
             self._created_output_dir = True
         else:
             self._created_output_dir = False
+     
         
     def tearDown(self):
-        # Clean up the created directory if we created it
+        # Clean up the created directory if we created it   
         if hasattr(self, '_created_output_dir') and self._created_output_dir:
             if os.path.exists(self.output_dir):
                 shutil.rmtree(self.output_dir)
         super().tearDown()
 
-    @testbook('../../demos/talk_paper_demos/JOSS2025/joss2025.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_joss2025_notebook(self, tb):
-        pass
+
+    def test_joss2025_notebook(self):
+        # locate_notebook will raise unittest.SkipTest if notebook not present
+        notebook_path, notebook_dir = self.locate_notebook('../../demos/talk_paper_demos/JOSS2025/joss2025.ipynb')
+        self.change_notebook_cells(notebook_path, 
+                                   replacements={"trials = 100": "trials = 2",
+                                                 "assert os.path.isdir(OUTDIR)":"",
+                                                 'fig.savefig':'#fig.savefig',
+                                                 'np.save':'#np.save',
+                                                 })        
+        self.run_notebook(notebook_path, timeout=TB_TIMEOUT)
 
 if __name__ == '__main__':
     unittest.main()

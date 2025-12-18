@@ -1,8 +1,17 @@
 import QuantLib as ql
 import numpy as np
 
-def generate_quantlib_paths(initial_value, mu, sigma, maturity, n_steps,
-                            n_paths, sampler_type='IIDStdUniform', seed=7):
+
+def generate_quantlib_paths(
+    initial_value: float,
+    mu: float,
+    sigma: float,
+    maturity: float,
+    n_steps: int,
+    n_paths: int,
+    sampler_type: str = 'IIDStdUniform',
+    seed: int = 7
+) -> tuple:
     """
     Generate Geometric Brownian Motion paths using QuantLib.
     
