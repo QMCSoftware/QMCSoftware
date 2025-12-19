@@ -30,6 +30,23 @@ jobs:
           sudo swapon /swapfile
           free -h
 
+      - name: Add 12GB swap (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # Create and mount a temporary swapfile
+          sudo mkfile 12g /private/var/vm/tempswapfile
+          sudo chmod 600 /private/var/vm/tempswapfile
+          # Show memory stats
+          vm_stat
+
+      - name: Add swap space (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Check current pagefile settings
+          Get-WmiObject Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize
+          # Display system memory info
+          Get-ComputerInfo -Property CsTotalPhysicalMemory
+
       # -----------------------------------------------------------
       # Free disk + conda cache early
       # -----------------------------------------------------------
@@ -47,6 +64,14 @@ jobs:
         run: |
           conda clean --all --yes
           pip cache purge || true
+          df -h
+
+      - name: Free space (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          conda clean --all --yes || true
+          pip cache purge || true
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
 
       - name: Show runner resources
         if: runner.os == 'Linux'
@@ -54,7 +79,9 @@ jobs:
           echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
           free -h || vm_stat
           df -h
+
       - run: pip install -e .[test]
+
       # -----------------------------------------------------------
       # Install minimal LaTeX (OS-specific)
       # -----------------------------------------------------------
@@ -75,14 +102,18 @@ jobs:
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install miktex -y || true
-          refreshenv || true
-          # update file name database if available
-          $initexmf = Get-Command initexmf -ErrorAction SilentlyContinue
-          if ($initexmf) { & $initexmf.Source --update-fndb } else { Write-Host "initexmf not found" }
-          # try to update package database (may be available as mpm)
-          $mpm = Get-Command mpm -ErrorAction SilentlyContinue
-          if ($mpm) { & $mpm.Source --admin --update-db } else { Write-Host "mpm not found" }
+          choco install miktex -y
+          # Add MiKTeX to PATH for current session
+          $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
+          # Verify installation
+          latex --version || echo "LaTeX not in PATH"
+          # Initialize MiKTeX
+          initexmf --admin --set-config-value [MPM] AutoInstall=1 || true
+      - name: Configure matplotlib (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -c "import matplotlib; matplotlib.rcParams['text.usetex'] = False; print('Matplotlib configured to use mathtext instead of LaTeX')"
+
       - run: pip freeze
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
@@ -101,7 +132,9 @@ jobs:
             echo "umbridge doctests only run on Linux"
           fi
       - run: make doctests_markdown
-      - run: make unittests
+      - name: Run unittests (parallel)
+        run: |
+          python -m pytest -n auto -q
       - name: Check for missing booktest files
         run: make check_booktests
 
@@ -114,10 +147,11 @@ jobs:
         run: |
           make booktests_parallel_no_docker
 
-      - name: Run booktests (sequential) on Windows
+      - name: Run booktests (parallel) on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          cd test/booktests && python -m unittest discover -p "tb_*.py" -v
+          # run booktests in parallel using pytest
+          python -m pytest -n auto -q test/booktests
       - run: make coverage
 
