@@ -78,9 +78,11 @@ jobs:
           choco install miktex -y || true
           refreshenv || true
           # update file name database if available
-          initexmf --update-fndb || true
+          $initexmf = Get-Command initexmf -ErrorAction SilentlyContinue
+          if ($initexmf) { & $initexmf.Source --update-fndb } else { Write-Host "initexmf not found" }
           # try to update package database (may be available as mpm)
-          mpm --admin --update-db || true
+          $mpm = Get-Command mpm -ErrorAction SilentlyContinue
+          if ($mpm) { & $mpm.Source --admin --update-db } else { Write-Host "mpm not found" }
       - run: pip freeze
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
