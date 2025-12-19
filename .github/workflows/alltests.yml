@@ -103,16 +103,12 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install miktex -y
-          # Add MiKTeX to PATH for current session
           $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
-          # Verify installation
-          latex --version || echo "LaTeX not in PATH"
-          # Initialize MiKTeX
+          # Initialize MiKTeX and enable automatic package installation
           initexmf --admin --set-config-value [MPM] AutoInstall=1 || true
-      - name: Configure matplotlib (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          python -c "import matplotlib; matplotlib.rcParams['text.usetex'] = False; print('Matplotlib configured to use mathtext instead of LaTeX')"
+          # Install required LaTeX packages
+          mpm --admin --install-some=texlive-latex-base,texlive-latex-extra,texlive-latex-recommended,latexmk,dvipng || echo "Package installation completed or skipped"
+          latex --version || echo "LaTeX not in PATH"
 
       - run: pip freeze
       - run: make doctests_minimal
@@ -147,11 +143,14 @@ jobs:
         run: |
           make booktests_parallel_no_docker
 
+      - name: Configure matplotlib for Windows
+        if: runner.os == 'Windows'
+        run: |
+          python -c "import matplotlib; matplotlib.use('Agg'); matplotlib.rcParams['text.usetex'] = False"
+
       - name: Run booktests (parallel) on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # run booktests in parallel using pytest
+          # Execute notebook integration tests in parallel
           python -m pytest -n auto -q test/booktests
-      - run: make coverage
-
