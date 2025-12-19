@@ -146,11 +146,17 @@ jobs:
       - name: Configure matplotlib for Windows
         if: runner.os == 'Windows'
         run: |
-          python -c "import matplotlib; matplotlib.use('Agg'); matplotlib.rcParams['text.usetex'] = False"
+          # Create matplotlib config directory and disable LaTeX
+          $configDir = "$env:USERPROFILE\.matplotlib"
+          New-Item -ItemType Directory -Force -Path $configDir
+          Set-Content -Path "$configDir\matplotlibrc" -Value "text.usetex: False`nbackend: Agg"
+          # Verify configuration
+          python -c "import matplotlib; print('usetex:', matplotlib.rcParams['text.usetex'])"
 
       - name: Run booktests (parallel) on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           # Execute notebook integration tests in parallel
+          $env:MPLBACKEND = "Agg"
           python -m pytest -n auto -q test/booktests
