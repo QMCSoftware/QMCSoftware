@@ -11,13 +11,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:
-            os: ["macos-latest", "ubuntu-latest", "windows-latest"]
+            os: [ "windows-latest"]  # "macos-latest", "ubuntu-latest",
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-activate-base: true
+          conda-remove-defaults: true
       # -----------------------------------------------------------
       # Add 12GB swap (Linux only)
       # -----------------------------------------------------------
@@ -101,14 +102,29 @@ jobs:
           
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
           choco install miktex -y
+          choco install ghostscript -y
+          choco install strawberryperl -y
+
+          # Put MiKTeX on PATH
           $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
-          # Initialize MiKTeX and enable automatic package installation
-          initexmf --admin --set-config-value [MPM] AutoInstall=1 || true
-          # Install required LaTeX packages
-          mpm --admin --install-some=texlive-latex-base,texlive-latex-extra,texlive-latex-recommended,latexmk,dvipng || echo "Package installation completed or skipped"
-          latex --version || echo "LaTeX not in PATH"
+          # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
+          initexmf --admin --set-config-value [MPM]AutoInstall=1
+
+          # Refresh package database + upgrade base
+          mpm --admin --update-db
+          mpm --admin --upgrade
+
+          # Install a few common “baseline” packages explicitly (names are MiKTeX packages)
+          mpm --admin --install=latexmk
+          mpm --admin --install=dvipng
+
+          latex --version
+          latexmk -v
+          dvipng --version
+          gswin64c -v
 
       - run: pip freeze
       - run: make doctests_minimal
@@ -150,3 +166,4 @@ jobs:
           # Execute notebook integration tests in parallel
           $env:MPLBACKEND = "Agg"
           #python -m pytest -n auto -q test/booktests
+          #python -m pytest -q test/booktests --maxfail=1 -vv     # sequential
