@@ -20,9 +20,9 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
       # -----------------------------------------------------------
-      # Add 12GB swap (Linux only)
+      # Add 12GB swap (OS-specific)
       # -----------------------------------------------------------
-      - name: Add 12GB swap
+      - name: Add 12GB swap (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo fallocate -l 12G /swapfile
@@ -37,8 +37,6 @@ jobs:
           # Create and mount a temporary swapfile
           sudo mkfile 12g /private/var/vm/tempswapfile
           sudo chmod 600 /private/var/vm/tempswapfile
-          # Show memory stats
-          vm_stat
 
       - name: Add 8GB swap space (Windows)
         if: runner.os == 'Windows'
@@ -66,7 +64,7 @@ jobs:
           if (-not $exists) {
             Write-Host "Creating new pagefile: $auto (${desiredMB} MB)"
             try {
-              New-CimInstance -ClassName Win32_PageFileSetting -Property @{Name=$auto; InitialSize=[UInt32]$desiredMB; MaximumSize=[UInt32]$desiredMB}
+              $null = Set-WmiInstance -Class Win32_PageFileSetting -Arguments @{Name=$auto; InitialSize=[UInt32]$desiredMB; MaximumSize=[UInt32]$desiredMB}
               Write-Host "Pagefile created. May take effect immediately or require reboot."
             } catch {
               Write-Warning "Failed to create pagefile: $_"
@@ -76,7 +74,7 @@ jobs:
           }
 
       # -----------------------------------------------------------
-      # Free disk + conda cache early
+      # Free disk + conda cache early (OS-specific)
       # -----------------------------------------------------------
       - name: Free space (Linux)
         if: runner.os == 'Linux'
@@ -102,7 +100,7 @@ jobs:
           Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
 
       # -----------------------------------------------------------
-      # Show resources (OS specific)
+      # Show resources (OS-specific)
       # -----------------------------------------------------------
       - name: Show runner resources
         if: runner.os != 'Windows'
@@ -192,7 +190,7 @@ jobs:
         run: |
           python -m pytest -n auto -q
       # -----------------------------------------------------------
-      # Run unit tests for notebooks (OS-specific)
+      # Run unittests for Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------   
       - name: Check for missing booktest files
         run: make check_booktests
