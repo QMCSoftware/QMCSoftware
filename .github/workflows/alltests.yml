@@ -105,7 +105,7 @@ jobs:
         shell: pwsh
         run: |
           choco install miktex -y
-          choco install ghostscript -y
+          #choco install ghostscript -y
           choco install strawberryperl -y
           # Put MiKTeX on PATH
           $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
