@@ -38,14 +38,44 @@ jobs:
           sudo mkfile 12g /private/var/vm/tempswapfile
           sudo chmod 600 /private/var/vm/tempswapfile
 
-      - name: Add 12GB pagefile (Windows) (best effort)
+      - name: Configure pagefile (Windows) via CIM (12GB)
         if: runner.os == 'Windows'
-        continue-on-error: true
-        uses: al-cheb/configure-pagefile-action@v1.5
-        with:
-          minimum-size: 12GB
-          maximum-size: 12GB
-          disk-root: "D:"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $drive    = "D:"
+          $initialMB = 12288
+          $maxMB     = 12288
+          $pagefile  = "$drive\pagefile.sys"
+
+          Write-Host "Configuring pagefile: $pagefile (Initial=${initialMB}MB, Max=${maxMB}MB)"
+
+          # Disable automatic management
+          $cs = Get-CimInstance Win32_ComputerSystem
+          if ($cs.AutomaticManagedPagefile) {
+            Set-CimInstance -InputObject $cs -Property @{ AutomaticManagedPagefile = $false } | Out-Null
+          }
+
+          # Create or update the pagefile setting
+          $escaped = $pagefile.Replace('\','\\')
+          $pfs = Get-CimInstance Win32_PageFileSetting -Filter "Name='$escaped'" -ErrorAction SilentlyContinue
+
+          if ($null -eq $pfs) {
+            New-CimInstance -ClassName Win32_PageFileSetting -Property @{
+              Name        = $pagefile
+              InitialSize = $initialMB
+              MaximumSize = $maxMB
+            } | Out-Null
+          } else {
+            Set-CimInstance -InputObject $pfs -Property @{
+              InitialSize = $initialMB
+              MaximumSize = $maxMB
+            } | Out-Null
+          }
+
+          "=== Pagefile settings ==="
+          Get-CimInstance Win32_PageFileSetting | Format-Table Name,InitialSize,MaximumSize -Auto
 
       # -----------------------------------------------------------
       # Free disk + conda cache early (OS-specific)
