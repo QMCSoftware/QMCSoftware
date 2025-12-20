@@ -40,7 +40,7 @@ jobs:
           # Show memory stats
           vm_stat
 
-      - name: Add swap space (Windows)
+      - name: Add 8GB swap space (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -66,7 +66,7 @@ jobs:
           if (-not $exists) {
             Write-Host "Creating new pagefile: $auto (${desiredMB} MB)"
             try {
-              New-CimInstance -ClassName Win32_PageFileSetting -Property @{Name=$auto; InitialSize=$desiredMB; MaximumSize=$desiredMB}
+              New-CimInstance -ClassName Win32_PageFileSetting -Property @{Name=$auto; InitialSize=[UInt32]$desiredMB; MaximumSize=[UInt32]$desiredMB}
               Write-Host "Pagefile created. May take effect immediately or require reboot."
             } catch {
               Write-Warning "Failed to create pagefile: $_"
@@ -74,10 +74,6 @@ jobs:
           } else {
             Write-Host "Pagefile $auto already exists."
           }
-
-          # Show current pagefile status
-          Get-CimInstance -ClassName Win32_PageFileUsage | Format-Table Name, AllocatedBaseSize, CurrentUsage
-          Get-ComputerInfo -Property CsTotalPhysicalMemory
 
       # -----------------------------------------------------------
       # Free disk + conda cache early
@@ -136,7 +132,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super  # ghostscript
+          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super
 
       - name: Install minimal LaTeX (macOS)
         if: runner.os == 'macOS'
@@ -151,7 +147,6 @@ jobs:
         shell: pwsh
         run: |
           choco install miktex -y
-          #choco install ghostscript -y
           choco install strawberryperl -y
           # Put MiKTeX on PATH for all subsequent steps
           echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -169,6 +164,9 @@ jobs:
           latexmk -v
           dvipng --version
 
+      # -----------------------------------------------------------
+      # Run doectests (OS-specific)
+      # -----------------------------------------------------------      
       - run: pip freeze
       - run: make doctests_minimal
       - run: pip install -e .[test_torch] 
@@ -187,9 +185,15 @@ jobs:
             echo "umbridge doctests only run on Linux"
           fi
       - run: make doctests_markdown
+      # -----------------------------------------------------------
+      # Run unittests for Python source files
+      # -----------------------------------------------------------   
       - name: Run unittests (parallel)
         run: |
           python -m pytest -n auto -q
+      # -----------------------------------------------------------
+      # Run unit tests for notebooks (OS-specific)
+      # -----------------------------------------------------------   
       - name: Check for missing booktest files
         run: make check_booktests
 
