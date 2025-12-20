@@ -178,7 +178,7 @@ jobs:
       - name: Generate missing booktest files
         run: make generate_booktests
 
-      - name: Run booktests (parallel) on macOS/Ubuntu
+      - name: Run booktests (parallel) on macOS (43 mins) and Ubuntu (20 mins)
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
