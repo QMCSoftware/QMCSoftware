@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:
-            os: [ "windows-latest"]  # "macos-latest", "ubuntu-latest",
+            os: ["windows-latest"m "macos-latest", "ubuntu-latest"]
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -90,7 +90,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super ghostscript
+          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super  # ghostscript
 
       - name: Install minimal LaTeX (macOS)
         if: runner.os == 'macOS'
