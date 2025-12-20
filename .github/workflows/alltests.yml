@@ -40,13 +40,63 @@ jobs:
           # Show memory stats
           vm_stat
 
-      - name: Add swap space (Windows)
+      # Attempt to create/resize a pagefile on Windows runners (may still require reboot
+      # for some changes to take full effect). This tries to create or resize
+      # D:\pagefile.sys to 8GB if it's smaller.
+      - name: Ensure pagefile on Windows (best-effort, no-reboot)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          # Check current pagefile settings
-          Get-WmiObject Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize
-          # Display system memory info
-          Get-ComputerInfo -Property CsTotalPhysicalMemory
+          $desiredMB = 8192
+          $orig = 'D:\\pagefile.sys'
+          $auto = 'D:\\pagefile_auto.sys'
+
+          Write-Host "Checking pagefile usage for $orig"
+          try {
+            $usage = Get-CimInstance -ClassName Win32_PageFileUsage | Where-Object { $_.Name -eq $orig }
+          } catch {
+            $usage = $null
+          }
+
+          # disable automatic management so explicit sizes can be set
+          try {
+            $cs = Get-CimInstance -ClassName Win32_ComputerSystem
+            if ($cs.AutomaticManagedPagefile) {
+              Write-Host "Disabling AutomaticManagedPagefile"
+              Set-CimInstance -InputObject $cs -Property @{AutomaticManagedPagefile=$false}
+            } else {
+              Write-Host "AutomaticManagedPagefile already disabled"
+            }
+          } catch {
+            Write-Warning "Could not query/set AutomaticManagedPagefile: $_"
+          }
+
+          # If existing pagefile is already large enough, do nothing.
+          if ($usage -and $usage.AllocatedBaseSize -ge $desiredMB) {
+            Write-Host "Existing $orig allocated size ($($usage.AllocatedBaseSize) MB) >= $desiredMB MB. No change needed."
+          } else {
+            Write-Host "Existing $orig is smaller than $desiredMB MB or not present. Creating a new pagefile at $auto to avoid resizing existing (no-reboot attempt)."
+            try {
+              $exists = Get-CimInstance -ClassName Win32_PageFileSetting | Where-Object { $_.Name -eq $auto }
+            } catch { $exists = $null }
+
+            if (-not $exists) {
+              try {
+                $class = Get-CimClass -ClassName Win32_PageFileSetting
+                $result = $class.Create($auto, $desiredMB, $desiredMB)
+                Write-Host "Create result: $result"
+              } catch {
+                Write-Warning "Failed to create pagefile entry $auto: $_"
+              }
+            } else {
+              Write-Host "$auto already exists. Ensuring sizes set (may require reboot to take effect)."
+              $exists.InitialSize = $desiredMB
+              $exists.MaximumSize = $desiredMB
+              $exists | Set-CimInstance | Out-Null
+            }
+          }
+
+          Write-Host "Note: Creating a new pagefile on a different drive often takes effect immediately without reboot, but some systems still require a reboot for changes to be fully used."
 
       # -----------------------------------------------------------
       # Free disk + conda cache early
@@ -81,6 +131,15 @@ jobs:
           free -h || vm_stat
           df -h
 
+      - name: Show runner resources
+        if: runner.os == 'Windows'
+        run: |
+          # Check current pagefile settings
+          Get-WmiObject Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize
+          # Display system memory info
+          Get-ComputerInfo -Property CsTotalPhysicalMemory
+
+        
       - run: pip install -e .[test]
 
       # -----------------------------------------------------------
