@@ -100,31 +100,56 @@ jobs:
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
           
-      - name: Install minimal LaTeX (Windows)
+      - name: Install MiKTeX + deps (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
           choco install miktex -y
           choco install ghostscript -y
           choco install strawberryperl -y
 
-          # Put MiKTeX on PATH
-          $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
-          # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
-          initexmf --admin --set-config-value [MPM]AutoInstall=1
+      - name: Configure MiKTeX (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
 
-          # Refresh package database + upgrade base
-          mpm --admin --update-db
-          mpm --admin --upgrade
+          # Try to find MiKTeX binaries robustly
+          $miktexBin = "C:\Program Files\MiKTeX\miktex\bin\x64"
+          if (-not (Test-Path $miktexBin)) {
+            # fallback: search typical locations
+            $miktexBin = (Get-ChildItem "C:\Program Files\MiKTeX" -Recurse -Directory -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match "\\miktex\\bin\\x64$" } |
+              Select-Object -First 1 -ExpandProperty FullName)
+          }
+          if (-not $miktexBin) { throw "Could not locate MiKTeX bin directory." }
+          $env:PATH = "$miktexBin;$env:PATH"
 
-          # Install a few common “baseline” packages explicitly (names are MiKTeX packages)
-          mpm --admin --install=latexmk
-          mpm --admin --install=dvipng
+          # Enable install-on-the-fly (shared/admin)
+          initexmf --admin --set-config-value "[MPM]AutoInstall=1"
+          initexmf --admin --set-config-value "[MPM]AutoAdmin=1"
 
+          # Refresh FNDB + links (often needed after CI installs)
+          initexmf --admin --update-fndb
+          initexmf --admin --mklinks --force
+
+          # Update package database + packages using the supported CLI
+          miktex --admin packages update-package-database
+          miktex --admin packages update
+
+      - name: Verify LaTeX toolchain (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
           latex --version
+          pdflatex --version
+          perl -v
+          gswin64c -v
           latexmk -v
           dvipng --version
-          gswin64c -v
+        
 
       - run: pip freeze
       - run: make doctests_minimal
