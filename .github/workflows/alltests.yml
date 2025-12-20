@@ -20,7 +20,7 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
       # -----------------------------------------------------------
-      # Add 12GB swap (OS-specific)
+      # Add 12GB swap, i.e., virtual memory (OS-specific)
       # -----------------------------------------------------------
       - name: Add 12GB swap (Linux)
         if: runner.os == 'Linux'
@@ -38,40 +38,14 @@ jobs:
           sudo mkfile 12g /private/var/vm/tempswapfile
           sudo chmod 600 /private/var/vm/tempswapfile
 
-      - name: Add 8GB swap space (Windows)
+      - name: Add 8GB swap space (Windows)  # pagefile
         if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $desiredMB = 8192
-          $auto = 'D:\pagefile_auto.sys'
-
-          # Disable automatic pagefile management
-          try {
-            $cs = Get-CimInstance -ClassName Win32_ComputerSystem
-            if ($cs.AutomaticManagedPagefile) {
-              Write-Host "Disabling AutomaticManagedPagefile"
-              Set-CimInstance -InputObject $cs -Property @{AutomaticManagedPagefile=$false}
-            }
-          } catch {
-            Write-Warning "Could not disable AutomaticManagedPagefile: $_"
-          }
-
-          # Create a new pagefile (creating new file more likely to work without reboot)
-          try {
-            $exists = Get-CimInstance -ClassName Win32_PageFileSetting | Where-Object { $_.Name -eq $auto }
-          } catch { $exists = $null }
-
-          if (-not $exists) {
-            Write-Host "Creating new pagefile: $auto (${desiredMB} MB)"
-            try {
-              $null = Set-WmiInstance -Class Win32_PageFileSetting -Arguments @{Name=$auto; InitialSize=[UInt32]$desiredMB; MaximumSize=[UInt32]$desiredMB}
-              Write-Host "Pagefile created. May take effect immediately or require reboot."
-            } catch {
-              Write-Warning "Failed to create pagefile: $_"
-            }
-          } else {
-            Write-Host "Pagefile $auto already exists."
-          }
+        uses: al-cheb/configure-pagefile-action@v1.5
+        with:
+          minimum-size: 8GB
+          maximum-size: 12GB
+          # D: is the default for this action; keep it unless you specifically want C:
+          disk-root: "D:"
 
       # -----------------------------------------------------------
       # Free disk + conda cache early (OS-specific)
