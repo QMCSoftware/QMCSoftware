@@ -256,13 +256,13 @@ jobs:
         run: |
           python -m pytest -n auto -q
       # -----------------------------------------------------------
-      # Run unittests for Jupyter notebooks  141.71s (0:02:21)
+      # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
       - name: Run booktests (parallel) on macOS and Ubuntu (~13 mins)
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
-          make booktests_parallel_pytest
+          make booktests_parallel_no_docker   # Parsl does not support Windows
 
       - name: Run booktests (parallel) on Windows (~26 mins)
         if: runner.os == 'Windows'
