@@ -23,12 +23,14 @@ def get_site_paths():
         if purelib:
             paths.add(Path(purelib))
     except Exception:
+        # purelib unavailable in this environment; skip
         pass
     try:
         user_site = site.getusersitepackages()
         if user_site:
             paths.add(Path(user_site))
     except Exception:
+        # user site-packages unavailable; skip
         pass
     for p in sys.path:
         try:
@@ -36,6 +38,7 @@ def get_site_paths():
             if "site-packages" in str(pp):
                 paths.add(pp)
         except Exception:
+            # invalid path; skip
             pass
     return [p for p in paths if p.exists()]
 
@@ -60,7 +63,7 @@ def find_invalid_dists(site_paths):
         except PermissionError:
             continue
     # deduplicate and sort
-    unique = sorted(set(candidates), key=lambda p: str(p))
+    unique = sorted(set(candidates), key=str)
     return unique
 
 
