@@ -131,13 +131,53 @@ jobs:
         with:
           path: |
             ~/.cache/pip
+            ~/.cache/pip/wheels
             ~/Library/Caches/pip
+            ~/Library/Caches/pip/wheels
             ~\AppData\Local\pip\Cache
+            ~\AppData\Local\pip\Cache\wheels
           key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+      - name: Cache wheel files
+        uses: actions/cache@v4
+        with:
+          path: ./.wheels
+          key: ${{ runner.os }}-wheels-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-wheels-
           
-      - run: pip install -e .[test]
+      - name: Build and cache wheels (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch,test_umbridge] || true
+
+      - name: Install Python dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]"
+
+      - name: Build and cache wheels (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || true
+
+      - name: Install Python dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch]"
+
+      - name: Build and cache wheels (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || Write-Host 'wheel build step completed'
+
+      - name: Install Python dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
 
       # -----------------------------------------------------------
       # Install minimal LaTeX (OS-specific)
@@ -169,8 +209,13 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install miktex -y
-          choco install strawberryperl -y
+          $miktexPath = 'C:\Program Files\MiKTeX'
+          if (-Not (Test-Path $miktexPath)) {
+            choco install miktex -y
+            choco install strawberryperl -y
+          } else {
+            Write-Host 'MiKTeX cache hit — skipping choco/strawberryperl install'
+          }
           # Put MiKTeX on PATH for all subsequent steps
           echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # Refresh PATH in current session
@@ -188,21 +233,17 @@ jobs:
           dvipng --version
 
       # -----------------------------------------------------------
-      # Run doectests (OS-specific)
+      # Run doctests (OS-specific)
       # -----------------------------------------------------------      
       - run: pip freeze
       - run: make doctests_minimal
-      - run: pip install -e .[test_torch] 
-      - run: make doctests_torch 
-      - run: pip install -e .[test_gpytorch]
+      - run: make doctests_torch
       - run: make doctests_gpytorch
-      - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
       - name: run umbridge doctests on Linux only
         shell: bash -l {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            pip install -e .[test_umbridge]
             make doctests_umbridge
           else
             echo "umbridge doctests only run on Linux"
@@ -217,11 +258,11 @@ jobs:
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
-      - name: Run booktests (parallel) on macOS (11 mins) and Ubuntu (11 mins)
+      - name: Run booktests (parallel) on macOS and Ubuntu (~11 minutes)
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
-          make booktests_parallel_no_docker
+          make booktests_parallel_pytest
 
       - name: Run booktests (parallel) on Windows (~11 minutes with pytest-xdist)
         if: runner.os == 'Windows'
