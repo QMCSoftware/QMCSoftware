@@ -78,7 +78,6 @@ generate_booktests:
 
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests"
-	pip install -q -e ".[test]"  && \
 	set -e && \
 	cd test/booktests/ && \
 	if [ -z "$(TESTS)" ]; then \
@@ -93,7 +92,6 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 # make booktests_parallel_no_docker  TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
 booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
-	pip install -q -e ".[test]"  && \
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
@@ -102,8 +100,6 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 
 # Windows-compatible parallel booktests using pytest-xdist instead of Parsl
 booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files
-	@echo "\nNotebook tests with pytest-xdist (Windows-compatible)"
-	pip install -q -e ".[test]"  && \
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py --cov=qmcpy --cov-append --cov-report=term --cov-report=json && \
@@ -112,18 +108,15 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 tests: 
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
-
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
 	python scripts/cleanup_invalid_dist.py --apply || true && \
-	pip install -q -e .[test] && \
 	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests && $(MAKE) coverage
 
 # Fast test target: run doctests and unittests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
 	python scripts/cleanup_invalid_dist.py --apply || true
-	python -m pip install -q -e .[test]
 	set -e; \
 	( $(MAKE) doctests_no_docker ) & \
 	( $(MAKE) unittests ) & \
