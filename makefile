@@ -100,6 +100,15 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	python parsl_test_runner.py $(TESTS) -v --failfast && \
 	cd ../.. 
 
+# Windows-compatible parallel booktests using pytest-xdist instead of Parsl
+booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files
+	@echo "\nNotebook tests with pytest-xdist (Windows-compatible)"
+	pip install -q -e ".[test]"  && \
+	cd test/booktests/ && \
+	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+	python -W ignore -m pytest -n auto -v tb_*.py && \
+	cd ../.. 
+
 tests: 
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 

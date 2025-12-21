@@ -180,7 +180,7 @@ jobs:
           # Refresh package database + upgrade base
           mpm --admin --update-db
           mpm --admin --upgrade
-          # Install a few common "baseline" packages explicitly (names are MiKTeX packages)
+          # Install a few common "baseline" packages explicitly 
           mpm --admin --install=latexmk
           mpm --admin --install=dvipng
           latex --version
@@ -223,8 +223,8 @@ jobs:
         run: |
           make booktests_parallel_no_docker
 
-      - name: Run booktests (parallel) on Windows (should be ~32 minutes)
+      - name: Run booktests (parallel) on Windows (~11 minutes with pytest-xdist)
         if: runner.os == 'Windows'
-        shell: bash -l {0}
+        shell: pwsh
         run: |
-          make booktests_no_docker
+          make booktests_parallel_pytest
