@@ -1,17 +1,6 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 
-# Compute a safe default worker count at runtime if not provided.
-# Inline a small Python one-liner to avoid requiring an extra script file.
-# Heuristics: leave one CPU free; assume ~2 GB RAM per worker; cap at 8.
-PYTEST_WORKERS ?= $(shell python -c "import multiprocessing,platform,subprocess;s=platform.system();mem=4*1024**3;exec(\"try:\\n    with open('/proc/meminfo') as f:\\n        for l in f:\\n            if l.startswith('MemTotal:'):\\n                mem=int(l.split()[1])*1024\\n                break\\nexcept Exception:\\n    pass\" if s=='Linux' else \"try:\\n    mem=int(subprocess.check_output(['sysctl','-n','hw.memsize']).strip())\\nexcept Exception:\\n    pass\" if s=='Darwin' else \"\");cpus=max(1,multiprocessing.cpu_count());cpu_based=max(1,cpus-1);total_gb=mem/(1024**3);mem_based=max(1,int(total_gb//2));workers=min(cpu_based,mem_based);workers=max(1,min(8,workers));print(workers)" 2>/dev/null || echo 1)
-
-# If the user supplied PYTEST_WORKERS (or the computed value exists), prefer
-# using it as the xdist `-n` argument rather than any auto-detection.
-ifneq ($(strip $(PYTEST_WORKERS)),)
-PYTEST_XDIST = -n $(PYTEST_WORKERS)
-endif
-
 doctests_minimal:
 	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \

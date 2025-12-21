@@ -11,8 +11,8 @@ jobs:
     name: All Tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-        matrix:
-            os: ["windows-latest", "macos-latest", "ubuntu-latest"]
+        matrix:  # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+            os: ["windows-latest", "macos-latest", "ubuntu-latest"] 
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -255,17 +255,18 @@ jobs:
       - name: Run unittests (parallel)
         run: |
           python -m pytest -n auto -q
+          
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
-      - name: Run booktests (parallel) on macOS and Ubuntu (~13 mins)
+      - name: Run booktests (parallel) on Linux
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
-          make booktests_parallel_no_docker   # Parsl does not support Windows
+          make booktests_parallel_no_docker    # Parsl not supported on Windows
 
-      - name: Run booktests (parallel) on Windows (~18 mins, 4 CPUs)
+      - name: Run booktests (parallel) on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          make booktests_parallel_pytest
+          make booktests_parallel_pytest PYTEST_XDIST="-n 4"
