@@ -264,8 +264,65 @@ jobs:
         run: |
           make booktests_parallel_no_docker   # Parsl does not support Windows
 
-      - name: Run booktests (parallel) on Windows (~26 mins)
+      # -----------------------------------------------------------
+      # A/B test: measure pytest-xdist with 2 vs 4 workers on Windows
+      # (moved here to run after setup and other tests)
+      # -----------------------------------------------------------
+      - name: Run booktests n=2 (Windows A/B)
         if: runner.os == 'Windows'
         shell: pwsh
+        continue-on-error: true
         run: |
-          make booktests_parallel_pytest
+          try {
+            $env:PYTEST_XDIST = "-n 2"
+            $t = Measure-Command { cmd /c 'make booktests_parallel_pytest' }
+            $t.TotalSeconds | Out-File -FilePath time_n2.txt -Encoding ascii
+            Write-Host "booktests n=2 time(s): $($t.TotalSeconds)"
+          } catch {
+            "ERROR: $($_.Exception.Message)" | Out-File -FilePath time_n2.txt -Encoding ascii
+            Write-Host "booktests n=2 failed"
+          }
+
+      - name: Run booktests n=3 (Windows A/B)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          try {
+            $env:PYTEST_XDIST = "-n 3"
+            $t = Measure-Command { cmd /c 'make booktests_parallel_pytest' }
+            $t.TotalSeconds | Out-File -FilePath time_n3.txt -Encoding ascii
+            Write-Host "booktests n=3 time(s): $($t.TotalSeconds)"
+          } catch {
+            "ERROR: $($_.Exception.Message)" | Out-File -FilePath time_n2.txt -Encoding ascii
+            Write-Host "booktests n=3 failed"
+          }
+
+      - name: Run booktests n=4 (Windows A/B)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          try {
+            $env:PYTEST_XDIST = "-n 4"
+            $t = Measure-Command { cmd /c 'make booktests_parallel_pytest' }
+            $t.TotalSeconds | Out-File -FilePath time_n4.txt -Encoding ascii
+            Write-Host "booktests n=4 time(s): $($t.TotalSeconds)"
+          } catch {
+            "ERROR: $($_.Exception.Message)" | Out-File -FilePath time_n4.txt -Encoding ascii
+            Write-Host "booktests n=4 failed"
+          }
+
+      - name: Upload Windows booktest times
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: booktest-times-windows
+          path: time_n2.txt,time_n4.txt,time_n3.txt
+
+      # Disabled: duplicate final Windows booktests step (A/B timing runs earlier)
+      # - name: Run booktests (parallel) on Windows (~26 mins)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     make booktests_parallel_pytest
