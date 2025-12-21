@@ -4,9 +4,6 @@ nav:
   - Components: components.md
   - Contributing: CONTRIBUTING.md
   - Community: community.md
-  - News:
-    - Releases:
-      - QMCPy v2.1: releases/QMCPy-2.1-announcement.md
   - Package Reference:
     - Discrete Distributions: api/discrete_distributions.md
     - True Measures: api/true_measures.md
@@ -65,7 +62,7 @@ nav:
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
   - For Developers:
-    - Release Manual: releases/RELEASE.md
+    - Release Manual: RELEASE.md
   - Printable Docs: print_page/
 
 plugins:
