@@ -198,11 +198,11 @@ jobs:
       - run: make doctests_gpytorch
       - run: pip install -e .[test_botorch]
       - run: make doctests_botorch
-      - run: pip install -e .[test_umbridge]
       - name: run umbridge doctests on Linux only
         shell: bash -l {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
+            pip install -e .[test_umbridge]
             make doctests_umbridge
           else
             echo "umbridge doctests only run on Linux"
@@ -216,23 +216,15 @@ jobs:
           python -m pytest -n auto -q
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
-      # -----------------------------------------------------------   
-      - name: Check for missing booktest files
-        run: make check_booktests
-
-      - name: Generate missing booktest files
-        run: make generate_booktests
-
-      - name: Run booktests (parallel) on macOS (43 mins) and Ubuntu (20 mins)
+      # ----------------------------------------------------------- 
+      - name: Run booktests (parallel) on macOS (11 mins) and Ubuntu (11 mins)
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
           make booktests_parallel_no_docker
 
-      - name: Run booktests (sequential) on Windows
+      - name: Run booktests (parallel) on Windows (should be ~32 minutes)
         if: runner.os == 'Windows'
-        shell: pwsh
+        shell: bash -l {0}
         run: |
-          # Execute notebook integration tests in parallel
-          $env:MPLBACKEND = "Agg"
-          make booktests_no_docker TESTS="tb_*.py"
+          make booktests_no_docker
