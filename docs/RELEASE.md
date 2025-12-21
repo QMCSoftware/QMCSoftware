@@ -12,7 +12,7 @@ In order to publish a release, you will need to have an account on the two websi
 Notes:
 
 - These accounts will be different from each other. PyPI is the standard Python package index where users can `pip install qmcpy` from. TestPyPI is a separate package index meant for developers to test their release before publishing on the actual PyPI. In order to release `qmcpy`, you will need to contact Aleksei to request access to the actual `qmcpy` project on both websites.
-- When setting up your PyPi account, please have another team member invite you as a collaborator. However, you will need to have two factor authentication (2FA) setup for your account before you can be added. We will not go over the steps on setting up 2FA as that depends on the vendor and method (mobile app or security key) you choose. Please research on the setup procedure for the 2FA vendor and method you pick. Some common 2FA authenticators you can install on your smartphone include Google Authenticator and Microsoft Authenticator.
+- When setting up your PyPI account, please have another team member invite you as a collaborator. However, you will need to have two factor authentication (2FA) setup for your account before you can be added. We will not go over the steps on setting up 2FA as that depends on the vendor and method (mobile app or security key) you choose. Please research on the setup procedure for the 2FA vendor and method you pick. Some common 2FA authenticators you can install on your smartphone include Google Authenticator and Microsoft Authenticator.
 
 Please setup and save your PyPI and TestPyPI API keys (do not commit to a public git repo). They should look something like the following 
 
@@ -26,7 +26,6 @@ Please setup and save your PyPI and TestPyPI API keys (do not commit to a public
   password = ...
 ```
 
-Note that, when setting up your PyPI and Test PyPI accounts, you will need to have two factor authentication (2FA) setup for your account before you can be added. We will not go over the steps on setting up 2FA as that depends on the vendor and method (mobile app or security key) you choose. Please research on the setup procedure for the 2FA vendor and method you pick. Some common 2FA authenticators you can install on your smartphone include Google Authenticator and Microsoft Authenticator.
 
 ## Sanity Checks
 
@@ -53,7 +52,7 @@ With PDM installed, you can follow the [PDM publish guide](https://pdm-project.o
 pdm publish --repository testpypi
 ```
 
-When prompted for a username put `__token__`, and when prompted for a password put the password for your API token for TestPyPI. If successful, you will get a link to the release on PyPI. Note that locally, your build may be found at `QMCSoftware/dist`. 
+When prompted for a username put `__token__`, and when prompted for a password put the password for your API token for TestPyPI. If successful, you will get a link to the release on TestPyPI. Note that locally, your build may be found at `QMCSoftware/dist`. 
 
 To actually test our TestPyPI release, it is a good idea to pretend you are a new user and create a fresh environment in which you try some basic QMCPy commands. Here are some commands to run to create a fresh environment and run some basic tests 
 
@@ -70,7 +69,7 @@ Of course you will need to replace ??? with the version name. If the `pip instal
 pip install --index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple "qmcpy==2.1"
 ```
 
-Once in the python console in the `tmp` environment, try running some basic commands such as 
+Once in the Python console in the `tmp` environment, try running some basic commands such as 
 
 ```python
 import qmcpy as qp 
@@ -88,7 +87,7 @@ pip install torch
 python
 ```
 
-back in the Python console, run 
+Back in the Python console, run 
 
 ```python
 import qmcpy as qp 
