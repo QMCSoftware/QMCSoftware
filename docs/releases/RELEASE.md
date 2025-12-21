@@ -26,6 +26,8 @@ Please setup and save your PyPI and TestPyPI API keys (do not commit to a public
   password = ...
 ```
 
+Note that, when setting up your PyPI and Test PyPI accounts, you will need to have two factor authentication (2FA) setup for your account before you can be added. We will not go over the steps on setting up 2FA as that depends on the vendor and method (mobile app or security key) you choose. Please research on the setup procedure for the 2FA vendor and method you pick. Some common 2FA authenticators you can install on your smartphone include Google Authenticator and Microsoft Authenticator.
+
 ## Sanity Checks
 
 
