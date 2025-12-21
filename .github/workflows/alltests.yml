@@ -3,6 +3,7 @@ name: All Tests
 #   push:
 #     branches:
 #       - master 
+#       - develop
 on: [push]
 
 jobs:
@@ -19,6 +20,7 @@ jobs:
           miniconda-version: "latest"
           auto-activate-base: true
           conda-remove-defaults: true
+          use-only-tar-bz2: true
       # -----------------------------------------------------------
       # Add 12GB swap, i.e., virtual memory (OS-specific)
       # -----------------------------------------------------------
@@ -124,6 +126,16 @@ jobs:
       # -----------------------------------------------------------
       # Install Python dependencies
       # -----------------------------------------------------------
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/Library/Caches/pip
+            ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
           
       - run: pip install -e .[test]
 
@@ -143,6 +155,15 @@ jobs:
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+
+      - name: Cache MiKTeX (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: C:\Program Files\MiKTeX
+          key: ${{ runner.os }}-miktex-${{ hashFiles('.github/workflows/alltests.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-miktex-
           
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows'
