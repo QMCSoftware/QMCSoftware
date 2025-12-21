@@ -247,6 +247,7 @@ jobs:
           # Install a few common "baseline" packages explicitly 
           mpm --admin --install=latexmk
           mpm --admin --install=dvipng
+          mpm --admin --install=geometry    # to install LaTeX `geometry.sty' 
           latex --version
           latexmk -v
           dvipng --version
