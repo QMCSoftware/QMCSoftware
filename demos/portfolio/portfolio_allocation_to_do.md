@@ -12,7 +12,7 @@
 9.  Save price datasets to `data` folder --- DONE
 10. Save figures as .png in `images` --- DONE
 11. Use same colors for same samplers across all visualizations --- DONE
-12. Use white background for all visualizations --- TODO
+12. Use white background for all visualizations --- DONE
 13. Stopping checking in .png or binary files into repository --- TODO
 14. Clean up demo --- TODO
 15. Add references to the demo --- TODO
