@@ -175,30 +175,6 @@ jobs:
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
 
       # -----------------------------------------------------------
-      # Run doctests (OS-specific)
-      # -----------------------------------------------------------      
-      - run: pip freeze
-      - run: make doctests_minimal
-      - run: make doctests_torch
-      - run: make doctests_gpytorch
-      - run: make doctests_botorch
-      - run: make doctests_markdown
-      - name: run umbridge doctests on Linux only
-        shell: bash -l {0}
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            make doctests_umbridge
-          else
-            echo "umbridge doctests only run on Linux"
-          fi
-      # -----------------------------------------------------------
-      # Run unittests for Python source files
-      # -----------------------------------------------------------   
-      - name: Run unittests (parallel)
-        run: |
-          python -m pytest -n auto -q
-      
-      # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
       - name: Install minimal LaTeX (Linux)
@@ -251,7 +227,31 @@ jobs:
           latex --version
           latexmk -v
           dvipng --version
-        
+      
+      # -----------------------------------------------------------
+      # Run doctests (OS-specific)
+      # -----------------------------------------------------------      
+      - run: pip freeze
+      - run: make doctests_minimal
+      - run: make doctests_torch
+      - run: make doctests_gpytorch
+      - run: make doctests_botorch
+      - run: make doctests_markdown
+      - name: run umbridge doctests on Linux only
+        shell: bash -l {0}
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            make doctests_umbridge
+          else
+            echo "umbridge doctests only run on Linux"
+          fi
+      # -----------------------------------------------------------
+      # Run unittests for Python source files
+      # -----------------------------------------------------------   
+      - name: Run unittests (parallel)
+        run: |
+          python -m pytest -n auto -q
+      
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
