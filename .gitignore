@@ -29,6 +29,7 @@ qmcpy.egg-info/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
+.venv
 
 # tests
 .coverage
@@ -84,7 +85,12 @@ _ags/*
 
 # SC Choi
 .vscode/settings.json
+/sc
+sc_*
 /sc_*
 sc_*
 
 
+
+# SciPyWrapper demo generated figures
+/demos/scipywrapper_dependence_custom/figures/*.png
