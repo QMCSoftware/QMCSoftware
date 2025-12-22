@@ -9,7 +9,8 @@ import time
 import os
 import subprocess
 from testbook import testbook
-import nbformat
+import matplotlib
+matplotlib.rcParams['text.usetex'] = False
 
 TB_TIMEOUT = 3600
 subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
