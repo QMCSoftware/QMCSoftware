@@ -282,7 +282,7 @@ jobs:
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
-      - name: Run booktests (parallel) on Linux
+      - name: Run booktests (parallel) on Linux/macOS
         if: runner.os != 'Windows'
         shell: bash -l {0}
         run: |
@@ -292,6 +292,15 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4"
+
+      # -----------------------------------------------------------
+      # Display final accumulated coverage from all test stages
+      # -----------------------------------------------------------
+      - name: Display final coverage report
+        if: runner.os != 'Windows'
+        run: |
+          coverage report -m
+          coverage json
 
       # -----------------------------------------------------------
       # Upload coverage data for later combination
