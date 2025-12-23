@@ -86,10 +86,10 @@ jobs:
           Get-CimInstance Win32_PageFileSetting | Format-Table Name,InitialSize,MaximumSize -Auto
 
       # -----------------------------------------------------------
-      # Free disk + conda cache early (OS-specific) if debug enabled
+      # Free disk + conda cache early (OS-specific) 
       # -----------------------------------------------------------
       - name: Free space (Linux)
-        if: runner.os == 'Linux' && github.event.inputs.debug == 'true'
+        if: runner.os == 'Linux' 
         run: |
           sudo apt-get clean
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
@@ -98,14 +98,14 @@ jobs:
           df -h
 
       - name: Free space (macOS)
-        if: runner.os == 'macOS' && github.event.inputs.debug == 'true'
+        if: runner.os == 'macOS' 
         run: |
           conda clean --all --yes
           pip cache purge || true
           df -h
 
       - name: Free space (Windows)
-        if: runner.os == 'Windows' && github.event.inputs.debug == 'true'
+        if: runner.os == 'Windows' 
         run: |
           conda clean --all --yes || true
           pip cache purge || true
