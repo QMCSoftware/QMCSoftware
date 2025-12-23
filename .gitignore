@@ -32,6 +32,7 @@ demos/.jupyter
 
 # tests
 .coverage
+*.wgw*
 
 # C
 *.so
@@ -86,5 +87,7 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
+
 
 

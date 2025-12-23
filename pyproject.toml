@@ -83,6 +83,7 @@ test = [
     "quantlib == 1.38",
     "ipywidgets == 8.1.7",
     "nbconvert >= 7.2.9",
+    "pytest-xdist >= 3.8.0",
     ]
 test_torch = [
     "torch >= 2.7.0",

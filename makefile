@@ -1,5 +1,8 @@
+# Emit pytest-xdist argument if available; can be overridden on the make command line
+PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
+
 doctests_minimal:
-	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
 		--ignore qmcpy/fast_transform/ft_pytorch.py \
 		--ignore qmcpy/stopping_criterion/pf_gp_ci.py \
@@ -11,23 +14,23 @@ doctests_minimal:
 		--ignore qmcpy/integrand/hartmann6d.py \
 
 doctests_torch:
-	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/fast_transform/ft_pytorch.py \
 		--doctest-modules qmcpy/kernel/*.py \
 		--doctest-modules qmcpy/util/dig_shift_invar_ops.py \
 		--doctest-modules qmcpy/util/shift_invar_ops.py \
 
 doctests_gpytorch:
-	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/stopping_criterion/pf_gp_ci.py \
 
 doctests_botorch:
-	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
 doctests_umbridge: # https://github.com/UM-Bridge/umbridge/issues/96
 	@docker --version
-	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/umbridge_wrapper.py \
 
 doctests_markdown:
@@ -38,7 +41,7 @@ doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch do
 doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
 unittests:
-	python -m pytest -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
 
 check_booktests:
 	rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
@@ -75,7 +78,6 @@ generate_booktests:
 
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests"
-	pip install -q -e ".[test]"  && \
 	set -e && \
 	cd test/booktests/ && \
 	if [ -z "$(TESTS)" ]; then \
@@ -90,19 +92,37 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 # make booktests_parallel_no_docker  TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
 booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
-	pip install -q -e ".[test]"  && \
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	python parsl_test_runner.py $(TESTS) -v --failfast && \
 	cd ../.. 
 
+# Windows-compatible parallel booktests using pytest-xdist instead of Parsl
+booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files
+	cd test/booktests/ && \
+	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py --cov=qmcpy --cov-append --cov-report=term --cov-report=json && \
+	cd ../.. 
+
 tests: 
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
 tests_no_docker: 
-	pip install -q -e .[test] && \
+	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
+	python scripts/cleanup_invalid_dist.py --apply || true && \
 	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests && $(MAKE) coverage
+
+# Fast test target: run doctests and unittests concurrently
+tests_fast:
+	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
+	python scripts/cleanup_invalid_dist.py --apply || true
+	set -e; \
+	( $(MAKE) doctests_no_docker ) & \
+	( $(MAKE) unittests ) & \
+	( $(MAKE) booktests_parallel_no_docker ) & \
+	wait
+	$(MAKE) coverage
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
