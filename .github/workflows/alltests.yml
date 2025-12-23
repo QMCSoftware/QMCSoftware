@@ -1,5 +1,16 @@
 name: All Tests
-on: [push]
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug/diagnostic steps (swap, free space, resource info)'
+        required: false
+        default: 'false'   # 'true' to debug, 'false' to run faster
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 jobs:
   tests:
@@ -17,10 +28,10 @@ jobs:
           conda-remove-defaults: true
           use-only-tar-bz2: true
       # -----------------------------------------------------------
-      # Add 12GB swap, i.e., virtual memory (OS-specific)
+      # Add 12GB swap, i.e., virtual memory (OS-specific) if debug enabled
       # -----------------------------------------------------------
       - name: Add 12GB swap (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && github.event.inputs.debug == 'true'
         run: |
           sudo fallocate -l 12G /swapfile
           sudo chmod 600 /swapfile
@@ -29,14 +40,14 @@ jobs:
           free -h
 
       - name: Add 12GB swap (macOS)
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && github.event.inputs.debug == 'true'
         run: |
           # Create and mount a temporary swapfile
           sudo mkfile 12g /private/var/vm/tempswapfile
           sudo chmod 600 /private/var/vm/tempswapfile
 
       - name: Configure pagefile (Windows) via CIM (12GB)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && github.event.inputs.debug == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -75,10 +86,10 @@ jobs:
           Get-CimInstance Win32_PageFileSetting | Format-Table Name,InitialSize,MaximumSize -Auto
 
       # -----------------------------------------------------------
-      # Free disk + conda cache early (OS-specific)
+      # Free disk + conda cache early (OS-specific) if debug enabled
       # -----------------------------------------------------------
       - name: Free space (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && github.event.inputs.debug == 'true'
         run: |
           sudo apt-get clean
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
@@ -87,31 +98,31 @@ jobs:
           df -h
 
       - name: Free space (macOS)
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && github.event.inputs.debug == 'true'
         run: |
           conda clean --all --yes
           pip cache purge || true
           df -h
 
       - name: Free space (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && github.event.inputs.debug == 'true'
         run: |
           conda clean --all --yes || true
           pip cache purge || true
           Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
 
       # -----------------------------------------------------------
-      # Show resources (OS-specific)
+      # Show resources (OS-specific) if debug enabled
       # -----------------------------------------------------------
       - name: Show runner resources
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && github.event.inputs.debug == 'true'
         run: |
           echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
           free -h || vm_stat
           df -h
 
       - name: Show runner resources
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && github.event.inputs.debug == 'true'
         run: |
           # Check current pagefile settings
           Get-WmiObject Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize
@@ -173,7 +184,43 @@ jobs:
         shell: pwsh
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
+      
 
+      - name: Show installed Python packages
+        if: github.event.inputs.debug == 'true'
+        run: pip freeze
+      # -----------------------------------------------------------
+      # Run doctests (OS-specific)
+      # -----------------------------------------------------------  
+      - run: make doctests_minimal
+      - run: make doctests_torch
+      - run: make doctests_gpytorch
+      - run: make doctests_botorch
+      - run: make doctests_markdown
+      - name: run umbridge doctests on Linux only
+        shell: bash -l {0}
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            make doctests_umbridge
+          else
+            echo "umbridge doctests only run on Linux"
+          fi
+          
+      # -----------------------------------------------------------
+      # Run unittests for Python source files
+      # -----------------------------------------------------------   
+      - name: Run unittests (parallel) on Linux/Windows
+        if: runner.os != 'macOS'
+        shell: bash -l {0}
+        run: |
+          python -m pytest -n 4 -q
+
+      - name: Run unittests (parallel) on macOS
+        if: runner.os == 'macOS'
+        shell: pwsh
+        run: |
+          python -m pytest -n 3 -q
+      
       # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
@@ -225,31 +272,7 @@ jobs:
           latex --version
           latexmk -v
           dvipng --version
-      
-      # -----------------------------------------------------------
-      # Run doctests (OS-specific)
-      # -----------------------------------------------------------      
-      - run: pip freeze
-      - run: make doctests_minimal
-      - run: make doctests_torch
-      - run: make doctests_gpytorch
-      - run: make doctests_botorch
-      - run: make doctests_markdown
-      - name: run umbridge doctests on Linux only
-        shell: bash -l {0}
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            make doctests_umbridge
-          else
-            echo "umbridge doctests only run on Linux"
-          fi
-      # -----------------------------------------------------------
-      # Run unittests for Python source files
-      # -----------------------------------------------------------   
-      - name: Run unittests (parallel)
-        run: |
-          python -m pytest -n auto -q
-      
+
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
