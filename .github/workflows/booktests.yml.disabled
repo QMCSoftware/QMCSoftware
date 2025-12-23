@@ -16,8 +16,7 @@ on:
     paths:
       - 'demos/**/*.ipynb'
       - '.github/workflows/booktests.yml'
-      - 'test/booktests/*.py'
-      - 'pyproject.toml'
+      - 'tests/booktests/**.py'
 
 jobs:
   booktests:
@@ -97,6 +96,7 @@ jobs:
           brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
 
       - name: Check for missing booktest files
