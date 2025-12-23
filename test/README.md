@@ -256,8 +256,163 @@ make tests_no_docker        # Sequential, safe (60–120s)
 **Issue**: Coverage numbers seem low or cumulative
 - **Solution**: Reset coverage with `make delcoverage`, then run tests
 
+---
+
+## Coverage Report Strategy
+
+### Overview
+QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub Actions CI. Coverage data from all test types (doctests, unittests, booktests) running on all platforms (Ubuntu, macOS, Windows) is combined into a single comprehensive report.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Matrix Job: tests (windows-latest, macos-latest, ubuntu-latest)  │
+├─────────────────────────────────────────────────────────┤
+│  1. Clean old coverage files (.coverage*, coverage.json)│
+│  2. Run doctests (with --cov-append)                    │
+│  3. Run unittests (with --cov-append)                   │
+│  4. Run booktests (with --cov-append)                   │
+│  5. Upload .coverage & coverage.json as artifacts       │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  Final Job: combine-coverage (ubuntu-latest)            │
+├─────────────────────────────────────────────────────────┤
+│  1. Download all coverage artifacts (3 OS runners)      │
+│  2. Combine with: coverage combine                      │
+│  3. Generate reports:                                   │
+│     - coverage report -m (terminal)                     │
+│     - coverage xml -o coverage.xml                      │
+│     - coverage html -d coverage_html                    │
+│  4. Upload final HTML & XML as artifacts                │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Key Syntax & Configuration
+
+#### 1. Makefile Test Targets (Coverage Append Mode)
+All test targets use `--cov-append` to accumulate coverage within each OS runner:
+
+```makefile
+doctests_minimal:
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --cov-append \
+		--doctest-modules qmcpy/ ...
+
+doctests_torch:
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --cov-append \
+		--doctest-modules qmcpy/fast_transform/ft_pytorch.py ...
+
+unittests:
+	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --cov-append test/
+
+booktests_no_docker:
+	python -m coverage run --append --source=../../qmcpy/ -m unittest discover ...
+```
+
+**Key flags:**
+- `--cov qmcpy/` – Target package for coverage measurement
+- `--cov-append` – Append to existing `.coverage` data (don't overwrite)
+- `--cov-report term` – Terminal output after each test run
+- `--cov-report json` – Generate `coverage.json` for tracking
+- `coverage run --append` – For unittest-based notebook tests
+
+#### 2. GitHub Actions Workflow
+
+**Clean coverage at start of each matrix job:**
+```yaml
+- name: Remove old coverage data (Unix)
+  if: runner.os != 'Windows'
+  run: rm -f .coverage* coverage.json || true
+
+- name: Remove old coverage data (Windows)
+  if: runner.os == 'Windows'
+  shell: pwsh
+  run: |
+    Remove-Item -Path .coverage* -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path coverage.json -Force -ErrorAction SilentlyContinue
+```
+
+**Upload coverage artifacts after all tests:**
+```yaml
+- name: Upload coverage artifacts
+  uses: actions/upload-artifact@v4
+  with:
+    name: coverage-${{ matrix.os }}
+    path: |
+      .coverage
+      .coverage.*
+      coverage.json
+    retention-days: 1
+```
+
+**Combine in separate job:**
+```yaml
+combine-coverage:
+  runs-on: ubuntu-latest
+  needs: tests
+  steps:
+    - name: Download all coverage artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: coverage-data
+        pattern: coverage-*
+    - name: Combine coverage and generate reports
+      run: |
+        find coverage-data -name '.coverage*' -exec mv {} . \;
+        python -m coverage combine
+        python -m coverage report -m
+        python -m coverage xml -o coverage.xml
+        python -m coverage html -d coverage_html
+```
+
+### Local Coverage Workflow
+
+**Run tests and view coverage locally:**
+```bash
+# Clean old coverage
+make delcoverage
+
+# Run tests (accumulates coverage with --cov-append)
+make doctests_no_docker
+make unittests
+make booktests_no_docker
+
+# View combined report
+make coverage                 # Terminal summary
+coverage html                 # Generate HTML in htmlcov/
+coverage xml -o coverage.xml  # For external tools
+```
+
+### Benefits
+
+1. **Unified cross-platform coverage** – One report combines Ubuntu, macOS, and Windows execution paths
+2. **Comprehensive test coverage** – Includes doctests, unittests, and notebook tests
+3. **Artifact persistence** – HTML and XML reports available for download/review in GitHub Actions
+4. **Incremental local testing** – `--cov-append` allows building coverage across multiple test runs
+5. **CI/CD integration ready** – XML output compatible with Codecov, Coveralls, etc.
+
+### Troubleshooting
+
+**Coverage numbers seem wrong or incomplete:**
+- Run `make delcoverage` to clean old data before starting fresh
+- Ensure all test commands use `--cov-append` or `coverage run --append`
+
+**GitHub Actions shows no coverage report:**
+- Check that `combine-coverage` job downloaded artifacts from all 3 OS runners
+- Verify each matrix job successfully uploaded coverage artifacts
+
+**Coverage combining fails locally:**
+- Ensure `coverage` package is installed: `pip install coverage`
+- Check that `.coverage` files exist before running `coverage combine`
+
+---
+
 ## See Also
 
 - [../Makefile](../Makefile) – Full test target definitions
+- [../.github/workflows/alltests.yml](../.github/workflows/alltests.yml) – CI coverage workflow
 - [../scripts/cleanup_invalid_dist.py](../scripts/cleanup_invalid_dist.py) – Artifact cleanup utility
 - [../scripts/pytest_xdist.py](../scripts/pytest_xdist.py) – Parallel execution detection helper
+
+
