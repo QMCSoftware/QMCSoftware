@@ -9,8 +9,8 @@ import time
 import os
 import subprocess
 from testbook import testbook
-import matplotlib
-matplotlib.rcParams['text.usetex'] = False
+#import matplotlib
+#matplotlib.rcParams['text.usetex'] = False    # Disable LaTeX
 
 TB_TIMEOUT = 3600
 subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)

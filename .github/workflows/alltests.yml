@@ -204,13 +204,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $miktexPath = 'C:\Program Files\MiKTeX'
-          if (-Not (Test-Path $miktexPath)) {
-            choco install miktex -y
-            choco install strawberryperl -y
-          } else {
-            Write-Host 'MiKTeX cache hit — skipping choco/strawberryperl install'
-          }
+          choco install miktex -y
+          choco install strawberryperl -y
           # Put MiKTeX on PATH for all subsequent steps
           echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # Refresh PATH in current session
@@ -220,10 +215,13 @@ jobs:
           # Refresh package database + upgrade base
           mpm --admin --update-db
           mpm --admin --upgrade
-          # Install a few common "baseline" packages explicitly 
+          # Install a few common "baseline" MiKTeX packages explicitly
           mpm --admin --install=latexmk
           mpm --admin --install=dvipng
-          mpm --admin --install=geometry    # to install LaTeX `geometry.sty' 
+          mpm --admin --install=cm-super
+          mpm --admin --install=lmodern
+          mpm --admin --install=type1cm
+          mpm --admin --install=tex-gyre
           latex --version
           latexmk -v
           dvipng --version
