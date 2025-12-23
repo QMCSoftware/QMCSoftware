@@ -28,10 +28,10 @@ jobs:
           conda-remove-defaults: true
           use-only-tar-bz2: true
       # -----------------------------------------------------------
-      # Add 12GB swap, i.e., virtual memory (OS-specific) if debug enabled
+      # Add 12GB swap, i.e., virtual memory (OS-specific) 
       # -----------------------------------------------------------
       - name: Add 12GB swap (Linux)
-        if: runner.os == 'Linux' && github.event.inputs.debug == 'true'
+        if: runner.os == 'Linux'  
         run: |
           sudo fallocate -l 12G /swapfile
           sudo chmod 600 /swapfile
@@ -40,14 +40,14 @@ jobs:
           free -h
 
       - name: Add 12GB swap (macOS)
-        if: runner.os == 'macOS' && github.event.inputs.debug == 'true'
+        if: runner.os == 'macOS'  
         run: |
           # Create and mount a temporary swapfile
           sudo mkfile 12g /private/var/vm/tempswapfile
           sudo chmod 600 /private/var/vm/tempswapfile
 
       - name: Configure pagefile (Windows) via CIM (12GB)
-        if: runner.os == 'Windows' && github.event.inputs.debug == 'true'
+        if: runner.os == 'Windows'  
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
