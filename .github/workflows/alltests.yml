@@ -340,11 +340,15 @@ jobs:
       
       - name: Combine coverage and generate reports
         run: |
+          # List downloaded artifacts for debugging
+          ls -la coverage-data/
+          find coverage-data -type f -name '.coverage*' -o -name 'coverage.json'
           # Move all coverage files to current directory
-          find coverage-data -name '.coverage*' -exec mv {} . \;
-          find coverage-data -name 'coverage.json' -exec mv {} coverage-${{ github.run_id }}.json \; || true
+          find coverage-data -name '.coverage*' -exec cp {} . \;
+          # List coverage files to combine
+          ls -la .coverage*
           # Combine coverage data from all runners
-          python -m coverage combine
+          python -m coverage combine --keep
           # Generate reports
           python -m coverage report -m
           python -m coverage xml -o coverage.xml

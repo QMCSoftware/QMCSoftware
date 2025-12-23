@@ -291,7 +291,15 @@ QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub
 
 ### Key Syntax & Configuration
 
-#### 1. Makefile Test Targets (Coverage Append Mode)
+#### 1. Coverage Configuration (`.coveragerc`)
+Cross-platform coverage combining requires relative paths to handle different OS path formats (Windows `C:\`, macOS `/Users/`, Ubuntu `/home/`):
+
+**`.coveragerc` settings:**
+- `relative_files = True` – Store paths relative to project root
+- `[paths]` section maps all OS path variants to common source location
+- Enables successful `coverage combine` across Windows, macOS, and Ubuntu runners
+
+#### 2. Makefile Test Targets (Coverage Append Mode)
 All test targets use `--cov-append` (pytest) or `coverage run --append` to accumulate coverage within each OS runner:
 
 **Doctest targets:** `doctests_minimal`, `doctests_torch`, `doctests_gpytorch`, `doctests_botorch`, `doctests_umbridge` – all use `--cov-append`
@@ -310,72 +318,20 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 - `--cov-report term` – Terminal output after each test run
 - `--cov-report json` – Generate `coverage.json` for tracking
 
-#### 2. GitHub Actions Workflow
+#### 3. GitHub Actions Workflow
 
-**Clean coverage at start of each matrix job:**
-```yaml
-- name: Remove old coverage data (Unix)
-  if: runner.os != 'Windows'
-  run: rm -f .coverage* coverage.json || true
-
-- name: Remove old coverage data (Windows)
-  if: runner.os == 'Windows'
-  shell: pwsh
-  run: |
-    Remove-Item -Path .coverage* -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path coverage.json -Force -ErrorAction SilentlyContinue
-```
-
-**Upload coverage artifacts after all tests:**
-```yaml
-- name: Upload coverage artifacts
-  uses: actions/upload-artifact@v4
-  with:
-    name: coverage-${{ matrix.os }}
-    path: |
-      .coverage
-      .coverage.*
-      coverage.json
-    retention-days: 1
-```
-
-**Combine in separate job:**
-```yaml
-combine-coverage:
-  runs-on: ubuntu-latest
-  needs: tests
-  steps:
-    - name: Download all coverage artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: coverage-data
-        pattern: coverage-*
-    - name: Combine coverage and generate reports
-      run: |
-        find coverage-data -name '.coverage*' -exec mv {} . \;
-        python -m coverage combine
-        python -m coverage report -m
-        python -m coverage xml -o coverage.xml
-        python -m coverage html -d coverage_html
-```
+- **Clean coverage at start of each matrix job:**
+- **Upload coverage artifacts after all tests:**
+- **Combine in separate job:**
 
 ### Local Coverage Workflow
 
 **Run tests and view coverage locally:**
-```bash
-# Clean old coverage
-make delcoverage
 
-# Run tests (accumulates coverage with --cov-append)
-make doctests_no_docker
-make unittests
-make booktests_no_docker
+- Clean old coverage
+- Run tests (accumulates coverage with --cov-append)
+- View combined report
 
-# View combined report
-make coverage                 # Terminal summary
-coverage html                 # Generate HTML in htmlcov/
-coverage xml -o coverage.xml  # For external tools
-```
 
 ### Benefits
 

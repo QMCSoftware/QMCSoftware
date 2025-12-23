@@ -1,0 +1,15 @@
+[run]
+relative_files = True
+source = qmcpy
+
+[paths]
+source =
+    qmcpy/
+    */qmcpy/
+    *\qmcpy\
+
+[report]
+precision = 2
+
+[html]
+directory = coverage_html
