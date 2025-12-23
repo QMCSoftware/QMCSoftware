@@ -89,7 +89,7 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	fi && \
 	cd ../..
 
-# make booktests_parallel_no_docker  TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
+# coverage is done in function run_single_test() in test/booktests/parsl_test_runner.py
 booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
 	cd test/booktests/ && \
@@ -97,6 +97,7 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	python parsl_test_runner.py $(TESTS) -v --failfast && \
 	cd ../.. 
+	
 
 # Windows-compatible parallel booktests using pytest-xdist instead of Parsl
 booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files

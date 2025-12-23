@@ -292,30 +292,23 @@ QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub
 ### Key Syntax & Configuration
 
 #### 1. Makefile Test Targets (Coverage Append Mode)
-All test targets use `--cov-append` to accumulate coverage within each OS runner:
+All test targets use `--cov-append` (pytest) or `coverage run --append` to accumulate coverage within each OS runner:
 
-```makefile
-doctests_minimal:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --cov-append \
-		--doctest-modules qmcpy/ ...
+**Doctest targets:** `doctests_minimal`, `doctests_torch`, `doctests_gpytorch`, `doctests_botorch`, `doctests_umbridge` – all use `--cov-append`
 
-doctests_torch:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --cov-append \
-		--doctest-modules qmcpy/fast_transform/ft_pytorch.py ...
+**Unit test target:** `unittests` – uses `--cov-append`
 
-unittests:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --cov-append test/
-
-booktests_no_docker:
-	python -m coverage run --append --source=../../qmcpy/ -m unittest discover ...
-```
+**Notebook test targets:**
+- `booktests_no_docker` – uses `coverage run --append`
+- `booktests_parallel_no_docker` – Parsl runner internally uses `coverage run --append`
+- `booktests_parallel_pytest` – uses `--cov-append`
 
 **Key flags:**
 - `--cov qmcpy/` – Target package for coverage measurement
-- `--cov-append` – Append to existing `.coverage` data (don't overwrite)
+- `--cov-append` – Append to existing `.coverage` data (pytest-cov)
+- `coverage run --append` – Append mode for unittest-based tests
 - `--cov-report term` – Terminal output after each test run
 - `--cov-report json` – Generate `coverage.json` for tracking
-- `coverage run --append` – For unittest-based notebook tests
 
 #### 2. GitHub Actions Workflow
 
