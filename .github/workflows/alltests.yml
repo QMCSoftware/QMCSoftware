@@ -287,3 +287,16 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4"
+
+      # -----------------------------------------------------------
+      # Combine coverage data from multiple test runs and emit reports
+      # -----------------------------------------------------------
+      - name: Combine coverage data and produce report
+        run: |
+          python -m pip install --upgrade coverage || true
+          # Remove legacy single .coverage file to ensure combine uses parallel files
+          rm -f .coverage || true
+          python -m coverage combine || true
+          python -m coverage report -m
+          python -m coverage xml -o coverage.xml || true
+          python -m coverage html -d coverage_html || true
