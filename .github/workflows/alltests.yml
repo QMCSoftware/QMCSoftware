@@ -20,9 +20,17 @@ jobs:
       # -----------------------------------------------------------
       # Clean old coverage files
       # -----------------------------------------------------------
-      - name: Remove old coverage data
+      - name: Remove old coverage data (Unix)
+        if: runner.os != 'Windows'
         run: |
           rm -f .coverage* coverage.json || true
+
+      - name: Remove old coverage data (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Remove-Item -Path .coverage* -Force -ErrorAction SilentlyContinue -Confirm:$false
+          Remove-Item -Path coverage.json -Force -ErrorAction SilentlyContinue -Confirm:$false
       # -----------------------------------------------------------
       # Add 12GB swap, i.e., virtual memory (OS-specific)
       # -----------------------------------------------------------
@@ -308,3 +316,5 @@ jobs:
         with:
           name: coverage-xml
           path: coverage.xml
+
+# For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
