@@ -90,20 +90,24 @@ jobs:
       - name: Free space (Linux)
         if: runner.os == 'Linux'
         run: |
+          df -h
           sudo apt-get clean
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
           conda clean --all --yes
           pip cache purge || true
           df -h
       - name: Free space (macOS)
         if: runner.os == 'macOS'
         run: |
+          df -h
           conda clean --all --yes
           pip cache purge || true
           df -h
       - name: Free space (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
           conda clean --all --yes || true
           pip cache purge || true
           Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
@@ -252,20 +256,25 @@ jobs:
       - name: Free space (Linux)
         if: runner.os == 'Linux'
         run: |
+          df -h
           sudo apt-get clean
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          docker system prune -af || true
           conda clean --all --yes
           pip cache purge || true
           df -h
       - name: Free space (macOS)
         if: runner.os == 'macOS'
         run: |
+          df -h
           conda clean --all --yes
           pip cache purge || true
           df -h
       - name: Free space (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
           conda clean --all --yes || true
           pip cache purge || true
           Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
