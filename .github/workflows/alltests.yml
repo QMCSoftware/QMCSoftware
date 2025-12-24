@@ -334,12 +334,11 @@ jobs:
       - name: Install coverage
         run: python -m pip install coverage
       
-      - name: Download all coverage artifacts
+      - name: Download all coverage artifacts (into separate folders)
         uses: actions/download-artifact@v4
         with:
           path: coverage-data
           pattern: coverage-*
-          merge-multiple: true
         continue-on-error: true
       
       - name: Combine coverage and generate reports
@@ -348,11 +347,10 @@ jobs:
           echo "=== Coverage data directory ==="
           ls -laR coverage-data/ 2>/dev/null || echo "No coverage-data directory"
           echo "=== Finding coverage files ==="
-          find . -name '.coverage*' -type f 2>/dev/null || echo "No coverage files found"
-          # Copy all coverage files to current directory (handle both flat and nested structures)
-          find coverage-data -name '.coverage*' -exec cp {} . \; 2>/dev/null || true
-          # Also check if files are directly in coverage-data (with merge-multiple: true)
-          cp coverage-data/.coverage* . 2>/dev/null || true
+          # Search recursively for any .coverage* files produced by runners
+          find coverage-data -type f -name '.coverage*' -o -name 'coverage.json' -print 2>/dev/null || echo "No coverage files found"
+          # Copy all found coverage files to current directory preserving names
+          find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) -exec cp {} . \; 2>/dev/null || true
           # List coverage files to combine
           echo "=== Coverage files to combine ==="
           ls -la .coverage* 2>/dev/null || echo "No .coverage files to combine"
