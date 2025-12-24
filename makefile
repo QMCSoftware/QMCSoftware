@@ -128,6 +128,15 @@ tests_fast:
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
 
+combine-coverage-local:  # Combine coverage files found under `coverage-data` and build reports locally
+	@echo "Combining coverage files from coverage-data/ and generating reports"
+	@mkdir -p coverage-data && \
+	if [ -z "$$(find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) 2>/dev/null)" ]; then \
+		echo "No coverage files found in coverage-data/. Copying from current directory..."; \
+		cp -r .coverage* coverage.json coverage-data/ 2>/dev/null || ( echo "No coverage data found locally. Run tests first (e.g., make unittests)"; exit 1 ); \
+	fi; \
+	python scripts/combine_coverage.py --dir coverage-data --outdir coverage_html --keep
+
 delcoverage:
 	@rm .coverage
 	@rm coverage.json 

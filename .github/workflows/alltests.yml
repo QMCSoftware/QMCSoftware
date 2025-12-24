@@ -334,28 +334,30 @@ jobs:
       - name: Install coverage
         run: python -m pip install coverage
       
-      - name: Download all coverage artifacts (into separate folders)
+      - name: Download all coverage artifacts
         uses: actions/download-artifact@v4
         with:
           path: coverage-data
           pattern: coverage-*
+          merge-multiple: true
         continue-on-error: true
       
       - name: Combine coverage and generate reports
+        shell: bash
         run: |
           # List downloaded artifacts for debugging
           echo "=== Coverage data directory ==="
           ls -laR coverage-data/ 2>/dev/null || echo "No coverage-data directory"
           echo "=== Finding coverage files ==="
           # Search recursively for any .coverage* files produced by runners
-          find coverage-data -type f -name '.coverage*' -o -name 'coverage.json' -print 2>/dev/null || echo "No coverage files found"
+          find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) -print 2>/dev/null || echo "No coverage files found"
           # Copy all found coverage files to current directory preserving names
           find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) -exec cp {} . \; 2>/dev/null || true
           # List coverage files to combine
           echo "=== Coverage files to combine ==="
-          ls -la .coverage* 2>/dev/null || echo "No .coverage files to combine"
+          ls -la .coverage* coverage.json 2>/dev/null || echo "No .coverage files to combine"
           # Combine coverage data from all runners (only if files exist)
-          if compgen -G ".coverage*" > /dev/null; then
+          if ls .coverage* coverage.json 1>/dev/null 2>&1; then
             python -m coverage combine --keep
             python -m coverage report -m
             python -m coverage xml -o coverage.xml
