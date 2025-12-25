@@ -1,7 +1,6 @@
 name: All Tests
 on: [push]
 
-
 jobs:
   #============================================================
   # 3 Test Jobs on 3 OSes: Windows, macOS, Ubuntu
@@ -239,6 +238,7 @@ jobs:
           else
             echo "umbridge doctests only run on Linux"
           fi
+
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
@@ -281,6 +281,16 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4"
+  
+      # -----------------------------------------------------------
+      # Display final accumulated coverage from all test stages
+      # -----------------------------------------------------------
+      - name: Display final coverage report
+        if: runner.os != 'Windows'
+        run: |
+          coverage report -m
+          coverage json
+      
       # -----------------------------------------------------------
       # Upload coverage data for later combination
       # -----------------------------------------------------------
@@ -289,10 +299,8 @@ jobs:
         with:
           name: coverage-${{ matrix.os }}
           path: |
-            .coverage
-            .coverage.*
-            coverage.json
-          retention-days: 7
+            *coverage*
+          retention-days: 10
 
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
