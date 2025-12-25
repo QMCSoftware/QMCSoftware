@@ -28,7 +28,6 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           rm -f .coverage* coverage.json || true
-
       - name: Remove old coverage data (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -279,7 +278,6 @@ jobs:
           conda clean --all --yes || true
           pip cache purge || true
           Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
-
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 
@@ -293,7 +291,6 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4"
-
       # -----------------------------------------------------------
       # Display final accumulated coverage from all test stages
       # -----------------------------------------------------------
@@ -302,7 +299,6 @@ jobs:
         run: |
           coverage report -m
           coverage json
-
       # -----------------------------------------------------------
       # Upload coverage data for later combination
       # -----------------------------------------------------------
@@ -334,30 +330,38 @@ jobs:
       - name: Install coverage
         run: python -m pip install coverage
       
-      - name: Download all coverage artifacts
+      - name: Download all coverage artifacts (into separate folders)
         uses: actions/download-artifact@v4
         with:
           path: coverage-data
           pattern: coverage-*
-          merge-multiple: true
         continue-on-error: true
       
       - name: Combine coverage and generate reports
-        shell: bash
         run: |
           # List downloaded artifacts for debugging
           echo "=== Coverage data directory ==="
           ls -laR coverage-data/ 2>/dev/null || echo "No coverage-data directory"
-          echo "=== Finding coverage files ==="
+
+    
           # Search recursively for any .coverage* files produced by runners
-          find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) -print 2>/dev/null || echo "No coverage files found"
-          # Copy all found coverage files to current directory preserving names
+          echo "=== Finding coverage files ==="
+          find coverage-data -type f -name '.coverage*' -o -name 'coverage.json' -print 2>/dev/null || echo "No coverage files found"
+
+          # Copy all found coverage files to current directory changing names
           find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) -exec cp {} . \; 2>/dev/null || true
+          
+          # Rename coverage.json files based on OS
+          [ -f "coverage-data/coverage-macos-latest/coverage.json" ] && cp "coverage-data/coverage-macos-latest/coverage.json" "macos-coverage.json" 2>/dev/null || true
+          [ -f "coverage-data/coverage-windows-latest/coverage.json" ] && cp "coverage-data/coverage-windows-latest/coverage.json" "windows-coverage.json" 2>/dev/null || true
+          [ -f "coverage-data/coverage-ubuntu-latest/coverage.json" ] && cp "coverage-data/coverage-ubuntu-latest/coverage.json" "ubuntu-coverage.json" 2>/dev/null || true
+          
           # List coverage files to combine
           echo "=== Coverage files to combine ==="
-          ls -la .coverage* coverage.json 2>/dev/null || echo "No .coverage files to combine"
-          # Combine coverage data from all runners (only if files exist)
-          if ls .coverage* coverage.json 1>/dev/null 2>&1; then
+          ls -la *coverage* 2>/dev/null || echo "No .coverage files to combine"
+          
+          # Combine coverage data from all runners 
+          if compgen -G "*coverage*" > /dev/null; then
             python -m coverage combine --keep
             python -m coverage report -m
             python -m coverage xml -o coverage.xml
