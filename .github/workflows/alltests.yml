@@ -346,10 +346,17 @@ jobs:
     
           # Search recursively for any .coverage* files produced by runners
           echo "=== Finding coverage files ==="
-          find coverage-data -type f -name '.coverage*' -o -name 'coverage.json' -print 2>/dev/null || echo "No coverage files found"
+          find coverage-data -type f \( -name '.coverage' -o -name '.coverage.*' -o -name 'coverage.json' \) -print 2>/dev/null || echo "No coverage files found"
 
-          # Copy all found coverage files to current directory changing names
-          find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) -exec cp {} . \; 2>/dev/null || true
+          # Copy and rename .coverage binary files from each OS with unique names
+          [ -f "coverage-data/coverage-macos-latest/.coverage" ] && cp "coverage-data/coverage-macos-latest/.coverage" ".coverage.macos" 2>/dev/null || true
+          [ -f "coverage-data/coverage-windows-latest/.coverage" ] && cp "coverage-data/coverage-windows-latest/.coverage" ".coverage.windows" 2>/dev/null || true
+          [ -f "coverage-data/coverage-ubuntu-latest/.coverage" ] && cp "coverage-data/coverage-ubuntu-latest/.coverage" ".coverage.ubuntu" 2>/dev/null || true
+          
+          # Copy any additional .coverage.* files (from parallel test execution)
+          find coverage-data/coverage-macos-latest -name '.coverage.*' -exec cp {} . \; 2>/dev/null || true
+          find coverage-data/coverage-windows-latest -name '.coverage.*' -exec cp {} . \; 2>/dev/null || true
+          find coverage-data/coverage-ubuntu-latest -name '.coverage.*' -exec cp {} . \; 2>/dev/null || true
           
           # Rename coverage.json files based on OS
           [ -f "coverage-data/coverage-macos-latest/coverage.json" ] && cp "coverage-data/coverage-macos-latest/coverage.json" "macos-coverage.json" 2>/dev/null || true
@@ -358,10 +365,10 @@ jobs:
           
           # List coverage files to combine
           echo "=== Coverage files to combine ==="
-          ls -la *coverage* 2>/dev/null || echo "No .coverage files to combine"
+          ls -la .coverage* 2>/dev/null || echo "No .coverage files to combine"
           
-          # Combine coverage data from all runners 
-          if compgen -G "*coverage*" > /dev/null; then
+          # Combine coverage data from all runners (only if .coverage* binary files exist)
+          if compgen -G ".coverage*" > /dev/null; then
             python -m coverage combine --keep
             python -m coverage report -m
             python -m coverage xml -o coverage.xml
