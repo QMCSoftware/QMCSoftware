@@ -23,194 +23,325 @@ jobs:
             python-version: '3.8'
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[dev]
-    
-    - name: Run tests with coverage
-      run: |
-        coverage run -m pytest
-        coverage report
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-
-  test-notebooks:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        notebook-group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[dev]
-        pip install jupyter nbconvert
-    
-    - name: Get notebook list
-      id: notebooks
-      run: |
-        # Get all Jupyter notebooks, excluding certain directories
-        notebooks=$(find . -name "*.ipynb" -not -path "*/.*" -not -path "*/_*" | sort)
-        echo "All notebooks:"
-        echo "$notebooks"
-        
-        # Count total notebooks
-        total=$(echo "$notebooks" | wc -l)
-        echo "Total notebooks: $total"
-        
-        # Calculate notebooks per group (ceiling division)
-        per_group=$(( ($total + 9) / 10 ))
-        echo "Notebooks per group: $per_group"
-        
-        # Get notebooks for this group
-        start=$(( (${{ matrix.notebook-group }} - 1) * per_group + 1 ))
-        end=$(( ${{ matrix.notebook-group }} * per_group ))
-        
-        group_notebooks=$(echo "$notebooks" | sed -n "${start},${end}p")
-        echo "Group ${{ matrix.notebook-group }} notebooks (lines $start-$end):"
-        echo "$group_notebooks"
-        
-        # Save to file for next step
-        echo "$group_notebooks" > notebooks_to_test.txt
-    
-    - name: Test notebooks
-      run: |
-        echo "Testing notebooks in group ${{ matrix.notebook-group }}:"
-        cat notebooks_to_test.txt
-        
-        failed=0
-        while IFS= read -r notebook; do
-          if [ -n "$notebook" ]; then
-            echo "Testing: $notebook"
-            if jupyter nbconvert --to notebook --execute --inplace "$notebook"; then
-              echo "✓ Passed: $notebook"
-            else
-              echo "✗ Failed: $notebook"
-              failed=$((failed + 1))
-            fi
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-activate-base: true
+          conda-remove-defaults: true
+          use-only-tar-bz2: true
+      
+      # -----------------------------------------------------------
+      # Clean old coverage files
+      # -----------------------------------------------------------
+      - name: Remove old coverage data (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          rm -f .coverage* coverage.json || true
+      - name: Remove old coverage data (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Remove-Item -Path .coverage* -Force -ErrorAction SilentlyContinue -Confirm:$false
+          Remove-Item -Path coverage.json -Force -ErrorAction SilentlyContinue -Confirm:$false
+      # -----------------------------------------------------------
+      # Add 12GB swap, i.e., virtual memory (OS-specific)
+      # -----------------------------------------------------------
+      - name: Add 12GB swap (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo fallocate -l 12G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+      - name: Add 12GB swap (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # Create and mount a temporary swapfile
+          sudo mkfile 12g /private/var/vm/tempswapfile
+          sudo chmod 600 /private/var/vm/tempswapfile
+      - name: Configure pagefile (Windows) via CIM (12GB)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $drive    = "D:"
+          $initialMB = 12288
+          $maxMB     = 12288
+          $pagefile  = "$drive\pagefile.sys"
+          Write-Host "Configuring pagefile: $pagefile (Initial=${initialMB}MB, Max=${maxMB}MB)"
+          # Disable automatic management
+          $cs = Get-CimInstance Win32_ComputerSystem
+          if ($cs.AutomaticManagedPagefile) {
+            Set-CimInstance -InputObject $cs -Property @{ AutomaticManagedPagefile = $false } | Out-Null
+          }
+          # Create or update the pagefile setting
+          $escaped = $pagefile.Replace('\','\\')
+          $pfs = Get-CimInstance Win32_PageFileSetting -Filter "Name='$escaped'" -ErrorAction SilentlyContinue
+          if ($null -eq $pfs) {
+            New-CimInstance -ClassName Win32_PageFileSetting -Property @{
+              Name        = $pagefile
+              InitialSize = $initialMB
+              MaximumSize = $maxMB
+            } | Out-Null
+          } else {
+            Set-CimInstance -InputObject $pfs -Property @{
+              InitialSize = $initialMB
+              MaximumSize = $maxMB
+            } | Out-Null
+          }
+          "=== Pagefile settings ==="
+          Get-CimInstance Win32_PageFileSetting | Format-Table Name,InitialSize,MaximumSize -Auto
+      # -----------------------------------------------------------
+      # Free disk + conda cache early (OS-specific)
+      # -----------------------------------------------------------
+      - name: Free space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          df -h
+          sudo apt-get clean
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+      - name: Free space (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          df -h
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+      - name: Free space (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+          conda clean --all --yes || true
+          pip cache purge || true
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+      # -----------------------------------------------------------
+      # Show resources (OS-specific)
+      # -----------------------------------------------------------
+      - name: Show runner resources
+        if: runner.os != 'Windows'
+        run: |
+          echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
+          free -h || vm_stat
+          df -h
+      - name: Show runner resources
+        if: runner.os == 'Windows'
+        run: |
+          # Check current pagefile settings
+          Get-WmiObject Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize
+          # Display system memory info
+          Get-ComputerInfo -Property CsTotalPhysicalMemory
+      # -----------------------------------------------------------
+      # Install Python dependencies
+      # -----------------------------------------------------------
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/pip/wheels
+            ~/Library/Caches/pip
+            ~/Library/Caches/pip/wheels
+            ~\AppData\Local\pip\Cache
+            ~\AppData\Local\pip\Cache\wheels
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache wheel files
+        uses: actions/cache@v4
+        with:
+          path: ./.wheels
+          key: ${{ runner.os }}-wheels-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-wheels-
+          
+      - name: Build and cache wheels (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch,test_umbridge] || true
+      - name: Install Python dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]"
+      - name: Build and cache wheels (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || true
+      - name: Install Python dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch]"
+      - name: Build and cache wheels (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || Write-Host 'wheel build step completed'
+      - name: Install Python dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
+      # -----------------------------------------------------------
+      # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
+      # -----------------------------------------------------------
+      - name: Install minimal LaTeX (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super
+      - name: Install minimal LaTeX (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask basictex
+          eval "$(/usr/libexec/path_helper)"
+          sudo tlmgr update --self
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+      - name: Cache MiKTeX (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: C:\Program Files\MiKTeX
+          key: ${{ runner.os }}-miktex-${{ hashFiles('.github/workflows/alltests.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-miktex-
+          
+      - name: Install MiKTeX (retry if needed)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install miktex --no-progress --limit-output -y || choco install miktex --no-progress --limit-output -y
+          # Put MiKTeX on PATH for all subsequent steps
+          echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
+      
+      - name: Install required MiKTeX packages
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          miktexsetup finish
+          mpm --admin --verbose --require=cm,cm-super,cmex10,luxi,times,thailatex,latexmk,dvipng
+      
+      - name: Update MiKTeX font map
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          initexmf --admin --update-fndb
+          initexmf --admin --mkmaps
+          
+          latex --version
+          latexmk -v
+          dvipng --version
+      
+      # -----------------------------------------------------------
+      # Run doctests (OS-specific)
+      # -----------------------------------------------------------      
+      - run: pip freeze
+      - run: make doctests_minimal
+      - run: make doctests_torch
+      - run: make doctests_gpytorch
+      - run: make doctests_botorch
+      - run: make doctests_markdown
+      - name: run umbridge doctests on Linux only
+        shell: bash -l {0}
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            make doctests_umbridge
+          else
+            echo "umbridge doctests only run on Linux"
           fi
-        done < notebooks_to_test.txt
+      # -----------------------------------------------------------
+      # Run unittests for Python source files
+      # -----------------------------------------------------------   
+      - name: Run unittests (parallel)
+        run: make unittests
+      
+      # -----------------------------------------------------------
+      # Free disk + conda cache before booktests (OS-specific)
+      # -----------------------------------------------------------
+      - name: Free space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          df -h
+          sudo apt-get clean
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          docker system prune -af || true
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+      - name: Free space (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          df -h
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+      - name: Free space (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+          conda clean --all --yes || true
+          pip cache purge || true
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+      # -----------------------------------------------------------
+      # Run unittests for Jupyter notebooks (OS-specific)
+      # ----------------------------------------------------------- 
+      - name: Run booktests (parallel) on Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash -l {0}
+        run: |
+          make booktests_parallel_no_docker    # Parsl not supported on Windows
+      - name: Run booktests (parallel) on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          make booktests_parallel_pytest PYTEST_XDIST="-n 4"
+      # -----------------------------------------------------------
+      # Display final accumulated coverage from all test stages
+      # -----------------------------------------------------------
+      - name: Display final coverage report
+        if: runner.os != 'Windows'
+        run: |
+          coverage report -m
+          coverage json
+      
+      # -----------------------------------------------------------
+      # Debug: List coverage files before upload
+      # -----------------------------------------------------------
+      - name: List coverage files before upload
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== All coverage files ==="
+          ls -la .coverage* coverage.json 2>/dev/null || echo "No coverage files found"
+          echo "=== Find all .coverage files ==="
+          find . -maxdepth 1 -name '.coverage*' -o -name 'coverage.json' | head -20
+        shell: bash
         
-        if [ $failed -gt 0 ]; then
-          echo "$failed notebook(s) failed"
-          exit 1
-        fi
+      # -----------------------------------------------------------
+      # Upload coverage data for later combination
+      # -----------------------------------------------------------
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.os }}
+          path: |
+            .coverage
+            .coverage.*
+            coverage.json
+          retention-days: 1
+          if-no-files-found: warn
+          include-hidden-files: true
 
-  test-workouts:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        workout-group: [1, 2, 3, 4, 5]
-
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[dev]
-    
-    - name: Get workout list
-      id: workouts
-      run: |
-        # Get all Python files in workouts directory
-        workouts=$(find ./workouts -name "*.py" -not -name "__*" | sort)
-        echo "All workouts:"
-        echo "$workouts"
-        
-        # Count total workouts
-        total=$(echo "$workouts" | wc -l)
-        echo "Total workouts: $total"
-        
-        # Calculate workouts per group (ceiling division)
-        per_group=$(( ($total + 4) / 5 ))
-        echo "Workouts per group: $per_group"
-        
-        # Get workouts for this group
-        start=$(( (${{ matrix.workout-group }} - 1) * per_group + 1 ))
-        end=$(( ${{ matrix.workout-group }} * per_group ))
-        
-        group_workouts=$(echo "$workouts" | sed -n "${start},${end}p")
-        echo "Group ${{ matrix.workout-group }} workouts (lines $start-$end):"
-        echo "$group_workouts"
-        
-        # Save to file for next step
-        echo "$group_workouts" > workouts_to_test.txt
-    
-    - name: Test workouts
-      run: |
-        echo "Testing workouts in group ${{ matrix.workout-group }}:"
-        cat workouts_to_test.txt
-        
-        failed=0
-        while IFS= read -r workout; do
-          if [ -n "$workout" ]; then
-            echo "Testing: $workout"
-            if python "$workout"; then
-              echo "✓ Passed: $workout"
-            else
-              echo "✗ Failed: $workout"
-              failed=$((failed + 1))
-            fi
-          fi
-        done < workouts_to_test.txt
-        
-        if [ $failed -gt 0 ]; then
-          echo "$failed workout(s) failed"
-          exit 1
-        fi
-
-  test-integration:
-    runs-on: ubuntu-latest
-    needs: [test, test-notebooks, test-workouts]
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[dev]
-    
-    - name: Run integration tests
-      run: |
-        pytest test/fasttests/test_integration.py -v
-
-  coverage-report:
+  # =============================================================
+  # Combine coverage from all OS runners and produce final report
+  # =============================================================
+  combine-coverage:
     runs-on: ubuntu-latest
     needs: test
     
