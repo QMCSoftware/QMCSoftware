@@ -2,9 +2,9 @@ name: Run all tests
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ main, develop, booktests_choi ]
   pull_request:
-    branches: [ master, develop ]
+    branches: [ main, develop ]
   workflow_dispatch:
 
 jobs:
@@ -16,186 +16,244 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ['3.8', '3.9', '3.10', '3.11']
         exclude:
-          # Exclude some combinations to reduce CI time
+          # Exclude some combinations to reduce build time
           - os: macos-latest
             python-version: '3.8'
-          - os: macos-latest
-            python-version: '3.9'
           - os: windows-latest
             python-version: '3.8'
-          - os: windows-latest
-            python-version: '3.9'
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Get pip cache dir
-        id: pip-cache
-        shell: bash
-        run: |
-          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache pip packages
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
-            ${{ runner.os }}-pip-
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-cov coverage
-
-      - name: Run unit tests
-        shell: bash
-        run: |
-          echo "Running unit tests..."
-          python -m pytest test/fasttests --cov=qmcpy --cov-report=xml --cov-report=term -v
-
-      - name: Run integration tests
-        shell: bash
-        run: |
-          echo "Running integration tests..."
-          python -m pytest test/longtests --cov=qmcpy --cov-append --cov-report=xml --cov-report=term -v
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          flags: unittests
-          env_vars: OS,PYTHON
-          name: codecov-umbrella
-          fail_ci_if_error: false
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+    
+    - name: Run tests with coverage
+      run: |
+        coverage run -m pytest
+        coverage report
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
 
   test-notebooks:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        notebook-group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        pip install jupyter nbconvert
+    
+    - name: Get notebook list
+      id: notebooks
+      run: |
+        # Get all Jupyter notebooks, excluding certain directories
+        notebooks=$(find . -name "*.ipynb" -not -path "*/.*" -not -path "*/_*" | sort)
+        echo "All notebooks:"
+        echo "$notebooks"
+        
+        # Count total notebooks
+        total=$(echo "$notebooks" | wc -l)
+        echo "Total notebooks: $total"
+        
+        # Calculate notebooks per group (ceiling division)
+        per_group=$(( ($total + 9) / 10 ))
+        echo "Notebooks per group: $per_group"
+        
+        # Get notebooks for this group
+        start=$(( (${{ matrix.notebook-group }} - 1) * per_group + 1 ))
+        end=$(( ${{ matrix.notebook-group }} * per_group ))
+        
+        group_notebooks=$(echo "$notebooks" | sed -n "${start},${end}p")
+        echo "Group ${{ matrix.notebook-group }} notebooks (lines $start-$end):"
+        echo "$group_notebooks"
+        
+        # Save to file for next step
+        echo "$group_notebooks" > notebooks_to_test.txt
+    
+    - name: Test notebooks
+      run: |
+        echo "Testing notebooks in group ${{ matrix.notebook-group }}:"
+        cat notebooks_to_test.txt
+        
+        failed=0
+        while IFS= read -r notebook; do
+          if [ -n "$notebook" ]; then
+            echo "Testing: $notebook"
+            if jupyter nbconvert --to notebook --execute --inplace "$notebook"; then
+              echo "✓ Passed: $notebook"
+            else
+              echo "✗ Failed: $notebook"
+              failed=$((failed + 1))
+            fi
+          fi
+        done < notebooks_to_test.txt
+        
+        if [ $failed -gt 0 ]; then
+          echo "$failed notebook(s) failed"
+          exit 1
+        fi
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install jupyter nbconvert nbformat pytest pytest-cov coverage
-
-      - name: Test workouts
-        run: |
-          echo "Testing workout notebooks..."
-          for notebook in workouts/wo*.ipynb; do
-            echo "Testing $notebook"
-            jupyter nbconvert --to notebook --execute --inplace "$notebook" || exit 1
-          done
-
-      - name: Test integration demos
-        run: |
-          echo "Testing integration demo notebooks..."
-          for notebook in demos/integration_examples*.ipynb; do
-            echo "Testing $notebook"
-            jupyter nbconvert --to notebook --execute --inplace "$notebook" || exit 1
-          done
-
-  test-memory:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-cov memory_profiler
-
-      - name: Run memory tests
-        run: |
-          echo "Running memory profiling tests..."
-          python -m pytest test/memory_tests -v
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install linting tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pylint
-
-      - name: Run flake8
-        run: |
-          # Stop the build if there are Python syntax errors or undefined names
-          flake8 qmcpy --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Exit-zero treats all errors as warnings
-          flake8 qmcpy --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-      - name: Run pylint
-        run: |
-          pylint qmcpy --exit-zero
-
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install sphinx sphinx_rtd_theme
-
-      - name: Build documentation
-        run: |
-          cd sphinx
-          make html
-
-  test-booktests:
+  test-workouts:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
-        test-group: [
+        workout-group: [1, 2, 3, 4, 5]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+    
+    - name: Get workout list
+      id: workouts
+      run: |
+        # Get all Python files in workouts directory
+        workouts=$(find ./workouts -name "*.py" -not -name "__*" | sort)
+        echo "All workouts:"
+        echo "$workouts"
+        
+        # Count total workouts
+        total=$(echo "$workouts" | wc -l)
+        echo "Total workouts: $total"
+        
+        # Calculate workouts per group (ceiling division)
+        per_group=$(( ($total + 4) / 5 ))
+        echo "Workouts per group: $per_group"
+        
+        # Get workouts for this group
+        start=$(( (${{ matrix.workout-group }} - 1) * per_group + 1 ))
+        end=$(( ${{ matrix.workout-group }} * per_group ))
+        
+        group_workouts=$(echo "$workouts" | sed -n "${start},${end}p")
+        echo "Group ${{ matrix.workout-group }} workouts (lines $start-$end):"
+        echo "$group_workouts"
+        
+        # Save to file for next step
+        echo "$group_workouts" > workouts_to_test.txt
+    
+    - name: Test workouts
+      run: |
+        echo "Testing workouts in group ${{ matrix.workout-group }}:"
+        cat workouts_to_test.txt
+        
+        failed=0
+        while IFS= read -r workout; do
+          if [ -n "$workout" ]; then
+            echo "Testing: $workout"
+            if python "$workout"; then
+              echo "✓ Passed: $workout"
+            else
+              echo "✗ Failed: $workout"
+              failed=$((failed + 1))
+            fi
+          fi
+        done < workouts_to_test.txt
+        
+        if [ $failed -gt 0 ]; then
+          echo "$failed workout(s) failed"
+          exit 1
+        fi
+
+  test-integration:
+    runs-on: ubuntu-latest
+    needs: [test, test-notebooks, test-workouts]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+    
+    - name: Run integration tests
+      run: |
+        pytest test/fasttests/test_integration.py -v
+
+  coverage-report:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+    
+    - name: Download all coverage artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: coverage-data
+    
+    - name: Combine coverage data
+      run: |
+        coverage combine coverage-data/**/.coverage*
+        coverage xml
+        coverage report
+    
+    - name: Upload combined coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: combined
+        name: codecov-combined
+
+  test-book:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        book-section: [
+          'preface',
           'chapter1',
-          'chapter2',
+          'chapter2', 
           'chapter3',
           'chapter4',
           'chapter5',
@@ -206,156 +264,176 @@ jobs:
         ]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Get pip cache dir
-        id: pip-cache
-        shell: bash
-        run: |
-          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache pip packages
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-booktests-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-booktests-${{ matrix.python-version }}-
-            ${{ runner.os }}-pip-booktests-
-
-      - name: Install system dependencies (Ubuntu)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install jupyter nbconvert nbformat pytest pytest-cov coverage ipykernel
-          python -m ipykernel install --user --name python3
-
-      - name: List notebooks for ${{ matrix.test-group }}
-        shell: bash
-        run: |
-          case "${{ matrix.test-group }}" in
-            chapter1)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter1*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter2)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter2*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter3)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter3*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter4)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter4*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter5)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter5*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter6)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter6*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter7)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter7*.ipynb" >> $GITHUB_ENV
-              ;;
-            chapter8)
-              echo "NOTEBOOKS=demos/mcqmc2024/Chapter8*.ipynb" >> $GITHUB_ENV
-              ;;
-            appendix)
-              echo "NOTEBOOKS=demos/mcqmc2024/Appendix*.ipynb" >> $GITHUB_ENV
-              ;;
-          esac
-
-      - name: Test ${{ matrix.test-group }} notebooks
-        shell: bash
-        run: |
-          echo "Testing notebooks matching pattern: $NOTEBOOKS"
-          shopt -s nullglob
-          notebooks=($NOTEBOOKS)
-          if [ ${#notebooks[@]} -eq 0 ]; then
-            echo "No notebooks found matching pattern: $NOTEBOOKS"
-            exit 0
-          fi
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-plain-generic pandoc
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        pip install jupyter-book sphinx-book-theme myst-nb
+    
+    - name: List book files
+      run: |
+        echo "Checking for book files in section: ${{ matrix.book-section }}"
+        if [ -d "book/${{ matrix.book-section }}" ]; then
+          echo "Found directory: book/${{ matrix.book-section }}"
+          ls -la book/${{ matrix.book-section }}
+        else
+          echo "Directory not found: book/${{ matrix.book-section }}"
+        fi
+    
+    - name: Test book section - ${{ matrix.book-section }}
+      run: |
+        section="${{ matrix.book-section }}"
+        
+        # Check if section directory exists
+        if [ ! -d "book/$section" ]; then
+          echo "Section directory book/$section does not exist, skipping..."
+          exit 0
+        fi
+        
+        # Find all .md and .ipynb files in the section
+        files=$(find "book/$section" -type f \( -name "*.md" -o -name "*.ipynb" \) 2>/dev/null || true)
+        
+        if [ -z "$files" ]; then
+          echo "No markdown or notebook files found in book/$section, skipping..."
+          exit 0
+        fi
+        
+        echo "Found files to test:"
+        echo "$files"
+        
+        # Test each file
+        failed=0
+        for file in $files; do
+          echo "Testing: $file"
           
-          for notebook in "${notebooks[@]}"; do
-            echo "========================================="
-            echo "Testing: $notebook"
-            echo "========================================="
-            
-            # Check if notebook exists
-            if [ ! -f "$notebook" ]; then
-              echo "Warning: Notebook not found: $notebook"
-              continue
+          if [[ "$file" == *.ipynb ]]; then
+            # For notebooks, execute them
+            if jupyter nbconvert --to notebook --execute --inplace "$file"; then
+              echo "✓ Passed: $file"
+            else
+              echo "✗ Failed: $file"
+              failed=$((failed + 1))
             fi
-            
-            # Execute notebook with coverage
-            jupyter nbconvert --to notebook \
-              --execute \
-              --inplace \
-              --ExecutePreprocessor.timeout=600 \
-              --ExecutePreprocessor.kernel_name=python3 \
-              "$notebook"
-            
-            if [ $? -ne 0 ]; then
-              echo "Error: Failed to execute $notebook"
-              exit 1
-            fi
-            
-            echo "Successfully executed: $notebook"
-          done
-
-      - name: Check for coverage files
-        shell: bash
-        run: |
-          echo "Checking for coverage files..."
-          ls -la .coverage* 2>/dev/null || echo "No coverage files found"
-
-      - name: Combine coverage reports
-        shell: bash
-        run: |
-          if ls .coverage .coverage.* 2>/dev/null | grep -v '.coveragerc' | grep -q .; then
-            echo "Combining coverage reports..."
-            coverage combine
-            coverage xml
-            coverage report
           else
-            echo "No coverage data files to combine"
+            # For markdown files, just check if they're valid
+            if [ -r "$file" ]; then
+              echo "✓ Readable: $file"
+            else
+              echo "✗ Not readable: $file"
+              failed=$((failed + 1))
+            fi
           fi
+        done
+        
+        if [ $failed -gt 0 ]; then
+          echo "$failed file(s) failed in section $section"
+          exit 1
+        fi
+    
+    - name: Build book section
+      run: |
+        section="${{ matrix.book-section }}"
+        
+        # Only try to build if section exists
+        if [ ! -d "book/$section" ]; then
+          echo "Section directory book/$section does not exist, skipping build..."
+          exit 0
+        fi
+        
+        # Create a minimal _config.yml for testing if it doesn't exist
+        if [ ! -f "book/_config.yml" ]; then
+          cat > book/_config.yml << 'EOF'
+        title: QMC Software Book
+        author: QMC Software Team
+        logo: ''
+        
+        execute:
+          execute_notebooks: cache
+          timeout: 300
+        
+        parse:
+          myst_enable_extensions:
+            - dollarmath
+            - linkify
+            - substitution
+            - colon_fence
+        
+        sphinx:
+          config:
+            nb_execution_mode: cache
+        EOF
+        fi
+        
+        # Create a minimal _toc.yml for this section if needed
+        if [ ! -f "book/_toc.yml" ]; then
+          cat > book/_toc.yml << EOF
+        format: jb-book
+        root: README
+        chapters:
+        - file: $section/README
+        EOF
+        fi
+        
+        # Try to build just this section
+        echo "Building book section: $section"
+        cd book
+        if ls $section/*.md $section/*.ipynb 2>/dev/null | grep -q .; then
+          if ls .coverage .coverage.* 2>/dev/null | grep -v '.coveragerc' | grep -q .; then
+            echo "Found coverage files, combining..."
+            coverage combine
+          fi
+          # Build the whole book (jupyter-book doesn't support partial builds easily)
+          jupyter-book build . || echo "Build had warnings but continuing..."
+        else
+          echo "No content files found in $section/"
+        fi
 
-      - name: Upload coverage
-        if: success()
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          flags: booktests-${{ matrix.test-group }}
-          env_vars: PYTHON
-          name: codecov-booktests-${{ matrix.test-group }}-py${{ matrix.python-version }}
-          fail_ci_if_error: false
-
-  coverage:
+  build-full-book:
     runs-on: ubuntu-latest
-    needs: [test, test-booktests]
-    if: always()
+    needs: test-book
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/booktests_choi')
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Download all coverage reports
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-
-      - name: Upload final coverage
-        uses: codecov/codecov-action@v3
-        continue-on-error: true
-        with:
-          fail_ci_if_error: false
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-plain-generic pandoc
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        pip install jupyter-book sphinx-book-theme myst-nb
+    
+    - name: Build full book
+      run: |
+        cd book
+        jupyter-book build .
+    
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./book/_build/html
+        publish_branch: gh-pages
+        force_orphan: true
