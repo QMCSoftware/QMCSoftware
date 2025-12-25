@@ -352,5 +352,149 @@ jobs:
           if-no-files-found: warn
           retention-days: 1
 
+  #============================================================
+  # Coverage Summary Job - Runs after all OS tests complete
+  #============================================================
+  coverage-summary:
+    name: Generate Coverage Summary
+    needs: tests
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install coverage
+        run: pip install coverage
+      
+      # Download all coverage artifacts
+      - name: Download all coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage-artifacts
+          merge-multiple: false
+      
+      - name: Generate OS-specific coverage summary
+        run: |
+          python3 << 'EOF'
+          import json
+          import os
+          from pathlib import Path
+          
+          # OS platforms from the workflow
+          os_mapping = {
+              "windows-latest": "Windows",
+              "macos-latest": "macOS",
+              "ubuntu-latest": "Ubuntu"
+          }
+          
+          coverage_data = {}
+          artifacts_dir = Path("coverage-artifacts")
+          
+          # Read coverage from each OS artifact
+          for os_key in os_mapping.keys():
+              artifact_path = artifacts_dir / f"coverage-{os_key}" / "coverage.json"
+              if artifact_path.exists():
+                  with open(artifact_path, 'r') as f:
+                      data = json.load(f)
+                      coverage_pct = data.get('totals', {}).get('percent_covered', 0)
+                      coverage_data[os_key] = coverage_pct
+              else:
+                  coverage_data[os_key] = None
+          
+          # Generate summary table
+          print("\n" + "="*60)
+          print("OS and Coverage Summary")
+          print("="*60)
+          print(f"{'Operating System':<25} {'Coverage %':>20}")
+          print("-"*60)
+          
+          total_coverage = 0
+          valid_count = 0
+          
+          for os_key, os_name in os_mapping.items():
+              coverage_pct = coverage_data.get(os_key)
+              if coverage_pct is not None:
+                  print(f"{os_name:<25} {coverage_pct:>19.2f}%")
+                  total_coverage += coverage_pct
+                  valid_count += 1
+              else:
+                  print(f"{os_name:<25} {'N/A':>20}")
+          
+          print("-"*60)
+          if valid_count > 0:
+              avg_coverage = total_coverage / valid_count
+              print(f"{'Average Coverage':<25} {avg_coverage:>19.2f}%")
+          print("="*60)
+          print()
+          EOF
+      
+      - name: Comment coverage summary on PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            const osMapping = {
+              'windows-latest': 'Windows',
+              'macos-latest': 'macOS',
+              'ubuntu-latest': 'Ubuntu'
+            };
+            
+            let coverageData = {};
+            const artifactsDir = 'coverage-artifacts';
+            
+            // Read coverage from each OS artifact
+            for (const [osKey, osName] of Object.entries(osMapping)) {
+              const artifactPath = path.join(artifactsDir, `coverage-${osKey}`, 'coverage.json');
+              if (fs.existsSync(artifactPath)) {
+                const data = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
+                const coveragePct = data.totals?.percent_covered || 0;
+                coverageData[osKey] = coveragePct;
+              } else {
+                coverageData[osKey] = null;
+              }
+            }
+            
+            // Generate markdown table
+            let comment = '## 📊 Coverage Summary by OS\n\n';
+            comment += '| Operating System | Coverage % |\n';
+            comment += '|-----------------|------------|\n';
+            
+            let totalCoverage = 0;
+            let validCount = 0;
+            
+            for (const [osKey, osName] of Object.entries(osMapping)) {
+              const coverage = coverageData[osKey];
+              if (coverage !== null) {
+                comment += `| ${osName} | ${coverage.toFixed(2)}% |\n`;
+                totalCoverage += coverage;
+                validCount++;
+              } else {
+                comment += `| ${osName} | N/A |\n`;
+              }
+            }
+            
+            if (validCount > 0) {
+              const avgCoverage = totalCoverage / validCount;
+              comment += `| **Average** | **${avgCoverage.toFixed(2)}%** |\n`;
+            }
+            
+            // Post comment
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
