@@ -20,6 +20,15 @@ This document describes the available test targets in the Makefile for QMCSoftwa
 
 ## Detailed Descriptions
 
+## Scope
+
+This short guide highlights four practical areas:
+- Local tests in the `test/` directory and the Makefile targets that run them (for example `make unittests`, `make booktests_no_docker`, and `make doctests_no_docker`).
+- Local coverage targets in the Makefile (for example `make coverage` and `make delcoverage`) and how to collect coverage locally using `--cov-append` or `coverage run --append`.
+- Remote CI: the GitHub Actions workflow at `.github/workflows/alltests.yml` (referred to here as `alltests.yml`) which runs matrix jobs and invokes the Makefile targets for full validation.
+- Remote coverage publishing to Codecov and how to add a Codecov badge to the project `README.md`.
+
+
 ### Core Test Targets (Recommended)
 
 #### `make tests_fast` ⚡ **RECOMMENDED**
@@ -261,7 +270,7 @@ make tests_no_docker        # Sequential, safe (60–120s)
 ## Coverage Report Strategy
 
 ### Overview
-QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub Actions CI. Coverage data from all test types (doctests, unittests, booktests) running on all platforms (Ubuntu, macOS, Windows) is combined into a single comprehensive report.
+QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub Actions CI. Coverage data from all test types (doctests, unittests, booktests) running on all platforms (Ubuntu, macOS, Windows) is combined into a single  coverage percentage.
 
 ### Architecture
 
@@ -275,18 +284,6 @@ QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub
 │  4. Run booktests (with --cov-append)                   │
 │  5. Upload .coverage & coverage.json as artifacts       │
 └─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│  Final Job: combine-coverage (ubuntu-latest)            │
-├─────────────────────────────────────────────────────────┤
-│  1. Download all coverage artifacts (3 OS runners)      │
-│  2. Combine with: coverage combine                      │
-│  3. Generate reports:                                   │
-│     - coverage report -m (terminal)                     │
-│     - coverage xml -o coverage.xml                      │
-│     - coverage html -d coverage_html                    │
-│  4. Upload final HTML & XML as artifacts                │
-└─────────────────────────────────────────────────────────┘
 ```
 
 ### Key Syntax & Configuration
@@ -297,7 +294,6 @@ Cross-platform coverage combining requires relative paths to handle different OS
 **`.coveragerc` settings:**
 - `relative_files = True` – Store paths relative to project root
 - `[paths]` section maps all OS path variants to common source location
-- Enables successful `coverage combine` across Windows, macOS, and Ubuntu runners
 
 #### 2. Makefile Test Targets (Coverage Append Mode)
 All test targets use `--cov-append` (pytest) or `coverage run --append` to accumulate coverage within each OS runner:
@@ -321,8 +317,14 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 #### 3. GitHub Actions Workflow
 
 - **Clean coverage at start of each matrix job:**
-- **Upload coverage artifacts after all tests:**
-- **Combine in separate job:**
+
+## CI & Coverage (summary)
+
+- **GitHub Actions:** The main CI workflow is [`.github/workflows/alltests.yml`](../.github/workflows/alltests.yml) (referred to in this document as `alltests.yml`). It runs a matrix across OSes, and calls Makefile targets (e.g. `make tests_fast` / `make tests_no_docker`).
+
+
+    Note: the project CI is configured to upload coverage to Codecov.
+
 
 ### Local Coverage Workflow
 
@@ -330,16 +332,14 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 
 - Clean old coverage
 - Run tests (accumulates coverage with --cov-append)
-- View combined report
 
 
 ### Benefits
 
-1. **Unified cross-platform coverage** – One report combines Ubuntu, macOS, and Windows execution paths
-2. **Comprehensive test coverage** – Includes doctests, unittests, and notebook tests
-3. **Artifact persistence** – HTML and XML reports available for download/review in GitHub Actions
-4. **Incremental local testing** – `--cov-append` allows building coverage across multiple test runs
-5. **CI/CD integration ready** – XML output compatible with Codecov, Coveralls, etc.
+1. **Comprehensive test coverage** – Includes doctests, unittests, and notebook tests
+2. **Artifact persistence** – HTML and XML reports available 
+3. **Incremental local testing** – `--cov-append` allows building coverage across multiple test runs
+4. **CI/CD integration ready** – XML output compatible with Codecov, Coveralls, etc.
 
 ### Troubleshooting
 
@@ -347,13 +347,8 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 - Run `make delcoverage` to clean old data before starting fresh
 - Ensure all test commands use `--cov-append` or `coverage run --append`
 
-**GitHub Actions shows no coverage report:**
-- Check that `combine-coverage` job downloaded artifacts from all 3 OS runners
-- Verify each matrix job successfully uploaded coverage artifacts
-
 **Coverage combining fails locally:**
 - Ensure `coverage` package is installed: `pip install coverage`
-- Check that `.coverage` files exist before running `coverage combine`
 
 ---
 
