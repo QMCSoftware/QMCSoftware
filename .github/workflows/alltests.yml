@@ -281,26 +281,6 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4"
-  
-      # -----------------------------------------------------------
-      # Display final accumulated coverage from all test stages
-      # -----------------------------------------------------------
-      - name: Display final coverage report
-        if: runner.os != 'Windows'
-        run: |
-          coverage report -m
-          coverage json
-      
-      # -----------------------------------------------------------
-      # Upload coverage data for later combination
-      # -----------------------------------------------------------
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-${{ matrix.os }}
-          path: |
-            *coverage*
-          retention-days: 10
 
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
