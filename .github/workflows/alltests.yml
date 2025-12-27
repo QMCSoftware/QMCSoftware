@@ -83,28 +83,10 @@ jobs:
           "=== Pagefile settings ==="
           Get-CimInstance Win32_PageFileSetting | Format-Table Name,InitialSize,MaximumSize -Auto
       # -----------------------------------------------------------
-      # Free disk + conda cache early (OS-specific)
+      # Free disk + conda cache early
       # -----------------------------------------------------------
-      - name: Free space (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get clean
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          conda clean --all --yes
-          pip cache purge || true
-          df -h
-      - name: Free space (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          conda clean --all --yes
-          pip cache purge || true
-          df -h
-      - name: Free space (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          conda clean --all --yes || true
-          pip cache purge || true
-          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+      - name: Free space
+        run: make free_space
       # -----------------------------------------------------------
       # Show resources (OS-specific)
       # -----------------------------------------------------------
@@ -172,20 +154,11 @@ jobs:
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
       # -----------------------------------------------------------
-      # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
+      # Install minimal LaTeX required by Jupyter notebooks
       # -----------------------------------------------------------
-      - name: Install minimal LaTeX (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update
-          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super
-      - name: Install minimal LaTeX (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install --cask basictex
-          eval "$(/usr/libexec/path_helper)"
-          sudo tlmgr update --self
-          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+      - name: Install minimal LaTeX (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: make install_latex
       - name: Cache MiKTeX (Windows)
         if: runner.os == 'Windows'
         uses: actions/cache@v4
@@ -246,28 +219,10 @@ jobs:
         run: make unittests
       
       # -----------------------------------------------------------
-      # Free disk + conda cache before booktests (OS-specific)
+      # Free disk + conda cache before booktests
       # -----------------------------------------------------------
-      - name: Free space (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get clean
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          conda clean --all --yes
-          pip cache purge || true
-          df -h
-      - name: Free space (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          conda clean --all --yes
-          pip cache purge || true
-          df -h
-      - name: Free space (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          conda clean --all --yes || true
-          pip cache purge || true
-          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+      - name: Free space
+        run: make free_space
       # -----------------------------------------------------------
       # Run unittests for Jupyter notebooks (OS-specific)
       # ----------------------------------------------------------- 

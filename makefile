@@ -1,6 +1,33 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 
+free_space:
+	@echo "Cleaning conda cache..."
+	@conda clean --all --yes || true
+	@echo "Cleaning pip cache..."
+	@pip cache purge || true
+	@echo "Disk usage:"
+	@df -h || true
+
+install_latex:
+	@echo "Installing minimal LaTeX for Jupyter notebooks..."
+	@if [ "$$(uname)" = "Linux" ]; then \
+		echo "Detected Linux - installing texlive packages..."; \
+		sudo apt update && \
+		sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super; \
+	elif [ "$$(uname)" = "Darwin" ]; then \
+		echo "Detected macOS - installing BasicTeX..."; \
+		brew install --cask basictex && \
+		eval "$$(/usr/libexec/path_helper)" && \
+		sudo tlmgr update --self && \
+		sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm; \
+	else \
+		echo "Unsupported OS for automated LaTeX installation"; \
+		echo "Please install LaTeX manually"; \
+		exit 1; \
+	fi
+	@echo "LaTeX installation complete"
+
 doctests_minimal:
 	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
@@ -131,7 +158,8 @@ tests_fast:
 	( $(MAKE) booktests_parallel_no_docker ) & \
 	wait
 	$(MAKE) coverage
-
+      - name: Free space
+        run: make free_space
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
 
