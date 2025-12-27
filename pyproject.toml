@@ -49,7 +49,7 @@ requires-python = ">= 3.5"
 dependencies = [
     "numpy >= 1.17.0",
     "scipy >= 1.1.0",
-    "qmctoolscl >= 1.1.5",
+    "qmctoolscl >= 1.1.6",
     ]
 
 [project.optional-dependencies]
@@ -83,6 +83,7 @@ test = [
     "quantlib == 1.38",
     "ipywidgets == 8.1.7",
     "nbconvert >= 7.2.9",
+    "pytest-xdist >= 3.8.0",
     ]
 test_torch = [
     "torch >= 2.7.0",

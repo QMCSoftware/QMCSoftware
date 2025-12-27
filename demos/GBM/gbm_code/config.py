@@ -1,6 +1,6 @@
 is_debug = False
 
-def get_experiment_configurations():
+def get_experiment_configurations() -> dict:
     """
     Define experimental parameter ranges for GBM simulations.
     
@@ -20,7 +20,7 @@ def get_experiment_configurations():
             }
         }
 
-def get_sampler_configurations():
+def get_sampler_configurations() -> dict:
     """
     Define sampler types available for testing.
     
@@ -32,7 +32,7 @@ def get_sampler_configurations():
             'quantlib_samplers': ['IIDStdUniform', 'Sobol']
            }
 
-def get_gbm_parameters():
+def get_gbm_parameters() -> dict:
     """
     Define base Geometric Brownian Motion parameters.
     

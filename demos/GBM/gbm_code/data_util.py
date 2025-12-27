@@ -1,10 +1,11 @@
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import quantlib_util as qlu
 import qmcpy_util as qpu
 import config as cf
 
-def add_theoretical_results(results_data, theoretical_mean, theoretical_std):
+def add_theoretical_results(results_data: list, theoretical_mean: float, theoretical_std: float) -> None:
     """
     Add theoretical benchmark values to results data.
     
@@ -22,7 +23,9 @@ def add_theoretical_results(results_data, theoretical_mean, theoretical_std):
         'Std Dev Error': 0,
     })
 
-def add_quantlib_results(results_data, sampler_type, quantlib_final, theoretical_mean, theoretical_std):
+def add_quantlib_results(results_data: list, sampler_type: str, 
+                         quantlib_final: npt.NDArray[np.floating], 
+                         theoretical_mean: float, theoretical_std: float) -> None:
     """
     Compute and add QuantLib simulation results to results data.
     
@@ -44,7 +47,9 @@ def add_quantlib_results(results_data, sampler_type, quantlib_final, theoretical
         'Std Dev Error': abs(ql_emp_std - theoretical_std),
     })
 
-def add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theoretical_mean, theoretical_std):
+def add_qmcpy_results(results_data: list, sampler_type: str, 
+                      qmcpy_final: npt.NDArray[np.floating], qp_emp_mean: float, 
+                      theoretical_mean: float, theoretical_std: float) -> None:
     """
     Compute and add QMCPy simulation results to results data.
     
@@ -66,7 +71,9 @@ def add_qmcpy_results(results_data, sampler_type, qmcpy_final, qp_emp_mean, theo
         'Std Dev Error': abs(qp_emp_std - theoretical_std),
     })
 
-def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretical_std, params_ql, params_qp):
+def process_sampler_data(sampler_type: str, results_data: list, 
+                         theoretical_mean: float, theoretical_std: float, 
+                         params_ql: dict, params_qp: dict) -> tuple:
     """
     Process and compare data for a single sampler type across both libraries.
     
@@ -94,6 +101,10 @@ def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretic
         quantlib_paths, ql_gbm = None, None
         
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
+    
+    # Handle 3D array (replications, n_paths, n_steps) by taking first replication
+    if qmcpy_paths.ndim == 3:
+        qmcpy_paths = qmcpy_paths[0]
 
     # Final value statistics
     qmcpy_final = qmcpy_paths[:, -1]
@@ -107,7 +118,8 @@ def process_sampler_data(sampler_type, results_data, theoretical_mean, theoretic
     return quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp
 
 
-def create_timing_dataframe(quantlib_results, qmcpy_results, baseline_sampler):
+def create_timing_dataframe(quantlib_results: dict, qmcpy_results: dict, 
+                            baseline_sampler: str) -> pd.DataFrame:
     """
     Create comprehensive timing comparison table from benchmark results.
     
@@ -145,7 +157,7 @@ def create_timing_dataframe(quantlib_results, qmcpy_results, baseline_sampler):
     
     return pd.DataFrame(timing_data)
 
-def extract_comparison_data(results_df):
+def extract_comparison_data(results_df: pd.DataFrame) -> tuple:
     """
     Extract data for comparison plotting from results dataframe.
     
@@ -185,7 +197,8 @@ def extract_comparison_data(results_df):
     
     return samplers, qmcpy_errors, qmcpy_times, quantlib_errors, quantlib_times, theoretical_mean
 
-def add_theoretical_row(results, series_name, n_steps, n_paths, theoretical_mean, theoretical_std):
+def add_theoretical_row(results: list, series_name: str, n_steps: int, n_paths: int, 
+                        theoretical_mean: float, theoretical_std: float) -> None:
     """Add theoretical benchmark row to results"""
     results.append({
         'Series': series_name,
@@ -201,8 +214,9 @@ def add_theoretical_row(results, series_name, n_steps, n_paths, theoretical_mean
         'Runtime Std (s)': 0
     })
 
-def collect_library_results(sampler, series_name, n_steps, n_paths, 
-                          ql_timing, qp_timing, theoretical_mean, theoretical_std):
+def collect_library_results(sampler: str, series_name: str, n_steps: int, n_paths: int, 
+                            ql_timing: dict, qp_timing: dict, 
+                            theoretical_mean: float, theoretical_std: float) -> list:
     """Collect results for both QuantLib and QMCPy for a given sampler"""
     results = []
     gbm_params = cf.get_gbm_parameters()

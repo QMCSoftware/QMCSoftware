@@ -17,13 +17,13 @@ class IntegrationExampleTest(unittest.TestCase):
         dimensions = [1, 2, 3]
         true_values = [1.3803884470431430, 1.808186429263620, 2.168309102165481]
         for i in range(len(dimensions)):
-            integrand = Keister(IIDStdUniform(dimension=dimensions[i]))
+            integrand = Keister(IIDStdUniform(dimension=dimensions[i], seed=42))
             solution,data = CubMCCLT(integrand,abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_asian_option_multi_level(self):
         abs_tol =.01
-        integrand = FinancialOption(IIDStdUniform(64))
+        integrand = FinancialOption(IIDStdUniform(dimension=64, seed=42))
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(np.isclose(solution, true_value, atol=abs_tol))

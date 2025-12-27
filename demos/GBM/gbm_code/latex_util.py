@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def format_number(x):
+def format_number(x: float) -> str:
     """Custom formatting function to avoid unnecessary trailing zeros"""
     if pd.isna(x) or x == '-':
         return '-'
@@ -15,7 +15,7 @@ def format_number(x):
         return str(x)
 
 
-def format_results_dataframe(df, numeric_columns):
+def format_results_dataframe(df: pd.DataFrame, numeric_columns: list) -> pd.DataFrame:
     """Apply custom formatting to numeric columns in results dataframe"""
     results_formatted = df.copy()
     for col in numeric_columns:
@@ -23,7 +23,7 @@ def format_results_dataframe(df, numeric_columns):
             results_formatted[col] = results_formatted[col].apply(format_number)
     return results_formatted
 
-def generate_latex_table(df, caption, label):
+def generate_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
     """Generate LaTeX table with booktabs formatting"""
     # Create custom header
     header = ("Method & Sampler & Mean & Std Dev & Mean Absolute & Std Dev  & "
