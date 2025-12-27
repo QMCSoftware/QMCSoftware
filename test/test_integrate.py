@@ -45,7 +45,7 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_lebesgue_inf_measure(self):
         abs_tol = .1
-        true_measure = Lebesgue(Gaussian(Lattice(1)))
+        true_measure = Lebesgue(Gaussian(Lattice(1, seed=7)))
         myfunc = lambda x: np.exp(-x**2).sum(1)
         integrand = CustomFun(true_measure, myfunc)
         solution,data = CubQMCLatticeG(integrand,abs_tol=abs_tol).integrate()
@@ -82,7 +82,7 @@ class IntegrationExampleTest(unittest.TestCase):
         true_value = 0
         for i in range(len(dimensions)):
             d = dimensions[i]
-            integrand = Linear0(DigitalNetB2(d,replications=32))
+            integrand = Linear0(DigitalNetB2(d,replications=32, seed=7))
             solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_value) < abs_tol)
 
@@ -121,14 +121,14 @@ class IntegrationExampleTest(unittest.TestCase):
             a_i = a_list[i]
             b_i = b_list[i]
             integrand = CustomFun(
-                true_measure = Uniform(Lattice(d)),
+                true_measure = Uniform(Lattice(d, seed=7)),
                 g = lambda x, a=a_i, b=b_i: (b * (x - a) ** 2).sum(1))
             solution,data = CubQMCLatticeG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
 
     def test_european_call(self):
         abs_tol = 1e-2
-        integrand = FinancialOption(DigitalNetB2(16),
+        integrand = FinancialOption(DigitalNetB2(16, seed=7),
             option="EUROPEAN",
             volatility = .2,
             start_price = 5,
@@ -157,7 +157,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_european_put_bayes_lattice(self):
         abs_tol = 1e-2
         integrand = FinancialOption(
-            sampler = Lattice(dimension=16, order='RADICAL INVERSE'),
+            sampler = Lattice(dimension=16, order='RADICAL INVERSE', seed=7),
             option = "EUROPEAN",
             volatility = .5,
             start_price = 10,
@@ -172,7 +172,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_european_put_bayes_net(self):
         abs_tol = 5e-2
         integrand = FinancialOption(
-            sampler = DigitalNetB2(dimension=4),
+            sampler = DigitalNetB2(dimension=4, seed=7),
             option = "EUROPEAN",
             volatility = .5,
             start_price = 10,
