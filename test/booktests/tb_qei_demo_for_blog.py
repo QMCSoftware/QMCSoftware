@@ -2,6 +2,7 @@ import unittest
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@pytest.mark.slow 
 class NotebookTests(BaseNotebookTest):
 
     @testbook('../../demos/qei-demo-for-blog.ipynb', execute=True, timeout=TB_TIMEOUT)

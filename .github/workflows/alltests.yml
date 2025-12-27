@@ -280,7 +280,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          make booktests_parallel_pytest PYTEST_XDIST="-n 4"
+          make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
 
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
