@@ -89,13 +89,21 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	fi && \
 	cd ../..
 
-# make booktests_parallel_no_docker  TESTS="tb_Argonne_2023_Talk_Figures tb_Purdue_Talk_Figures"
+# coverage is done in function run_single_test() in test/booktests/parsl_test_runner.py
 booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	python parsl_test_runner.py $(TESTS) -v --failfast && \
+	cd ../.. 
+	
+
+# Windows-compatible parallel booktests using pytest-xdist instead of Parsl
+booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files
+	cd test/booktests/ && \
+	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
+	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py --cov=qmcpy --cov-append --cov-report=term --cov-report=json && \
 	cd ../.. 
 
 # Windows-compatible parallel booktests using pytest-xdist instead of Parsl
@@ -126,6 +134,15 @@ tests_fast:
 
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
+
+combine-coverage-local:  # Combine coverage files found under `coverage-data` and build reports locally
+	@echo "Combining coverage files from coverage-data/ and generating reports"
+	@mkdir -p coverage-data && \
+	if [ -z "$$(find coverage-data -type f \( -name '.coverage*' -o -name 'coverage.json' \) 2>/dev/null)" ]; then \
+		echo "No coverage files found in coverage-data/. Copying from current directory..."; \
+		cp -r .coverage* coverage.json coverage-data/ 2>/dev/null || ( echo "No coverage data found locally. Run tests first (e.g., make unittests)"; exit 1 ); \
+	fi; \
+	python scripts/combine_coverage.py --dir coverage-data --outdir coverage_html --keep
 
 delcoverage:
 	@rm .coverage

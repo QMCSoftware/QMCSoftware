@@ -23,7 +23,7 @@ class IntegrationExampleTest(unittest.TestCase):
 
     def test_asian_option_multi_level(self):
         abs_tol =.01
-        integrand = FinancialOption(IIDStdUniform(dimension=64, seed=42))
+        integrand = FinancialOption(IIDStdUniform(dimension=64, seed=7))
         solution,data = CubMCCLT(integrand, abs_tol).integrate()
         true_value = 1.7845
         self.assertTrue(np.isclose(solution, true_value, atol=abs_tol))
@@ -54,7 +54,7 @@ class IntegrationExampleTest(unittest.TestCase):
     
     def test_lebesgue_inf_measure_2d(self):
         abs_tol = .1
-        true_measure = Lebesgue(Gaussian(Lattice(2,replications=32),mean=1,covariance=2))
+        true_measure = Lebesgue(Gaussian(Lattice(2,replications=32,seed=7),mean=1,covariance=2))
         myfunc = lambda x: np.exp(-x**2).prod(-1)
         integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand,abs_tol=abs_tol).integrate()
@@ -64,7 +64,7 @@ class IntegrationExampleTest(unittest.TestCase):
     def test_uniform_measure(self):
         """ Mathematica: Integrate[(x^3 y^3)/6, {x, 1, 3}, {y, 3, 6}] """
         abs_tol = 1
-        true_measure = Uniform(Lattice(2,replications=32), lower_bound=[1,3], upper_bound=[3,6])
+        true_measure = Uniform(Lattice(2,replications=32, seed=7), lower_bound=[1,3], upper_bound=[3,6])
         myfunc = lambda x: (x.prod(-1))**3
         integrand = CustomFun(true_measure,myfunc)
         solution,data = CubQMCCLT(integrand, abs_tol=abs_tol).integrate()
@@ -101,7 +101,7 @@ class IntegrationExampleTest(unittest.TestCase):
         for i in range(len(dimensions)):
             d = dimensions[i]
             integrand = CustomFun(
-                true_measure = Uniform(IIDStdUniform(d),lower_bound=0,upper_bound=1),
+                true_measure = Uniform(IIDStdUniform(dimension=d, seed=7),lower_bound=0,upper_bound=1),
                 g = lambda x: (5*x).sum(1))
             solution,data = CubMCG(integrand, abs_tol=abs_tol).integrate()
             self.assertTrue(abs(solution - true_values[i]) < abs_tol)
