@@ -1,4 +1,4 @@
-import unittest
+import unittest, pytest
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 

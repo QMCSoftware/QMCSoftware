@@ -1,4 +1,4 @@
-import unittest
+import unittest, pytest
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
 @pytest.mark.slow 
