@@ -1,7 +1,7 @@
 import unittest, pytest
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-@pytest.mark.slow 
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
   
     notebook_path = f'../../demos/elliptic-pde.ipynb'
