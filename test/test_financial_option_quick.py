@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from qmcpy.integrand.financial_option import FinancialOption
 import qmcpy
