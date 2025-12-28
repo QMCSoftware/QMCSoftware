@@ -12,7 +12,6 @@ xml and HTML reports. It is cross-platform as long as Python and the
 from __future__ import annotations
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
