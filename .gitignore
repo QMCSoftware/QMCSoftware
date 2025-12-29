@@ -7,7 +7,6 @@ api.github.com/
 coverage.json
 *.ckpt
 *.npz
-*.csv 
 *hparams.yaml
 *.ipynb_checkpoints/
 demos/fgpr_figs/
