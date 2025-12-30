@@ -29,14 +29,14 @@ class OptionTest(unittest.TestCase):
 
     def test_mlqmc(self):
         atol = 1e-3
-        integrand = FinancialOption(DigitalNet(seed=7,replications=8),**self.options_args)
+        integrand = FinancialOption(DigitalNetB2(seed=7,replications=8),**self.options_args)
         true_value = integrand.get_exact_value_inf_dim()
         solution,data = CubMLQMC(integrand,abs_tol=atol).integrate()
         self.assertTrue(abs(solution-true_value) < atol)
     
     def test_mlqmc_cont(self):
         atol = 1e-3
-        integrand = FinancialOption(DigitalNet(seed=7,replications=8),**self.options_args)
+        integrand = FinancialOption(DigitalNetB2(seed=7,replications=8),**self.options_args)
         true_value = integrand.get_exact_value_inf_dim()
         solution,data = CubMLQMCCont(integrand,abs_tol=atol).integrate()
         self.assertTrue(abs(solution-true_value) < atol)

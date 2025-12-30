@@ -61,7 +61,7 @@ class OptionTest(unittest.TestCase):
     
     def test_cub_qmc_clt_dnb2(self):
         atol = 5e-3
-        integrand = FinancialOption(DigitalNet(self.d,seed=7,replications=32),**self.options_args)
+        integrand = FinancialOption(DigitalNetB2(self.d,seed=7,replications=32),**self.options_args)
         true_value = integrand.get_exact_value()
         solution,data = CubQMCCLT(integrand, abs_tol=atol).integrate()
         self.assertTrue(abs(solution-true_value) < atol)

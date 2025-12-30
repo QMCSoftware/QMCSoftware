@@ -63,7 +63,7 @@ class PiProblemTest(unittest.TestCase):
     def test_cub_qmc_clt_dnb2(self):
         atol = 1e-3
         integrand = CustomFun(
-            true_measure = Lebesgue(Uniform(DigitalNet(1,seed=7,replications=32), lower_bound=-2, upper_bound=2)), 
+            true_measure = Lebesgue(Uniform(DigitalNetB2(1,seed=7,replications=32), lower_bound=-2, upper_bound=2)), 
             g = lambda x: (np.sqrt(4 - x**2) * (1. / 2 + x**3 * np.cos(x / 2))).sum(-1))
         solution,data = CubQMCCLT(integrand, abs_tol=atol).integrate()
         self.assertTrue(abs(solution-np.pi) < atol)
