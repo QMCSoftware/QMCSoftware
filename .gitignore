@@ -36,6 +36,7 @@ demos/.jupyter
 coverage-data/*
 *coverage*
 
+
 # C
 *.so
 *.dylib
@@ -48,6 +49,8 @@ coverage-data/*
 # Website
 docs/_site
 docs/Gemfile.lock
+/site
+*.svg
 
 # Sphinx
 sphinx/_build/
@@ -89,3 +92,4 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
