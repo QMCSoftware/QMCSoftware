@@ -292,11 +292,11 @@ class TestCubMCL(unittest.TestCase):
     """ Unit tests for CubMCML StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        integrand = FinancialOption(Lattice())
+        integrand = FinancialOption(Lattice(seed=7))
         self.assertRaises(DistributionCompatibilityError, CubMCML, integrand)
 
     def test_n_max(self):
-        integrand = FinancialOption(IIDStdUniform(),start_price=30,strike_price=30)
+        integrand = FinancialOption(IIDStdUniform(seed=7),start_price=30,strike_price=30)
         algorithm = CubMCML(integrand,rmse_tol=.001,n_limit=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
@@ -304,11 +304,11 @@ class TestCubQMCML(unittest.TestCase):
     """ Unit tests for CubQMCML StoppingCriterion. """
 
     def test_raise_distribution_compatibility_error(self):
-        integrand = FinancialOption(IIDStdUniform())
+        integrand = FinancialOption(IIDStdUniform(seed=7))
         self.assertRaises(DistributionCompatibilityError, CubQMCML, integrand)
 
     def test_n_max(self):
-        integrand = FinancialOption(Lattice(replications=32),start_price=30,strike_price=30)
+        integrand = FinancialOption(Lattice(replications=32, seed=7),start_price=30,strike_price=30)
         algorithm = CubQMCML(integrand,abs_tol=tol,n_limit=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
