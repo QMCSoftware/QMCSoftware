@@ -1,4 +1,4 @@
-from .digital_net_any_base import DigitalNetAnyBases
+from .digital_net_any_bases import DigitalNetAnyBases
 
 
 class Faure(DigitalNetAnyBases):
