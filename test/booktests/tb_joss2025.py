@@ -1,9 +1,10 @@
-import unittest
+import unittest, pytest
 import os
 import shutil
 import subprocess
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     notebook_dir = '../../demos/talk_paper_demos/JOSS2025/'

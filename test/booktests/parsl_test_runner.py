@@ -24,7 +24,7 @@ else:
 def run_single_test(test_file, stdout='test_output.txt', stderr='test_error.txt'):
     """Run a single test file using bash"""
     return f"""
-    PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" python -m unittest {test_file} 2>&1
+    PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" python -m coverage run --append --source=../../qmcpy/ -m unittest {test_file} 2>&1
     """
 
 def execute_parallel_tests():

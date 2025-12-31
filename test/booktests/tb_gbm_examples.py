@@ -1,7 +1,7 @@
-import unittest
+import unittest, pytest
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
-
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def test_gbm_examples_notebook(self):

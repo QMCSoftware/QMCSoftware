@@ -110,7 +110,7 @@ class TestDigitalNetB2(unittest.TestCase):
     """ Unit tests for DigitalNetB2 DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Sobol(dimension=3, randomize=True)
+        distribution = Sobol(dimension=3, randomize=True, seed=7)
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
