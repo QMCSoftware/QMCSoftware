@@ -177,6 +177,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
         r_b = self.bases.shape[0]
         r_C = self.C.shape[0]
         assert alpha==1, "currently only alpha=1 is supported"
+        if alpha>1: assert (self.bases==self.bases[0,0]).all(), "alpha>1 performs digital interlacing which requires the same base across dimensions and replications."
         if "LMS" in self.randomize:
             S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(self.t),np.uint64(r_b),self.bases)
             C_lms = np.empty((self.replications,self.d,self.m_max,self.t),dtype=np.uint64)
