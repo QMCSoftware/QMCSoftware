@@ -134,6 +134,12 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # randu_d_32
                 np.ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS')]  # dvec
             self.halton_cf_qrng.restype = None
+        self.alpha = alpha
+        assert self.alpha>=1
+        assert self.alpha%1==0
+        if self.alpha>1:
+            assert (self.dvec==np.arange(self.d)).all(), "digital interlacing requires dimension is an int"
+        self.dtalpha = self.alpha*self.d 
         if self.type_bases_generating_matrices=="HALTON":
             self.bases = self.all_primes[self.dvec][None,:]
             self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(self.bases.min())))
@@ -141,58 +147,97 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             self.t = self.m_max if self.m_max>t else t
             self.C = qmctoolscl.gdn_get_halton_generating_matrix(np.uint64(1),np.uint64(self.d),np.uint64(self._t_curr))
         elif self.type_bases_generating_matrices=="FAURE":
+            assert (self.dvec==np.arange(self.d)).all(), "Faure requires dimension is an int"
             p = self.all_primes[np.argmax(self.all_primes>=self.d)]
-            self.bases = p*np.ones((1,self.d),dtype=np.uint64)
+            self.bases = p*np.ones((1,self.dtalpha),dtype=np.uint64)
             self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(p)))
             self._t_curr = self.m_max
             self.t = self.m_max if self.m_max>t else t
-            self.C = np.ones((self.dvec.max(),1,1),dtype=np.uint64)*np.eye(self._t_curr,dtype=np.uint64)
-            if self.dvec.max()>1:
+            self.C = np.ones((self.dtalpha,1,1),dtype=np.uint64)*np.eye(self._t_curr,dtype=np.uint64)
+            if self.dtalpha>1:
                 for a in range(self._t_curr):
                     for b in range(a+1):
                         self.C[1,a,b] = comb(a,b)%p
-            if self.dvec.max()>2:
-                for k in range(2,self.dvec.max()):
+            if self.dtalpha>2:
+                for k in range(2,self.dtalpha):
                     for a in range(self._t_curr):
                         for b in range(a+1):
                             self.C[k,a,b] = (int(self.C[1,a,b])*((k**(a-b))%p))%p
-            self.C = self.C[self.dvec][None,:,:,:]
+            self.C = self.C[None,:,:,:]
         else:
             self.bases = bases.astype(np.uint64)
             if self.bases.ndim==1: self.bases = self.bases[None,:]
-            assert self.bases.shape[1]>=self.d 
-            self.bases = self.bases[:,self.dvec]
+            assert self.bases.shape[1]>=self.dtalpha
+            if self.alpha==1:
+                self.bases = self.bases[:,self.dvec]
+            else:
+                self.bases = self.bases[:,:self.dtalpha]
             self.C = generating_matrices.astype(np.uint64)
             if self.C.ndim==3: self.C = self.C[None,:,:,:]
-            assert self.C.shape[1]>=self.d 
-            self.C = self.C[:,self.dvec,:,:]
+            assert self.C.shape[1]>=self.dtalpha
+            if self.alpha==1:
+                self.C = self.C[:,self.dvec,:,:]
+            else:
+                self.C = self.C[:,:self.dtalpha,:,:]
             self.m_max,self._t_curr = self.C.shape[-2:]
             self.t = self.m_max if self.m_max>t else t
+        if self.alpha>1:
+            assert (self.bases==self.bases[0,0]).all(), "alpha>1 performs digital interlacing which requires the same base across dimensions and replications."
+            if self.m_max!=self._t_curr:
+                warnings.warn("Digital interlacing is often performed on generating matrices with the number of columns (m_max = %d) equal to the number of rows (_t_curr = %d), but this is not the case. Ensure you are NOT setting alpha>1 when generating matrices are already interlaced."%(self.m_max,self._t_curr),ParameterWarning)
         assert self.bases.ndim==2
-        assert self.bases.shape[-1]==self.d 
+        assert self.bases.shape[-1]==self.dtalpha
         assert self.bases.shape[0]==1 or self.bases.shape[0]==self.replications
         assert self.C.ndim==4
-        assert self.C.shape[-3:]==(self.d,self.m_max,self._t_curr)
+        assert self.C.shape[-3:]==(self.dtalpha,self.m_max,self._t_curr)
         assert self.C.shape[0]==1 or self.C.shape[0]==self.replications
         r_b = self.bases.shape[0]
         r_C = self.C.shape[0]
-        assert alpha==1, "currently only alpha=1 is supported"
-        if alpha>1: assert (self.bases==self.bases[0,0]).all(), "alpha>1 performs digital interlacing which requires the same base across dimensions and replications."
-        if "LMS" in self.randomize:
-            S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(self.t),np.uint64(r_b),self.bases)
-            C_lms = np.empty((self.replications,self.d,self.m_max,self.t),dtype=np.uint64)
-            qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(r_C),np.uint64(r_b),np.uint64(self._t_curr),np.uint64(self.t),self.bases,S,self.C,C_lms,backend="c")
-            self.C = C_lms
-            self._t_curr = self.t
-        if "DP" in self.randomize:
+        if self.randomize=="FALSE":
+            if self.alpha>1:
+                C_ho = np.empty((self.replications,self.dtalpha,self.m_max,self._t_curr*self.alpha),dtype=np.uint64)
+                qmctoolscl.gdn_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(self._t_curr*self.alpha),np.uint64(self.alpha),self.C,C_ho)
+                self.C = C_ho
+                self._t_curr = self._t_curr*self.alpha
+                self.t = self._t_curr
+                self.bases = self.bases[:,:self.d]
+        elif self.randomize=="DP":
             self.perms = qmctoolscl.gdn_get_digital_permutations(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
-        if "DS" in self.randomize:
+        elif self.randomize=="DS":
             self.rshift = qmctoolscl.gdn_get_digital_shifts(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
-        if "NUS" in self.randomize:
-            new_seeds = self._base_seed.spawn(self.replications*self.d)
-            self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(self.replications*self.d)]).reshape(self.replications,self.d)
-            self.root_nodes = np.array([qmctoolscl.NUSNode_gdn() for i in range(self.replications*self.d)]).reshape(self.replications,self.d)
+        elif self.randomize in ["LMS","LMS DS","LMS DP"]:
+            if self.alpha==1:
+                S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.d),np.uint64(self._t_curr),np.uint64(self.t),np.uint64(r_b),self.bases)
+                C_lms = np.empty((self.replications,self.d,self.m_max,self.t),dtype=np.uint64)
+                qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(r_C),np.uint64(r_b),np.uint64(self._t_curr),np.uint64(self.t),self.bases,S,self.C,C_lms,backend="c")
+                self.C = C_lms
+                self._t_curr = self.t
+            else:
+                t_dig = np.ceil(max(self.t/self.alpha,self._t_curr))
+                S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_dig),np.uint64(r_b),self.bases)
+                C_lms = np.empty((self.replications,self.dtalpha,self.m_max,self.t),dtype=np.uint64)
+                qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(r_C),np.uint64(r_b),np.uint64(self._t_curr),np.uint64(t_dig),self.bases,S,self.C,C_lms,backend="c")
+                C_lms_ho = np.empty((self.replications,self.dtalpha,self.m_max,self.t),dtype=np.uint64)
+                qmctoolscl.gdn_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(t_dig),np.uint64(self.t),np.uint64(self.alpha),C_lms,C_lms_ho)
+                self.C = C_lms_ho
+                self._t_curr = self.t
+                self.t = self._t_curr
+                self.bases = self.bases[:,:self.d]
+            if self.randomize=="LMS DP":
+                self.perms = qmctoolscl.gdn_get_digital_permutations(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
+            elif self.randomize=="LMS DS":
+                self.rshift = qmctoolscl.gdn_get_digital_shifts(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
+        elif "NUS" in self.randomize:
+            if self.alpha==1:
+                new_seeds = self._base_seed.spawn(self.replications*self.d)
+                self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(self.replications*self.d)]).reshape(self.replications,self.d)
+                self.root_nodes = np.array([qmctoolscl.NUSNode_gdn() for i in range(self.replications*self.d)]).reshape(self.replications,self.d)
+            else:
+                new_seeds = self._base_seed.spawn(self.replications*self.dtalpha)
+                self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(self.replications*self.dtalpha)]).reshape(self.replications,self.dtalpha)
+                self.root_nodes = np.array([qmctoolscl.NUSNode_gdn() for i in range(self.replications*self.dtalpha)]).reshape(self.replications,self.dtalpha)
         assert self.C.ndim==4 and (self.C.shape[0]==1 or self.C.shape[0]==self.replications) and self.C.shape[1]==self.d and self.C.shape[2]==self.m_max and self.C.shape[3]==self._t_curr
+        assert self.bases.ndim==2 and (self.bases.shape[0]==1 or self.bases.shape[0]==self.replications) and self.bases.shape[1]==self.d
         assert 0<self._t_curr<=self.t<=64
         if self.randomize=="FALSE": assert self.C.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.C.shape[0])
 
@@ -202,7 +247,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
         r_b = np.uint64(self.bases.shape[0])
         r_C = np.uint64(self.C.shape[0])
         n = np.uint64(n_max-n_min)
-        d = np.uint64(self.d) 
+        d = np.uint64(self.dtalpha) if self.randomize=="NUS" and self.alpha>1 else np.uint64(self.d)
         n_start = np.uint64(n_min)
         mmax = np.uint64(self.m_max)
         _t_curr = np.uint64(self._t_curr)
@@ -225,13 +270,23 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
         if "DS" in self.randomize:
             qmctoolscl.gdn_digital_shift(r,n,d,r_C,r_b,_t_curr,t,self.bases,self.rshift,xdig,xdig_new,backend="c")
         if "NUS" in self.randomize:
-            qmctoolscl.gdn_nested_uniform_scramble(r,n,d,r_C,r_b,_t_curr,t,self.rngs,self.root_nodes,self.bases,xdig,xdig_new)
+            if self.alpha==1:
+                qmctoolscl.gdn_nested_uniform_scramble(r,n,d,r_C,r_b,_t_curr,t,self.rngs,self.root_nodes,self.bases,xdig,xdig_new)
+            else:
+                d = np.uint64(self.d)
+                dtalpha = np.uint64(self.dtalpha)
+                alpha = np.uint64(self.alpha)
+                qmctoolscl.gdn_nested_uniform_scramble(r,n,dtalpha,r_C,r_b,_t_curr,t,self.rngs,self.root_nodes,self.bases,xdig,xdig_new)
+                xdig_new_new_reord = np.empty((r,n,d,t),dtype=np.uint64)
+                xdig_new_reord = np.moveaxis(xdig_new,[1,2],[2,1]).copy() 
+                qmctoolscl.gdn_interlace(np.uint64(self.replications),d,np.uint64(self.m_max),dtalpha,t,t,alpha,xdig_new_reord,xdig_new_new_reord)
+                xdig_new = np.moveaxis(xdig_new_new_reord,[1,2],[2,1]).copy()
         x = np.empty((r,n,d),dtype=np.float64)
         qmctoolscl.gdn_integer_to_float(r,n,d,r_b,t,self.bases,xdig_new,x,backend="c")
         return x         
 
     def _spawn(self, child_seed, dimension):
-        return DigitalNetAnyBases(
+        return type(self)(
              dimension = dimension,
             replications = None if self.no_replications else self.replications,
             seed = child_seed,
