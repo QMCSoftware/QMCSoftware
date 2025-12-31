@@ -46,7 +46,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                  seed = None, 
                  randomize = 'LMS DP',
                  bases_generating_matrices = None,
-                 t = 63,
+                 t = None,
                  alpha = 1,
                  n_lim = 2**32):
         r"""
@@ -144,6 +144,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             self.bases = self.all_primes[self.dvec][None,:]
             self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(self.bases.min())))
             self._t_curr = self.m_max
+            if t is None: t = 63
             self.t = self.m_max if self.m_max>t else t
             self.C = qmctoolscl.gdn_get_halton_generating_matrix(np.uint64(1),np.uint64(self.d),np.uint64(self._t_curr))
         elif self.type_bases_generating_matrices=="FAURE":
@@ -152,6 +153,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             self.bases = p*np.ones((1,self.dtalpha),dtype=np.uint64)
             self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(p)))
             self._t_curr = self.m_max
+            if t is None: t = self.m_max
             self.t = self.m_max if self.m_max>t else t
             self.C = np.ones((self.dtalpha,1,1),dtype=np.uint64)*np.eye(self._t_curr,dtype=np.uint64)
             if self.dtalpha>1:
@@ -195,11 +197,12 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
         r_C = self.C.shape[0]
         if self.randomize=="FALSE":
             if self.alpha>1:
-                C_ho = np.empty((self.replications,self.dtalpha,self.m_max,self._t_curr*self.alpha),dtype=np.uint64)
-                qmctoolscl.gdn_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(self._t_curr*self.alpha),np.uint64(self.alpha),self.C,C_ho)
+                t_alpha = min(self.t,self._t_curr*self.alpha)
+                C_ho = np.empty((self.replications,self.d,self.m_max,t_alpha),dtype=np.uint64)
+                qmctoolscl.gdn_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_alpha),np.uint64(self.alpha),self.C,C_ho)
                 self.C = C_ho
-                self._t_curr = self._t_curr*self.alpha
-                self.t = self._t_curr
+                self._t_curr = t_alpha
+                self.t = t_alpha
                 self.bases = self.bases[:,:self.d]
         elif self.randomize=="DP":
             self.perms = qmctoolscl.gdn_get_digital_permutations(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
@@ -216,8 +219,8 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 t_dig = np.ceil(max(self.t/self.alpha,self._t_curr))
                 S = qmctoolscl.gdn_get_linear_scramble_matrix(self.rng,np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self._t_curr),np.uint64(t_dig),np.uint64(r_b),self.bases)
                 C_lms = np.empty((self.replications,self.dtalpha,self.m_max,self.t),dtype=np.uint64)
-                qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(r_C),np.uint64(r_b),np.uint64(self._t_curr),np.uint64(t_dig),self.bases,S,self.C,C_lms,backend="c")
-                C_lms_ho = np.empty((self.replications,self.dtalpha,self.m_max,self.t),dtype=np.uint64)
+                qmctoolscl.gdn_linear_matrix_scramble(np.uint64(self.replications),np.uint64(self.dtalpha),np.uint64(self.m_max),np.uint64(r_C),np.uint64(r_b),np.uint64(self._t_curr),np.uint64(t_dig),self.bases,S,self.C,C_lms,backend="c")
+                C_lms_ho = np.empty((self.replications,self.d,self.m_max,self.t),dtype=np.uint64)
                 qmctoolscl.gdn_interlace(np.uint64(self.replications),np.uint64(self.d),np.uint64(self.m_max),np.uint64(self.dtalpha),np.uint64(t_dig),np.uint64(self.t),np.uint64(self.alpha),C_lms,C_lms_ho)
                 self.C = C_lms_ho
                 self._t_curr = self.t
