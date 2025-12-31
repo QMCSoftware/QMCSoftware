@@ -1,0 +1,183 @@
+from .digital_net_any_base import DigitalNetAnyBases
+
+
+class Halton(DigitalNetAnyBases):
+    r"""
+    Low discrepancy Halton points.
+
+    Note:
+        - The first point of an unrandomized Halton sequence is the origin.
+        - QRNG does *not* support multiple replications (independent randomizations).
+    
+    Examples:
+        >>> discrete_distrib = Halton(2,seed=7)
+        >>> discrete_distrib(4)
+        array([[0.83790457, 0.89981478],
+               [0.00986102, 0.4610941 ],
+               [0.62236343, 0.02796307],
+               [0.29427505, 0.79909098]])
+        >>> discrete_distrib
+        Halton (AbstractLDDiscreteDistribution)
+            d               2^(1)
+            replications    1
+            randomize       LMS DP
+            t               63
+            n_limit         2^(32)
+            entropy         7
+        
+        Replications of independent randomizations 
+
+        >>> x = Halton(3,seed=7,replications=2)(4)
+        >>> x.shape
+        (2, 4, 3)
+        >>> x
+        array([[[0.70988236, 0.18180876, 0.54073621],
+                [0.38178158, 0.61168824, 0.64684354],
+                [0.98597752, 0.70650871, 0.31479029],
+                [0.15795399, 0.28162992, 0.98945647]],
+        <BLANKLINE>
+               [[0.620398  , 0.57025403, 0.46336542],
+                [0.44021889, 0.69926312, 0.60133428],
+                [0.89132308, 0.12030255, 0.35715804],
+                [0.04025218, 0.44304244, 0.10724799]]])
+
+        Unrandomized Halton 
+
+        >>> Halton(2,randomize="FALSE",seed=7)(4,warn=False)
+        array([[0.        , 0.        ],
+               [0.5       , 0.33333333],
+               [0.25      , 0.66666667],
+               [0.75      , 0.11111111]])
+        
+        All randomizations 
+
+        >>> Halton(2,randomize="LMS DP",seed=7)(4)
+        array([[0.83790457, 0.89981478],
+               [0.00986102, 0.4610941 ],
+               [0.62236343, 0.02796307],
+               [0.29427505, 0.79909098]])
+        >>> Halton(2,randomize="LMS DS",seed=7)(4)
+        array([[0.82718745, 0.90603116],
+               [0.0303368 , 0.44704107],
+               [0.60182684, 0.03580544],
+               [0.30505343, 0.78367016]])
+        >>> Halton(2,randomize="LMS",seed=7)(4,warn=False)
+        array([[0.        , 0.        ],
+               [0.82822666, 0.92392942],
+               [0.28838899, 0.46493682],
+               [0.6165384 , 0.2493814 ]])
+        >>> Halton(2,randomize="DP",seed=7)(4)
+        array([[0.11593484, 0.99232505],
+               [0.61593484, 0.65899172],
+               [0.36593484, 0.32565839],
+               [0.86593484, 0.77010283]])
+        >>> Halton(2,randomize="DS",seed=7)(4)
+        array([[0.56793849, 0.04063513],
+               [0.06793849, 0.37396846],
+               [0.81793849, 0.7073018 ],
+               [0.31793849, 0.15174624]])
+        >>> Halton(2,randomize="NUS",seed=7)(4)
+        array([[0.141964  , 0.99285569],
+               [0.65536579, 0.51938353],
+               [0.46955206, 0.11342811],
+               [0.78505432, 0.87032345]])
+        >>> Halton(2,randomize="QRNG",seed=7)(4)
+        array([[0.35362988, 0.38733489],
+               [0.85362988, 0.72066823],
+               [0.10362988, 0.05400156],
+               [0.60362988, 0.498446  ]])
+        
+        Replications of randomizations 
+
+        >>> Halton(3,randomize="LMS DP",seed=7,replications=2)(4)
+        array([[[0.70988236, 0.18180876, 0.54073621],
+                [0.38178158, 0.61168824, 0.64684354],
+                [0.98597752, 0.70650871, 0.31479029],
+                [0.15795399, 0.28162992, 0.98945647]],
+        <BLANKLINE>
+               [[0.620398  , 0.57025403, 0.46336542],
+                [0.44021889, 0.69926312, 0.60133428],
+                [0.89132308, 0.12030255, 0.35715804],
+                [0.04025218, 0.44304244, 0.10724799]]])
+        >>> Halton(3,randomize="LMS DS",seed=7,replications=2)(4)
+        array([[[4.57465163e-01, 5.75419751e-04, 7.47353067e-01],
+                [6.29314800e-01, 9.24349881e-01, 8.47915779e-01],
+                [2.37544271e-01, 4.63986168e-01, 1.78817056e-01],
+                [9.09318567e-01, 2.48566227e-01, 3.17475640e-01]],
+        <BLANKLINE>
+               [[6.04003127e-01, 9.92849835e-01, 4.21625151e-01],
+                [4.57027115e-01, 1.97310094e-01, 2.43670150e-01],
+                [8.76467351e-01, 4.22339232e-01, 1.05777101e-01],
+                [5.46933622e-02, 7.79075280e-01, 9.29409300e-01]]])
+        >>> Halton(3,randomize="LMS",seed=7,replications=2)(4,warn=False)
+        array([[[0.        , 0.        , 0.        ],
+                [0.82822666, 0.92392942, 0.34057871],
+                [0.28838899, 0.46493682, 0.47954399],
+                [0.6165384 , 0.2493814 , 0.77045601]],
+        <BLANKLINE>
+               [[0.        , 0.        , 0.        ],
+                [0.93115665, 0.57483093, 0.87170952],
+                [0.48046642, 0.8122114 , 0.69381851],
+                [0.58055977, 0.28006957, 0.55586147]]])
+        >>> Halton(3,randomize="DS",seed=7,replications=2)(4)
+        array([[[0.56793849, 0.04063513, 0.74276256],
+                [0.06793849, 0.37396846, 0.94276256],
+                [0.81793849, 0.7073018 , 0.14276256],
+                [0.31793849, 0.15174624, 0.34276256]],
+        <BLANKLINE>
+               [[0.98309816, 0.80260469, 0.17299622],
+                [0.48309816, 0.13593802, 0.37299622],
+                [0.73309816, 0.46927136, 0.57299622],
+                [0.23309816, 0.9137158 , 0.77299622]]])
+        >>> Halton(3,randomize="DP",seed=7,replications=2)(4)
+        array([[[0.11593484, 0.99232505, 0.6010751 ],
+                [0.61593484, 0.65899172, 0.0010751 ],
+                [0.36593484, 0.32565839, 0.4010751 ],
+                [0.86593484, 0.77010283, 0.8010751 ]],
+        <BLANKLINE>
+               [[0.26543198, 0.12273092, 0.20202896],
+                [0.76543198, 0.45606426, 0.60202896],
+                [0.01543198, 0.78939759, 0.40202896],
+                [0.51543198, 0.23384203, 0.00202896]]])
+        >>> Halton(3,randomize="NUS",seed=7,replications=2)(4)
+        array([[[0.141964  , 0.99285569, 0.77722918],
+                [0.65536579, 0.51938353, 0.22797442],
+                [0.46955206, 0.11342811, 0.9975298 ],
+                [0.78505432, 0.87032345, 0.57696123]],
+        <BLANKLINE>
+               [[0.04813634, 0.16158904, 0.56038465],
+                [0.89364888, 0.33578478, 0.36145822],
+                [0.34111023, 0.84596814, 0.0292313 ],
+                [0.71866903, 0.23852281, 0.80431142]]])
+
+    **References:**
+    
+    1.  Marius Hofert and Christiane Lemieux.  
+        qrng: (Randomized) Quasi-Random Number Generators.  
+        R package version 0.0-7. (2019).  
+        [https://CRAN.R-project.org/package=qrng](https://CRAN.R-project.org/package=qrng).
+        
+    2.  A. B. Owen.  
+        A randomized Halton algorithm in R.  
+        [arXiv:1706.02808](https://arxiv.org/abs/1706.02808) [stat.CO]. 2017. 
+
+    3.  A. B. Owen and Z. Pan.  
+        Gain coefficients for scrambled Halton points.  
+        [arXiv:2308.08035](https://arxiv.org/abs/2308.08035) [stat.CO]. 2023. 
+    """
+    
+    DEFAULT_GENERATING_MATRICES = "HALTON"
+
+class Faure(DigitalNetAnyBases):
+    r"""
+    Low discrepancy Faure points.
+
+    Note:
+        - The first point of an unrandomized Faure sequence is the origin.
+    
+    Examples:
+        >>> pass
+
+    """
+    
+    DEFAULT_GENERATING_MATRICES = "FAURE"
