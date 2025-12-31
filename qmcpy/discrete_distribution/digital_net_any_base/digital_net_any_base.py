@@ -144,7 +144,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             self.bases = self.all_primes[self.dvec][None,:]
             self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(self.bases.min())))
             self._t_curr = self.m_max
-            if t is None: t = 63
+            if t is None: t = int(np.ceil(-np.log(2**(-63))/np.log(self.bases.min())))
             self.t = self.m_max if self.m_max>t else t
             self.C = qmctoolscl.gdn_get_halton_generating_matrix(np.uint64(1),np.uint64(self.d),np.uint64(self._t_curr))
         elif self.type_bases_generating_matrices=="FAURE":
@@ -152,8 +152,8 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             p = self.all_primes[np.argmax(self.all_primes>=self.d)]
             self.bases = p*np.ones((1,self.dtalpha),dtype=np.uint64)
             self.m_max = int(np.ceil(np.log(self.n_limit)/np.log(p)))
+            if t is None: t = int(np.ceil(-np.log(2**(-63))/np.log(p)))
             self._t_curr = self.m_max
-            if t is None: t = self.m_max
             self.t = self.m_max if self.m_max>t else t
             self.C = np.ones((self.dtalpha,1,1),dtype=np.uint64)*np.eye(self._t_curr,dtype=np.uint64)
             if self.dtalpha>1:
@@ -182,6 +182,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             else:
                 self.C = self.C[:,:self.dtalpha,:,:]
             self.m_max,self._t_curr = self.C.shape[-2:]
+            if t is None: t = int(np.ceil(-np.log(2**(-63))/np.log(self.bases.min())))
             self.t = self.m_max if self.m_max>t else t
         if self.alpha>1:
             assert (self.bases==self.bases[0,0]).all(), "alpha>1 performs digital interlacing which requires the same base across dimensions and replications."
@@ -230,7 +231,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 self.perms = qmctoolscl.gdn_get_digital_permutations(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
             elif self.randomize=="LMS DS":
                 self.rshift = qmctoolscl.gdn_get_digital_shifts(self.rng,np.uint64(self.replications),np.uint64(self.d),self.t,np.uint64(r_b),self.bases)
-        elif "NUS" in self.randomize:
+        elif self.randomize=="NUS":
             if self.alpha==1:
                 new_seeds = self._base_seed.spawn(self.replications*self.d)
                 self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(self.replications*self.d)]).reshape(self.replications,self.d)
@@ -239,8 +240,8 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 new_seeds = self._base_seed.spawn(self.replications*self.dtalpha)
                 self.rngs = np.array([np.random.Generator(np.random.SFC64(new_seeds[j])) for j in range(self.replications*self.dtalpha)]).reshape(self.replications,self.dtalpha)
                 self.root_nodes = np.array([qmctoolscl.NUSNode_gdn() for i in range(self.replications*self.dtalpha)]).reshape(self.replications,self.dtalpha)
-        assert self.C.ndim==4 and (self.C.shape[0]==1 or self.C.shape[0]==self.replications) and self.C.shape[1]==self.d and self.C.shape[2]==self.m_max and self.C.shape[3]==self._t_curr
-        assert self.bases.ndim==2 and (self.bases.shape[0]==1 or self.bases.shape[0]==self.replications) and self.bases.shape[1]==self.d
+        assert self.C.ndim==4 and (self.C.shape[0]==1 or self.C.shape[0]==self.replications) and self.C.shape[1]==(self.dtalpha if self.randomize=="NUS" else self.d) and self.C.shape[2]==self.m_max and self.C.shape[3]==self._t_curr
+        assert self.bases.ndim==2 and (self.bases.shape[0]==1 or self.bases.shape[0]==self.replications) and self.bases.shape[1]==(self.dtalpha if self.randomize=="NUS" else self.d)
         assert 0<self._t_curr<=self.t<=64
         if self.randomize=="FALSE": assert self.C.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.C.shape[0])
 
@@ -279,10 +280,12 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 d = np.uint64(self.d)
                 dtalpha = np.uint64(self.dtalpha)
                 alpha = np.uint64(self.alpha)
-                qmctoolscl.gdn_nested_uniform_scramble(r,n,dtalpha,r_C,r_b,_t_curr,t,self.rngs,self.root_nodes,self.bases,xdig,xdig_new)
-                xdig_new_new_reord = np.empty((r,n,d,t),dtype=np.uint64)
+                t_alpha = np.uint64(max(_t_curr,np.ceil(t/self.alpha)))
+                xdig_new = np.empty((r,n,dtalpha,t_alpha),dtype=np.uint64)
+                qmctoolscl.gdn_nested_uniform_scramble(r,n,dtalpha,r_C,r_b,_t_curr,t_alpha,self.rngs,self.root_nodes,self.bases,xdig,xdig_new)
                 xdig_new_reord = np.moveaxis(xdig_new,[1,2],[2,1]).copy() 
-                qmctoolscl.gdn_interlace(np.uint64(self.replications),d,np.uint64(self.m_max),dtalpha,t,t,alpha,xdig_new_reord,xdig_new_new_reord)
+                xdig_new_new_reord = np.empty((r,d,n,t),dtype=np.uint64)
+                qmctoolscl.gdn_interlace(np.uint64(self.replications),d,np.uint64(n),dtalpha,t_alpha,t,alpha,xdig_new_reord,xdig_new_new_reord)
                 xdig_new = np.moveaxis(xdig_new_new_reord,[1,2],[2,1]).copy()
         x = np.empty((r,n,d),dtype=np.float64)
         qmctoolscl.gdn_integer_to_float(r,n,d,r_b,t,self.bases,xdig_new,x,backend="c")
