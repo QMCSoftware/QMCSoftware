@@ -329,7 +329,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         super(DigitalNetB2,self).__init__(dimension,replications,seed,d_limit,n_limit)
         assert gen_mats.ndim==3 and gen_mats.shape[1]>=self.d and (gen_mats.shape[0]==1 or gen_mats.shape[0]==self.replications) and gen_mats.shape[2]>0, "invalid gen_mats.shape = %s"%str(gen_mats.shape)
         self.m_max = int(gen_mats.shape[-1])
-        if isinstance(generating_matrices,np.ndarray) and msb:
+        if isinstance(generating_matrices,np.ndarray) and (not msb):
             qmctoolscl.dnb2_gmat_lsb_to_msb(np.uint64(gen_mats.shape[0]),np.uint64(self.d),np.uint64(self.m_max),np.tile(np.uint64(self._t_curr),int(gen_mats.shape[0])),gen_mats,gen_mats,backend="c")
         self.order = str(order).upper().strip().replace("_"," ")
         if self.order=="GRAY CODE": self.order = "GRAY"

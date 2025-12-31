@@ -1,6 +1,7 @@
 import warnings
 from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ...util import ParameterError,ParameterWarning
+from ..digital_net_b2 import DigitalNetB2
 import qmctoolscl
 import numpy as np
 from math import *
@@ -24,8 +25,120 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             
             i.e. do *not* pass in interlaced `generating_matrices` and set `alpha>1`, this will apply additional interlacing. 
     
+    A few examples below showcase how to pass in custom bases and generating matrices. Many other examples can be found in the Halton and Faure implementations
+    
     Examples:
-        >>> pass
+        >>> bases = 3 
+        >>> generating_matrices = np.array(
+        ...     [
+        ...         [[1, 0, 0],
+        ...          [0, 1, 0],
+        ...          [1, 2, 1]],
+        ...         [[2, 0, 0],
+        ...          [1, 2, 0],
+        ...          [0, 2, 2]]
+        ...     ],
+        ...     dtype=np.uint64)
+        >>> DigitalNetAnyBases(2,randomize="False",bases_generating_matrices=(bases,generating_matrices))(9,warn=False)
+        array([[0.        , 0.        ],
+               [0.33333333, 0.66666667],
+               [0.66666667, 0.33333333],
+               [0.11111111, 0.55555556],
+               [0.44444444, 0.22222222],
+               [0.77777778, 0.88888889],
+               [0.22222222, 0.77777778],
+               [0.55555556, 0.44444444],
+               [0.88888889, 0.11111111]])
+        >>> DigitalNetAnyBases(1,randomize="False",alpha=2,bases_generating_matrices=(bases,generating_matrices))(9,warn=False)
+        array([[0.        ],
+               [0.55555556],
+               [0.77777778],
+               [0.17283951],
+               [0.39506173],
+               [0.95061728],
+               [0.30864198],
+               [0.5308642 ],
+               [0.75308642]])
+    
+        >>> rng = np.random.Generator(np.random.PCG64(7))
+        >>> bases = np.array(
+        ...     [[2,5,7,23],
+        ...      [3,11,13,17]],
+        ...     dtype=np.uint64)
+        >>> generating_matrices = np.stack(
+        ...     [
+        ...         np.stack(
+        ...             [   np.tril(rng.integers(0,2,(10,10))),
+        ...                 np.tril(rng.integers(0,5,(10,10))),
+        ...                 np.tril(rng.integers(0,7,(10,10))),
+        ...                 np.tril(rng.integers(0,23,(10,10))),],axis=0),
+        ...         np.stack(
+        ...             [   np.tril(rng.integers(0,3,(10,10))),
+        ...                 np.tril(rng.integers(0,11,(10,10))),
+        ...                 np.tril(rng.integers(0,13,(10,10))),
+        ...                 np.tril(rng.integers(0,17,(10,10))),],axis=0),
+        ...     ],axis=0).astype(np.uint64)
+        >>> discrete_distrib = DigitalNetAnyBases(
+        ...     dimension = 4,
+        ...     randomize = "NUS",
+        ...     seed = 7,
+        ...     replications = 2,
+        ...     bases_generating_matrices=(bases,generating_matrices),
+        ...     )
+        >>> discrete_distrib(10,warn=False)
+        array([[[0.141964  , 0.50711584, 0.75766621, 0.43359373],
+                [0.65536579, 0.66327673, 0.21825902, 0.93901529],
+                [0.46955206, 0.21554445, 0.54265048, 0.17421341],
+                [0.78505432, 0.99432677, 0.08408121, 0.8317411 ],
+                [0.65536579, 0.05422203, 0.37171211, 0.05616883],
+                [0.141964  , 0.21554445, 0.94198662, 0.89162246],
+                [0.78505432, 0.99432677, 0.62395426, 0.70351649],
+                [0.46955206, 0.05422203, 0.51786701, 0.75215221],
+                [0.98479561, 0.50711584, 0.06267682, 0.59165814],
+                [0.31524867, 0.66327673, 0.29204202, 0.29200658]],
+        <BLANKLINE>
+               [[0.16158904, 0.00911626, 0.99631587, 0.7984386 ],
+                [0.33578478, 0.98734618, 0.48165571, 0.84189861],
+                [0.84596814, 0.67093277, 0.72532656, 0.49339621],
+                [0.33578478, 0.54281197, 0.26069214, 0.43832903],
+                [0.84596814, 0.58529648, 0.80521628, 0.15910404],
+                [0.16158904, 0.4486066 , 0.84973668, 0.6750655 ],
+                [0.84596814, 0.21294277, 0.40387763, 0.19059409],
+                [0.16158904, 0.74257456, 0.19604142, 0.98366484],
+                [0.33578478, 0.31746094, 0.35948446, 0.75911922],
+                [0.64593022, 0.11007165, 0.63174328, 0.55910368]]])
+        
+        >>> bases = 2
+        >>> generating_matrices = np.array([
+        ...     [[1, 0, 0],
+        ...      [0, 1, 0],
+        ...      [1, 0, 1]],
+        ...     [[1, 0, 0],
+        ...      [1, 1, 0],
+        ...      [0, 1, 1]]],dtype=np.uint64)
+        >>> x = DigitalNetAnyBases(2,randomize="False",bases_generating_matrices=(bases,generating_matrices))(8,warn=False)
+        >>> x
+        array([[0.   , 0.   ],
+               [0.5  , 0.5  ],
+               [0.25 , 0.75 ],
+               [0.75 , 0.25 ],
+               [0.625, 0.375],
+               [0.125, 0.875],
+               [0.875, 0.625],
+               [0.375, 0.125]])
+        >>> generating_matrices_b2 = (generating_matrices*2**np.array([2,1,0])).sum(-1).astype(np.uint64)
+        >>> x_b2 = DigitalNetB2(2,randomize="False",order="radical inverse",generating_matrices=generating_matrices_b2,t=3,msb=True)(8,warn=False)
+        >>> x_b2
+        array([[0.   , 0.   ],
+               [0.5  , 0.5  ],
+               [0.25 , 0.75 ],
+               [0.75 , 0.25 ],
+               [0.625, 0.375],
+               [0.125, 0.875],
+               [0.875, 0.625],
+               [0.375, 0.125]])
+        >>> (x==x_b2).all()
+        True
     
     **References:**
 
@@ -184,6 +297,10 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             self.m_max,self._t_curr = self.C.shape[-2:]
             if t is None: t = int(np.ceil(-np.log(2**(-63))/np.log(self.bases.min())))
             self.t = self.m_max if self.m_max>t else t
+            assert (0<=self.C).all()
+            assert (self.C<self.bases[:,:,None,None]).all()
+            self.C = np.ascontiguousarray(self.C) 
+            self.bases = np.ascontiguousarray(self.bases)
         if self.alpha>1:
             assert (self.bases==self.bases[0,0]).all(), "alpha>1 performs digital interlacing which requires the same base across dimensions and replications."
             if self.m_max!=self._t_curr:
