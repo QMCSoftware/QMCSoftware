@@ -137,7 +137,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                [0.125, 0.875],
                [0.875, 0.625],
                [0.375, 0.125]])
-        >>> (x==x_b2).all()
+        >>> bool((x==x_b2).all())
         True
     
     **References:**
