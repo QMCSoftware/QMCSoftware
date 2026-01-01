@@ -11,6 +11,7 @@ import subprocess
 from testbook import testbook
 import matplotlib
 matplotlib.rcParams['text.usetex'] = False    # Disable LaTeX
+import nbformat
 
 TB_TIMEOUT = 3600
 subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
@@ -62,7 +63,7 @@ class BaseNotebookTest(unittest.TestCase):
                 os.symlink(f'gbm_code/{module}', symlink_path)
 
         
-    def change_notebook_cells(self, notebook_path, replacements=None):
+    def change_notebook_cells(self, notebook_path, replacements=None, is_overwrite=False):
         """Modify code-cell sources in a notebook file
         """
         notebook_dir = os.path.dirname(notebook_path)
@@ -79,7 +80,8 @@ class BaseNotebookTest(unittest.TestCase):
                             if old in src:
                                 src = src.replace(old, new)
                         cell['source'] = src
-                #nbformat.write(tb.nb, os.path.basename(notebook_path))
+                if is_overwrite:
+                    nbformat.write(tb.nb, os.path.basename(notebook_path))
         except Exception as e:
             print(f"Error modifying notebook cells: {e}")
         finally:
