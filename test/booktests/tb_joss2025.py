@@ -2,7 +2,7 @@ import unittest, pytest
 import os
 import shutil
 import subprocess
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import BaseNotebookTest
 
 @pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
@@ -40,8 +40,8 @@ class NotebookTests(BaseNotebookTest):
                       'fig.savefig':'#fig.savefig',
                       'np.save':'#np.save',
                      }
-        self.change_notebook_cells(self.notebook_path, replacements)        
-        self.run_notebook(self.notebook_path, timeout=TB_TIMEOUT)
+
+        self.run_notebook(self.notebook_path, replacements)
 
 if __name__ == '__main__':
     unittest.main()

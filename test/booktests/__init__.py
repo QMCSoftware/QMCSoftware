@@ -9,9 +9,9 @@ import time
 import os
 import subprocess
 from testbook import testbook
+import nbformat
 import matplotlib
 matplotlib.rcParams['text.usetex'] = False    # Disable LaTeX
-import nbformat
 
 TB_TIMEOUT = 3600
 subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
@@ -63,7 +63,7 @@ class BaseNotebookTest(unittest.TestCase):
                 os.symlink(f'gbm_code/{module}', symlink_path)
 
         
-    def change_notebook_cells(self, notebook_path, replacements=None, is_overwrite=False):
+    def change_notebook_cells(self, notebook_path, replacements=None, is_overwritr=False):
         """Modify code-cell sources in a notebook file
         """
         notebook_dir = os.path.dirname(notebook_path)
@@ -88,14 +88,30 @@ class BaseNotebookTest(unittest.TestCase):
             os.chdir(original_dir)
 
 
-    def run_notebook(self, notebook_path, timeout=TB_TIMEOUT):
+    def run_notebook(self, notebook_path, replacements=None, timeout=TB_TIMEOUT):
         """Execute a notebook file using nbconvert's ExecutePreprocessor.
+        
+        Args:
+            notebook_path: Path to the notebook file
+            timeout: Execution timeout in seconds
+            replacements: Optional dict of {old_str: new_str} to apply to code cells in memory
         """
         import nbformat
         from nbconvert.preprocessors import ExecutePreprocessor
 
         with open(notebook_path) as f:
             nb = nbformat.read(f, as_version=4)
+        
+        # Apply replacements in memory if provided
+        if replacements:
+            for cell in nb.cells:
+                if cell.get('cell_type') == 'code':
+                    src = cell.get('source', '')
+                    for old, new in replacements.items():
+                        if old in src:
+                            src = src.replace(old, new)
+                    cell['source'] = src
+        
         ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
         try:
             ep.preprocess(nb, {'metadata': {'path': os.path.dirname(notebook_path)}})
