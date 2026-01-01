@@ -63,7 +63,7 @@ class BaseNotebookTest(unittest.TestCase):
                 os.symlink(f'gbm_code/{module}', symlink_path)
 
         
-    def change_notebook_cells(self, notebook_path, replacements=None, is_overwritr=False):
+    def change_notebook_cells(self, notebook_path, replacements=None, is_overwrite=False):
         """Modify code-cell sources in a notebook file
         """
         notebook_dir = os.path.dirname(notebook_path)
