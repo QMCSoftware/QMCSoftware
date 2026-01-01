@@ -1,5 +1,5 @@
 import unittest
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
 
@@ -21,8 +21,8 @@ class NotebookTests(BaseNotebookTest):
             f'tickers2 = ["AAPL", "AMZN", "CSCO",{old_tick2}]': 'tickers2 = ["AAPL", "AMZN", "CSCO"]',
             f'description2 = ["Apple", "Amazon", "CISCO", {old_desc2}]': 'description2 = ["Apple", "Amazon", "CISCO"]',
         }
-        self.change_notebook_cells(notebook_path, replacements, is_overwrite=False)
-        self.run_notebook(notebook_path, timeout=TB_TIMEOUT)
+
+        self.run_notebook(notebook_path, replacements)
 
 
 if __name__ == '__main__':
