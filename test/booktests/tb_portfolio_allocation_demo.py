@@ -11,16 +11,14 @@ class NotebookTests(BaseNotebookTest):
         old_desc1 = '"CISCO", "IBM", "Tesla", "Meta", "Airbnb", "UPS", "Netflix", "Moderna"'
         old_tick2 = '"IBM","TSLA","META","ABNB","UPS","NFLX","MRNA","^IXIC", "T","GE","FMC","AMC","JPM","DIS","CVX","GOOGL","BA"'
         old_desc2 = '"IBM","Tesla","Meta","Airbnb","UPS","Netflix","Moderna","NASDAQ","AT&T","General Electric","FMC","AMC","JPMorgan","Disney","Chevron","Google","Boeing"'
-        params_replacement = """        params = [
-                    (4, 2**14),     
-                    (10, 2**15),   
-                    (20, 2**16),    
-                    (100, 2**17),   
-                    (500, 2**18),   
-                    (1000, 2**19)   
-                ]"""
+        params_replacement = """params = [\n(4, 2**14),\n(10, 2**15),\n(20, 2**16),\n(100, 2**17),\n(500, 2**18),\n(1000, 2**19)\n]"""
         replacements = {
-            params_replacement: "params = [(4, 2**14)]",
+            "(10, 2**15),":"",
+            "(20, 2**16),":"",
+            "(20, 2**16),":"",   
+            "(100, 2**17),":"",
+            "(500, 2**18),":"",   
+            "(1000, 2**19)":"",
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
             "start_date = '2014-01-01'": "start_date = '2025-01-01'",
             "dimensions = [5, 10, 20, 50, 100, 200, 500, 1000]": "dimensions = [5, 10]",
@@ -31,7 +29,7 @@ class NotebookTests(BaseNotebookTest):
             f'description2 = ["Apple", "Amazon", "CISCO", {old_desc2}]': 'description2 = ["Apple", "Amazon", "CISCO"]',
         }
         
-        # Add a line to notebook cell [44] after the line
+        #self.change_notebook_cells notebook_path, replacements,is_overwrite=True)
         self.run_notebook(notebook_path, replacements)
 
 
