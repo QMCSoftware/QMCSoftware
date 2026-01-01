@@ -1,5 +1,5 @@
 from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
-from ..fast_transform import fwht,omega_fwht
+from ..fast_transform import fwht, omega_fwht
 from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Gaussian, Uniform
@@ -11,7 +11,7 @@ import numpy as np
 
 class CubQMCNetG(AbstractCubQMCLDG):
     r"""
-    Quasi-Monte Carlo stopping criterion using digital net cubature 
+    Quasi-Monte Carlo stopping criterion using digital net cubature
     with guarantees for cones of functions with a predictable decay in the Walsh coefficients.
 
     Examples:
@@ -50,9 +50,9 @@ class CubQMCNetG(AbstractCubQMCLDG):
             alpha           1
             n_limit         2^(32)
             entropy         7
-        
+
         Vector outputs
-        
+
         >>> f = BoxIntegral(DigitalNetB2(3,seed=7),s=[-1,1])
         >>> abs_tol = 1e-3
         >>> sc = CubQMCNetG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
@@ -94,7 +94,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
         >>> true_value = np.array([sol3neg1,sol31])
         >>> assert (abs(true_value-solution)<abs_tol).all()
 
-        Sensitivity indices 
+        Sensitivity indices
 
         >>> function = Genz(DigitalNetB2(3,seed=7))
         >>> integrand = SensitivityIndices(function)
@@ -143,7 +143,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
             alpha           1
             n_limit         2^(32)
             entropy         7
-    
+
         Control Variates
 
         >>> dnb2 = DigitalNetB2(dimension=4,seed=7)
@@ -183,37 +183,38 @@ class CubQMCNetG(AbstractCubQMCLDG):
 
     **References:**
 
-    1.  Hickernell, Fred J., and Lluís Antoni Jiménez Rugama.  
-        "Reliable adaptive cubature using digital sequences."  
-        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014.  
+    1.  Hickernell, Fred J., and Lluís Antoni Jiménez Rugama.
+        "Reliable adaptive cubature using digital sequences."
+        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014.
         Springer International Publishing, 2016.
-    
-    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
-        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+
+    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).
         [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubSobol_g.m).
     """
 
-    def __init__(self, 
-                 integrand, 
-                 abs_tol = 1e-2,
-                 rel_tol = 0., 
-                 n_init = 2**10, 
-                 n_limit = 2**35,
-                 error_fun = "EITHER",
-                 fudge = lambda m: 5.*2.**(-m), 
-                 check_cone = False, 
-                 control_variates = [], 
-                 control_variate_means = [], 
-                 update_cv_coeffs = False,
-                 ):
+    def __init__(
+        self,
+        integrand,
+        abs_tol=1e-2,
+        rel_tol=0.0,
+        n_init=2**10,
+        n_limit=2**35,
+        error_fun="EITHER",
+        fudge=lambda m: 5.0 * 2.0 ** (-m),
+        check_cone=False,
+        control_variates=[],
+        control_variate_means=[],
+        update_cv_coeffs=False,
+    ):
         r"""
         Args:
             integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
-            n_init (int): Initial number of samples. 
+            n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
             error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
@@ -222,25 +223,37 @@ class CubQMCNetG(AbstractCubQMCLDG):
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
                     ```
-                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance.
                     Equivalent to setting
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
                     ```
-            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions. 
+            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions.
             check_cone (bool): Whether or not to check if the function falls in the cone.
             control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
-            control_variate_means (np.ndarray): Means of each control variate. 
-            update_cv_coeffs (bool): If set to true, the control variate coefficients are recomputed at each iteration. 
+            control_variate_means (np.ndarray): Means of each control variate.
+            update_cv_coeffs (bool): If set to true, the control variate coefficients are recomputed at each iteration.
                 Otherwise they are estimated once after the initial sampling and then fixed.
         """
-        super(CubQMCNetG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,
-            check_cone,control_variates,control_variate_means,update_cv_coeffs,
-            ptransform = 'none',
-            ft = fwht,
-            omega = omega_fwht,
-            allowed_distribs = [DigitalNetB2],
-            cast_complex = False,
-            error_fun = error_fun)
-        if self.discrete_distrib.order!='RADICAL INVERSE':
-            raise ParameterError("CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order")
+        super(CubQMCNetG, self).__init__(
+            integrand,
+            abs_tol,
+            rel_tol,
+            n_init,
+            n_limit,
+            fudge,
+            check_cone,
+            control_variates,
+            control_variate_means,
+            update_cv_coeffs,
+            ptransform="none",
+            ft=fwht,
+            omega=omega_fwht,
+            allowed_distribs=[DigitalNetB2],
+            cast_complex=False,
+            error_fun=error_fun,
+        )
+        if self.discrete_distrib.order != "RADICAL INVERSE":
+            raise ParameterError(
+                "CubQMCNet_g requires DigitalNetB2 with 'RADICAL INVERSE' order"
+            )

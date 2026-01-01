@@ -1,13 +1,13 @@
-import torch 
+import torch
 import numpy as np
-import itertools 
+import itertools
 
 
 def fftbr_torch(x):
     r"""
-    Torch implementation of the 1 dimensional Bit-Reversed-Order (BRO) Fast Fourier Transform (FFT) along the last dimension. 
-    Requires the last dimension of x is already in BRO, so we can skip the first step of the decimation-in-time FFT. 
-    Requires the size of the last dimension is a power of 2. 
+    Torch implementation of the 1 dimensional Bit-Reversed-Order (BRO) Fast Fourier Transform (FFT) along the last dimension.
+    Requires the last dimension of x is already in BRO, so we can skip the first step of the decimation-in-time FFT.
+    Requires the size of the last dimension is a power of 2.
 
     Examples:
         >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -31,30 +31,33 @@ def fftbr_torch(x):
                 0.19+0.51j, 0.12+0.90j])
         >>> fftbr_torch(torch.rand((2,3,4,5,8))+1j*torch.rand((2,3,4,5,8))).shape
         torch.Size([2, 3, 4, 5, 8])
-    
+
     Args:
         x (torch.Tensor): Array of samples at which to run BRO-FFT.
-    
+
     Returns:
         y (torch.Tensor): BRO-FFT values.
     """
     n = x.size(-1)
-    assert n&(n-1)==0 # require n is a power of 2
+    assert n & (n - 1) == 0  # require n is a power of 2
     m = int(np.log2(n))
     shape = list(x.shape)
     ndim = x.ndim
-    twos = [2]*m
-    xs = x.reshape(shape[:-1]+twos)
-    pdims = tuple(itertools.chain(range(ndim-1),range(m+ndim-2,ndim-2,-1)))#[i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
-    xrf = torch.permute(xs,pdims)
+    twos = [2] * m
+    xs = x.reshape(shape[:-1] + twos)
+    pdims = tuple(
+        itertools.chain(range(ndim - 1), range(m + ndim - 2, ndim - 2, -1))
+    )  # [i for i in range(ndim-1)]+[i+ndim-1 for i in range(m-1,-1,-1)]
+    xrf = torch.permute(xs, pdims)
     xr = xrf.contiguous().view(shape)
-    return torch.fft.fft(xr,norm="ortho")
+    return torch.fft.fft(xr, norm="ortho")
+
 
 def ifftbr_torch(x):
     r"""
-    Torch implementation of the 1 dimensional Bit-Reversed-Order (BRO) Inverse Fast Fourier Transform (IFFT) along the last dimension.  
-    Outputs an array in bit-reversed order, so we can skip the last step of the decimation-in-time IFFT.  
-    Requires the size of the last dimension is a power of 2. 
+    Torch implementation of the 1 dimensional Bit-Reversed-Order (BRO) Inverse Fast Fourier Transform (IFFT) along the last dimension.
+    Outputs an array in bit-reversed order, so we can skip the last step of the decimation-in-time IFFT.
+    Requires the size of the last dimension is a power of 2.
 
     Examples:
         >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -81,49 +84,60 @@ def ifftbr_torch(x):
 
     Args:
         x (torch.Tensor): Array of samples at which to run BRO-IFFT.
-    
+
     Returns:
         y (torch.Tensor): BRO-IFFT values.
     """
     n = x.size(-1)
-    assert n&(n-1)==0 # require n is a power of 2
+    assert n & (n - 1) == 0  # require n is a power of 2
     m = int(np.log2(n))
     shape = list(x.shape)
     ndim = x.ndim
-    twos = [2]*m
-    x = torch.fft.ifft(x,norm="ortho")
-    xs = x.reshape(shape[:-1]+twos)
-    pdims = tuple(itertools.chain(range(ndim-1),range(m+ndim-2,ndim-2,-1)))
-    xrf = torch.permute(xs,pdims)
+    twos = [2] * m
+    x = torch.fft.ifft(x, norm="ortho")
+    xs = x.reshape(shape[:-1] + twos)
+    pdims = tuple(itertools.chain(range(ndim - 1), range(m + ndim - 2, ndim - 2, -1)))
+    xrf = torch.permute(xs, pdims)
     xr = xrf.contiguous().view(shape)
     return xr
 
+
 def _fwht_torch(x):
-    y = x.clone()+0.
+    y = x.clone() + 0.0
     n = x.size(-1)
-    if n<=1: return y
-    assert n&(n-1)==0 # require n is a power of 2
+    if n <= 1:
+        return y
+    assert n & (n - 1) == 0  # require n is a power of 2
     m = int(np.log2(n))
-    it = torch.arange(n,dtype=torch.int64,device=x.device).reshape([2]*m) # 2 x 2 x ... x 2 array (size 2^m)
-    idx0 = [slice(None)]*(m-1)+[0]
-    idx1 = [slice(None)]*(m-1)+[1]
+    it = torch.arange(n, dtype=torch.int64, device=x.device).reshape(
+        [2] * m
+    )  # 2 x 2 x ... x 2 array (size 2^m)
+    idx0 = [slice(None)] * (m - 1) + [0]
+    idx1 = [slice(None)] * (m - 1) + [1]
     for k in range(m):
-        eps0 = it[tuple(idx0[-(k+1):])].flatten()
-        eps1 = it[tuple(idx1[-(k+1):])].flatten()
-        y0,y1 = y[(Ellipsis,eps0)],y[(Ellipsis,eps1)]
-        y[(Ellipsis,eps0)],y[(Ellipsis,eps1)] = (y0+y1)/np.sqrt(2),(y0-y1)/np.sqrt(2)
+        eps0 = it[tuple(idx0[-(k + 1) :])].flatten()
+        eps1 = it[tuple(idx1[-(k + 1) :])].flatten()
+        y0, y1 = y[(Ellipsis, eps0)], y[(Ellipsis, eps1)]
+        y[(Ellipsis, eps0)], y[(Ellipsis, eps1)] = (y0 + y1) / np.sqrt(2), (
+            y0 - y1
+        ) / np.sqrt(2)
     return y
+
+
 class _FWHTB2Ortho(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x):
         return _fwht_torch(x)
+
     @staticmethod
     def backward(ctx, dx):
         return _fwht_torch(dx)
+
+
 def fwht_torch(x):
     r"""
-    Torch implementation of the 1 dimensional Fast Walsh Hadamard Transform (FWHT) along the last dimension.  
-    Requires the size of the last dimension is a power of 2. 
+    Torch implementation of the 1 dimensional Fast Walsh Hadamard Transform (FWHT) along the last dimension.
+    Requires the size of the last dimension is a power of 2.
 
     Examples:
         >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -144,18 +158,19 @@ def fwht_torch(x):
         tensor([0.50, 1.47, 0.11, 1.23, 0.90, 0.51, 0.70, 0.64])
         >>> fwht_torch(torch.rand((2,3,4,5,8))).shape
         torch.Size([2, 3, 4, 5, 8])
-    
+
     Args:
         x (torch.Tensor): Array of samples at which to run FWHT.
-    
+
     Returns:
         y (torch.Tensor): FWHT values.
     """
     return _FWHTB2Ortho.apply(x)
 
+
 def omega_fwht_torch(m, device=None):
     r"""
-    Torch implementation useful when efficiently updating FWHT values after doubling the sample size.  
+    Torch implementation useful when efficiently updating FWHT values after doubling the sample size.
 
     Examples:
         >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -165,24 +180,26 @@ def omega_fwht_torch(m, device=None):
         >>> x = torch.cat([x1,x2],axis=-1)
         >>> ytrue = fwht_torch(x)
         >>> omega = omega_fwht_torch(m)
-        >>> y1 = fwht_torch(x1) 
-        >>> y2 = fwht_torch(x2) 
+        >>> y1 = fwht_torch(x1)
+        >>> y2 = fwht_torch(x2)
         >>> y = torch.cat([y1+omega*y2,y1-omega*y2],axis=-1)/np.sqrt(2)
         >>> np.allclose(y,ytrue)
         True
-    
+
     Args:
-        m (int): Size $2^m$ output. 
-    
+        m (int): Size $2^m$ output.
+
     Returns:
-        y (np.ndarray): $\left(1\right)_{k=0}^{2^m}$. 
+        y (np.ndarray): $\left(1\right)_{k=0}^{2^m}$.
     """
-    if device is None: device = "cpu"
-    return torch.ones(2**m,device=device)
+    if device is None:
+        device = "cpu"
+    return torch.ones(2**m, device=device)
+
 
 def omega_fftbr_torch(m, device=None):
     r"""
-    Torch implementation useful when efficiently updating FFT values after doubling the sample size. 
+    Torch implementation useful when efficiently updating FFT values after doubling the sample size.
 
     Examples:
         >>> rng = np.random.Generator(np.random.SFC64(11))
@@ -192,17 +209,18 @@ def omega_fftbr_torch(m, device=None):
         >>> x = torch.cat([x1,x2],axis=-1)
         >>> ytrue = fftbr_torch(x)
         >>> omega = omega_fftbr_torch(m)
-        >>> y1 = fftbr_torch(x1) 
-        >>> y2 = fftbr_torch(x2) 
+        >>> y1 = fftbr_torch(x1)
+        >>> y2 = fftbr_torch(x2)
         >>> y = torch.cat([y1+omega*y2,y1-omega*y2],axis=-1)/np.sqrt(2)
         >>> np.allclose(y,ytrue)
         True
-    
+
     Args:
-        m (int): Size $2^m$ output. 
-    
+        m (int): Size $2^m$ output.
+
     Returns:
-        y (np.ndarray): $\left(e^{- \pi \mathrm{i} k / 2^m}\right)_{k=0}^{2^m}$. 
+        y (np.ndarray): $\left(e^{- \pi \mathrm{i} k / 2^m}\right)_{k=0}^{2^m}$.
     """
-    if device is None: device = "cpu"
-    return torch.exp(-torch.pi*1j*torch.arange(2**m,device=device)/2**m)
+    if device is None:
+        device = "cpu"
+    return torch.exp(-torch.pi * 1j * torch.arange(2**m, device=device) / 2**m)

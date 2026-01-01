@@ -4,16 +4,16 @@ from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
 from ..integrand.genz import Genz
 from ..integrand.sensitivity_indices import SensitivityIndices
-from ..fast_transform import fftbr,omega_fftbr
+from ..fast_transform import fftbr, omega_fftbr
 from ..util import ParameterError
 import numpy as np
 
 
 class CubQMCLatticeG(AbstractCubQMCLDG):
     r"""
-    Quasi-Monte Carlo stopping criterion using rank-1 lattice cubature 
+    Quasi-Monte Carlo stopping criterion using rank-1 lattice cubature
     with guarantees for cones of functions with a predictable decay in the Fourier coefficients.
-    
+
     Examples:
         >>> k = Keister(Lattice(seed=7))
         >>> sc = CubQMCLatticeG(k,abs_tol=1e-3,rel_tol=0,check_cone=True)
@@ -48,9 +48,9 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
-        
+
         Vector outputs
-        
+
         >>> f = BoxIntegral(Lattice(3,seed=11),s=[-1,1])
         >>> abs_tol = 1e-3
         >>> sc = CubQMCLatticeG(f,abs_tol=abs_tol,rel_tol=0,check_cone=True)
@@ -90,7 +90,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
         >>> true_value = np.array([sol3neg1,sol31])
         >>> assert (abs(true_value-solution)<abs_tol).all()
 
-        Sensitivity indices 
+        Sensitivity indices
 
         >>> function = Genz(Lattice(3,seed=7))
         >>> integrand = SensitivityIndices(function)
@@ -112,7 +112,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             n               [[[16384 32768 65536]
                               [16384 32768 65536]
                               [16384 32768 65536]]
-        <BLANKLINE>                
+        <BLANKLINE>
                              [[ 2048 16384 32768]
                               [ 2048 16384 32768]
                               [ 2048 16384 32768]]]
@@ -137,39 +137,40 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             order           RADICAL INVERSE
             n_limit         2^(20)
             entropy         7
-    
+
     **References:**
 
-    1.  Lluis Antoni Jimenez Rugama and Fred J. Hickernell.  
-        "Adaptive multidimensional integration based on rank-1 lattices,"   
-        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium,  
-        April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics.  
+    1.  Lluis Antoni Jimenez Rugama and Fred J. Hickernell.
+        "Adaptive multidimensional integration based on rank-1 lattices,"
+        Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium,
+        April 2014 (R. Cools and D. Nuyens, eds.), Springer Proceedings in Mathematics.
         and Statistics, vol. 163, Springer-Verlag, Berlin, 2016, arXiv:1411.1966, pp. 407-422.
-        
-    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,  
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,  
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.  
-        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).  
+
+    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
+        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
+        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
+        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).
         [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/cubLattice_g.m).
     """
 
-    def __init__(self, 
-                 integrand, 
-                 abs_tol = 1e-2, 
-                 rel_tol = 0., 
-                 n_init = 2**10,
-                 n_limit = 2**30,
-                 error_fun = "EITHER",
-                 fudge = lambda m: 5.*2.**(-m), 
-                 check_cone = False,
-                 ptransform = 'BAKER',
-                 ):
+    def __init__(
+        self,
+        integrand,
+        abs_tol=1e-2,
+        rel_tol=0.0,
+        n_init=2**10,
+        n_limit=2**30,
+        error_fun="EITHER",
+        fudge=lambda m: 5.0 * 2.0 ** (-m),
+        check_cone=False,
+        ptransform="BAKER",
+    ):
         r"""
         Args:
             integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
             rel_tol (np.ndarray): Relative error tolerance.
-            n_init (int): Initial number of samples. 
+            n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
             error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
@@ -178,24 +179,34 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
                     ```
-                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance. 
+                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance.
                     Equivalent to setting
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
                     ```
-            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions. 
+            fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions.
             check_cone (bool): Whether or not to check if the function falls in the cone.
             ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
         """
-        super(CubQMCLatticeG,self).__init__(integrand,abs_tol,rel_tol,n_init,n_limit,fudge,check_cone,
-            control_variates = [],
-            control_variate_means = [],
-            update_beta = False,
-            ptransform = ptransform,
-            ft = fftbr,
-            omega = omega_fftbr,
-            allowed_distribs = [Lattice],
-            cast_complex = True,
-            error_fun = error_fun)
-        if self.discrete_distrib.order!='RADICAL INVERSE':
-            raise ParameterError("CubLattice_g requires Lattice with 'RADICAL INVERSE' order")
+        super(CubQMCLatticeG, self).__init__(
+            integrand,
+            abs_tol,
+            rel_tol,
+            n_init,
+            n_limit,
+            fudge,
+            check_cone,
+            control_variates=[],
+            control_variate_means=[],
+            update_beta=False,
+            ptransform=ptransform,
+            ft=fftbr,
+            omega=omega_fftbr,
+            allowed_distribs=[Lattice],
+            cast_complex=True,
+            error_fun=error_fun,
+        )
+        if self.discrete_distrib.order != "RADICAL INVERSE":
+            raise ParameterError(
+                "CubLattice_g requires Lattice with 'RADICAL INVERSE' order"
+            )

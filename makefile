@@ -169,6 +169,8 @@ copydocs: # mkdocs only looks for content in the docs/ folder, so we have to cop
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
+	@cp test/booktests/READEME.md docs/booktests.md
+	@cp test/README.md docs/tests.md
 
 runmkdocserve: 
 	@mkdocs serve
