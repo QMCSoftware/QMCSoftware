@@ -13,6 +13,7 @@ coverage.json
 *hparams.yaml
 *.ipynb_checkpoints/
 demos/fgpr_figs/
+demos/GBM/images/*.png
 *__pycache__/
 qmcpy.egg-info/
 *.blg

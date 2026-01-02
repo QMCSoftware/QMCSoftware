@@ -1,16 +1,38 @@
 import unittest
 from __init__ import BaseNotebookTest
 
-@unittest.skip("Skipping GBM demo notebook test") # Error: https://github.com/QMCSoftware/QMCSoftware/actions/runs/20248843941/job/58135823467#step:15:206
 class NotebookTests(BaseNotebookTest):
     
     def test_gbm_demo_notebook(self):
         notebook_path, notebook_dir = self.locate_notebook('../../demos/GBM/gbm_demo.ipynb')
-        symlinks_to_fix = ['config.py', 'data_util.py', 'latex_util.py', 'plot_util.py', 'qmcpy_util.py', 'quantlib_util.py']
+        symlinks_to_fix = ['config.py', 'data_util.py', 'latex_util.py',
+                           'plot_util.py', 'qmcpy_util.py', 'quantlib_util.py']
         self.fix_gbm_symlinks(notebook_dir, symlinks_to_fix)
-        # Toggle code cell [3] cf.is_debug -> True, then execute
-        replacements={"cf.is_debug = False": "cf.is_debug = True"}
+        replacements = {
+            "cf.is_debug = False": "cf.is_debug = True",
+            "n_samples = 2**12": "n_samples = 2**5",
+            "sampler = qp.Lattice(2**7, seed=42)": "sampler = qp.Lattice(2**4, seed=42)",
+            "qp.IIDStdUniform(2**8, seed=42)": "qp.IIDStdUniform(2**4, seed=42)",
+            "qp.Lattice(2**8, seed=42)": "qp.Lattice(2**4, seed=42)",
+            "'n_paths': 2**14": "'n_paths': 2**8",
+            "'n_steps': 252": "'n_steps': 32",
+            "replications = 3": "replications = 1",
+            "%timeit -n 10 -r 3 -o": "%timeit -n 3 -r 1 -o",
+            "plt.savefig":"#plt.savefig",
+            "['IIDStdUniform', 'Sobol', 'Lattice', 'Halton']":"['IIDStdUniform', 'Sobol']",
+            "252":"32",
+            "n_plot=50": "n_plot=8",
+            "value=7": "value=2",
+            "max=8": "max=3",
+            "range(4, 10)": "range(4, 6)",
+            "range(4, 7)": "range(4, 5)",
+            "range(6, 9)": "range(6, 7)",
+            "range(9, 15)": "range(9, 10)",
+            "for sampler_type in ['IIDStdUniform', 'Sobol', 'Lattice', 'Halton']": "for sampler_type in ['IIDStdUniform', 'Sobol']",
+        }
+
         self.run_notebook(notebook_path, replacements)
+        
         
 if __name__ == '__main__':
     unittest.main()
