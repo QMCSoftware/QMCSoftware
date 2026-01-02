@@ -9,6 +9,8 @@ from .bernoulli_cont import BernoulliCont
 from .johnsons_su import JohnsonsSU
 from .scipy_wrapper import SciPyWrapper
 from .matern_gp import MaternGP
+from .multivariate_student_t_joint import MultivariateStudentTJoint
+
 
 TrueMeasure = AbstractTrueMeasure
 _TrueMeasure = AbstractTrueMeasure

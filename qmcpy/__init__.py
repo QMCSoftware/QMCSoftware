@@ -35,6 +35,8 @@ from .fast_transform import (
     omega_fwht_torch,
 )
 from .util import plot_proj, mlmc_test
+from .true_measure import MultivariateStudentTJoint
+
 
 name = "qmcpy"
 __version__ = "2.1"

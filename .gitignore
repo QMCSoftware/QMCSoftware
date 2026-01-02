@@ -30,6 +30,9 @@ demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
 
+docs/assets/**/*.png
+
+
 # tests
 .coverage
 *.wgw*
