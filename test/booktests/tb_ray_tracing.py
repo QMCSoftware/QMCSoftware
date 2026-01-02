@@ -11,7 +11,7 @@ class NotebookTests(BaseNotebookTest):
             'px = 256': 'px = 64',
             'parallel_x_blocks=1, parallel_y_blocks=1': 'parallel_x_blocks=2, parallel_y_blocks=2'
         }
-        self.run_notebook(notebook_path, replacements=replacements)
+        self.run_notebook(notebook_path, replacements)
 
 if __name__ == '__main__':
     unittest.main()
