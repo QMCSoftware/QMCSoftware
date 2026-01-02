@@ -238,7 +238,6 @@ jobs:
           else
             echo "umbridge doctests only run on Linux"
           fi
-
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
@@ -281,6 +280,5 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
-
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests

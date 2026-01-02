@@ -62,39 +62,15 @@ class BaseNotebookTest(unittest.TestCase):
             elif not os.path.exists(symlink_path) and os.path.exists(target_path):
                 os.symlink(f'gbm_code/{module}', symlink_path)
 
-        
-    def change_notebook_cells(self, notebook_path, replacements=None, is_overwrite=False):
-        """Modify code-cell sources in a notebook file
-        """
-        notebook_dir = os.path.dirname(notebook_path)
-        original_dir = os.getcwd()
-        try:
-            os.chdir(notebook_dir)
-            if not replacements:
-                return
-            with testbook(os.path.basename(notebook_path), execute=False) as tb:
-                for cell in tb.nb.cells:
-                    if cell.get('cell_type') == 'code':
-                        src = cell.get('source', '')
-                        for old, new in replacements.items():
-                            if old in src:
-                                src = src.replace(old, new)
-                        cell['source'] = src
-                if is_overwrite:
-                    nbformat.write(tb.nb, os.path.basename(notebook_path))
-        except Exception as e:
-            print(f"Error modifying notebook cells: {e}")
-        finally:
-            os.chdir(original_dir)
 
-
-    def run_notebook(self, notebook_path, replacements=None, timeout=TB_TIMEOUT):
+    def run_notebook(self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT):
         """Execute a notebook file using nbconvert's ExecutePreprocessor.
         
         Args:
             notebook_path: Path to the notebook file
             timeout: Execution timeout in seconds
             replacements: Optional dict of {old_str: new_str} to apply to code cells in memory
+            is_overwrite: If True, overwrite the notebook file with modified cells
         """
         import nbformat
         from nbconvert.preprocessors import ExecutePreprocessor
@@ -111,6 +87,10 @@ class BaseNotebookTest(unittest.TestCase):
                         if old in src:
                             src = src.replace(old, new)
                     cell['source'] = src
+        
+        if is_overwrite:
+            nbformat.write(nb, notebook_path)
+            print(f"Notebook {notebook_path} overwritten with modified cells.")
         
         ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
         try:
