@@ -23,11 +23,11 @@ class JohnsonsSU(AbstractTrueMeasure):
             xi              2^(1)
             delta           3
             lam             2^(2)
-        
-        With independent replications 
+
+        With independent replications
 
         >>> x = JohnsonsSU(DigitalNetB2(3,seed=7,replications=2),gamma=1,xi=2,delta=3,lam=4)(4)
-        >>> x.shape 
+        >>> x.shape
         (2, 4, 3)
         >>> x
         array([[[-0.36735335, -0.71750135,  1.55387818],
@@ -44,65 +44,92 @@ class JohnsonsSU(AbstractTrueMeasure):
     def __init__(self, sampler, gamma=1, xi=1, delta=2, lam=2):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
-                
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
             gamma (Union[float,np.ndarray]): First parameter $\gamma$.
             xi (Union[float,np.ndarray]): Second parameter $\xi$.
-            delta (Union[float,np.ndarray]): Third parameter $\delta > 0$. 
+            delta (Union[float,np.ndarray]): Third parameter $\delta > 0$.
             lam (Union[float,np.ndarray]): Fourth parameter $\lambda > 0$.
         """
-        self.parameters = ['gamma', 'xi', 'delta', 'lam']
-        self.domain = np.array([[0,1]])
-        self.range = np.array([[-np.inf,np.inf]])
+        self.parameters = ["gamma", "xi", "delta", "lam"]
+        self.domain = np.array([[0, 1]])
+        self.range = np.array([[-np.inf, np.inf]])
         self._parse_sampler(sampler)
         self.gamma = gamma
         self.xi = xi
         self.delta = delta
         self.lam = lam
         self._gamma = np.array(gamma)
-        if self._gamma.size==1:
-            self._gamma = self._gamma.item()*np.ones(self.d)
+        if self._gamma.size == 1:
+            self._gamma = self._gamma.item() * np.ones(self.d)
         self._xi = np.array(xi)
-        if self._xi.size==1:
-            self._xi = self._xi.item()*np.ones(self.d)
+        if self._xi.size == 1:
+            self._xi = self._xi.item() * np.ones(self.d)
         self._delta = np.array(delta)
-        if self._delta.size==1:
-            self._delta = self._delta.item()*np.ones(self.d)
+        if self._delta.size == 1:
+            self._delta = self._delta.item() * np.ones(self.d)
         self._lam = np.array(lam)
-        if self._lam.size==1:
-            self._lam = self._lam.item()*np.ones(self.d)
-        if not (self._gamma.shape==(self.d,) and self._xi.shape==(self.d,) and self._delta.shape==(self.d,) and self._lam.shape==(self.d,)):
-            raise DimensionError("all Johnson's S_U parameters be scalar or have length equal to dimension.")
-        if not ((self._delta>0).all() and (self._lam>0).all()):
+        if self._lam.size == 1:
+            self._lam = self._lam.item() * np.ones(self.d)
+        if not (
+            self._gamma.shape == (self.d,)
+            and self._xi.shape == (self.d,)
+            and self._delta.shape == (self.d,)
+            and self._lam.shape == (self.d,)
+        ):
+            raise DimensionError(
+                "all Johnson's S_U parameters be scalar or have length equal to dimension."
+            )
+        if not ((self._delta > 0).all() and (self._lam > 0).all()):
             raise ParameterError("delta and lam must be all be positive")
-        super(JohnsonsSU,self).__init__()
-        assert self._gamma.shape==(self.d,) and self._xi.shape==(self.d,) and self._delta.shape==(self.d,) and self._lam.shape==(self.d,)
+        super(JohnsonsSU, self).__init__()
+        assert (
+            self._gamma.shape == (self.d,)
+            and self._xi.shape == (self.d,)
+            and self._delta.shape == (self.d,)
+            and self._lam.shape == (self.d,)
+        )
 
     def _transform(self, x):
-        return self._lam*np.sinh((norm.ppf(x)-self._gamma)/self._delta)+self._xi
-    
+        return self._lam * np.sinh((norm.ppf(x) - self._gamma) / self._delta) + self._xi
+
     def _weight(self, x):
-        term1 = (x-self._xi)/self._lam
-        term2 = self._delta/(self._lam*np.sqrt(2*np.pi)) * 1/np.sqrt(1+term1**2)
-        term3 = np.exp(-1/2*(self._gamma+self._delta*np.arcsinh(term1))**2)
-        return np.prod(term2*term3,-1)
-    
+        term1 = (x - self._xi) / self._lam
+        term2 = (
+            self._delta / (self._lam * np.sqrt(2 * np.pi)) * 1 / np.sqrt(1 + term1**2)
+        )
+        term3 = np.exp(-1 / 2 * (self._gamma + self._delta * np.arcsinh(term1)) ** 2)
+        return np.prod(term2 * term3, -1)
+
     def _spawn(self, sampler, dimension):
-        if dimension==self.d: # don't do anything if the dimension doesn't change
-            spawn = JohnsonsSU(sampler,gamma=self._gamma,xi=self._xi,delta=self._delta,lam=self._lam)
+        if dimension == self.d:  # don't do anything if the dimension doesn't change
+            spawn = JohnsonsSU(
+                sampler,
+                gamma=self._gamma,
+                xi=self._xi,
+                delta=self._delta,
+                lam=self._lam,
+            )
         else:
             gamma = self._gamma[0]
             xi = self._xi[0]
             delta = self._delta[0]
             lam = self._lam[0]
-            if not ( all(self._gamma==gamma) and all(self._xi==xi) and all(self._delta==delta) and all(self._lam==lam) ):
-                raise DimensionError('''
+            if not (
+                all(self._gamma == gamma)
+                and all(self._xi == xi)
+                and all(self._delta == delta)
+                and all(self._lam == lam)
+            ):
+                raise DimensionError(
+                    """
                     In order to spawn a JohnsonsSU measure
                     gamma must all be the same and 
                     xi must all be the same and 
                     delta must all be the same and 
-                    lam (lambda) must all be the same.''')
-            spawn = JohnsonsSU(sampler,gamma=gamma,xi=xi,delta=delta,lam=lam)
+                    lam (lambda) must all be the same."""
+                )
+            spawn = JohnsonsSU(sampler, gamma=gamma, xi=xi, delta=delta, lam=lam)
         return spawn
