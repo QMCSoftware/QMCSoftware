@@ -96,5 +96,10 @@ sc_*
 /sc_*
 sc_*
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> fbacb182e0738e92dcdb1763399a984d933248cd
 # SciPyWrapper demo generated figures
 /demos/scipywrapper_dependence_custom/figures/*.png
