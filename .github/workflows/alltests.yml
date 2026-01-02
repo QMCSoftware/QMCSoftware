@@ -199,19 +199,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # Install MiKTeX with retries
-          $maxTries = 2
-          $try = 0
-          while ($try -lt $maxTries) {
-            choco install miktex -y --no-progress
-            if ($LASTEXITCODE -eq 0) { exit 0 }
-            $try++
-            Write-Host "Retry $try of $maxTries..."
-            Start-Sleep -Seconds 30
-          }
-          Write-Error "MiKTeX installation failed after $maxTries attempts."
-
-          # Install Strawberry Perl (required by MiKTeX)
+          choco install miktex -y
           choco install strawberryperl -y
           # Put MiKTeX on PATH for all subsequent steps
           echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -250,7 +238,6 @@ jobs:
           else
             echo "umbridge doctests only run on Linux"
           fi
-
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
@@ -293,6 +280,5 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
-
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
