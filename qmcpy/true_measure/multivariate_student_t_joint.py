@@ -97,7 +97,8 @@ class MultivariateStudentTJoint(SciPyWrapper):
     Convenience true measure: joint multivariate Student t.
 
     Example:
-    >>> from qmcpy.discrete_distribution import DigitalNetB2
+    >>> import importlib
+    >>> DigitalNetB2 = importlib.import_module(__package__.rsplit(".", 1)[0] + ".discrete_distribution").DigitalNetB2
     >>> tm = MultivariateStudentTJoint(
     ...     sampler=DigitalNetB2(2, seed=7),
     ...     df=5,
