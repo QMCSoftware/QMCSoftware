@@ -203,7 +203,8 @@ jobs:
           $maxTries = 2
           $try = 0
           while ($try -lt $maxTries) {
-            choco install miktex --no-progress && exit 0
+            choco install miktex --no-progress
+            if ($LASTEXITCODE -eq 0) { exit 0 }
             $try++
             Write-Host "Retry $try of $maxTries..."
             Start-Sleep -Seconds 30
