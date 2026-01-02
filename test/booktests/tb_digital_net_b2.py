@@ -1,7 +1,6 @@
 import unittest, pytest
 from __init__ import BaseNotebookTest
 
-@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def test_digital_net_b2_notebook(self):
