@@ -19,16 +19,8 @@ class NotebookTests(BaseNotebookTest):
             "replications = 3": "replications = 1",
             "%timeit -n 10 -r 3 -o": "%timeit -n 3 -r 1 -o",
             "plt.savefig":"#plt.savefig",
-            "['IIDStdUniform', 'Sobol', 'Lattice', 'Halton']":"['IIDStdUniform', 'Sobol']",
-            "252":"32",
             "n_plot=50": "n_plot=8",
-            "value=7": "value=2",
-            "max=8": "max=3",
-            "range(4, 10)": "range(4, 6)",
-            "range(4, 7)": "range(4, 5)",
-            "range(6, 9)": "range(6, 7)",
-            "range(9, 15)": "range(9, 10)",
-            "for sampler_type in ['IIDStdUniform', 'Sobol', 'Lattice', 'Halton']": "for sampler_type in ['IIDStdUniform', 'Sobol']",
+            "def f(n=widgets.IntSlider(min=0, max=8, step=1, value=7,": "def f(n=widgets.IntSlider(min=0, max=3, step=1, value=2,",
         }
 
         self.run_notebook(notebook_path, replacements)
