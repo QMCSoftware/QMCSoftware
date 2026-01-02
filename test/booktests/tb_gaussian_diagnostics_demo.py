@@ -1,8 +1,7 @@
 import unittest, pytest
 import subprocess
 import os
-from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import BaseNotebookTest
 
 @pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
@@ -14,14 +13,20 @@ class NotebookTests(BaseNotebookTest):
         # Create outputs directory if needed
         os.makedirs('outputs_nb', exist_ok=True)
 
-    @testbook('../../demos/gaussian_diagnostics/gaussian_diagnostics_demo.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_gaussian_diagnostics_demo_notebook(self, tb):
-        # Execute cells up to but not including the stop_notebook cell
-        for i in range(len(self.cells)):  
-            if "plt.style.use('seaborn-v0_8-poster')" not in self.cells[i]['source']:
-                self.execute_cell(i)
-            else:
-                break  # not running the rest of the notebook depending on umbridge and docker
+    def test_gaussian_diagnostics_demo_notebook(self):
+        notebook_path, _ = self.locate_notebook('../../demos/gaussian_diagnostics/gaussian_diagnostics_demo.ipynb')
+        # Speed up heavy computations and plotting in the demo
+        replacements = {
+            'nRep = 20': 'nRep = 4',
+            'nRep = 5': 'nRep = 3',
+            'npts = 2 ** 6': 'npts = 2 ** 5',
+            'npts = 2 ** 10': 'npts = 2 ** 8',
+            'lnthetarange = np.arange(-2, 2.2, 0.2)': 'lnthetarange = np.arange(-2, 2.2, 0.8)',
+            "lnorderrange = np.arange(-1, 1.1, 0.1)": "lnorderrange = np.arange(-1, 1.1, 0.4)",
+            'xtol=1e-3': 'xtol=1e-2',
+            'N1 = int(2 ** np.floor(16 / dim))': 'N1 = int(2 ** np.floor(12 / dim))'
+        }
+        self.run_notebook(notebook_path, replacements=replacements)
 
 if __name__ == '__main__':
     unittest.main()

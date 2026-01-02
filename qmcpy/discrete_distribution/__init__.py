@@ -9,4 +9,3 @@ _DiscreteDistribution = AbstractDiscreteDistribution
 Sobol = DigitalNetB2
 DigitalNet = DigitalNetB2
 Net = DigitalNetB2
-

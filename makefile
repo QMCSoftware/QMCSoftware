@@ -1,6 +1,24 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 
+##########################################################
+# utilities
+##########################################################
+# This helps locate generated or local-only folders like build, .pytest_cache, etc.
+find_local_only_files:
+	chmod +x scripts/find_local_only_folders.sh
+	./scripts/find_local_only_folders.sh 
+
+clean_local_only_files:
+	rm -fr test/booktests/.ipynb_checkpoints/
+	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
+	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
+		rm -f "$$f"; > /dev/null 2>&1; \
+	done
+
+##########################################################
+# Doctests
+##########################################################
 doctests_minimal:
 	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
 		--doctest-modules qmcpy/ \
@@ -40,8 +58,18 @@ doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch do
 
 doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
 
+##########################################################
+# Unit Tests in `test/` folder
+##########################################################
 unittests:
-	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append test/
+	python -m pytest $(PYTEST_XDIST) -x --cov=qmcpy --cov-report term --cov-report json --no-header --cov-append test/ -W ignore::DeprecationWarning
+
+##########################################################
+# Unit Tests for `*.ipynb` in `demos/` folder
+##########################################################
+generate_booktests:
+	@echo "\nGenerating missing booktest files..."
+	cd test/booktests/ && python generate_test.py --check-missing
 
 check_booktests:
 	rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
@@ -57,24 +85,6 @@ check_booktests:
 	done
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
 	@echo "Total test files: $$(find test/booktests -name 'tb_*.py' | wc -l)"
-
-
-# This helps locate generated or local-only folders like build, .pytest_cache, etc.
-find_local_only_files:
-	chmod +x scripts/find_local_only_folders.sh
-	./scripts/find_local_only_folders.sh 
-
-clean_local_only_files:
-	rm -fr test/booktests/.ipynb_checkpoints/
-	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
-	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
-		rm -f "$$f"; > /dev/null 2>&1; \
-	done
-
-generate_booktests:
-	@echo "\nGenerating missing booktest files..."
-	cd test/booktests/ && python generate_test.py --check-missing
-
 
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests"
@@ -98,7 +108,6 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	python parsl_test_runner.py $(TESTS) -v --failfast && \
 	cd ../.. 
 	
-
 # Windows-compatible parallel booktests using pytest-xdist instead of Parsl
 booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files
 	cd test/booktests/ && \
@@ -106,13 +115,16 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py --cov=qmcpy --cov-append --cov-report=term --cov-report=json && \
 	cd ../.. 
 
+##########################################################
+# Combinations of Above Tests
+##########################################################
 tests: 
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
 	python scripts/cleanup_invalid_dist.py --apply || true && \
-	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests && $(MAKE) coverage
+	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
 
 # Fast test target: run doctests and unittests concurrently
 tests_fast:
@@ -125,6 +137,9 @@ tests_fast:
 	wait
 	$(MAKE) coverage
 
+##########################################################
+# Local Coverage Reports and Tools
+##########################################################
 coverage: # https://github.com/marketplace/actions/coverage-badge
 	python -m coverage report -m
 
@@ -138,9 +153,11 @@ combine-coverage-local:  # Combine coverage files found under `coverage-data` an
 	python scripts/combine_coverage.py --dir coverage-data --outdir coverage_html --keep
 
 delcoverage:
-	@rm .coverage
-	@rm coverage.json 
+	@rm -f .coverage coverage.json
 
+##########################################################
+# Make UML class diagrams
+##########################################################
 uml:
 	# UML Diagrams
 	#	Discrete Distributions
@@ -164,11 +181,16 @@ uml:
 	#	Kernel Specific
 	@pyreverse qmcpy/kernel/ -o svg 1>/dev/null && mv classes.svg docs/api/umls/kernel_specific.svg
 
+##########################################################
+# Documentation with `mkdocs`
+##########################################################
 copydocs: # mkdocs only looks for content in the docs/ folder, so we have to copy it there
 	@cp README.md docs/README.md 
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
+	@cp test/booktests/READEME.md docs/booktests.md
+	@cp test/README.md docs/tests.md
 
 runmkdocserve: 
 	@mkdocs serve

@@ -63,7 +63,9 @@ nav:
       - Ray Tracing: demos/ray_tracing.ipynb 
   - For Developers:
     - Release Manual: RELEASE.md
-    - Testing Guidelines: test/README.md
+    - Testing Guidelines: 
+      - Doc tests and unit tests on `qmcpy`: tests.md
+      - Unit tests on Jupyter Notebooks: booktests.md
   - Printable Docs: print_page/
 
 plugins:

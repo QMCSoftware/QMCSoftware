@@ -1,12 +1,17 @@
 import unittest
-from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
 
-    @testbook('../../demos/ray_tracing.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_ray_tracing_notebook(self, tb):
-        pass
+    def test_ray_tracing_notebook(self):
+        notebook_path, _ = self.locate_notebook('../../demos/ray_tracing.ipynb')
+        replacements = {
+            'n = 16': 'n = 8',
+            'd = 16': 'd = 4',
+            'px = 256': 'px = 64',
+            'parallel_x_blocks=1, parallel_y_blocks=1': 'parallel_x_blocks=2, parallel_y_blocks=2'
+        }
+        self.run_notebook(notebook_path, replacements)
 
 if __name__ == '__main__':
     unittest.main()

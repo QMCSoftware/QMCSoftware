@@ -1,5 +1,7 @@
 from .gaussian import Gaussian
-from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
 from ..discrete_distribution import DigitalNetB2
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import ParameterError, _univ_repr
@@ -9,11 +11,11 @@ from typing import Union
 
 class BrownianMotion(Gaussian):
     r"""
-    Brownian Motion as described in [https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion).  
+    Brownian Motion as described in [https://en.wikipedia.org/wiki/Brownian_motion](https://en.wikipedia.org/wiki/Brownian_motion).
     For a standard Brownian Motion $W$ we define the Brownian Motion $B$ with initial value $B_0$, drift $\gamma$, and diffusion $\sigma^2$ to be
 
     $$B(t) = B_0 + \gamma t + \sigma W(t).$$
-    
+
     Examples:
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
         >>> true_measure(2)
@@ -29,11 +31,11 @@ class BrownianMotion(Gaussian):
                              [0.5 1.  1.5 1.5]
                              [0.5 1.  1.5 2. ]]
             decomp_type     PCA
-    
-        With independent replications 
+
+        With independent replications
 
         >>> x = BrownianMotion(DigitalNetB2(3,seed=7,replications=2),t_final=2,drift=2)(4)
-        >>> x.shape 
+        >>> x.shape
         (2, 4, 3)
         >>> x
         array([[[0.66154685, 1.50620966, 3.52322901],
@@ -47,37 +49,57 @@ class BrownianMotion(Gaussian):
                 [2.06762574, 3.21756319, 4.93375923]]])
     """
 
-    def __init__(self, sampler, t_final=1, initial_value=0, drift=0, diffusion=1, decomp_type='PCA', lazy_decomp=True):
+    def __init__(
+        self,
+        sampler,
+        t_final=1,
+        initial_value=0,
+        drift=0,
+        diffusion=1,
+        decomp_type="PCA",
+        lazy_decomp=True,
+    ):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either  
-                
+            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            t_final (float): End time. 
-            initial_value (float): Initial value $B_0$. 
-            drift (int): Drift $\gamma$. 
-            diffusion (int): Diffusion $\sigma^2$. 
+            t_final (float): End time.
+            initial_value (float): Initial value $B_0$.
+            drift (int): Drift $\gamma$.
+            diffusion (int): Diffusion $\sigma^2$.
             decomp_type (str): Method for decomposition for covariance matrix. Options include
-             
-                - `'PCA'` for principal component analysis, or 
+
+                - `'PCA'` for principal component analysis, or
                 - `'Cholesky'` for cholesky decomposition.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
         """
-        self.parameters = ['time_vec', 'drift', 'mean', 'covariance', 'decomp_type']
+        self.parameters = ["time_vec", "drift", "mean", "covariance", "decomp_type"]
         # default to transform from standard uniform
-        self.domain = np.array([[0,1]])
+        self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
-        self.t = t_final # exercise time
+        self.t = t_final  # exercise time
         self.initial_value = initial_value
         self.drift = drift
         self.diffusion = diffusion
-        self.time_vec = np.linspace(self.t/self.d,self.t,self.d) # evenly spaced
-        self.diffused_sigma_bm = self.diffusion * np.minimum.outer(self.time_vec, self.time_vec)
-        self.drift_time_vec_plus_init = self.drift*self.time_vec+self.initial_value # mean
-        self._parse_gaussian_params(self.drift_time_vec_plus_init,self.diffused_sigma_bm,decomp_type,lazy_decomp)
-        self.range = np.array([[-np.inf,np.inf]])
-        super(Gaussian,self).__init__()
-    
+        self.time_vec = np.linspace(self.t / self.d, self.t, self.d)  # evenly spaced
+        self.diffused_sigma_bm = self.diffusion * np.minimum.outer(
+            self.time_vec, self.time_vec
+        )
+        self.drift_time_vec_plus_init = (
+            self.drift * self.time_vec + self.initial_value
+        )  # mean
+        self._parse_gaussian_params(
+            self.drift_time_vec_plus_init,
+            self.diffused_sigma_bm,
+            decomp_type,
+            lazy_decomp,
+        )
+        self.range = np.array([[-np.inf, np.inf]])
+        super(Gaussian, self).__init__()
+
     def _spawn(self, sampler, dimension):
-        return BrownianMotion(sampler,t_final=self.t,drift=self.drift,decomp_type=self.decomp_type)
+        return BrownianMotion(
+            sampler, t_final=self.t, drift=self.drift, decomp_type=self.decomp_type
+        )
