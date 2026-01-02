@@ -2,7 +2,6 @@ import unittest, pytest
 from testbook import testbook
 from __init__ import BaseNotebookTest
 
-@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def test_qei_demo_for_blog_notebook(self):
