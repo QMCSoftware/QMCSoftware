@@ -1,8 +1,9 @@
-import unittest
+import unittest, pytest
 import subprocess
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
 
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def setUp(self):

@@ -29,13 +29,13 @@ class TestDiscreteDistribution(unittest.TestCase):
     def test_abstract_methods(self):
         for d in [3,[1,3,5]]:
             dds = [
-                Lattice(d,order='natural'),
-                Lattice(d,order='linear'),
-                DigitalNetB2(d,randomize='LMS_DS',order="RADICAL INVERSE"),
-                DigitalNetB2(d,randomize='DS'),
-                DigitalNetB2(d,order="GRAY"),
-                Halton(d,randomize='QRNG'),
-                Halton(d,randomize='Owen'),
+                Lattice(d,order='natural', seed=7),
+                Lattice(d,order='linear', seed=7),
+                DigitalNetB2(d,randomize='LMS_DS',order="RADICAL INVERSE", seed=7),
+                DigitalNetB2(d,randomize='DS', seed=7),
+                DigitalNetB2(d,order="GRAY", seed=7),
+                Halton(d,randomize='QRNG', seed=7),
+                Halton(d,randomize='Owen', seed=7),
             ]
             for dd in dds:
                 for _dd in [dd]+dd.spawn(1):
@@ -50,7 +50,7 @@ class TestDiscreteDistribution(unittest.TestCase):
     
     def test_spawn(self):
         d = 3
-        for dd in [IIDStdUniform(d),Lattice(d),DigitalNetB2(d),Halton(d)]:
+        for dd in [IIDStdUniform(d, seed=7),Lattice(d, seed=7),DigitalNetB2(d, seed=7),Halton(d, seed=7)]:
             s = 3
             for spawn_dim in [4,[1,4,6]]:
                 spawns = dd.spawn(s=s,dimensions=spawn_dim)
@@ -110,23 +110,23 @@ class TestDigitalNetB2(unittest.TestCase):
     """ Unit tests for DigitalNetB2 DiscreteDistribution. """
 
     def test_mimics(self):
-        distribution = Sobol(dimension=3, randomize=True)
+        distribution = Sobol(dimension=3, randomize=True, seed=7)
         self.assertEqual(distribution.mimics, "StdUniform")
 
     def test_gen_samples(self):
-        dn123 = DigitalNetB2(dimension=4,order="RADICAL INVERSE",randomize=False)
+        dn123 = DigitalNetB2(dimension=4,order="RADICAL INVERSE",randomize=False, seed=7)
         x0123 = dn123.gen_samples(8,warn=False)
-        dn13 = DigitalNetB2(dimension=[1,3],order="RADICAL INVERSE",randomize=False)
+        dn13 = DigitalNetB2(dimension=[1,3],order="RADICAL INVERSE",randomize=False, seed=7)
         x13 = dn13.gen_samples(n_min=4,n_max=8,warn=False)
         self.assertTrue((x0123[4:8,[1,3]]==x13).all())
-        dn123 = DigitalNetB2(dimension=4,order="GRAY",randomize=False)
+        dn123 = DigitalNetB2(dimension=4,order="GRAY",randomize=False, seed=7)
         x0123 = dn123.gen_samples(8,warn=False)
-        dn13 = DigitalNetB2(dimension=[1,3],order="GRAY",randomize=False)
+        dn13 = DigitalNetB2(dimension=[1,3],order="GRAY",randomize=False, seed=7)
         x13 = dn13.gen_samples(n_min=5,n_max=7,warn=False)
         self.assertTrue((x0123[5:7,[1,3]]==x13).all())
     
     def test_graycode_ordering(self):
-        dnb2 = DigitalNetB2(2,randomize=False,order="GRAY")
+        dnb2 = DigitalNetB2(2,randomize=False,order="GRAY", seed=7)
         x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
         x_true = np.array([
             [ 0.375,  0.375],
@@ -136,7 +136,7 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertTrue((x==x_true).all())
 
     def test_natural_ordering(self):
-        dnb2 = DigitalNetB2(2,randomize=False,order="RADICAL INVERSE")
+        dnb2 = DigitalNetB2(2,randomize=False,order="RADICAL INVERSE", seed=7)
         x = dnb2.gen_samples(n_min=4,n_max=8,warn=False)
         x_true = np.array([
             [ 0.125,  0.625],

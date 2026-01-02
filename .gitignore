@@ -33,6 +33,10 @@ demos/.jupyter
 
 # tests
 .coverage
+*.wgw*
+coverage-data/*
+*coverage*
+
 
 # C
 *.so
@@ -46,6 +50,8 @@ demos/.jupyter
 # Website
 docs/_site
 docs/Gemfile.lock
+/site
+*.svg
 
 # Sphinx
 sphinx/_build/
@@ -89,8 +95,6 @@ _ags/*
 sc_*
 /sc_*
 sc_*
-
-
 
 # SciPyWrapper demo generated figures
 /demos/scipywrapper_dependence_custom/figures/*.png

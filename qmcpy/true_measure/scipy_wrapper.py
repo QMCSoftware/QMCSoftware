@@ -3,6 +3,9 @@ from ..util import DimensionError, ParameterError
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 import scipy.stats
@@ -130,6 +133,7 @@ class SciPyWrapper(AbstractTrueMeasure):
         >>> xs.shape
         (4, 2)
     """
+
 
     def __init__(self, sampler, scipy_distribs):
         """
@@ -410,7 +414,9 @@ class SciPyWrapper(AbstractTrueMeasure):
         t = np.empty_like(x, dtype=float)
         for j in range(self.d):
             t[..., j] = self.sds[j].ppf(x[..., j])
+            t[..., j] = self.sds[j].ppf(x[..., j])
         return t
+
 
     def _weight(self, x):
         """

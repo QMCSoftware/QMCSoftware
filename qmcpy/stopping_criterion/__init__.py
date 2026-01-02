@@ -11,20 +11,31 @@ from .cub_mlqmc_cont import CubMLQMCCont
 from .cub_qmc_bayes_lattice_g import CubQMCBayesLatticeG
 from .cub_qmc_bayes_net_g import CubQMCBayesNetG
 from .cub_mc_clt_vec import CubMCCLTVec
-try: 
+
+try:
     import torch
     import gpytorch
-    from .pf_gp_ci import PFGPCI,PFSampleErrorDensityAR,SuggesterSimple
+    from .pf_gp_ci import PFGPCI, PFSampleErrorDensityAR, SuggesterSimple
 except ImportError:
+
     class PFGPCI(object):
         def __init__(self, *args, **kwargs):
-            raise Exception("PFGPCI requires torch and gpytorch but no installations found")
+            raise Exception(
+                "PFGPCI requires torch and gpytorch but no installations found"
+            )
+
     class PFSampleErrorDensityAR(object):
         def __init__(self, *args, **kwargs):
-            raise Exception("PFSampleErrorDensityAR requires torch and gpytorch but no installations found")
+            raise Exception(
+                "PFSampleErrorDensityAR requires torch and gpytorch but no installations found"
+            )
+
     class SuggesterSimple(object):
         def __init__(self, *args, **kwargs):
-            raise Exception("SuggesterSimple requires torch and gpytorch but no installations found")
+            raise Exception(
+                "SuggesterSimple requires torch and gpytorch but no installations found"
+            )
+
 
 StoppingCriterion = AbstractStoppingCriterion
 _StoppingCriterion = AbstractStoppingCriterion

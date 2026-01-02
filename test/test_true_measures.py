@@ -11,21 +11,21 @@ class TestTrueMeasure(unittest.TestCase):
     def test_abstract_methods(self):
         d = 2
         tms = [
-            Uniform(DigitalNetB2(d)),
-            Uniform(DigitalNetB2(d),lower_bound=[1,2],upper_bound=[2,3]),
-            Kumaraswamy(DigitalNetB2(d)),
-            Kumaraswamy(DigitalNetB2(d),a=[2,4],b=[1,3]),
-            JohnsonsSU(DigitalNetB2(d)),
-            JohnsonsSU(DigitalNetB2(d),gamma=[1,2],xi=[4,5],delta=[7,8],lam=[10,11]),
-            Gaussian(DigitalNetB2(d)),
-            Gaussian(DigitalNetB2(d),mean=[1,2],covariance=[[9,5],[5,9]],decomp_type='Cholesky'),
-            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
-            BrownianMotion(DigitalNetB2(d)),
-            BrownianMotion(DigitalNetB2(d),t_final=2,drift=3,decomp_type='Cholesky'),
-            BernoulliCont(DigitalNetB2(d)),
-            BernoulliCont(DigitalNetB2(d),lam=[.25,.75]),
-            SciPyWrapper(DigitalNetB2(2),[scipy.stats.triang(c=.1),scipy.stats.uniform(loc=1,scale=2)]),
-            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang(c=.1,loc=1,scale=2)),
+            Uniform(DigitalNetB2(d, seed=7)),
+            Uniform(DigitalNetB2(d, seed=7),lower_bound=[1,2],upper_bound=[2,3]),
+            Kumaraswamy(DigitalNetB2(d, seed=7)),
+            Kumaraswamy(DigitalNetB2(d, seed=7),a=[2,4],b=[1,3]),
+            JohnsonsSU(DigitalNetB2(d, seed=7)),
+            JohnsonsSU(DigitalNetB2(d, seed=7),gamma=[1,2],xi=[4,5],delta=[7,8],lam=[10,11]),
+            Gaussian(DigitalNetB2(d, seed=7)),
+            Gaussian(DigitalNetB2(d, seed=7),mean=[1,2],covariance=[[9,5],[5,9]],decomp_type='Cholesky'),
+            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d, seed=7)))),
+            BrownianMotion(DigitalNetB2(d, seed=7)),
+            BrownianMotion(DigitalNetB2(d, seed=7),t_final=2,drift=3,decomp_type='Cholesky'),
+            BernoulliCont(DigitalNetB2(d, seed=7)),
+            BernoulliCont(DigitalNetB2(d, seed=7),lam=[.25,.75]),
+            SciPyWrapper(DigitalNetB2(2, seed=7),[scipy.stats.triang(c=.1),scipy.stats.uniform(loc=1,scale=2)]),
+            SciPyWrapper(DigitalNetB2(2, seed=7),scipy.stats.triang(c=.1,loc=1,scale=2)),
         ]
         for tm in tms:
             for _tm in [tm]+tm.spawn(1):
@@ -42,16 +42,16 @@ class TestTrueMeasure(unittest.TestCase):
     def test_spawn(self):
         d = 3
         tms = [
-            Uniform(DigitalNetB2(d)),
-            Lebesgue(Uniform(DigitalNetB2(d))),
-            Lebesgue(Gaussian(DigitalNetB2(d))),
-            Kumaraswamy(DigitalNetB2(d)),
-            JohnsonsSU(DigitalNetB2(d)),
-            Gaussian(DigitalNetB2(d)),
-            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d)))),
-            BrownianMotion(DigitalNetB2(d)),
-            BernoulliCont(DigitalNetB2(d)),
-            SciPyWrapper(DigitalNetB2(2),scipy.stats.triang(c=.1,loc=1,scale=2)),
+            Uniform(DigitalNetB2(d, seed=7)),
+            Lebesgue(Uniform(DigitalNetB2(d, seed=7))),
+            Lebesgue(Gaussian(DigitalNetB2(d, seed=7))),
+            Kumaraswamy(DigitalNetB2(d, seed=7)),
+            JohnsonsSU(DigitalNetB2(d, seed=7)),
+            Gaussian(DigitalNetB2(d, seed=7)),
+            Gaussian(Kumaraswamy(Kumaraswamy(DigitalNetB2(d, seed=7)))),
+            BrownianMotion(DigitalNetB2(d, seed=7)),
+            BernoulliCont(DigitalNetB2(d, seed=7)),
+            SciPyWrapper(DigitalNetB2(2, seed=7),scipy.stats.triang(c=.1,loc=1,scale=2)),
         ]
         for tm in tms:
             s = 3
