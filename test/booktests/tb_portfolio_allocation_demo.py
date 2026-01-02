@@ -6,12 +6,12 @@ class NotebookTests(BaseNotebookTest):
     def test_portfolio_allocation_demo_notebook(self):
         notebook_path, _ = self.locate_notebook('../../demos/portfolio/portfolio_allocation_demo.ipynb')
         
-        # Define ticker patterns for readability (wildcard: [...] represents variable list items)
+        # Define variables for readability 
         old_tick1 = '"CSCO", "IBM", "TSLA", "META", "ABNB", "UPS", "NFLX", "MRNA"'
         old_desc1 = '"CISCO", "IBM", "Tesla", "Meta", "Airbnb", "UPS", "Netflix", "Moderna"'
         old_tick2 = '"IBM","TSLA","META","ABNB","UPS","NFLX","MRNA","^IXIC", "T","GE","FMC","AMC","JPM","DIS","CVX","GOOGL","BA"'
         old_desc2 = '"IBM","Tesla","Meta","Airbnb","UPS","Netflix","Moderna","NASDAQ","AT&T","General Electric","FMC","AMC","JPMorgan","Disney","Chevron","Google","Boeing"'
-        params_replacement = """params = [\n(4, 2**14),\n(10, 2**15),\n(20, 2**16),\n(100, 2**17),\n(500, 2**18),\n(1000, 2**19)\n]"""
+   
         replacements = {
             "(10, 2**15),":"",
             "(20, 2**16),":"",
@@ -29,7 +29,6 @@ class NotebookTests(BaseNotebookTest):
             f'description2 = ["Apple", "Amazon", "CISCO", {old_desc2}]': 'description2 = ["Apple", "Amazon", "CISCO"]',
         }
         
-        #self.change_notebook_cells notebook_path, replacements,is_overwrite=True)
         self.run_notebook(notebook_path, replacements)
 
 
