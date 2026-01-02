@@ -84,6 +84,7 @@ test = [
     "ipywidgets == 8.1.7",
     "nbconvert >= 7.2.9",
     "pytest-xdist >= 3.8.0",
+    "yfinance >= 0.2.66",
     ]
 test_torch = [
     "torch >= 2.7.0",
