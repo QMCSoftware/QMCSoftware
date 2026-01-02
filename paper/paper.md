@@ -37,7 +37,7 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: November 20, 2025
+date: January 2, 2026
 bibliography: refs_all.bib
 csl: joss-simple.csl
 colorlinks: true
@@ -109,9 +109,7 @@ framework, bridging theory and practice, with the following features:
 - **Robust and adaptive sampling** with theoretically grounded error estimation, and
 - **Extensible OO components** enabling researchers to implement and test new algorithms.
 
-Unlike other (Q)MC modules such as `SciPy`'s `scipy.stats.qmc`
-[@2020SciPy-NMeth] or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015],
-`QMCPy` provides:
+While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]:
 
 - customizable LD sequences with diverse randomization techniques,
 - automatic variable transformations for (Q)MC compatibility, and
