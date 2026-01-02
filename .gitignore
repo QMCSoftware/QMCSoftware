@@ -88,3 +88,10 @@ _ags/*
 # SC Choi's file exclusion
 .vscode/settings.json
 sc/*
+/sc_qmc
+/site
+/test/booktests/JOSS2025.outputs
+/test/booktests/logs
+/test/booktests/outputs
+/test/booktests/outputs_nb
+/test/booktests/raw.githubusercontent.com
