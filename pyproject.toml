@@ -79,7 +79,7 @@ test = [
     "ipykernel",
     "matplotlib >= 3.9.0",
     "pandas >= 1.3.0",
-    "yfinance >= 0.2.0",
+    "yfinance",
     "quantlib == 1.38",
     "ipywidgets == 8.1.7",
     "nbconvert >= 7.2.9",
