@@ -19,6 +19,7 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
+          python-version: "3.12"
       
       # -----------------------------------------------------------
       # Clean old coverage files

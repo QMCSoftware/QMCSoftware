@@ -1,7 +1,7 @@
 import unittest, pytest
 from __init__ import BaseNotebookTest
 
-@pytest.mark.slow
+#@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def test_portfolio_allocation_demo_notebook(self):
