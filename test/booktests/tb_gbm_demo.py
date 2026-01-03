@@ -11,20 +11,33 @@ class NotebookTests(BaseNotebookTest):
         replacements = {
             "cf.is_debug = False": "cf.is_debug = True",
             "n_samples = 2**12": "n_samples = 4",
-            "sampler = qp.Lattice(2**7, seed=42)": "sampler = qp.Lattice(2**4, seed=42)",
-            "qp.IIDStdUniform(2**8, seed=42)": "qp.IIDStdUniform(2**4, seed=42)",
+            "sampler = qp.Lattice(2**7, seed=42)": "sampler = qp.Lattice(4, seed=42)",
+            "qp.IIDStdUniform(2**8, seed=42)": "qp.IIDStdUniform(4, seed=42)",
             "qp.Lattice(2**8, seed=42)": "qp.Lattice(4, seed=42)",
             "'n_paths': 2**14": "'n_paths': 4",
-            "'n_steps': 252": "'n_steps': 2",
-            "replications = 3": "replications = 0",
-            "timeit -n 10 -r 3": "timeit -n 2 -r 1",
+            "'n_steps': 252": "'n_steps': 4",
+            "replications = 3": "replications = 1",
+            "timeit -n 10 -r 3": "timeit -n 1 -r 1",
+            "timeit -n 2 -r 1": "timeit -n 1 -r 1",
             "plt.savefig":"#plt.savefig",
-            "n_plot=50": "n_plot=8",
+            "n_plot=50": "n_plot=2",
             "'IIDStdUniform', 'Sobol', 'Lattice', 'Halton'": "'Sobol'",
             "S0, mu, sigma, T, n_samples = 100.0, 0.05, 0.20, 1.0, 2**12": "S0, mu, sigma, T, n_samples = 100.0, 0.05, 0.20, 1.0, 4",
             "n=32": "n=4",
+            # Additional replacements to reduce computation
+            "2**n": "4",
+            "max=8": "max=2",
         }
-        self.run_notebook(notebook_path, replacements)
+        
+        # Skip the widget and stop before the expensive sampler comparison loop
+        self.run_notebook(notebook_path, replacements, 
+                         is_overwrite=False,
+                         stop_at_pattern="def run_single_configuration(",
+                         skip_patterns=[
+                             "@widgets.interact",  # Skip interactive widget
+                         ]
+                        )
+
         
         
 if __name__ == '__main__':

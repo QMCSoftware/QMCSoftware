@@ -63,16 +63,77 @@ class BaseNotebookTest(unittest.TestCase):
                 os.symlink(f'gbm_code/{module}', symlink_path)
 
 
-    def run_notebook(self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT):
-        """Execute a notebook file using nbconvert's ExecutePreprocessor.
+    def run_notebook(self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT, stop_at_pattern=None, skip_patterns=None):
+        """Execute a notebook file using nbconvert's ExecutePreprocessor or testbook.
         
         Args:
             notebook_path: Path to the notebook file
             timeout: Execution timeout in seconds
             replacements: Optional dict of {old_str: new_str} to apply to code cells in memory
             is_overwrite: If True, overwrite the notebook file with modified cells
+            stop_at_pattern: Optional string pattern - if provided, uses testbook to stop execution
+                           at the first cell containing this pattern
+            skip_patterns: Optional list of string patterns - cells containing any of these patterns will be skipped
         """
         import nbformat
+        
+        # If stop_at_pattern or skip_patterns is provided, use testbook for selective execution
+        if stop_at_pattern or skip_patterns:
+            with open(notebook_path) as f:
+                nb = nbformat.read(f, as_version=4)
+            
+            # Apply replacements if provided
+            if replacements:
+                for cell in nb.cells:
+                    if cell.get('cell_type') == 'code':
+                        src = cell.get('source', '')
+                        for old, new in replacements.items():
+                            if old in src:
+                                src = src.replace(old, new)
+                        cell['source'] = src
+            
+            if is_overwrite:
+                nbformat.write(nb, notebook_path)
+                print(f"Notebook {notebook_path} overwritten with modified cells.")
+            
+            # Write modified notebook to a temp file so testbook uses the replacements
+            import tempfile
+            notebook_dir = os.path.dirname(notebook_path)
+            temp_fd, temp_path = tempfile.mkstemp(suffix='.ipynb', dir=notebook_dir)
+            os.close(temp_fd)
+            try:
+                nbformat.write(nb, temp_path)
+                
+                # Use testbook to execute cells until we hit the stop pattern
+                # Execute from the notebook's directory to ensure imports work
+                original_cwd = os.getcwd()
+                skip_patterns = skip_patterns or []
+                try:
+                    os.chdir(notebook_dir)
+                    with testbook(temp_path, timeout=timeout, execute=False) as tb:
+                        for i, cell in enumerate(tb.cells):
+                            if cell.cell_type == 'code':
+                                if stop_at_pattern and stop_at_pattern in cell.source:
+                                    print(f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'")
+                                    break
+                                # Check if this cell should be skipped
+                                should_skip = any(pattern in cell.source for pattern in skip_patterns)
+                                if should_skip:
+                                    print(f"Skipping cell {i}: matched skip pattern")
+                                    continue
+                                try:
+                                    tb.execute_cell(i)
+                                except Exception as e:
+                                    raise RuntimeError(f"Error executing cell {i} in {notebook_path}: {e}")
+                finally:
+                    os.chdir(original_cwd)
+            finally:
+                # Clean up temp file
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+            return
+        
+        # Otherwise use the original ExecutePreprocessor method
         from nbconvert.preprocessors import ExecutePreprocessor
 
         with open(notebook_path) as f:
