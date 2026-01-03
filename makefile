@@ -109,10 +109,12 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	cd ../.. 
 	
 # Windows-compatible parallel booktests using pytest-xdist instead of Parsl
+# Note: Coverage is not collected because notebook execution happens in separate
+# Jupyter kernels, so pytest-cov cannot track qmcpy imports.
 booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
-	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py --cov=qmcpy --cov-append --cov-report=term --cov-report=json && \
+	python -W ignore -m pytest $(PYTEST_XDIST) $(PYTEST) -v tb_*.py && \
 	cd ../.. 
 
 ##########################################################
