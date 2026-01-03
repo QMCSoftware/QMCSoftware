@@ -1,6 +1,7 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
+from ..discrete_distribution import DigitalNetB2
 
 import numpy as np
 import scipy.stats
@@ -93,9 +94,6 @@ class SciPyWrapper(AbstractTrueMeasure):
     Examples:
         Independent marginals from ``scipy.stats``:
 
-        >>> from importlib import import_module
-        >>> _base = SciPyWrapper.__module__.split(".true_measure.", 1)[0]
-        >>> DigitalNetB2 = import_module(_base + ".discrete_distribution").DigitalNetB2
         >>> import scipy.stats as stats
         >>> tm = SciPyWrapper(
         ...     sampler=DigitalNetB2(3, seed=7),
