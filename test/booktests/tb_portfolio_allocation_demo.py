@@ -30,3 +30,6 @@ class NotebookTests(BaseNotebookTest):
         }
         
         self.run_notebook(notebook_path, replacements)
+
+if __name__ == '__main__':
+    unittest.main()
