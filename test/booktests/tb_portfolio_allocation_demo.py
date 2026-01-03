@@ -1,7 +1,7 @@
 import unittest, pytest
 from __init__ import BaseNotebookTest
 
-@pytest.mark.slow  # Uses yfinance which requires network access and can be unreliable in CI
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def test_portfolio_allocation_demo_notebook(self):
