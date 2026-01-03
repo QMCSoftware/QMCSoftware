@@ -16,10 +16,10 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
+          python-version: "3.10"
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-          python-version: "3.12"
       
       # -----------------------------------------------------------
       # Clean old coverage files
