@@ -47,20 +47,34 @@ class BaseNotebookTest(unittest.TestCase):
         return notebook_path, os.path.dirname(notebook_path)
 
     def fix_gbm_symlinks(self, notebook_dir, symlinks_to_fix=None):
-        """Fix or create symlinks inside a demo notebook directory."""
+        """Fix or create symlinks inside a demo notebook directory.
+        On Windows, copies files instead of creating symlinks (symlinks require admin privileges).
+        """
+        import shutil
+        import sys
+        
         code_dir = os.path.join(notebook_dir, 'gbm_code')
         if not symlinks_to_fix:
             return
         for module in symlinks_to_fix:
             symlink_path = os.path.join(notebook_dir, module)
             target_path = os.path.join(code_dir, module)
-            if os.path.islink(symlink_path):
-                link_target = os.readlink(symlink_path)
-                if link_target.startswith('code/') or not os.path.exists(symlink_path):
+            
+            # On Windows, use file copy instead of symlink
+            if sys.platform == 'win32':
+                if os.path.exists(symlink_path):
                     os.remove(symlink_path)
+                if os.path.exists(target_path):
+                    shutil.copy2(target_path, symlink_path)
+            else:
+                # Unix: use symlinks
+                if os.path.islink(symlink_path):
+                    link_target = os.readlink(symlink_path)
+                    if link_target.startswith('code/') or not os.path.exists(symlink_path):
+                        os.remove(symlink_path)
+                        os.symlink(f'gbm_code/{module}', symlink_path)
+                elif not os.path.exists(symlink_path) and os.path.exists(target_path):
                     os.symlink(f'gbm_code/{module}', symlink_path)
-            elif not os.path.exists(symlink_path) and os.path.exists(target_path):
-                os.symlink(f'gbm_code/{module}', symlink_path)
 
 
     def run_notebook(self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT, stop_at_pattern=None, skip_patterns=None):
@@ -97,10 +111,11 @@ class BaseNotebookTest(unittest.TestCase):
                 print(f"Notebook {notebook_path} overwritten with modified cells.")
             
             # Write modified notebook to a temp file so testbook uses the replacements
+            # Use a hidden file name to avoid polluting the directory
             import tempfile
+            import uuid
             notebook_dir = os.path.dirname(notebook_path)
-            temp_fd, temp_path = tempfile.mkstemp(suffix='.ipynb', dir=notebook_dir)
-            os.close(temp_fd)
+            temp_path = os.path.join(notebook_dir, f'.tmp_test_{uuid.uuid4().hex[:8]}.ipynb')
             try:
                 nbformat.write(nb, temp_path)
                 
