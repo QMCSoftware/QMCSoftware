@@ -2,11 +2,11 @@ name: Unit Tests
 on: [push]
 
 jobs:
-  #============================================================
+  #======================================================================
   # 3 Test Jobs on 3 OSes: Windows, macOS, Ubuntu with Python 3.5 to 3.14
-  #============================================================
+  #======================================================================
   tests:
-    name: All Tests on ${{ matrix.os }}
+    name: Unit Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:  # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
