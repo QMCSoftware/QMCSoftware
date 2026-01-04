@@ -1,9 +1,5 @@
 name: All Tests
-on:
-  push:
-    branches:
-      - develop
-      - master
+on: [push]
 
 jobs:
   #============================================================

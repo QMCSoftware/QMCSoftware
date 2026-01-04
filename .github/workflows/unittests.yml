@@ -1,5 +1,9 @@
 name: Unit Tests
-on: [push]
+on:
+  push:
+    branches:
+      - develop
+      - master
 
 jobs:
   #======================================================================
@@ -9,9 +13,28 @@ jobs:
     name: Unit Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
-        matrix:  # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
-            os: ["windows-latest", "macos-latest", "ubuntu-latest"] 
-            python-version: ['3.5', '3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3,13', '3.14']
+        matrix:
+            include:
+              - os: macos-latest
+                python-version: '3.5'
+              - os: macos-latest
+                python-version: '3.8'
+              - os: macos-latest
+                python-version: '3.11'
+              - os: macos-latest
+                python-version: '3.14'
+              - os: ubuntu-latest
+                python-version: '3.6'
+              - os: ubuntu-latest
+                python-version: '3.9'
+              - os: ubuntu-latest
+                python-version: '3.12'
+              - os: windows-latest
+                python-version: '3.7'
+              - os: windows-latest
+                python-version: '3.10'
+              - os: windows-latest
+                python-version: '3.13'
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -173,23 +196,6 @@ jobs:
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
       
-      # -----------------------------------------------------------
-      # Run doctests (OS-specific)
-      # -----------------------------------------------------------      
-      - run: pip freeze
-      - run: make doctests_minimal
-      - run: make doctests_torch
-      - run: make doctests_gpytorch
-      - run: make doctests_botorch
-      - run: make doctests_markdown
-      - name: run umbridge doctests on Linux only
-        shell: bash -l {0}
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            make doctests_umbridge
-          else
-            echo "umbridge doctests only run on Linux"
-          fi
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
