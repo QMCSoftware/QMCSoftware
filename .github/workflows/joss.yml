@@ -3,8 +3,7 @@ name: Markdown to PDF
 on:
   push:
     branches:
-      - develop
-      - joss
+      - joss_ignore
     paths:
       - 'paper/paper.md'
       - '.github/workflows/joss.yml'

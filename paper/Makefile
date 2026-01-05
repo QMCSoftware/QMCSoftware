@@ -46,7 +46,7 @@ $(OUTPUT): $(PAPER) $(BIB)
 	$(PANDOC) $(PAPER) -o $(OUTPUT) $(PANDOC_FLAGS) --bibliography=$(BIB)
 	@echo "✅ Done: $(OUTPUT) generated successfully."
 
-maintex_pdf: main.bib $(MD_SRC) $(LUA_FILTER)
+maintex_pdf: $(MD_SRC) $(LUA_FILTER)
 	@echo "Generating main.tex from paper.md with natbib..."
 	pandoc $(MD_SRC) -o $(SRC) --template=template.latex --lua-filter=include-code-files.lua --natbib --bibliography=main.bib -M colorlinks=true -M linkcolor=blue -M citecolor=blue -M urlcolor=blue -M filecolor=magenta
 	@echo "Adding bibliography commands to main.tex..."
@@ -62,7 +62,7 @@ maintex_pdf: main.bib $(MD_SRC) $(LUA_FILTER)
 	@echo "✅ Done: $(OUT) generated successfully."
 	open $(OUT) &
 
-main_pdf: cleanall main.bib $(MD_SRC) $(LUA_FILTER)
+main_pdf: cleanall $(MD_SRC) $(LUA_FILTER)
 	@echo "Building main.pdf from $(MD_SRC) with Pandoc and Lua filter..."
 	@if command -v $(CROSSREF) >/dev/null 2>&1; then \
 	  EXTRA_FILTER="--filter $(CROSSREF)"; \
@@ -74,22 +74,6 @@ main_pdf: cleanall main.bib $(MD_SRC) $(LUA_FILTER)
 	$(PANDOC) $(MD_SRC) -o main.pdf --template=template.latex --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=main.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
 	@echo "✅ Done: main.pdf generated successfully."
 	open main.pdf &
-
-
-main.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
-	@echo "Generating main.bib..."
-	cat $^ > $@
-	@echo "Cleaning LaTeX commands from main.bib..."
-	@grep -v '^[[:space:]]*\\(def\|providecommand\|newcommand)' $@ > $@.tmp && mv $@.tmp $@
-	sed -i.bak '79,$$s/\\HickernellFJ/Hickernell/g' $@
-	sed -i.bak -E 's/@(online|software|url)\{/@misc{/g' $@
-	@echo "Adding author field to @proceedings entries for natbib compatibility..."
-	@perl -i.bak2 -pe 'if (/^\@proceedings/) {$$in_proc=1} if ($$in_proc && /^(\s*)editor\s*=\s*\{([^}]+)\},?$$/) {$$ed=$$2; $$sp=$$1; $$_=$$_ . "$${sp}author = {$$ed},\n"; $$in_proc=0}' $@
-	sed -i.bak -E 's/Choi, Sou[- ]?Cheng( T\.?)?/Choi, S.-C. T./g' $@
-	sed -i.bak -E 's/Dick, Josef/Dick, J./g' $@
-	sed -i.bak -E 's/Xiaoqun Wang/Wang, X./g' $@
-	sed -i.bak -E 's/((A.|Art) B. Owen)|(Owen, Art B)/Owen, A. B./g' $@
-	@echo "✅ main.bib generated successfully."
 
 clean:
 	find . -type f \( -name '*.aux' -o -name '*.fdb_latexmk' -o -name '*.fls' -o -name '*.log' -o -name '*.out' -o -name '*.synctex.gz' -o -name '*.toc' -o -name '*.bbl' -o -name '*.blg' -o -name '*.awk' -o -name '*.pyg' -o -name '*.bak*' -o -name '*.brf' \) -delete
