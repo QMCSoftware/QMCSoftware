@@ -1,5 +1,15 @@
+%% This BibTeX bibliography file was created using BibDesk.
+%% https://bibdesk.sourceforge.io/
+
+%% Created for Fred Hickernell at 2025-10-27 16:45:08 -0500 
+
+
+%% Saved with string encoding Unicode (UTF-8) 
+
+
 @preamble{"\def\Ignore#1{}"}
 @preamble{"\def\notesupp#1{}"}
+
 
 @string{acmtomacs = {ACM Trans.\ Model.\ Comput.\ Simul.}}
 
@@ -68,20 +78,47 @@
   author              = {F. J. Hickernell and L. Jiang and Y. Liu and Owen, A. B.},
   pages               = {105--128},
   doi                 = {10.1007/978-3-642-41095-6_5},
-  url                 = {https://doi.org/10.1007/978-3-642-41095-6\%5F5},
+  url                 = {https://doi.org/10.1007/978-3-642-41095-6_5},
   crossref            = {KuoEtal14a},
-  pubtype             = chap,
+    pubtype             = chap,
 }
+
+@proceedings{KuoEtal14a,
+	booktitle = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2012},
+	doi = {10.1007/978-3-642-41095-6},
+	editor = {J. Dick and F. Y. Kuo and G. W. Peters and I. H. Sloan},
+	publisher = {Springer-Verlag, Berlin},
+	pubtype = ed,
+	series = {Springer Proceedings in Mathematics and Statistics},
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2012},
+	volume = {65},
+	year = {2013},
+	url = {https://doi.org/10.1007/978-3-642-41095-6}}
 
 @inproceedings{HicJim16a,
   title               = {Reliable Adaptive Cubature Using Digital Sequences},
   author              = {Hickernell, F. J. and {Jim\'enez Rugama}, {Ll. A.}},
   pages               = {367--383},
   doi                 = {10.1007/978-3-319-33507-0_18},
-  url                 = {https://doi.org/10.1007/978-3-319-33507-0\%5F18},
+  url                 = {https://doi.org/10.1007/978-3-319-33507-0_18},
   crossref            = {CooNuy16a},
   pubtype             = chap,
 }
+
+@proceedings{CooNuy16a,
+	booktitle = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {L}euven, {B}elgium, {A}pril 2014},
+	date-added = {2011-08-10 03:05:41 +0000},
+	date-modified = {2016-08-13 15:08:35 +0000},
+	editor = {R. Cools and D. Nuyens},
+	author = {R. Cools and D. Nuyens},
+	publisher = {Springer-Verlag, Berlin},
+	pubtype = ed,
+	series = {Springer Proceedings in Mathematics and Statistics},
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {L}euven, {B}elgium, {A}pril 2014},
+	volume = {163},
+	year = {2016},
+	doi = {10.1007/978-3-319-33507-0},
+	url = {https://doi.org/10.1007/978-3-319-33507-0}}
 
 @incollection{JagHic22a,
   title               = {Fast Automatic {B}ayesian Cubature Using {S}obol' Sampling},
@@ -89,17 +126,26 @@
   booktitle           = {Advances in Modeling and Simulation: {F}estschrift in Honour of {P}ierre {L'E}cuyer},
   pages               = {301--318},
   doi                 = {10.1007/978-3-031-10193-9_15},
-  url                 = {https://doi.org/10.1007/978-3-031-10193-9\%5F15},
+  url                 = {https://doi.org/10.1007/978-3-031-10193-9_15},
   crossref            = {LEc2022},
   pubtype             = chap,
 }
+
+@book{LEc2022,
+	editor = {Z. Botev and A. Keller and C. Lemieux and B. Tuffin},
+	publisher = {Springer, Cham},
+	title = {Advances in Modeling and Simulation: {F}estschrift in Honour of {P}ierre {L'E}cuyer},
+	year = {2022},
+	doi                 = {10.1007/978-3-031-10193-9},
+  url                 = {https://doi.org/10.1007/978-3-031-10193-9},
+  }
 
 @inproceedings{JimHic16a,
   title               = {Adaptive Multidimensional Integration Based on Rank-1 Lattices},
   author              = {{{\relax Ll}. A.} {Jim\'enez Rugama} and F. J. Hickernell},
   pages               = {407--422},
   doi                 = {10.1007/978-3-319-33507-0_20},
-  url                 = {https://doi.org/10.1007/978-3-319-33507-0\%5F20},
+  url                 = {https://doi.org/10.1007/978-3-319-33507-0_20},
   crossref            = {CooNuy16a},
   pubtype             = chap,
 }
@@ -110,9 +156,21 @@
   booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods in Scientific Computing},
   pages               = {299--317},
   doi                 = {10.1007/978-1-4612-2552-2_19},
-  url                 = {https://doi.org/10.1007/978-1-4612-2552-2\%5F19},
+  url                 = {https://doi.org/10.1007/978-1-4612-2552-2_19},
   crossref            = {NieShi95},
 }
+
+@proceedings{NieShi95,
+	booktitle = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods in Scientific Computing},
+	editor = {H. Niederreiter and P. J.-S. Shiue},
+	author = {H. Niederreiter and P. J.-S. Shiue},
+	publisher = {Springer-Verlag, New York},
+	series = {Lecture Notes in Statistics},
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods in Scientific Computing},
+	volume = {106},
+	doi                 = {10.1007/978-1-4612-2552-2},
+  url                 = {https://doi.org/10.1007/978-1-4612-2552-2},
+	year = 1995}
 
 @misc{QMCPyDocs2,
   title               = {{QMCPy} Documentation},
@@ -125,12 +183,25 @@
   author              = {Y. Wang and F. J. Hickernell},
   pages               = {158--167},
   doi                 = {10.1007/978-3-642-56046-0_10},
-  url                 = {https://doi.org/10.1007/978-3-642-56046-0\%5F10},
+  url                 = {https://doi.org/10.1007/978-3-642-56046-0_10},
   crossref            = {NieFanHic01},
   mr                  = {1 958 852},
   pubtype             = chap,
   zm                  = {1012.11067},
 }
+
+@proceedings{NieFanHic01,
+	booktitle = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2000},
+	editor = {K. T. Fang and F. J. Hickernell and H. Niederreiter},
+	author = {K. T. Fang and F. J. Hickernell and H. Niederreiter},
+	mr = {2003i:65006},
+	publisher = {Springer-Verlag, Berlin},
+	pubtype = ed,
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2000},
+	year = 2002,
+	doi                 = {10.1007/978-3-642-56046-0},
+  	url                 = {https://doi.org/10.1007/978-3-642-56046-0},
+	zm = {0980.00040}}
 
 @techreport{Ric51,
   title               = {The Evaluation of Definite Integrals, and a {Q}uasi-{M}onte-{C}arlo Method Based on the Properties of Algebraic Numbers},
@@ -240,19 +311,6 @@
   date-modified       = {2007-09-26 10:50:17 -0500},
 }
 
-@proceedings{NieShi95,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods in Scientific Computing},
-  author              = {H. Niederreiter and P. J.-S. Shiue},
-  year                = {1995},
-  booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods in Scientific Computing},
-  publisher           = {Springer-Verlag, New York},
-  series              = {Lecture Notes in Statistics},
-  volume              = {106},
-  doi                 = {10.1007/978-1-4612-2552-2},
-  url                 = {https://doi.org/10.1007/978-1-4612-2552-2},
-  editor              = {H. Niederreiter and P. J.-S. Shiue},
-}
-
 @article{Mat98,
   title               = {On the {$L_2$}-Discrepancy for Anchored Boxes},
   author              = {J. Matou\v{s}ek},
@@ -295,20 +353,6 @@
   fjournal            = {Reviews of Modern Physics},
   mrclass             = {82B99 (82B43)},
   mrreviewer          = {Dimitri Petritis},
-}
-
-@proceedings{NieFanHic01,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2000},
-  author              = {K. T. Fang and F. J. Hickernell and H. Niederreiter},
-  year                = {2002},
-  booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2000},
-  publisher           = {Springer-Verlag, Berlin},
-  doi                 = {10.1007/978-3-642-56046-0},
-  url                 = {https://doi.org/10.1007/978-3-642-56046-0},
-  editor              = {K. T. Fang and F. J. Hickernell and H. Niederreiter},
-  mr                  = {2003i:65006},
-  pubtype             = ed,
-  zm                  = {0980.00040},
 }
 
 @article{WanHic00b,
@@ -521,19 +565,6 @@
   url                 = {https://doi.org/10.1017/s0962492913000044},
 }
 
-@proceedings{KuoEtal14a,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2012},
-  year                = {2013},
-  booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods 2012},
-  publisher           = {Springer-Verlag, Berlin},
-  series              = {Springer Proceedings in Mathematics and Statistics},
-  volume              = {65},
-  doi                 = {10.1007/978-3-642-41095-6},
-  url                 = {https://doi.org/10.1007/978-3-642-41095-6},
-  editor              = {J. Dick and F. Y. Kuo and G. W. Peters and I. H. Sloan},
-  pubtype             = ed,
-}
-
 @article{Cho14a2,
   title               = {{MINRES-QLP P}ack and Reliable Reproducible Research via Staunch Scientific Software},
   author              = {Choi, S.-C. T.},
@@ -559,7 +590,7 @@
   title               = {{MIT} uncertainty quantification (MUQ) library},
   author              = {Parno, Matthew and Davis, Andrew and Seelinger, Linus and Marzouk, Youssef},
   year                = {2014},
-  url                 = {https://mituq.bitbucket.io/source/\%5Fsite/index.html},
+  url                 = {https://mituq.bitbucket.io/source/\_site/index.html},
 }
 
 @article{bernhard2015quantifying,
@@ -587,22 +618,6 @@
   url                 = {https://doi.org/10.1017/S096249291500001X},
 }
 
-@proceedings{CooNuy16a,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {L}euven, {B}elgium, {A}pril 2014},
-  author              = {R. Cools and D. Nuyens},
-  year                = {2016},
-  booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {L}euven, {B}elgium, {A}pril 2014},
-  publisher           = {Springer-Verlag, Berlin},
-  series              = {Springer Proceedings in Mathematics and Statistics},
-  volume              = {163},
-  doi                 = {10.1007/978-3-319-33507-0},
-  url                 = {https://doi.org/10.1007/978-3-319-33507-0},
-  date-added          = {2011-08-10 03:05:41 +0000},
-  date-modified       = {2016-08-13 15:08:35 +0000},
-  editor              = {R. Cools and D. Nuyens},
-  pubtype             = ed,
-}
-
 @article{KuoNuy16a,
   title               = {Application of quasi-{M}onte {C}arlo methods to elliptic {PDE}s with random diffusion coefficients -- a survey of analysis and implementation},
   author              = {F. Y. Kuo and D. Nuyens},
@@ -627,7 +642,7 @@
   pages               = {1--41},
   doi                 = {10.1007/978-3-319-11259-6_23-1},
   isbn                = {978-3-319-11259-6},
-  url                 = {https://doi.org/10.1007/978-3-319-11259-6\%5F23-1},
+  url                 = {https://doi.org/10.1007/978-3-319-11259-6_23-1},
   editor              = {Ghanem, Roger and Higdon, David and Owhadi, Houman},
 }
 
@@ -639,7 +654,7 @@
   publisher           = {Springer-Verlag},
   pages               = {597--619},
   doi                 = {978-3-319-72456-0_27},
-  url                 = {https://doi.org/10.1007/978-3-319-72456-0\%5F27},
+  url                 = {https://doi.org/10.1007/978-3-319-72456-0_27},
   date-added          = {2016-11-18 02:39:54 +0000},
   date-modified       = {2018-06-17 02:08:37 +0000},
   editor              = {J. Dick and F. Y. Kuo and H. Wo\'zniakowski},
@@ -730,12 +745,27 @@
   booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {R}ennes, France, {J}uly 2018},
   pages               = {161--181},
   doi                 = {10.1007/978-3-030-43465-6_8},
-  url                 = {https://doi.org/10.1007/978-3-030-43465-6\%5F8},
   crossref            = {LEcTuf20a},
   date-added          = {2018-09-13 00:43:12 -0500},
   date-modified       = {2022-06-04 13:34:58 -0500},
   pubtype             = chap,
+  url          = {https://doi.org/10.1007/978-3-030-43465-6_8},
 }
+
+@proceedings{LEcTuf20a,
+	date-added = {2020-12-20 14:16:16 -0600},
+	date-modified = {2020-12-20 14:16:16 -0600},
+	editor = {P. L'Ecuyer and B. Tuffin},
+	author = {P. L'Ecuyer and B. Tuffin},
+	publisher = {Springer, Cham},
+	pubtype = ed,
+	series = {Springer Proceedings in Mathematics and Statistics},
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {R}ennes, France, {J}uly 2018},
+	volume = {324},
+  	doi          = {10.1007/978-3-030-43465-6},
+  	url          = {https://doi.org/10.1007/978-3-030-43465-6},
+
+	year = {2020}}
 
 @article{harris2020array,
   title               = {Array programming with {NumPy}},
@@ -751,27 +781,12 @@
   url                 = {https://doi.org/10.1038/s41586-020-2649-2},
 }
 
-@proceedings{LEcTuf20a,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {R}ennes, France, {J}uly 2018},
-  author              = {P. L'Ecuyer and B. Tuffin},
-  year                = {2020},
-  publisher           = {Springer, Cham},
-  series              = {Springer Proceedings in Mathematics and Statistics},
-  volume              = {324},
-  doi                 = {10.1007/978-3-030-43465-6},
-  url                 = {https://doi.org/10.1007/978-3-030-43465-6},
-  date-added          = {2020-12-20 14:16:16 -0600},
-  date-modified       = {2020-12-20 14:16:16 -0600},
-  editor              = {P. L'Ecuyer and B. Tuffin},
-  pubtype             = ed,
-}
-
 @misc{ChoEtal21a2,
   title               = {{GAIL}: {G}uaranteed {A}utomatic {I}ntegration {L}ibrary (Versions 1.0--2.3.2)},
   author              = {Choi, S.-C. T. and Ding, Yuhan and Hickernell, Fred J. and Jiang, Lan and {Jim\'enez Rugama}, Ll. A. and Li, D. and Rathinavel, Jagadeeswaran and Tong, X. and Zhang, K. and Zhang, Y. and Zhou, X.},
   year                = {2021},
   doi                 = {10.5281/zenodo.4018189},
-  url                 = {http://gailgithub.github.io/GAIL\%5FDev/},
+  url                 = {http://gailgithub.github.io/GAIL_Dev/},
 }
 
 @article{DICK2021101587,
@@ -836,7 +851,7 @@
   booktitle           = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {O}xford, England, {A}ugust 2020},
   pages               = {23--50},
   doi                 = {10.1007/978-3-030-98319-2_2},
-  url                 = {https://doi.org/10.1007/978-3-030-98319-2\%5F2},
+  url                 = {https://doi.org/10.1007/978-3-030-98319-2_2},
   crossref            = {Kel22a},
   date-added          = {2021-02-17 11:24:14 -0600},
   date-modified       = {2022-07-07 13:28:46 -0500},
@@ -844,25 +859,15 @@
 }
 
 @proceedings{Kel22a,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {O}xford, England, {A}ugust 2020},
-  author              = {A. Keller},
-  year                = {2022},
-  publisher           = {Springer, Cham},
-  series              = {Springer Proceedings in Mathematics and Statistics},
-  doi                 = {10.1007/978-3-030-98319-2},
-  url                 = {https://doi.org/10.1007/978-3-030-98319-2},
-  editor              = {A. Keller},
-  pubtype             = ed,
-}
-
-@book{LEc2022,
-  title               = {Advances in Modeling and Simulation: {F}estschrift in Honour of {P}ierre {L'E}cuyer},
-  year                = {2022},
-  publisher           = {Springer, Cham},
-  doi                 = {10.1007/978-3-031-10193-9},
-  url                 = {https://doi.org/10.1007/978-3-031-10193-9},
-  editor              = {Z. Botev and A. Keller and C. Lemieux and B. Tuffin},
-}
+	editor = {A. Keller},
+	author = {A. Keller},
+	publisher = {Springer, Cham},
+	pubtype = ed,
+	series = {Springer Proceedings in Mathematics and Statistics},
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {O}xford, England, {A}ugust 2020},
+	year = {2022},
+	doi                 = {10.1007/978-3-030-98319-2},
+  	url                 = {https://doi.org/10.1007/978-3-030-98319-2},}
 
 @inproceedings{sorokin2022bounding,
   title               = {On Bounding and Approximating Functions of Multiple Expectations Using Quasi-{M}onte {C}arlo},
@@ -871,7 +876,7 @@
   booktitle           = {International Conference on {M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods in Scientific Computing},
   pages               = {583--599},
   doi                 = {10.1007/978-3-031-59762-6_29},
-  url                 = {https://doi.org/10.1007/978-3-031-59762-6\%5F29},
+  url                 = {https://doi.org/10.1007/978-3-031-59762-6_29},
   organization        = {Springer},
 }
 
@@ -909,7 +914,7 @@
   publisher           = {Springer},
   pages               = {209--222},
   doi                 = {10.1007/978-3-031-59762-6_9},
-  url                 = {https://doi.org/10.1007/978-3-031-59762-6\%5F9},
+  url                 = {https://doi.org/10.1007/978-3-031-59762-6_9},
 }
 
 @misc{MultilevelEstimators,
@@ -989,7 +994,7 @@
   title               = {{QMCP}y {JOSS}2025: Reproducible Figures and Demos},
   author              = {Sorokin, Aleksei G. and Hickernell, Fred J. and Choi, S.-C. T. and Jain, Aadit and Rathinavel, Jagadeeswaran and Robbe, Pieterjan},
   year                = {2025},
-  url                 = {https://github.com/QMCSoftware/QMCSoftware/blob/joss/demos/talk\%5Fpaper\%5Fdemos/JOSS2025/joss2025.ipynb},
+  url                 = {https://github.com/QMCSoftware/QMCSoftware/blob/joss/demos/talk_paper_demos/JOSS2025/joss2025.ipynb},
   note                = {Jupyter Notebook, QMCSoftware},
 }
 
@@ -1024,9 +1029,8 @@
 
 
 @proceedings{LemFen26,
-  title               = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {W}aterloo, {C}anada, {A}ugust 2024},
-  author              = {C. Lemieux and B. Feng},
-  year                = {2025+},
-  publisher           = {Springer, Cham},
-  editor              = {C. Lemieux and B. Feng},
-}
+	editor = {C. Lemieux and B. Feng},
+	author = {C. Lemieux and B. Feng},
+	publisher = {Springer, Cham},
+	title = {{M}onte {C}arlo and Quasi-{M}onte {C}arlo Methods: {MCQMC}, {W}aterloo, {C}anada, {A}ugust 2024},
+	year = {2025+}}
