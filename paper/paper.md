@@ -100,7 +100,7 @@ practical implementation demands numerical and algorithmic expertise. Our
 `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library
 (GAIL) [@ChoEtal21a2; @TonEtAl22a], with both adhering to reproducible research
 practices [@Cho14a2; @ChoEtal22a]. However, `QMCPy` consolidates a substantially
-broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a; @ChoEtal24a;
+broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a; @ChoEtal24a2;
 @sorokin2022bounding; @sorokin2025unified; @HicKirSor26a] into a unified
 framework, bridging theory and practice, with the following features:
 
@@ -109,7 +109,7 @@ framework, bridging theory and practice, with the following features:
 - **Robust and adaptive sampling** with theoretically grounded error estimation, and
 - **Extensible OO components** enabling researchers to implement and test new algorithms.
 
-While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]:
+While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` [@Roy2023] for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]:
 
 - customizable LD sequences with diverse randomization techniques,
 - automatic variable transformations for (Q)MC compatibility, and
