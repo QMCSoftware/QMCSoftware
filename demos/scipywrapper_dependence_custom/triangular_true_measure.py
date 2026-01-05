@@ -73,7 +73,7 @@ class BadTriangularDistribution:
         return np.ones_like(x)  # not normalized on purpose
 
 
-class TriangularUserTrueMeasure(SciPyWrapper):
+class TriangularTrueMeasure(SciPyWrapper):
     """
     Convenience true measure for the custom triangular marginal example.
 

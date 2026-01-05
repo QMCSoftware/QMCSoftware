@@ -9,11 +9,10 @@ from .bernoulli_cont import BernoulliCont
 from .johnsons_su import JohnsonsSU
 from .scipy_wrapper import SciPyWrapper
 from .matern_gp import MaternGP
-from .multivariate_student_t_joint import MultivariateStudentTJoint
-from .multivariate_normal_joint import MultivariateNormalJoint
-from .zero_inflated_exp_uniform_joint import ZeroInflatedExpUniformJoint
-from .uniform_triangle_joint import UniformTriangleJoint
-from .triangular_user_true_measure import TriangularUserTrueMeasure, TriangularUserDistribution, BadTriangularDistribution
+from .student_t import StudentT
+from .uniform_triangle import UniformTriangle
+from .zero_inflated_exp_uniform import ZeroInflatedExpUniform
+from .triangular import Triangular
 
 TrueMeasure = AbstractTrueMeasure
 _TrueMeasure = AbstractTrueMeasure
