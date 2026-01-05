@@ -8,11 +8,7 @@ on:
     paths:
       - 'paper/paper.md'
       - '.github/workflows/joss.yml'
-      - 'paper/choi2025.bib'
-      - 'paper/FJH25.bib'
-      - 'paper/FJHown25.bib'
-      - 'paper/other.bib'
-      - 'paper/refs_all.bib'
+      - 'paper/main.bib'
       - 'paper/Makefile'
 
 jobs:
@@ -26,10 +22,10 @@ jobs:
       - name: List files in workspace
         run: ls -R
 
-      - name: Generate refs_all.bib with transformations
+      - name: Generate main.bib with transformations
         run: |
           cd paper
-          make refs_all.bib
+          make main.bib
           
       - name: Build draft PDF
         uses: openjournals/openjournals-draft-action@master

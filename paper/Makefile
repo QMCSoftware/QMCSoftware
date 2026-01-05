@@ -46,12 +46,12 @@ $(OUTPUT): $(PAPER) $(BIB)
 	$(PANDOC) $(PAPER) -o $(OUTPUT) $(PANDOC_FLAGS) --bibliography=$(BIB)
 	@echo "✅ Done: $(OUTPUT) generated successfully."
 
-maintex_pdf: refs_all.bib $(MD_SRC) $(LUA_FILTER)
+maintex_pdf: main.bib $(MD_SRC) $(LUA_FILTER)
 	@echo "Generating main.tex from paper.md with natbib..."
-	pandoc $(MD_SRC) -o $(SRC) --template=template.latex --lua-filter=include-code-files.lua --natbib --bibliography=refs_all.bib -M colorlinks=true -M linkcolor=blue -M citecolor=blue -M urlcolor=blue -M filecolor=magenta
+	pandoc $(MD_SRC) -o $(SRC) --template=template.latex --lua-filter=include-code-files.lua --natbib --bibliography=main.bib -M colorlinks=true -M linkcolor=blue -M citecolor=blue -M urlcolor=blue -M filecolor=magenta
 	@echo "Adding bibliography commands to main.tex..."
 	@if ! grep -q '\\bibliography{' $(SRC); then \
-		perl -i.bak -pe 's/(\\end\{document\})/\\bibliographystyle{abbrvnat}\n\\bibliography{refs_all}\n$$1/' $(SRC); \
+		perl -i.bak -pe 's/(\\end\{document\})/\\bibliographystyle{abbrvnat}\n\\bibliography{main}\n$$1/' $(SRC); \
 	fi
 	@echo "Compiling main.tex with pdflatex..."
 	rm -f maintex.bbl maintex.aux
@@ -62,7 +62,7 @@ maintex_pdf: refs_all.bib $(MD_SRC) $(LUA_FILTER)
 	@echo "✅ Done: $(OUT) generated successfully."
 	open $(OUT) &
 
-main_pdf: cleanall refs_all.bib $(MD_SRC) $(LUA_FILTER)
+main_pdf: cleanall main.bib $(MD_SRC) $(LUA_FILTER)
 	@echo "Building main.pdf from $(MD_SRC) with Pandoc and Lua filter..."
 	@if command -v $(CROSSREF) >/dev/null 2>&1; then \
 	  EXTRA_FILTER="--filter $(CROSSREF)"; \
@@ -71,15 +71,15 @@ main_pdf: cleanall refs_all.bib $(MD_SRC) $(LUA_FILTER)
 	  EXTRA_FILTER=""; \
 	  echo "pandoc-crossref not found; proceeding without it"; \
 	fi; \
-	$(PANDOC) $(MD_SRC) -o main.pdf --template=template.latex --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=refs_all.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
+	$(PANDOC) $(MD_SRC) -o main.pdf --template=template.latex --lua-filter=$(LUA_FILTER) $$EXTRA_FILTER --citeproc --bibliography=main.bib --csl=joss-simple.csl --pdf-engine=$(PDF_ENGINE)
 	@echo "✅ Done: main.pdf generated successfully."
 	open main.pdf &
 
 
-refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
-	@echo "Generating refs_all.bib..."
+main.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
+	@echo "Generating main.bib..."
 	cat $^ > $@
-	@echo "Cleaning LaTeX commands from refs_all.bib..."
+	@echo "Cleaning LaTeX commands from main.bib..."
 	@grep -v '^[[:space:]]*\\(def\|providecommand\|newcommand)' $@ > $@.tmp && mv $@.tmp $@
 	sed -i.bak '79,$$s/\\HickernellFJ/Hickernell/g' $@
 	sed -i.bak -E 's/@(online|software|url)\{/@misc{/g' $@
@@ -89,13 +89,13 @@ refs_all.bib: FJH25.bib FJHown25.bib choi2025.bib other.bib
 	sed -i.bak -E 's/Dick, Josef/Dick, J./g' $@
 	sed -i.bak -E 's/Xiaoqun Wang/Wang, X./g' $@
 	sed -i.bak -E 's/((A.|Art) B. Owen)|(Owen, Art B)/Owen, A. B./g' $@
-	@echo "✅ refs_all.bib generated successfully."
+	@echo "✅ main.bib generated successfully."
 
 clean:
 	find . -type f \( -name '*.aux' -o -name '*.fdb_latexmk' -o -name '*.fls' -o -name '*.log' -o -name '*.out' -o -name '*.synctex.gz' -o -name '*.toc' -o -name '*.bbl' -o -name '*.blg' -o -name '*.awk' -o -name '*.pyg' -o -name '*.bak*' -o -name '*.brf' \) -delete
 
 cleanall: clean
-	rm -f $(OUTPUT) $(OUT) $(OUT2) main.pdf refs_all.bib* tmp.md
+	rm -f $(OUTPUT) $(OUT) $(OUT2) main.pdf main.bib* tmp.md
 
 install-mac:
 	@echo "Installing dependencies (Pandoc, pandoc-crossref, TeX Live)..."
