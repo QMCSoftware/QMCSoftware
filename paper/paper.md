@@ -111,7 +111,7 @@ framework, bridging theory and practice, with the following features:
 
 While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` [@Roy2023] for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]:
 
-- customizable LD sequences with diverse randomization techniques,
+- customizable LD sequences with diverse randomization techniques and efficient routines for generating multiple independent randomizations,
 - automatic variable transformations for (Q)MC compatibility, and
 - rigorous adaptive error estimation algorithms.
 
@@ -231,8 +231,7 @@ width=100% }
 `QMCPy` can be installed using the command `pip install qmcpy` [@qmcpy_pypi].
 \autoref{fig:points} and \autoref{fig:stopping_crit} are reproducible via the
 Jupyter Notebook [@QMCPyJOSS2025Notebook]. Our project website [@QMCBlog]
-features publications, presentations, blogs, documentation [@QMCPyDocs], and
-demos. Our GitHub repository [@choi2023qmcpy] contains open-source code with
+features documentation [@QMCPyDocs], publications, presentations, blogs, demos, and community guidelines. Our GitHub repository [@choi2023qmcpy] contains open-source code with
 continuous integration, tests, and issue tracking [@ChoEtal22a;
 @sorokin2025unified]. `QMCPy` is distributed under the Apache (v2.0) license.
 Community feedback and engagement are welcome.
