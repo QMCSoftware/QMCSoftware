@@ -30,15 +30,8 @@ demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
 
-docs/assets/**/*.png
-
-
 # tests
 .coverage
-*.wgw*
-coverage-data/*
-*coverage*
-
 
 # C
 *.so
@@ -52,8 +45,6 @@ coverage-data/*
 # Website
 docs/_site
 docs/Gemfile.lock
-/site
-*.svg
 
 # Sphinx
 sphinx/_build/
@@ -96,7 +87,3 @@ _ags/*
 /sc_*
 sc_*
 
-
-# Virtual environments
-.venv/
-venv/
