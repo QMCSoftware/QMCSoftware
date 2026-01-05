@@ -95,7 +95,7 @@ randomized with nested uniform scrambling (Owen scrambling); the Halton sequence
 was randomized with linear matrix scrambling and permutation
 scrambling.\label{fig:points}](./figs/points.png){width=100%}
 
-While (Q)MC methods are well established [@dick2010digital; @dick2013high],
+While (Q)MC methods are well established [@DicPil10a; @dick2013high],
 practical implementation demands numerical and algorithmic expertise. Our
 `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library
 (GAIL) [@ChoEtal21a2; @TonEtAl22a], with both adhering to reproducible research
@@ -162,7 +162,7 @@ sequences and randomization routines [@sorokin2025unified] include
       called Owen scrambling) [@Sob67; @dick2005multivariate; @Mat98; @Owe95;
       @owen2003variance; @dick2011higher; @Nie87; @Nie92; @DicPil10a].
     - **Halton Sequences** with digital shifts, permutation scrambling, LMS, or
-      NUS [@Hal60; @WanHic00; @Mat98; @owen2024gain; @MorCaf94; @owen2024gain].
+      NUS [@Hal60; @WanHic00; @Mat98; @owen2024gain; @MorCaf94].
 
     We support higher-order digital sequences and higher order scrambling for
     integrands $f$ with $\alpha$ degrees of "smoothness", enabling QMC
