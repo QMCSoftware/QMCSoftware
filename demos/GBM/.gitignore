@@ -1,0 +1,15 @@
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex*
+*.bak
+*.md
+*.pdf
+*.tex
+sc_*.
+* copy*
+.DS_Store
+__pycache__/
+*/*.png

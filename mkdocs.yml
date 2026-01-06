@@ -19,8 +19,14 @@ nav:
       - Pricing Options: demos/pricing_options.ipynb 
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
     - Publication Notebooks:
+      - 2025 Sorokin Thesis: demos/talk_paper_demos/SorokinThesis2025/sorokin_thesis_2025.ipynb
       - 2025 JOSS Paper: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
       - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
+      - 2025 ParslFest:
+        - Parallel Implementation: demos/talk_paper_demos/Parslfest_2025/02_parallel.ipynb
+        - Sequential Implementation: demos/talk_paper_demos/Parslfest_2025/01_sequential.ipynb
+        - Speedup Visualization: demos/talk_paper_demos/Parslfest_2025/03_visualize_speedup.ipynb
+        - Sequential Output: demos/talk_paper_demos/Parslfest_2025/output/01_sequential_output.ipynb
       - 2023 Argonne Talk: demos/talk_paper_demos/Argonne_Talk_2023_May/Argonne_2023_Talk_Figures.ipynb
       - 2022 MCQMC Paper 1: demos/talk_paper_demos/MCQMC2022_Article_Figures/MCQMC2022_Article_Figures.ipynb
       - 2022 MCQMC Paper 2: 
@@ -28,7 +34,7 @@ nav:
         - Vectorized QMC Bayesian Cubature: demos/vectorized_qmc_bayes.ipynb
       - 2023 Probability of Failure Paper: demos/talk_paper_demos/ProbFailureSorokinRao/prob_failure_gp_ci.ipynb
       - 2023 Purdue Talk: demos/talk_paper_demos/Purdue_Talk_2023_March/Purdue_Talk_Figures.ipynb
-      - 2023 PyData Chicago Talk: demos/talk_paper_demos/pydata.chi.2023.ipynb
+      - 2023 PyData Chicago Talk: demos/talk_paper_demos/pydata_chi_2023.ipynb
       - 2020 MCQMC Software Tutorial: demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial.ipynb
     - Blog Posts:
       - 2023 Random Lattice Generating Vectors: demos/lattice_random_generator.ipynb
@@ -49,35 +55,40 @@ nav:
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
-      - Geometric Brownian Motion: demos/gbm_demo.ipynb
+      - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
+      - GBM Examples: demos/GBM/examples.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
+  - For Developers:
+    - Release Manual: RELEASE.md
+    - Testing Guidelines: 
+      - Doc tests and unit tests on `qmcpy`: tests.md
+      - Unit tests on Jupyter Notebooks: booktests.md
   - Printable Docs: print_page/
 
 plugins:
   - search
   - mkdocs-jupyter:
-      ignore_h1_titles: true    # Include H1 from notebooks
+      ignore_h1_titles: true      # Ignore H1 titles from notebooks
       execute: false              # Execute notebooks during build
-      include_source: true       # Add download link for source notebooks
-      remove_empty_cells: true
+      include_source: true        # Add download link for source notebooks
       # theme: dark               # Use dark theme for code cells
       # include: ["*.ipynb"]  # File patterns to include
       # execute_ignore: []  # Skip certain files
       # allow_errors: false        # Fail build on notebook errors
       # kernel_name: python3       # Specify kernel to use
-      # show_input: true          # Show input cells by default
-      # no_input: false           # Don't hide all inputs
+      # show_input: true           # Show input cells by default
+      # no_input: false            # Don't hide all inputs
       # remove_tag_config:
       #   remove_cell_tags:
-      #     - "hide"              # Hide cells with these tags
+      #     - "hide"               # Hide cells with these tags
       #     - "hide-cell"
       #   remove_all_outputs_tags:
-      #     - "hide-output"       # Hide outputs for tagged cells
+      #     - "hide-output"        # Hide outputs for tagged cells
       #   remove_input_tags:
-      #     - "hide-input"        # Hide input for tagged cells
+      #     - "hide-input"         # Hide input for tagged cells
   - mkdocstrings:
       #enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
       #custom_templates: templates
