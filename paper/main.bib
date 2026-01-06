@@ -1,70 +1,5 @@
 % bibtex-tidy --omit=abstract --curly --months --align=20 --sort=year,key --duplicates=key,doi,citation,abstract --merge=overwrite --sort-fields --trailing-commas --no-tidy-comments --remove-empty-fields paper/main.bib
 
-@preamble{"\def\Ignore#1{}"}
-@preamble{"\def\notesupp#1{}"}
-
-@string{acmtomacs = {ACM Trans.\ Model.\ Comput.\ Simul.}}
-
-@string{acmtoms = {ACM Trans.\ Math.\ Software}}
-
-@string{annstat = {Ann.\ Stat.}}
-
-@string{art = {\Ignore{a}Refereed Journal Articles}}
-
-@string{book = {\Ignore{b}Book}}
-
-@string{chap = {\Ignore{c}Refereed and/or Invited Book Chapters and Conference Papers}}
-
-@string{cma = {Comput.\ Math.\ Appl.}}
-
-@string{ed = {\Ignore{d}Edited Volumes}}
-
-@string{jasa = {J.\ Amer.\ Statist.\ Assoc.}}
-
-@string{jcam = {J.\ Comput.\ Appl.\ Math.}}
-
-@string{jcgs = {J.\ Comput.\ Graph.\ Statist.}}
-
-@string{jcomp = {J.\ Complexity}}
-
-@string{jcp = {J.\ Comput.\ Phys.}}
-
-@string{jrssb = {J.\ Roy.\ Statist.\ Soc.\ B}}
-
-@string{jspi = {J.\ Statist.\ Plann.\ Inference}}
-
-@string{mc = {Math.\ Comp.}}
-
-@string{mcm = {Math.\ Comput.\ Modelling}}
-
-@string{mm = {Monatsh.\ Math.}}
-
-@string{nummath = {Numer.\ Math.}}
-
-@string{oth = {\Ignore{o}Other Publications}}
-
-@string{pnas = {Proc.\ Natl.\ Acad.\ Sci.}}
-
-@string{prep = {\Ignore{z}Manuscripts in Preparation}}
-
-@string{pub-bh = {Birkh{\"{a}}user}}
-
-@string{pub-bh:adr = {Boston, MA, USA}}
-
-@string{sinum = {SIAM J.\ Numer.\ Anal.}}
-
-@string{sirev = {SIAM Rev.}}
-
-@string{sisc = {SIAM J.\ Sci.\ Comput.}}
-
-@string{ss = {Statist.\ Sinica}}
-
-@string{stam = {Stud.\ Appl.\ Math}}
-
-@string{statprob = {Statist.\ Probab.\ Lett.}}
-
-@string{sub = {\Ignore{u}Manuscripts Under Review}}
-
 @inproceedings{HicEtal14a,
   title               = {Guaranteed Conservative Fixed Width Confidence Intervals Via {M}onte {C}arlo Sampling},
   author              = {F. J. Hickernell and L. Jiang and Y. Liu and Owen, A. B.},
@@ -72,7 +7,6 @@
   doi                 = {10.1007/978-3-642-41095-6_5},
   url                 = {https://doi.org/10.1007/978-3-642-41095-6_5},
   crossref            = {KuoEtal14a},
-  pubtype             = chap,
 }
 
 @inproceedings{HicJim16a,
@@ -82,7 +16,6 @@
   doi                 = {10.1007/978-3-319-33507-0_18},
   url                 = {https://doi.org/10.1007/978-3-319-33507-0_18},
   crossref            = {CooNuy16a},
-  pubtype             = chap,
 }
 
 @incollection{JagHic22a,
@@ -93,7 +26,6 @@
   doi                 = {10.1007/978-3-031-10193-9_15},
   url                 = {https://doi.org/10.1007/978-3-031-10193-9_15},
   crossref            = {LEc2022},
-  pubtype             = chap,
 }
 
 @inproceedings{JimHic16a,
@@ -103,7 +35,6 @@
   doi                 = {10.1007/978-3-319-33507-0_20},
   url                 = {https://doi.org/10.1007/978-3-319-33507-0_20},
   crossref            = {CooNuy16a},
-  pubtype             = chap,
 }
 
 @inproceedings{Owe95,
@@ -124,7 +55,6 @@
   url                 = {https://doi.org/10.1007/978-3-642-56046-0_10},
   crossref            = {NieFanHic01},
   mr                  = {1 958 852},
-  pubtype             = chap,
   zm                  = {1012.11067},
 }
 
@@ -142,7 +72,7 @@
   title               = {On the Efficiency of Certain Quasi-Random Sequences of Points in Evaluating Multi-Dimensional Integrals},
   author              = {J. H. Halton},
   year                = {1960},
-  journal             = NumMath,
+  journal             = {Numer.\ Math.},
   volume              = {2},
   pages               = {84--90},
   doi                 = {10.1007/bf01386213},
@@ -177,7 +107,7 @@
   title               = {Randomization of Number Theoretic Methods for Multiple Integration},
   author              = {R. Cranley and T. N. L. Patterson},
   year                = {1976},
-  journal             = SINUM,
+  journal             = {SIAM J.\ Numer.\ Anal.},
   volume              = {13},
   pages               = {904--914},
   doi                 = {10.1137/0713071},
@@ -220,7 +150,7 @@
   title               = {Quasi-Random Sequences and Their Discrepancies},
   author              = {W. J. Morokoff and R. E. Caflisch},
   year                = {1994},
-  journal             = SISC,
+  journal             = {SIAM J.\ Sci.\ Comput.},
   volume              = {15},
   pages               = {1251--1279},
   doi                 = {10.1137/0915077},
@@ -244,7 +174,7 @@
   title               = {On the {$L_2$}-Discrepancy for Anchored Boxes},
   author              = {J. Matou\v{s}ek},
   year                = {1998},
-  journal             = JComp,
+  journal             = {J.\ Complexity},
   volume              = {14},
   pages               = {527--556},
   doi                 = {10.1006/jcom.1998.0489},
@@ -255,13 +185,12 @@
   title               = {Randomized {H}alton Sequences},
   author              = {X. Wang and F. J. Hickernell},
   year                = {2000},
-  journal             = MCM,
+  journal             = {Math.\ Comput.\ Modelling},
   volume              = {32},
   pages               = {887--899},
   doi                 = {10.1016/s0895-7177(00)00178-3},
   url                 = {https://doi.org/10.1016/s0895-7177(00)00178-3},
   mr                  = {2001i:65010},
-  pubtype             = art,
   zm                  = {965.65005},
 }
 
@@ -292,7 +221,6 @@
   url                 = {https://doi.org/10.1007/978-3-642-56046-0},
   editor              = {K. T. Fang and F. J. Hickernell and H. Niederreiter},
   mr                  = {2003i:65006},
-  pubtype             = ed,
   zm                  = {0980.00040},
 }
 
@@ -300,13 +228,12 @@
   title               = {The Error Bounds and Tractability of Quasi-{M}onte {C}arlo Algorithms in Infinite Dimension},
   author              = {F. J. Hickernell and X. Wang},
   year                = {2002},
-  journal             = MC,
+  journal             = {Math.\ Comp.},
   volume              = {71},
   pages               = {1641--1661},
   doi                 = {10.1090/S0025-5718-01-01377-1},
   url                 = {https://dx.doi.org/10.1090/S0025-5718-01-01377-1},
   mr                  = {2003i:65009},
-  pubtype             = art,
   zm                  = {pre01802731},
 }
 
@@ -314,7 +241,7 @@
   title               = {Remark on Algorithm 659: Implementing {S}obol's quasirandom sequence generator},
   author              = {S. Joe and F. Y. Kuo},
   year                = {2003},
-  journal             = acmtoms,
+  journal             = {ACM Trans.\ Math.\ Software},
   volume              = {29},
   pages               = {49--57},
   doi                 = {10.1145/641876.641879},
@@ -337,7 +264,7 @@
   title               = {Strong Tractability of Multivariate Integration Using {Q}uasi-{M}onte {C}arlo Algorithms},
   author              = {X. Wang},
   year                = {2003},
-  journal             = MC,
+  journal             = {Math.\ Comp.},
   volume              = {72},
   pages               = {823--838},
   doi                 = {10.1090/s0025-5718-02-01440-0},
@@ -378,7 +305,6 @@
   pages               = {1--31},
   doi                 = {10.1214/088342304000000468},
   url                 = {https://dx.doi.org/10.1214/088342304000000468},
-  pubtype             = art,
 }
 
 @article{wangsloan05,
@@ -503,7 +429,6 @@
   doi                 = {10.1007/978-3-642-41095-6},
   url                 = {https://doi.org/10.1007/978-3-642-41095-6},
   editor              = {J. Dick and F. Y. Kuo and G. W. Peters and I. H. Sloan},
-  pubtype             = ed,
 }
 
 @article{Cho14a2,
@@ -570,7 +495,6 @@
   doi                 = {10.1007/978-3-319-33507-0},
   url                 = {https://doi.org/10.1007/978-3-319-33507-0},
   editor              = {R. Cools and D. Nuyens},
-  pubtype             = ed,
 }
 
 @article{KuoNuy16a,
@@ -608,7 +532,6 @@
   doi                 = {10.1007/978-3-319-72456-0_27},
   url                 = {https://doi.org/10.1007/978-3-319-72456-0_27},
   editor              = {J. Dick and F. Y. Kuo and H. Wo\'zniakowski},
-  pubtype             = chap,
 }
 
 @incollection{HicEtal18a,
@@ -620,7 +543,6 @@
   doi                 = {10.1002/9781118445112.stat08035},
   url                 = {https://doi.org/10.1002/9781118445112.stat08035},
   editor              = {M. Davidian and B. Everitt and R. S. Kenett and G. Molenberghs and W. Piegorsch and F. Ruggeri},
-  pubtype             = chap,
 }
 
 @inproceedings{pmlr-v80-chen18f,
@@ -665,7 +587,6 @@
   pages               = {1215--1229},
   doi                 = {10.1007/s11222-019-09895-9},
   url                 = {https://doi.org/10.1007/s11222-019-09895-9},
-  pubtype             = art,
 }
 
 @article{2020SciPy-NMeth,
@@ -688,7 +609,6 @@
   doi                 = {10.1007/978-3-030-43465-6_8},
   url                 = {https://doi.org/10.1007/978-3-030-43465-6_8},
   crossref            = {LEcTuf20a},
-  pubtype             = chap,
 }
 
 @article{harris2020array,
@@ -715,7 +635,6 @@
   doi                 = {10.1007/978-3-030-43465-6},
   url                 = {https://doi.org/10.1007/978-3-030-43465-6},
   editor              = {P. L'Ecuyer and B. Tuffin},
-  pubtype             = ed,
 }
 
 @misc{ChoEtal21a2,
@@ -784,7 +703,6 @@
   doi                 = {10.1007/978-3-030-98319-2_2},
   url                 = {https://doi.org/10.1007/978-3-030-98319-2_2},
   crossref            = {Kel22a},
-  pubtype             = chap,
 }
 
 @proceedings{Kel22a,
@@ -796,7 +714,6 @@
   doi                 = {10.1007/978-3-030-98319-2},
   url                 = {https://doi.org/10.1007/978-3-030-98319-2},
   editor              = {A. Keller},
-  pubtype             = ed,
 }
 
 @book{LEc2022,
@@ -828,7 +745,6 @@
   pages               = {7},
   doi                 = {10.5334/jors.381},
   url                 = {https://doi.org/10.5334/jors.381},
-  pubtype             = art,
 }
 
 @inproceedings{l2023confidence,
@@ -919,7 +835,6 @@
   url                 = {https://doi.org/10.48550/arXiv.2502.03644},
   crossref            = {LemFen26},
   howpublished        = {Accepted for publication},
-  pubtype             = chap,
   sortname            = {F. J. Hickernell and N. Kirk and A. G. Sorokin},
 }
 
@@ -932,26 +847,6 @@
   editor              = {C. Lemieux and B. Feng},
 }
 
-@misc{choi2023qmcpy,
-  title               = {{QMCPy} {G}it{H}ub Repository.},
-  author              = {Choi, S.-C. T. and Hickernell, Fred J and McCourt, Michael and Rathinavel, Jagadeeswaran and Sorokin, Aleksei G.},
-  year                = {2026},
-  url                 = {https://github.com/QMCSoftware/QMCSoftware},
-}
-
-@webpage{QMCBlog,
-  title               = {{QMCPy} Blogs},
-  author              = {S.-C. T. Choi and F. J. Hickernell and J. Rathinavel and  M. J. McCourt and A. Sorokin},
-  year                = {2026},
-  url                 = {https://qmcpy.org},
-}
-
-@misc{qmcpy_pypi,
-  title               = {{QMCPy} in the {P}ython Package Index},
-  author              = {Choi, S.-C. T. and Hickernell, Fred J. and Jagadeeswaran, Rathinavel and McCourt, Michael and Sorokin, Aleksei G.},
-  year                = {2026},
-  url                 = {https://pypi.org/project/qmcpy/},
-}
 
 @misc{QMCPy2025,
   title               = {{QMCPy}: A quasi-{M}onte {C}arlo {P}ython Library},
@@ -960,21 +855,6 @@
   publisher           = {Python Software, Zenodo},
   doi                 = {10.5281/zenodo.3964489},
   url                 = {https://qmcsoftware.github.io/QMCSoftware/},
-}
-
-@misc{QMCPyDocs,
-  title               = {{QMCPy} Documentation},
-  author              = {Choi, S.-C. T. and Hickernell, Fred J. and Rathinavel, Jagadeeswaran and McCourt, Michael J. and Sorokin, Aleksei G.},
-  year                = {2026},
-  url                 = {https://qmcsoftware.github.io/QMCSoftware},
-}
-
-@misc{QMCPyJOSS2025Notebook,
-  title               = {{QMCP}y {JOSS}2026: Reproducible Figures and Demos},
-  author              = {Sorokin, Aleksei G. and Hickernell, Fred J. and Choi, S.-C. T. and Jain, Aadit and Rathinavel, Jagadeeswaran and Robbe, Pieterjan},
-  year                = {2026},
-  url                 = {https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/talk_paper_demos/JOSS2025/joss2025.ipynb},
-  note                = {Jupyter Notebook, QMCSoftware},
 }
 
 @misc{QMCToolsCL,
