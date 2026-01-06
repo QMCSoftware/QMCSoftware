@@ -56,39 +56,36 @@ header-includes:
   #- \titlespacing*{\subsubsection}{0pt}{0.6ex plus .2ex minus .2ex}{0.4ex plus .1ex}
 ---
 
-<!--================================================================================-->
 # Summary
 
-Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample averages at independent random points in the integration domain. Quasi-Monte Carlo (QMC) methods replacing the independent random samples with low-discrepancy (LD) sequences which more uniformly cover the integration domain, leading to faster convergence and reduced computational requirements. `QMCPy` is an open-source Python package for high-dimensional numerical integration using MC and QMC methods, collectively "(Q)MC." Its object-oriented (OO) design enables researchers to easily implement novel (Q)MC algorithms. The framework offers user-friendly APIs, diverse (Q)MC algorithms, adaptive error estimation, and integration with scientific libraries following reproducible research practices. Compared to previous versions, `QMCPy` v2.0 includes
+Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample averages at independent and identically distributed (IID) random points in the integration domain. Quasi-Monte Carlo (QMC) methods replacing the IID samples with low-discrepancy (LD) sequences which more uniformly cover the integration domain, leading to faster convergence and reduced computational requirements. `QMCPy` [@QMCPy2025] is an open-source Python package for high-dimensional numerical integration using MC and QMC methods, collectively "(Q)MC." Its object-oriented design enables researchers to easily implement novel (Q)MC algorithms. The framework offers user-friendly APIs, diverse (Q)MC algorithms, adaptive error estimation techniques, and integration with scientific libraries following reproducible research practices. Compared to previous versions, `QMCPy` v2.0 includes
 
 - improved documentation,
 - strengthened tests and demos,
-- expanded support for randomized low-discrepancy (LD) sequences,
+- expanded support for randomized LD sequences,
 - enhanced option pricing capabilities, and
 - new utilities for fast QMC-based kernel methods.
 
-<!--================================================================================-->
-
 # Statement of Need
 
-High-dimensional integration and simulation are essential for computational finance [@Lem04a;@wangsloan05;@giles2009multilevel;@zhang2021sentiment], uncertainty quantification [@MUQ;@parno2021muq;@Marzouk2016;@KaaEtal21], machine learning [@DICK2021101587;@pmlr-v80-chen18f], and physics [@AB02;@LanBin14;@bernhard2015quantifying]. `QMCPy` [@QMCPy2025] implements both MC methods which use independent and identically distributed (IID) sequences and QMC methods which use LD sequences that more evenly cover the unit cube, enabling faster convergence [@Ric51]. \autoref{fig:points} visualizes IID and LD sequences.
+High-dimensional integration and simulation are essential for computational finance [@Lem04a;@wangsloan05;@giles2009multilevel;@zhang2021sentiment], uncertainty quantification [@Seelinger2023;@MUQ;@parno2021muq;@Marzouk2016;@KaaEtal21], machine learning [@DICK2021101587;@pmlr-v80-chen18f], and physics [@AB02;@LanBin14;@bernhard2015quantifying]. `QMCPy` implements both MC methods with IID points and QMC methods with LD points. \autoref{fig:points} visualizes IID and LD sequences.
 
 ![An IID sequence with gaps and clusters alongside LD sequences which more evenly fill the space. Each of the three randomized LD sequences contains purple stars (initial 32 points), green triangles (next 32), and blue circles (subsequent 64). The lattice was randomly shifted; the digital sequence was randomized with nested uniform scrambling (Owen scrambling); the Halton sequence was randomized with linear matrix scrambling and permutation scrambling.\label{fig:points}](./figs/points.png){width=100%}
 
-While (Q)MC methods are well established [@DicPil10a;@dick2013high], practical implementation demands numerical and algorithmic expertise. Our `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library (GAIL) [@ChoEtal21a2;@TonEtAl22a], with both adhering to reproducible research practices [@Cho14a2;@ChoEtal22a]. However, `QMCPy` consolidates a substantially broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a;@ChoEtal24a2;@sorokin2022bounding;@sorokin2025unified;@HicKirSor26a] into a unified framework, bridging theory and practice, featuring
+While (Q)MC methods are well established [@DicPil10a;@dick2013high], practical implementation demands numerical and algorithmic expertise. Our `QMCPy` implementation follows MATLAB's Guaranteed Automatic Integration Library (GAIL) [@ChoEtal21a2;@TonEtAl22a], with both adhering to reproducible research practices [@Cho14a2;@ChoEtal22a]. However, `QMCPy` consolidates a substantially broader range of cutting-edge (Q)MC algorithms [@ChoEtal22a;@ChoEtal24a2;@sorokin2022bounding;@sorokin2025unified;@HicKirSor26a] into a unified framework, bridging theory and practice. `QMCPy` features
 
 - **intuitive APIs** for problem specification and accessing (Q)MC methods,
 - **flexible integrations** with `NumPy` [@harris2020array] and `SciPy` [@2020SciPy-NMeth],
 - **robust and adaptive sampling** with theoretically grounded error estimation, and
 - **extensible components** enabling researchers to implement and test new algorithms.
 
-While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` [@Roy2023] for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]:
+While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` [@Roy2023] for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]. Advanced fatures unique to `QMCPy` include
 
-- customizable LD sequences with diverse randomization techniques and efficient routines for generating multiple independent randomizations,
+- customizable LD sequences with diverse randomization techniques,
+- efficient generators of LD sequences with multiple independent randomizations,
 - automatic variable transformations for (Q)MC compatibility, and
 - rigorous adaptive error estimation algorithms.
 
-<!--================================================================================-->
 # Components
 
 (Q)MC methods approximate the multivariate integral
@@ -105,11 +102,10 @@ If $\boldsymbol{\psi}$ satisfies $\mathbf{T} \sim \boldsymbol{\psi}(\mathbf{X})$
 \begin{equation}\label{eq:mu-hat}
   \widehat{\mu} := \frac{1}{n} \sum_{i=1}^{n} f(\mathbf{X}_i).
 \end{equation}
-MC methods choose IID sampling nodes $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods choose dependent LD nodes that fill $[0,1]^d$ more evenly, achieving errors like $\mathcal{O}(n^{-1+\delta})$ where $\delta>0$ is arbitrarily small  [@WanHic00b;@Wan03a]. A key feature of `QMCPy` is **stopping criteria** that automatically determine $n$ so $|\mu - \widehat{\mu}| \le \varepsilon$ for a user-specified tolerance $\varepsilon>0$, either deterministically or with high probability.
+MC methods choose IID sampling nodes $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods choose dependent LD nodes that fill $[0,1]^d$ more evenly, i.e., the discrepancy between the **discrete distribution** of $\mathbf{X}_1,\dots,\mathbf{X}_n$ and the uniform distribution is small. QMC methods can achieving errors like $\mathcal{O}(n^{-1+\delta})$ where $\delta>0$ is arbitrarily small [@WanHic00b;@Wan03a]. A key feature of `QMCPy` is **stopping criteria** that automatically determine $n$ so $|\mu - \widehat{\mu}| \le \varepsilon$ for a user-specified tolerance $\varepsilon>0$, either deterministically or with high probability.
 
 `QMCPy` contains four main abstract classes which are extensible for new (Q)MC algorithms:
 
-<!------------------------------------------------------------------------------------>
 1. **Discrete Distributions** generate IID or LD sequences. Available LD
 sequences and randomization routines [@sorokin2025unified] include
 
@@ -135,17 +131,14 @@ sequences and randomization routines [@sorokin2025unified] include
 
 ![MC and QMC SC comparison for pricing an Asian option.\label{fig:stopping_crit}](./figs/stopping_crit.png){width=100%}
 
-<!--================================================================================-->
 # Distribution and Resources
 
-`QMCPy` can be installed using the command `pip install qmcpy` from [https://pypi.org/project/qmcpy/](https://pypi.org/project/qmcpy/). Our project website [https://qmcpy.org](https://qmcpy.org) features documentation [https://qmcsoftware.github.io/QMCSoftware](https://qmcsoftware.github.io/QMCSoftware), publications, presentations, blogs, demos, and community guidelines. Our GitHub repository [https://github.com/QMCSoftware/QMCSoftware](https://github.com/QMCSoftware/QMCSoftware) contains open-source code with continuous integration, tests, and issue tracking. `QMCPy` is distributed under the Apache (v2.0) license. Community feedback and engagement are welcome. \autoref{fig:points} and \autoref{fig:stopping_crit} are reproducible via the Jupyter notebook at [https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/talk_paper_demos/JOSS2025/joss2025.ipynb](https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/talk_paper_demos/JOSS2025/joss2025.ipynb).
+`QMCPy` can be installed using the command `pip install qmcpy`. Our project website ([https://qmcpy.org](https://qmcpy.org)) links documentation ([https://qmcsoftware.github.io/QMCSoftware](https://qmcsoftware.github.io/QMCSoftware)), publications, presentations, blogs, demos, and community guidelines. Our GitHub repository ([https://github.com/QMCSoftware/QMCSoftware](https://github.com/QMCSoftware/QMCSoftware)) contains open-source code with continuous integration, tests, and issue tracking. `QMCPy` is distributed under the Apache (v2.0) license. Community feedback and engagement are welcome. \autoref{fig:points} and \autoref{fig:stopping_crit} are reproducible via the Jupyter notebook at [https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/talk_paper_demos/JOSS2025/joss2025.ipynb](https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/talk_paper_demos/JOSS2025/joss2025.ipynb).
 
-<!--================================================================================-->
 # Acknowledgements
 
 The authors acknowledge support from the U.S. National Science Foundation grant DMS-231601 and Department of Energy Office of Science Graduate Student Research Program. We thank the international (Q)MC research community for invaluable feedback and support.
 
 This article has been co-authored by employees of National Technology and Engineering Solutions of Sandia, LLC under Contract No. DE-NA0003525 with the U.S. Department of Energy (DOE). The employees co-own right, title and interest in and to the article and are responsible for its contents. The United States Government retains and the publisher, by accepting the article for publication, acknowledges that the United States Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this article or allow others to do so, for United States Government purposes. The DOE will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan ([https://www.energy.gov/downloads/doe-public-access-plan](https://www.energy.gov/downloads/doe-public-access-plan)).
 
-<!--================================================================================-->
 # References
