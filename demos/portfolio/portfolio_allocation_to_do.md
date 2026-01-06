@@ -27,6 +27,7 @@
 1. Utilize QMCPy's `replications` parameter for averaged results --TODO
 2. Implement out-of-sample backtesting --TODO
 3. Make tb_portfolio_allocation_demo.py work in CI tests on Windows ---TODO, Brandon  
+4. Implement rebalancing
 
 
 
