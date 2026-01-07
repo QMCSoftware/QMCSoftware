@@ -79,7 +79,7 @@ While (Q)MC methods are well established [@DicPil10a;@dick2013high], practical i
 - **robust and adaptive sampling** with theoretically grounded error estimation, and
 - **extensible components** enabling researchers to implement and test new algorithms.
 
-While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` [@Roy2023] for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]. Advanced fatures unique to `QMCPy` include
+While `SciPy` [@2020SciPy-NMeth], a foundational scientific computing library, provides basic QMC sampling (Sobol', Halton, Latin hypercube) via `scipy.stats.qmc` [@Roy2023] for the broad computational community, `QMCPy` targets (Q)MC researchers and practitioners requiring capabilities beyond the scopes of `SciPy` or `PyTorch`'s `torch.quasirandom` [@NEURIPS2019_9015]. Advanced features unique to `QMCPy` include
 
 - customizable LD sequences with diverse randomization techniques,
 - efficient generators of LD sequences with multiple independent randomizations,
