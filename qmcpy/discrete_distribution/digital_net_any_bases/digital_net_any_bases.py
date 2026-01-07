@@ -10,7 +10,7 @@ from copy import deepcopy
 
 class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
     r"""
-    Low discrpancy digital net with arbitrary bases for each dimension. 
+    Low discrepancy digital net with arbitrary bases for each dimension. 
     
     Note: 
         - Digital net samples sizes should be products of powers of bases, 
@@ -185,7 +185,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             bases_generating_matrices (Union[str,tuple]: Specify the bases and the generating matrices.
                 
                 - `"HALTON"` will use Halton generating matrices.
-                - `"FAURE" will use Faure generating matrices .
+                - `"FAURE"` will use Faure generating matrices .
                 - `bases,generating_matrices` requires 
                     
                     - `bases` is an `np.ndarray` of integers with shape $(,d)$ or $(r,d)$ where $d$ is the number of dimensions and $r$ is the number of replications.
