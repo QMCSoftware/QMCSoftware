@@ -645,19 +645,24 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         n_start = np.uint64(n_min)
         mmax = np.uint64(self.m_max)
         xb = np.empty((r_x, n, d), dtype=np.uint64)
+        if not ( (n_min == 0 or np.log2(n_min) % 1 == 0) and (n_max == 0 or np.log2(n_max) % 1 == 0)):
+            if self.order == "GRAY":
+                if warn:
+                    warnings.warn("DigitalNetB2 in graycode order recommends n_min and n_max be 0 or powers of 2 at which the digital net achieves superior uniformity properties")
+            elif self.order == "RADICAL INVERSE":
+                raise ParameterError("DigitalNetB2 in radical inverse order requires n_min and n_max be 0 or powers of 2")
+            else:
+                raise Exception("invalid digital net order")
         if self.order == "GRAY":
             qmctoolscl.dnb2_gen_gray(
                 r_x, n, d, n_start, mmax, self.gen_mats, xb, backend="c"
             )
         elif self.order == "RADICAL INVERSE":
-            assert (n_min == 0 or np.log2(n_min) % 1 == 0) and (
-                n_max == 0 or np.log2(n_max) % 1 == 0
-            ), "DigitalNetB2 in natural order requires n_min and n_max be 0 or powers of 2"
             qmctoolscl.dnb2_gen_natural(
                 r_x, n, d, n_start, mmax, self.gen_mats, xb, backend="c"
             )
         else:
-            "invalid digital net order"
+            raise Exception("invalid digital net order")
         r = np.uint64(self.replications)
         if "NUS" in self.randomize:
             if self.alpha == 1:

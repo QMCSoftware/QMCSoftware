@@ -370,6 +370,8 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:
             warnings.warn("Without randomization, the first DigitalNetAnyBases point is the origin")
+        if warn and (self.bases==self.bases[0,0]).all() and not ( (n_min == 0 or n_min == self.bases[0,0]**np.round(np.log(n_min)/np.log(self.bases[0,0]))) and (n_max == 0 or n_max == self.bases[0,0]**np.round(np.log(n_max)/np.log(self.bases[0,0])))):
+            warnings.warn("DigitalNetAnyBases recommends n_min and n_max be 0 or powers of the common base %d at which the digital net achieves superior uniformity properties"%self.bases[0,0])
         r_b = np.uint64(self.bases.shape[0])
         r_C = np.uint64(self.C.shape[0])
         n = np.uint64(n_max-n_min)
