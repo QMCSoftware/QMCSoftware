@@ -237,17 +237,15 @@ class TestDigitalNetB2(unittest.TestCase):
         #   remaining: rows of ints (d_limit rows, m_max columns)
         #
         # Keep it minimal: d_limit=2, m_max=4 => n_limit=2^4=16, _t_curr=4.
-        contents = "\n".join(
-    [
-        "2",
-        "2",
-        "16",
-        "4",
-        "8 8 8 8",
-        "9 9 9 9",
-        "",
-    ]
-)
+        contents = "\n".join([
+            "2",
+            "2",
+            "16",
+            "4",
+            "8 8 8 8",
+            "9 9 9 9",
+            "",
+        ])
 
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "tiny_dnet.txt")
