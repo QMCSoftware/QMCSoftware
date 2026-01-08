@@ -287,7 +287,7 @@ class TestDigitalNetB2(unittest.TestCase):
         x = dnb2(4, warn=False)
         self.assertEqual(x.shape, (4, 2))
         self.assertTrue(np.isfinite(x).all())
-        self.assertTrue(((x >= 0) & (x < 1)).all()) 
+        self.assertTrue(((x >= 0) & (x < 1)).all())
 
 class TestHalton(unittest.TestCase):
     """ Unit test for Halton DiscreteDistribution. """
