@@ -14,6 +14,7 @@
 10. Use white background for all visualizations --DONE
 11. Implement a more optimal simplex transformation for low-discrepancy sequences --TODO
 12. Clean up demo --TODO
+14. Improve documentation --TODO
 
 ## Documentation
 
