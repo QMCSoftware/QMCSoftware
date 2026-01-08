@@ -32,10 +32,6 @@ demos/.jupyter
 
 # tests
 .coverage
-*.wgw*
-coverage-data/*
-*coverage*
-
 
 # C
 *.so
@@ -49,8 +45,6 @@ coverage-data/*
 # Website
 docs/_site
 docs/Gemfile.lock
-/site
-*.svg
 
 # Sphinx
 sphinx/_build/
