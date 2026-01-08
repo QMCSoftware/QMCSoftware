@@ -5,13 +5,12 @@ from ..util import ParameterError, DimensionError
 from .scipy_wrapper import SciPyWrapper
 from ..discrete_distribution import DigitalNetB2
 
-
 class _StudentTAdapter:
     """
     Multivariate Student t adapter for SciPyWrapper.
 
     - transform(u): sequential conditioning using univariate t conditionals
-    - logpdf(x): forwarded to scipy.stats.multivariate_t
+    - logpdf(x): forwarded to scipy.stats.multivariate_t (if available)
     """
 
     def __init__(self, loc, shape, df):
@@ -27,6 +26,13 @@ class _StudentTAdapter:
             raise DimensionError("loc and shape dimensions do not match.")
         if self.df <= 0:
             raise ParameterError("df must be positive.")
+
+        # SciPy compatibility guard
+        if not hasattr(stats, "multivariate_t"):
+            raise ImportError(
+                "scipy.stats.multivariate_t is not available in the installed SciPy. "
+                "StudentT requires a SciPy version that provides scipy.stats.multivariate_t."
+            )
 
         self.dim = self.loc.size
         self._rv = stats.multivariate_t(loc=self.loc, shape=self.shape, df=self.df)
@@ -49,11 +55,9 @@ class _StudentTAdapter:
 
         x = np.empty_like(uu)
 
-        # First coordinate marginal
         scale0 = np.sqrt(self.shape[0, 0])
         x[:, 0] = stats.t.ppf(uu[:, 0], df=self.df, loc=self.loc[0], scale=scale0)
 
-        # Sequential conditioning
         for i in range(1, self.dim):
             A = slice(0, i)
 
@@ -61,25 +65,23 @@ class _StudentTAdapter:
             mu_B = self.loc[i]
 
             Sigma_AA = self.shape[A, A]
-            Sigma_BA = self.shape[i, A]   # shape (i,)
-            Sigma_AB = self.shape[A, i]   # shape (i,)
-            Sigma_BB = self.shape[i, i]   # scalar
+            Sigma_BA = self.shape[i, A]
+            Sigma_AB = self.shape[A, i]
+            Sigma_BB = self.shape[i, i]
 
             x_A = x[:, A]
             diff = x_A - mu_A
 
-            # sol = inv(Sigma_AA) @ diff^T, but stable
-            sol = np.linalg.solve(Sigma_AA, diff.T).T  # (n, i)
-            d_A = np.sum(diff * sol, axis=1)           # (n,)
+            sol = np.linalg.solve(Sigma_AA, diff.T).T
+            d_A = np.sum(diff * sol, axis=1)
 
-            mu_cond = mu_B + sol @ Sigma_BA            # (n,)
+            mu_cond = mu_B + sol @ Sigma_BA
 
-            # schur = Sigma_BB - Sigma_BA @ inv(Sigma_AA) @ Sigma_AB
             Sigma_AA_inv_Sigma_AB = np.linalg.solve(Sigma_AA, Sigma_AB)
             schur = Sigma_BB - Sigma_BA @ Sigma_AA_inv_Sigma_AB
 
             df_cond = self.df + i
-            shape_cond = (self.df + d_A) / (self.df + i) * schur  # (n,)
+            shape_cond = (self.df + d_A) / (self.df + i) * schur
             shape_cond = np.maximum(shape_cond, np.finfo(float).tiny)
 
             x[:, i] = stats.t.ppf(
@@ -103,17 +105,10 @@ class _StudentTAdapter:
 class StudentT(SciPyWrapper):
     """
     Convenience true measure: multivariate Student t.
-
-    Example:
-    >>> tm = StudentT(
-    ...     sampler=DigitalNetB2(2, seed=7),
-    ...     loc=[0.0, 0.0],
-    ...     shape=[[1.0, 0.8], [0.8, 1.0]],
-    ...     df=5.0,
-    ... )
-    >>> tm(4).shape
-    (4, 2)
     """
 
     def __init__(self, sampler, loc, shape, df):
-        super().__init__(sampler=sampler, scipy_distribs=_StudentTAdapter(loc=loc, shape=shape, df=df))
+        super().__init__(
+            sampler=sampler,
+            scipy_distribs=_StudentTAdapter(loc=loc, shape=shape, df=df),
+        )

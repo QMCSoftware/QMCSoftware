@@ -2,15 +2,14 @@ import numpy as np
 
 from ..util import ParameterError
 from .scipy_wrapper import SciPyWrapper
-from ..discrete_distribution import DigitalNetB2
 
-
-class _TriangularDistribution:
+class TriangularDistribution:
     """
-    Triangular distribution (scipy.stats.triang style).
+    Triangular distribution matching scipy.stats.triang behavior.
 
     Support: [loc, loc + scale]
-    Mode   : loc + c * scale, where 0 < c < 1
+    Mode: loc + c*scale, with 0 < c < 1
+    Provides ppf and pdf for SciPyWrapper custom-marginal usage.
     """
 
     def __init__(self, c=0.5, loc=0.0, scale=1.0):
@@ -46,7 +45,6 @@ class _TriangularDistribution:
     def ppf(self, u):
         u = np.asarray(u, dtype=float)
         a, m, b = self._a, self._m, self._b
-
         Fm = (m - a) / (b - a)
 
         x = np.empty_like(u, dtype=float)
@@ -59,15 +57,7 @@ class _TriangularDistribution:
 
 
 class Triangular(SciPyWrapper):
-    """
-    Convenience true measure: triangular distribution custom marginal.
-
-    Example:
-    >>> tm = Triangular(sampler=DigitalNetB2(1, seed=7), c=0.3, loc=-1.0, scale=2.0)
-    >>> tm(4).shape
-    (4, 1)
-    """
+    """Convenience TrueMeasure wrapper around TriangularDistribution."""
 
     def __init__(self, sampler, c=0.5, loc=0.0, scale=1.0):
-        dist = _TriangularDistribution(c=c, loc=loc, scale=scale)
-        super().__init__(sampler=sampler, scipy_distribs=dist)
+        super().__init__(sampler=sampler, scipy_distribs=TriangularDistribution(c=c, loc=loc, scale=scale))

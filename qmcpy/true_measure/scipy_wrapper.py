@@ -8,6 +8,54 @@ import scipy.stats
 import warnings
 
 
+def _custom_univariate_sanity_issues(dist, n_grid=64):
+    issues = []
+
+    if not hasattr(dist, "ppf"):
+        return ["missing ppf()"]
+
+    eps = np.finfo(float).eps
+    u = np.linspace(eps, 1.0 - eps, n_grid)
+
+    try:
+        x = np.asarray(dist.ppf(u), dtype=float)
+    except Exception as e:
+        return [f"ppf() raised {type(e).__name__}: {e}"]
+
+    if np.any(~np.isfinite(x)):
+        issues.append("ppf() returned non-finite values")
+
+    dx = np.diff(x)
+    if np.any(dx < -1e-12):
+        issues.append("ppf() is not nondecreasing (looks non-monotone)")
+
+    # Light-touch pdf/logpdf checks on quantiles (works for bounded/unbounded support)
+    uq = np.linspace(0.01, 0.99, 9)
+    try:
+        xq = np.asarray(dist.ppf(uq), dtype=float)
+    except Exception:
+        xq = None
+
+    if xq is not None and hasattr(dist, "pdf"):
+        try:
+            p = np.asarray(dist.pdf(xq), dtype=float)
+            if np.any(~np.isfinite(p)):
+                issues.append("pdf() returned non-finite values on quantiles")
+            if np.any(p < -1e-12):
+                issues.append("pdf() returned negative values on quantiles")
+        except Exception as e:
+            issues.append(f"pdf() raised {type(e).__name__}: {e}")
+
+    if xq is not None and hasattr(dist, "logpdf"):
+        try:
+            lp = np.asarray(dist.logpdf(xq), dtype=float)
+            if np.any(~np.isfinite(lp)):
+                issues.append("logpdf() returned non-finite values on quantiles")
+        except Exception as e:
+            issues.append(f"logpdf() raised {type(e).__name__}: {e}")
+
+    return issues
+
 
 class _MVNAdapter:
     """
@@ -291,15 +339,15 @@ class SciPyWrapper(AbstractTrueMeasure):
                     UserWarning,
                 )
 
-            warnings.warn(
-                "SciPyWrapper received a custom univariate distribution that is "
-                "not a scipy.stats frozen distribution. Please double check "
-                "that its ppf and pdf/logpdf define a valid probability law.",
-                UserWarning,
-            )
-
-            # Run a small sanity check and warn if anything looks wrong.
-            self._sanity_check_univariate(sd)
+            issues = _custom_univariate_sanity_issues(sd)
+            if issues:
+                warnings.warn(
+                    "SciPyWrapper received a custom univariate distribution (not a scipy.stats frozen distribution) "
+                    "and it failed sanity checks:\n  - " + "\n  - ".join(issues),
+                    UserWarning,
+                    stacklevel=2,
+                )
+                
             checked.append(sd)
 
         # Broadcast a single marginal across all dimensions, like the

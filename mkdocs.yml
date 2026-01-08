@@ -58,7 +58,6 @@ nav:
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - GBM Examples: demos/GBM/examples.ipynb
       - Control Variates: demos/control_variates.ipynb 
-      - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
       - Importance Sampling with True Measures:

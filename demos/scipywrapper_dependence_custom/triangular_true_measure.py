@@ -1,9 +1,8 @@
 import numpy as np
 
-from ..util import ParameterError
-from .scipy_wrapper import SciPyWrapper
-
-from ..discrete_distribution import DigitalNetB2
+from qmcpy.util import ParameterError
+from qmcpy.true_measure import SciPyWrapper
+from qmcpy.discrete_distribution import DigitalNetB2
 
 
 class TriangularUserDistribution:
@@ -62,6 +61,7 @@ class TriangularUserDistribution:
 class BadTriangularDistribution:
     """
     Intentionally broken distribution to trigger SciPyWrapper warnings.
+    Only for demo use. Do not export from qmcpy.true_measure.
     """
 
     def ppf(self, u):
@@ -78,7 +78,7 @@ class TriangularTrueMeasure(SciPyWrapper):
     Convenience true measure for the custom triangular marginal example.
 
     Example:
-    >>> tm = TriangularUserTrueMeasure(
+    >>> tm = TriangularTrueMeasure(
     ...     sampler=DigitalNetB2(1, seed=7),
     ...     c=0.3,
     ...     loc=-1.0,

@@ -4,7 +4,6 @@ from ..util import DimensionError
 from .scipy_wrapper import SciPyWrapper
 from ..discrete_distribution import DigitalNetB2
 
-
 class _UniformTriangleAdapter:
     """
     Uniform on triangle T = {(x, y): 0 <= y <= x <= 1}
