@@ -223,6 +223,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 bases = int(bases)*np.ones(d_limit,dtype=int)
             assert bases.ndim==1 or bases.ndim==2
         self.input_t = deepcopy(t) 
+        self.input_bases_generating_matrices = deepcopy(bases_generating_matrices)
         super(DigitalNetAnyBases,self).__init__(dimension,replications,seed,d_limit,n_lim)
         self.randomize = str(randomize).upper().strip().replace("_"," ")
         if self.randomize=="TRUE": self.randomize = "LMS DP"
@@ -365,7 +366,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
         if self.randomize=="FALSE": assert self.C.shape[0]==self.replications, "randomize='FALSE' but replications = %d does not equal the number of sets of generating vectors %d"%(self.replications,self.C.shape[0])
         if warn and (self.bases==2).all():
             warnings.warn("It is more efficient to use DigitalNetB2 instead of DigitalNetAnyBases when all bases are 2")
-
+        self.warn = warn
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE","LMS"] and warn:
@@ -417,9 +418,12 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
 
     def _spawn(self, child_seed, dimension):
         return type(self)(
-             dimension = dimension,
+            dimension = dimension,
             replications = None if self.no_replications else self.replications,
             seed = child_seed,
             randomize = self.randomize,
+            bases_generating_matrices = self.input_bases_generating_matrices,
             t = self.input_t,
-            n_lim = self.n_limit)
+            alpha = self.alpha,
+            n_lim = self.n_limit,
+            warn = self.warn)

@@ -56,7 +56,7 @@ class TestDiscreteDistribution(unittest.TestCase):
         d = 3
         for dd in [IIDStdUniform(d, seed=7),Lattice(d, seed=7),DigitalNetB2(d, seed=7),Halton(d, seed=7)]:
             s = 3
-            for spawn_dim in [4,[1,4,6]]:
+            for spawn_dim in [4,[2,4,6]]:
                 spawns = dd.spawn(s=s,dimensions=spawn_dim)
                 self.assertTrue(len(spawns)==s)
                 self.assertTrue(all(type(spawn)==type(dd) for spawn in spawns))
@@ -158,7 +158,7 @@ class TestDigitalNetB2(unittest.TestCase):
 
     def test_radical_inverse_requires_powers_of_two_bounds(self):
         dnb2 = DigitalNetB2(dimension=2, randomize=False, order="RADICAL INVERSE", seed=7)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ParameterError):
             _ = dnb2.gen_samples(n_min=3, n_max=5, warn=False)  # not powers of 2
 
     def test_deprecated_graycode_emits_warning_and_maps_order(self):
