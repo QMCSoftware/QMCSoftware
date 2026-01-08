@@ -37,7 +37,7 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: January 2, 2026
+date: January 8, 2026
 bibliography: main.bib
 csl: joss-simple.csl
 colorlinks: true
