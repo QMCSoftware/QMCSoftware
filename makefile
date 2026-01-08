@@ -93,7 +93,6 @@ unittests: ensure_artifacts
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
 		--no-header \
-		--cov-append \
 		test/ -W ignore::DeprecationWarning
 
 ##########################################################
