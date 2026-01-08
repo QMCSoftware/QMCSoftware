@@ -8,6 +8,7 @@ import numpy as np
 import time
 import numpy.testing as npt
 import tempfile
+import warnings
 
 
 class TestDiscreteDistribution(unittest.TestCase):
