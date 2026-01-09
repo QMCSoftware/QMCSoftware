@@ -23,6 +23,7 @@ qmcpy.egg-info/
 *.out
 *.pyc
 *.vrb
+*.npy
 .DS_Store
 .idea/
 .pytest_cache/
@@ -78,8 +79,8 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-demos/**.png
-demos/**.eps
+*.png
+*.eps
 
 # release
 /build/
