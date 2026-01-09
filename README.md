@@ -34,7 +34,7 @@ If you find QMCPy helpful in your work, please support us by citing the followin
 
 ~~~
 Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei G. Sorokin,
-QMCPy: A Quasi-Monte Carlo Python Library. 2025.
+QMCPy: A Quasi-Monte Carlo Python Library. 2026.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
 
