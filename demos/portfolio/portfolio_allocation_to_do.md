@@ -20,12 +20,12 @@
 
 1. Stop checking in .png or binary files into repository --DONE
 2. Create `mkdocs.yml` documentation for the demo and make it like a blog --TODO 
-3. Add references to the demo--TODO
+3. Add references to the demo--DONE
 4. Add more text in Markdown cells before code cells to the demo --TODO
 
 ## Tests
 
-1. Utilize QMCPy's `replications` parameter for averaged results --TODO
+1. Utilize QMCPy's `replications` parameter for averaged results --DONE
 2. Implement out-of-sample backtesting --TODO
 3. Make tb_portfolio_allocation_demo.py work in CI tests on Windows ---TODO, Brandon  
 4. Implement rebalancing
