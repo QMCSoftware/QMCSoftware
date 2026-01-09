@@ -32,7 +32,7 @@ TEST_RUNTIMES_FALLBACK = {
     'tb_MCQMC_2020_QMC_Software_Tutorial': 16.94,
     'tb_vectorized_qmc': 16.89,
     'tb_plot_proj_function': 14.29,
-    'tb_joss2025': 12.93,
+    'tb_joss2026': 12.93,
     'tb_control_variates': 10.81,
     'tb_pricing_options': 10.43,
     

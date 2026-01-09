@@ -35,7 +35,7 @@ demos/.jupyter
 *.wgw*
 coverage-data/*
 *coverage*
-/test/booktests/JOSS2025.outputs
+/test/booktests/JOSS2026.outputs
 /test/booktests/logs
 /test/booktests/outputs
 /test/booktests/outputs_nb
