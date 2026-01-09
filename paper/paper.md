@@ -137,7 +137,7 @@ sequences and randomization routines [@sorokin2025unified] include
 
 # Acknowledgements
 
-The authors acknowledge support from the U.S. National Science Foundation grant DMS-231601 and Department of Energy Office of Science Graduate Student Research Program. We thank the international (Q)MC research community for invaluable feedback and support.
+The authors acknowledge support from the U.S. National Science Foundation grant DMS-2316011 and Department of Energy Office of Science Graduate Student Research Program. We thank the international (Q)MC research community for invaluable feedback and support.
 
 This article has been co-authored by employees of National Technology and Engineering Solutions of Sandia, LLC under Contract No. DE-NA0003525 with the U.S. Department of Energy (DOE). The employees co-own right, title and interest in and to the article and are responsible for its contents. The United States Government retains and the publisher, by accepting the article for publication, acknowledges that the United States Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this article or allow others to do so, for United States Government purposes. The DOE will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan ([https://www.energy.gov/downloads/doe-public-access-plan](https://www.energy.gov/downloads/doe-public-access-plan)).
 
