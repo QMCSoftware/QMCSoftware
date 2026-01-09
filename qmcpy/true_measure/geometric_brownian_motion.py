@@ -309,7 +309,7 @@ class GeometricBrownianMotion(BrownianMotion):
             warn (bool): whether to warn about sample generation
 
         Returns:
-            ndarray or tuple: GBM samples, optionally with weights if return_weights=True
+            np.ndarray or tuple: GBM samples, or tuple of (samples, weights) if return_weights=True
         """
         return super().gen_samples(
             n=n, n_min=n_min, n_max=n_max, return_weights=return_weights, warn=warn
