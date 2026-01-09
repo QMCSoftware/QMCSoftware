@@ -71,12 +71,12 @@ nav:
 plugins:
   - search
   - mkdocs-jupyter:
-      ignore_h1_titles: true      # Ignore H1 titles from notebooks
-      execute: false              # Execute notebooks during build
-      include_source: true        # Add download link for source notebooks
-      # theme: dark               # Use dark theme for code cells
-      # include: ["*.ipynb"]  # File patterns to include
-      # execute_ignore: []  # Skip certain files
+      ignore_h1_titles: true       # Ignore H1 titles from notebooks
+      execute: false               # Execute notebooks during build
+      include_source: true         # Add download link for source notebooks
+      # theme: dark                # Use dark theme for code cells
+      # include: ["*.ipynb"]       # File patterns to include
+      # execute_ignore: []         # Skip certain files
       # allow_errors: false        # Fail build on notebook errors
       # kernel_name: python3       # Specify kernel to use
       # show_input: true           # Show input cells by default
