@@ -5,7 +5,7 @@ from .scipy_wrapper import SciPyWrapper
 
 class TriangularDistribution:
     """
-    Triangular distribution matching scipy.stats.triang behaviour.
+    Triangular distribution matching scipy.stats.triang behavior.
 
     Support: [loc, loc + scale]
     Mode: loc + c*scale, with 0 < c < 1
