@@ -288,7 +288,7 @@ This distinction is intentional and follows standard software engineering best p
 
 - **Doctests** validate correctness of documented examples, but:
   - Often execute high-level workflows
-  - May implicitly cover large portions of code without asserting behavior
+  - May implicitly cover large portions of code without asserting behaviour
   - Can inflate coverage without increasing test rigor
 
 - **Booktests (notebook tests)**:

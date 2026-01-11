@@ -35,7 +35,7 @@ def test_financial_option_payoffs_and_exact():
     g_call = fo_geo.payoff_asian_geometric_right_call(np.array([[30.0, 30.0, 30.0]]))
     assert g_call.shape == (1,)
 
-    # barrier options: up and down behaviors
+    # barrier options: up and down behaviours
     fo_barrier_up = FinancialOption(sampler, option='BARRIER', barrier_in_out='IN', barrier_price=25, start_price=20)
     gbm_up = np.array([[20.0, 26.0, 27.0]])
     v = fo_barrier_up.payoff_barrier_in_up_call(gbm_up)
