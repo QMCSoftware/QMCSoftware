@@ -118,6 +118,6 @@ If it sees that the CDF is not increasing or the density does not look normalise
 ---
 
 ## Notes
-- The behaviour for the original use case (lists of SciPy univariate frozen distributions) is unchanged.
+- The behavior for the original use case (lists of SciPy univariate frozen distributions) is unchanged.
 - Dependence is introduced only when the user passes a joint distribution object.
 - Validation is kept intentionally light so that advanced users can still experiment, but beginners are warned when their custom distributions are clearly broken.

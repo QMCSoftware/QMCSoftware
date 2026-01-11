@@ -31,7 +31,7 @@ So if you gave it a 3 dimensional `DigitalNetB2` and three frozen continuous dis
 2. It assumes everything comes from `scipy.stats` continuous distributions.  
 3. There is no structured way to plug in a completely user defined distribution while still catching obvious mistakes.
 
-The goal of this project is to keep the original behaviour for simple cases, but extend it in two directions:
+The goal of this project is to keep the original behavior for simple cases, but extend it in two directions:
 - support joint distributions that encode dependence, including non trivial constructions like zero inflated models and acceptance rejection transforms;
 - support user defined marginals that follow a SciPy like interface, with sanity checks and clear warnings when something looks wrong.
 
@@ -148,7 +148,7 @@ We then compute:
 
 ![Figure 3: Acceptance rejection with iid versus QMC](figures/fig03_accept_reject_mc_vs_qmc.png)
 
-- The left panel shows the accepted points when the proposals come from iid uniform draws. The triangle is filled, but there are small gaps and some regions look a bit more crowded than others. This is normal Monte Carlo behaviour.
+- The left panel shows the accepted points when the proposals come from iid uniform draws. The triangle is filled, but there are small gaps and some regions look a bit more crowded than others. This is normal Monte Carlo behavior.
 - The right panel shows the same acceptance region when the proposals come from a digital net. The overall shape is exactly the same, but the fill looks more even. There are fewer “clumps” and voids. The points spread across the triangle in a more uniform way, which is what low discrepancy sequences are designed to do.
 
 The printed statistics highlight that:
@@ -220,7 +220,7 @@ Custom distribution ppf appears non increasing
 Custom distribution pdf looks poorly normalised
 ```
 
-This is exactly the behaviour we want. It does not block experimentation, but it gives the user a clear signal that their distribution is probably not what they think it is.
+This is exactly the behavior we want. It does not block experimentation, but it gives the user a clear signal that their distribution is probably not what they think it is.
 
 ---
 
