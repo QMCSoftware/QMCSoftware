@@ -9,33 +9,35 @@ tags:
 authors:
   - name: Aleksei G. Sorokin
     orcid: 0000-0003-1004-4632
-    affiliation: "1"
+    affiliation: "1, 2"
   - name: Fred J. Hickernell
     orcid: 0000-0001-6677-1324
     affiliation: "1"
   - name: Sou-Cheng T. Choi
     orcid: 0000-0002-6190-2986
-    affiliation:  "1, 2" # (Multiple affiliations must be quoted)
+    affiliation:  "1, 3" # (Multiple affiliations must be quoted)
   - name: Jagadeeswaran Rathinavel
     orcid: 0009-0005-6753-4589
-    affiliation: "3"
+    affiliation: "4"
   - name: Pieterjan Robbe
     orcid: 0000-0002-6254-8245
-    affiliation: "4"
+    affiliation: "5"
   - name: Aadit Jain
     orcid: 0009-0002-4805-3665
-    affiliation: "5"
+    affiliation: "6"
 affiliations:
  - name: Illinois Institute of Technology, USA
    index: 1
- - name: SouLab LLC, USA
+ - name: University of Chicago, USA
    index: 2
- - name: Torc Robotics, USA
+ - name: SouLab LLC, USA
    index: 3
- - name: Sandia National Laboratories, USA
+ - name: Torc Robotics, USA
    index: 4
- - name: University of California San Diego, USA
+ - name: Sandia National Laboratories, USA
    index: 5
+ - name: University of California San Diego, USA
+   index: 6
 date: 9 January 2026
 bibliography: paper.bib
 csl: joss-simple.csl
