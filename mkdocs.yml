@@ -71,7 +71,6 @@ nav:
   - Printable Docs: print_page/
   
 
-
 plugins:
   - search
   - mkdocs-jupyter:
@@ -128,7 +127,7 @@ plugins:
        background: white
        shadow: true
        manual: false
-  - print-site # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
+  - print-site  # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
   
 theme:
   palette:

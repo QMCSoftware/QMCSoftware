@@ -65,6 +65,7 @@ coverage-data/*
 # Website
 docs/_site
 docs/Gemfile.lock
+site/
 
 # Sphinx
 sphinx/_build/
