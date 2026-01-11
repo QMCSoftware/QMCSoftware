@@ -15,7 +15,7 @@ authors:
     affiliation: "1"
   - name: Sou-Cheng T. Choi
     orcid: 0000-0002-6190-2986
-    affiliation:  "1, 2" # (Multiple affiliations must be quoted)
+    affiliation:  "1, 2"  # (Multiple affiliations must be quoted)
   - name: Jagadeeswaran Rathinavel
     orcid: 0009-0005-6753-4589
     affiliation: "3"
@@ -36,7 +36,7 @@ affiliations:
    index: 4
  - name: University of California San Diego, USA
    index: 5
-date: 9 January 2026
+date: 11 January, 2026
 bibliography: paper.bib
 csl: joss-simple.csl
 colorlinks: true
@@ -49,10 +49,6 @@ header-includes:
   - \usepackage{xspace,titlesec}
   # Convenience macro for author name
   - \providecommand{\HickernellFJ}{Hickernell\xspace}
-  # Reduce vertical spacing around headings
-  #- \titlespacing*{\section}{0pt}{1ex plus .2ex minus .2ex}{0.6ex plus .1ex}
-  #- \titlespacing*{\subsection}{0pt}{0.8ex plus .2ex minus .2ex}{0.5ex plus .1ex}
-  #- \titlespacing*{\subsubsection}{0pt}{0.6ex plus .2ex minus .2ex}{0.4ex plus .1ex}
 ---
 
 # Summary
