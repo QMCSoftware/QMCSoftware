@@ -1,6 +1,7 @@
 from .brownian_motion import BrownianMotion
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError
+from typing import Union, Tuple
 from numpy import (
     exp,
     zeros,
@@ -14,6 +15,7 @@ from numpy import (
     cumsum,
     add,
     multiply,
+    ndarray,
 )
 from scipy.stats import multivariate_normal, norm
 
@@ -297,7 +299,7 @@ class GeometricBrownianMotion(BrownianMotion):
 
     def gen_samples(
         self, n=None, n_min=None, n_max=None, return_weights=False, warn=True
-    ):
+    ) -> Union[ndarray, Tuple[ndarray, ndarray]]:
         """
         Generate GBM samples using the parent's transform pipeline.
 
