@@ -394,8 +394,8 @@ A second workflow, `.github/workflows/unittests.yml`, runs a matrix across Pytho
 ## See Also
 
 - `Makefile` – Full test target definitions (in project root)
-- `.github/workflows/alltests.yml` – CI coverage workflow
-- .github/workflows/unittests.yml` - CI unit test workflow
+- `.github/workflows/alltests.yml` – CI all test workflow
+- `.github/workflows/unittests.yml` - CI unit test workflow
 - `scripts/cleanup_invalid_dist.py` – Artifact cleanup utility
 - `scripts/pytest_xdist.py` – Parallel execution detection helper
 

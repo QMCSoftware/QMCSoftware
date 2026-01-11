@@ -272,6 +272,45 @@ make tests_no_docker        # Sequential, safe (60–120s)
 ### Overview
 QMCSoftware uses a **multi-platform unified coverage report** approach in GitHub Actions CI. Coverage data from all test types (doctests, unittests, booktests) running on all platforms (Ubuntu, macOS, Windows) is combined into a single  coverage percentage.
 
+### Official Coverage Metric (Unit Tests Only)
+
+Although QMCSoftware executes **doctests**, **unit tests**, and **booktests**, only **unit tests** are used as the **official coverage metric** for evaluating code coverage.
+
+This distinction is intentional and follows standard software engineering best practices.
+
+#### Rationale
+
+- **Unit tests (`test/`)** are:
+  - Deterministic and isolated
+  - Designed to explicitly exercise control flow, edge cases, and error paths
+  - Stable across platforms and environments
+  - The industry-standard basis for coverage metrics
+
+- **Doctests** validate correctness of documented examples, but:
+  - Often execute high-level workflows
+  - May implicitly cover large portions of code without asserting behavior
+  - Can inflate coverage without increasing test rigor
+
+- **Booktests (notebook tests)**:
+  - Execute demonstration notebooks end-to-end
+  - Are environment- and runtime-dependent
+  - Primarily validate documentation and reproducibility, not fine-grained logic
+
+For these reasons, **doctests and booktests are excluded from the official coverage percentage** to avoid overstating test completeness.
+
+#### Local vs CI Coverage
+
+- **Local development coverage**:
+  - Developers may accumulate coverage across test types for diagnostic purposes
+  - HTML reports may include additional lines exercised by doctests or booktests
+
+- **Official coverage evaluation**:
+  - Coverage reported for review, grading, or quality metrics is derived **only from unit tests**
+  - This ensures coverage reflects intentional, maintainable, and reviewable tests
+
+This policy ensures that coverage metrics remain **meaningful, reproducible, and aligned with software quality goals**, rather than reflecting incidental execution paths.
+
+
 ### Architecture
 
 ```
@@ -320,11 +359,11 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 
 ## CI & Coverage (summary)
 
-- **GitHub Actions:** The main CI workflow is [`.github/workflows/alltests.yml`](../.github/workflows/alltests.yml) (referred to in this document as `alltests.yml`). It runs a matrix across OSes, and calls Makefile targets (e.g. `make tests_fast` / `make tests_no_docker`).
+- **GitHub Actions:** The main CI workflow is `.github/workflows/alltests.yml` (referred to in this document as `alltests.yml`). It runs a matrix across OSes, and calls Makefile targets 
 
+    _Note_: The project CI is configured to upload coverage to Codecov.
 
-    Note: the project CI is configured to upload coverage to Codecov.
-
+A second workflow, `.github/workflows/unittests.yml`, runs a matrix across Python versions and is triggered by updates to `develop` and `master` branches only.
 
 ### Local Coverage Workflow
 
@@ -354,9 +393,10 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 
 ## See Also
 
-- [../Makefile](../Makefile) – Full test target definitions
-- [../.github/workflows/alltests.yml](../.github/workflows/alltests.yml) – CI coverage workflow
-- [../scripts/cleanup_invalid_dist.py](../scripts/cleanup_invalid_dist.py) – Artifact cleanup utility
-- [../scripts/pytest_xdist.py](../scripts/pytest_xdist.py) – Parallel execution detection helper
+- `Makefile` – Full test target definitions (in project root)
+- `.github/workflows/alltests.yml` – CI coverage workflow
+- `.github/workflows/unittests.yml` - CI unit test workflow
+- `scripts/cleanup_invalid_dist.py` – Artifact cleanup utility
+- `scripts/pytest_xdist.py` – Parallel execution detection helper
 
 
