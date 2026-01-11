@@ -9,13 +9,13 @@ tags:
 authors:
   - name: Aleksei G. Sorokin
     orcid: 0000-0003-1004-4632
-    affiliation: "1, 2"
+    affiliation: "1, 2"  # Multiple affiliations must be quoted
   - name: Fred J. Hickernell
     orcid: 0000-0001-6677-1324
     affiliation: "1"
   - name: Sou-Cheng T. Choi
     orcid: 0000-0002-6190-2986
-    affiliation:  "1, 3"  # (Multiple affiliations must be quoted)
+    affiliation:  "1, 3"  
   - name: Jagadeeswaran Rathinavel
     orcid: 0009-0005-6753-4589
     affiliation: "4"
