@@ -7,7 +7,7 @@ on:
     paths:
       - 'paper/paper.md'
       - '.github/workflows/joss.yml'
-      - 'paper/main.bib'
+      - 'paper/paper.bib'
       - 'paper/Makefile'
 
 jobs:
@@ -21,10 +21,10 @@ jobs:
       - name: List files in workspace
         run: ls -R
 
-      - name: Generate main.bib with transformations
+      - name: Generate paper.bib with transformations
         run: |
           cd paper
-          make main.bib
+          make paper.bib
           
       - name: Build draft PDF
         uses: openjournals/openjournals-draft-action@master
