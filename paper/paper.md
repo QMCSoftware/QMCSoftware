@@ -37,7 +37,7 @@ affiliations:
  - name: Sandia National Laboratories, USA
    index: 5
  - name: University of California San Diego, USA
-   index: 5
+   index: 6
 date: 11 January, 2026
 bibliography: paper.bib
 csl: joss-simple.csl
