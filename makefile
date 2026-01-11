@@ -263,6 +263,9 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp -r demos docs
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
+	@cp paper/paper.md docs/joss_paper.md
+	@mkdir docs/figs/
+	@cp paper/figs/* docs/figs/
 
 runmkdocserve: 
 	@mkdocs serve
