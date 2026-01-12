@@ -10,6 +10,7 @@ To render `paper.md` as a PDF,
 docker run --rm     --volume $PWD/paper:/data     --user $(id -u):$(id -g)     --env JOURNAL=joss     openjournals/inara
 ```
 
+* To count number of words, run `wc -w paper/paper.md` in Terminal.
 
 <!-- 
 
