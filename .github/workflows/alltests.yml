@@ -200,17 +200,28 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install miktex -y
-          choco install strawberryperl -y
+          $ErrorActionPreference = "Continue"
+          choco install miktex -y --no-progress --execution-timeout=600
+          choco install strawberryperl -y --no-progress
           # Put MiKTeX on PATH for all subsequent steps
           echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # Refresh PATH in current session
           $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
           # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
           initexmf --admin --set-config-value [MPM]AutoInstall=1
-          # Refresh package database + upgrade base
-          mpm --admin --update-db
-          mpm --admin --upgrade
+          # Refresh package database + upgrade base with retry
+          $retries = 2
+          for ($i = 1; $i -le $retries; $i++) {
+            try {
+              mpm --admin --update-db
+              mpm --admin --upgrade
+              break
+            } catch {
+              if ($i -eq $retries) { throw }
+              Write-Host "Retry $i/$retries failed, waiting 10s..."
+              Start-Sleep -Seconds 10
+            }
+          }
           # Install a few common "baseline" MiKTeX packages explicitly
           mpm --admin --install=latexmk
           mpm --admin --install=dvipng
