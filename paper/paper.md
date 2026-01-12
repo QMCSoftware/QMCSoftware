@@ -76,7 +76,7 @@ High-dimensional integration and simulation are essential for computational fina
 - **robust and adaptive sampling** with theoretically grounded error estimation, and
 - **extensible (Q)MC components** enabling researchers to implement and test new algorithms.
 
-While modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol', Halton, and Latin hypercube, `QMCPy` targets (Q)MC researchers and practitioners requiring additional capabilities to enable state of the art (Q)MC techniques. Advanced features unique to `QMCPy` include
+While modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol', Halton, and Latin hypercube, `QMCPy` targets (Q)MC researchers and practitioners requiring additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
 
 - customizable LD sequences with diverse randomization techniques,
 - efficient generators of LD sequences with multiple independent randomizations,
