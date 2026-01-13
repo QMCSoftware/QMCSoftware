@@ -97,23 +97,23 @@ If $\mathbf{T} \sim \boldsymbol{\psi}(\mathbf{X})$, then $f = g \circ \boldsymbo
 \begin{equation}\label{eq:mu-hat}
   \widehat{\mu} := \frac{1}{n} \sum_{i=1}^{n} f(\mathbf{X}_i).
 \end{equation}
-MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods choose dependent LD nodes that fill $[0,1]^d$ more evenly, i.e., the discrepancy between the **discrete distribution** of $\mathbf{X}_1,\dots,\mathbf{X}_n$ and the uniform distribution is small. QMC methods can achieve errors like $\mathcal{O}(n^{-1+\delta})$ where $\delta>0$ is arbitrarily small [@WanHic00b;@Wan03a]. A key feature of `QMCPy` is **stopping criteria** that automatically determine $n$ so $|\mu - \widehat{\mu}| \le \varepsilon$ for a user-specified tolerance $\varepsilon>0$, either deterministically or with high probability.
+MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods choose dependent LD nodes that fill $[0,1]^d$ more evenly, i.e., the discrepancy between the **discrete distribution** of $\mathbf{X}_1,\dots,\mathbf{X}_n$ and the uniform distribution is small. QMC methods can achieve errors like $\mathcal{O}(n^{-1+\delta})$ where $\delta>0$ is arbitrarily small [@WanHic00b;@Wan03a]. A key feature of `QMCPy` is **stopping criteria** that automatically determine $n$ so $|\mu - \widehat{\mu}| \le \varepsilon$ for a user-specified tolerance $\varepsilon>0$, deterministically or with high probability.
 
 `QMCPy` contains four main abstract classes:
 
 1. **Discrete Distributions** generate IID or randomized LD sequences [@sorokin2025unified] including
 
     - **Lattices** with a random shift [@CraPat76;@HicEtal03;@Ric51;@coveyou1967fourier;@WanHic02a].
-    - **Digital Sequences** (including Sobol' and Faure constructions) with digital shifts (DS), linear matrix scrambling (LMS), or nested uniform scrambling (NUS, also called Owen scrambling) [@Sob67;@dick2005multivariate; @Mat98;@Owe95;@owen2003variance;@dick2011higher;@Nie87;@Nie92;@DicPil10a].
+    - **Digital Sequences** (including Sobol' and Faure constructions) with digital shifts (DS), linear matrix scrambling (LMS), or nested uniform scrambling (NUS, also called Owen scrambling) [@Sob67;@dick2005multivariate; @Mat98;@Owe95;@owen2003variance;@dick2011higher;@Nie87;@Nie92;@DicPil10a]. Higher-order digital sequences are available to enable QMC convergence like $\mathcal{O}(n^{-\alpha+\delta})$ when $f$ has $\alpha$ degrees of smoothness [@dick2011higher]. 
     - **Halton Sequences** with a digital permutation, DS, LMS, or NUS [@Hal60;@WanHic00;@Mat98;@owen2024gain;@MorCaf94].
 
-    We further support higher-order digital sequences which enable QMC convergence like $\mathcal{O}(n^{-\alpha+\delta})$ when $f$ has $\alpha$ degrees of smoothness [@dick2011higher]. Internally, `QMCPy`'s LD generators call our C package `QMCToolsCL` [@QMCToolsCL]. `QMCPy` also integrates with the `LDData` repository [@LDData] which collects lattice generating vectors and digital sequence generating matrices from Frances Kuo's websites [@cools2006constructing;@nuyens2006fast;@KuoGenerators;@JoeKuo03;@joe2008constructing;@SobolDirection], the `Magic Point Shop` [@KuoNuy16a], and `LatNet Builder` [@LatNetBuilder.software].
+    Internally, `QMCPy`'s LD generators call our C package `QMCToolsCL` [@QMCToolsCL]. It also integrates with the `LDData` repository [@LDData] which collects lattice generating vectors and digital sequence generating matrices from Kuo's websites [@cools2006constructing;@nuyens2006fast;@KuoGenerators;@JoeKuo03;@joe2008constructing;@SobolDirection], the `Magic Point Shop` [@KuoNuy16a], and `LatNet Builder` [@LatNetBuilder.software].
 
 2. **True Measures** come with default transformations $\boldsymbol{\psi}$ satisfying $\boldsymbol{\psi}(\mathbf{X}) \sim \mathbf{T}$. For example, if $\mathbf{T} \sim \mathcal{N}(\mathbf{m},\Sigma= \mathbf{A}\mathbf{A}^T)$ is a $d$-dimensional Gaussian, then $\boldsymbol{\psi}(\mathbf{X}) = \mathbf{A} \Phi^{-1}(\mathbf{X}) + \mathbf{m}$ where $\Phi^{-1}$ is the inverse Gaussian distribution function applied elementwise. We support the broad range of measures included in `scipy.stats` [@2020SciPy-NMeth].
 
 3. **Integrands** $g$, given a transformation $\boldsymbol{\psi}$, automatically set $f = g \circ \boldsymbol{\psi}$ so that $\mu = \mathbb{E}[g(\mathbf{T})] = \mathbb{E}[f(\mathbf{X})]$.
 
-4. **Stopping Criteria (SC)** adaptively increase the sample size $n$ until (Q)MC estimates satisfy user-defined error tolerances [@HicEtal18a;@TonEtAl22a;@owen2024error]. SC include guaranteed MC algorithms [@HicEtal14a] or QMC algorithms based on:
+4. **Stopping Criteria (SC)** adaptively increase the sample size $n$ until (Q)MC estimates satisfy user-defined error tolerances [@HicEtal18a;@TonEtAl22a;@owen2024error]. SC include guaranteed (Q)MC algorithms [@HicEtal14a] based on:
 
     - multiple randomizations of LD sequences [@l2023confidence],
     - quickly tracking the decay of Fourier coefficients [@HicJim16a;@JimHic16a;@HicEtal17a;@DinHic20a], or
@@ -121,7 +121,7 @@ MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\
 
     `QMCPy` is also capable of simultaneously approximating functions of multiple integrands [@sorokin2022bounding], and we are actively expanding support for multilevel (Q)MC algorithms following Julia's `MultilevelEstimators.jl` [@MultilevelEstimators].
 
-    \autoref{fig:stopping_crit} compares (Q)MC SC for Asian option pricing with 100 independent trials per error tolerance $\varepsilon$. The left and middle plots show median lines and shaded regions for 10%-90% quantiles. While MC SC require $n = \mathcal{O}(1/\varepsilon^2)$ samples (and time), QMC SC require only $n = \mathcal{O}(1/\varepsilon)$. (Q)MC SC consistently meet tolerances, with the right plot showing the distribution of (Q)MC errors for a single error tolerance. 
+    \autoref{fig:stopping_crit} compares (Q)MC SC for Asian option pricing with 100 independent trials per error tolerance $\varepsilon$. The left and middle plots show median lines and shaded regions for 10%--90% quantiles. While MC SC require $n = \mathcal{O}(1/\varepsilon^2)$ samples (and time), QMC SC require only $n = \mathcal{O}(1/\varepsilon)$. (Q)MC SC consistently meet tolerances, with the right plot showing the distribution of (Q)MC errors for a single error tolerance. 
 
 ![(Q)MC SC for Asian option pricing.\label{fig:stopping_crit}](./figs/stopping_crit.png){width=100%}
 
