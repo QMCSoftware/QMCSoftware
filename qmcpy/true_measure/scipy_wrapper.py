@@ -1,6 +1,8 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
-from ..discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
 from ..discrete_distribution import DigitalNetB2
 
 import numpy as np
@@ -161,7 +163,7 @@ class SciPyWrapper(AbstractTrueMeasure):
         >>> tm_joint = SciPyWrapper(DigitalNetB2(2, seed=7), mvn)
         >>> tm_joint(2).shape
         (2, 2)
-        
+
 
         2D Student t distribution (independent marginals):
 
@@ -177,7 +179,6 @@ class SciPyWrapper(AbstractTrueMeasure):
         >>> xs.shape
         (4, 2)
     """
-
 
     def __init__(self, sampler, scipy_distribs):
         """
@@ -200,7 +201,11 @@ class SciPyWrapper(AbstractTrueMeasure):
         self.domain = np.array([[0.0, 1.0]])
 
         if not isinstance(sampler, AbstractDiscreteDistribution):
-            if not (hasattr(sampler, "d") and hasattr(sampler, "gen_samples") and callable(sampler.gen_samples)):
+            if not (
+                hasattr(sampler, "d")
+                and hasattr(sampler, "gen_samples")
+                and callable(sampler.gen_samples)
+            ):
                 raise ParameterError(
                     "SciPyWrapper requires sampler be an AbstractDiscreteDistribution."
                 )
@@ -347,7 +352,7 @@ class SciPyWrapper(AbstractTrueMeasure):
                     UserWarning,
                     stacklevel=2,
                 )
-                
+
             checked.append(sd)
 
         # Broadcast a single marginal across all dimensions, like the
@@ -460,7 +465,6 @@ class SciPyWrapper(AbstractTrueMeasure):
         for j in range(self.d):
             t[..., j] = self.sds[j].ppf(x[..., j])
         return t
-
 
     def _weight(self, x):
         """

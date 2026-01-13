@@ -2,6 +2,7 @@
 Individual notebook test modules using testbook.
 Each tb_*.py file tests a single demo notebook.
 """
+
 import unittest, gc
 import psutil
 import gc
@@ -11,14 +12,16 @@ import subprocess
 from testbook import testbook
 import nbformat
 import matplotlib
-matplotlib.rcParams['text.usetex'] = False    # Disable LaTeX
+
+matplotlib.rcParams["text.usetex"] = False  # Disable LaTeX
 
 TB_TIMEOUT = 3600
-subprocess.run(['pip', 'install', '-q', 'psutil', 'testbook', 'parsl'], check=False)
+subprocess.run(["pip", "install", "-q", "psutil", "testbook", "parsl"], check=False)
+
 
 class BaseNotebookTest(unittest.TestCase):
     """Base class for notebook tests with automatic memory cleanup"""
-    
+
     def get_memory_usage(self):
         """Get current memory usage in GB"""
         process = psutil.Process()
@@ -29,12 +32,14 @@ class BaseNotebookTest(unittest.TestCase):
         """Clean up before each test"""
         self.start_time = time.time()
         gc.collect()
-    
+
     def tearDown(self):
         """Clean up after each test"""
-        end_time = time.time()  
+        end_time = time.time()
         self.get_memory_usage()
-        print(f"    Memory used: {self.memory_gb:.2f} GB.  Test time: {end_time - self.start_time:.2f} s")
+        print(
+            f"    Memory used: {self.memory_gb:.2f} GB.  Test time: {end_time - self.start_time:.2f} s"
+        )
         gc.collect()
 
     # -- Shared helpers for notebook tests -------------------------------------------------
@@ -48,7 +53,7 @@ class BaseNotebookTest(unittest.TestCase):
 
     def fix_gbm_symlinks(self, notebook_dir, symlinks_to_fix=None):
         """Fix or create symlinks inside a demo notebook directory."""
-        code_dir = os.path.join(notebook_dir, 'gbm_code')
+        code_dir = os.path.join(notebook_dir, "gbm_code")
         if not symlinks_to_fix:
             return
         for module in symlinks_to_fix:
@@ -56,16 +61,17 @@ class BaseNotebookTest(unittest.TestCase):
             target_path = os.path.join(code_dir, module)
             if os.path.islink(symlink_path):
                 link_target = os.readlink(symlink_path)
-                if link_target.startswith('code/') or not os.path.exists(symlink_path):
+                if link_target.startswith("code/") or not os.path.exists(symlink_path):
                     os.remove(symlink_path)
-                    os.symlink(f'gbm_code/{module}', symlink_path)
+                    os.symlink(f"gbm_code/{module}", symlink_path)
             elif not os.path.exists(symlink_path) and os.path.exists(target_path):
-                os.symlink(f'gbm_code/{module}', symlink_path)
+                os.symlink(f"gbm_code/{module}", symlink_path)
 
-
-    def run_notebook(self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT):
+    def run_notebook(
+        self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT
+    ):
         """Execute a notebook file using nbconvert's ExecutePreprocessor.
-        
+
         Args:
             notebook_path: Path to the notebook file
             timeout: Execution timeout in seconds
@@ -77,23 +83,23 @@ class BaseNotebookTest(unittest.TestCase):
 
         with open(notebook_path) as f:
             nb = nbformat.read(f, as_version=4)
-        
+
         # Apply replacements in memory if provided
         if replacements:
             for cell in nb.cells:
-                if cell.get('cell_type') == 'code':
-                    src = cell.get('source', '')
+                if cell.get("cell_type") == "code":
+                    src = cell.get("source", "")
                     for old, new in replacements.items():
                         if old in src:
                             src = src.replace(old, new)
-                    cell['source'] = src
-        
+                    cell["source"] = src
+
         if is_overwrite:
             nbformat.write(nb, notebook_path)
             print(f"Notebook {notebook_path} overwritten with modified cells.")
-        
-        ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
+
+        ep = ExecutePreprocessor(timeout=timeout, kernel_name="python3")
         try:
-            ep.preprocess(nb, {'metadata': {'path': os.path.dirname(notebook_path)}})
+            ep.preprocess(nb, {"metadata": {"path": os.path.dirname(notebook_path)}})
         except Exception as e:
             raise RuntimeError(f"Error executing the notebook {notebook_path}: {e}")

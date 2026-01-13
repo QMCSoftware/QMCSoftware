@@ -2,11 +2,12 @@ import unittest, pytest
 from testbook import testbook
 from __init__ import BaseNotebookTest
 
+
 class NotebookTests(BaseNotebookTest):
 
     def test_qei_demo_for_blog_notebook(self):
 
-        notebook_path, _ = self.locate_notebook('../../demos/qei-demo-for-blog.ipynb')
+        notebook_path, _ = self.locate_notebook("../../demos/qei-demo-for-blog.ipynb")
         replacements = {
             "abs_tol=5e-7)": "abs_tol=1e-1)",
             "[2e-4, 5e-4, 1e-3, 2e-3, 5e-3, 1e-2]": "[1e-1]",
@@ -31,5 +32,6 @@ class NotebookTests(BaseNotebookTest):
         }
         self.run_notebook(notebook_path, replacements)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
