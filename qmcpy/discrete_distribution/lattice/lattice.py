@@ -161,7 +161,7 @@ class Lattice(AbstractLDDiscreteDistribution):
                 - `'SHIFT'`: Random shift.
                 - `'FALSE'`: No randomization. In this case the first point will be the origin.
 
-            generating_vector (Union[str, np.ndarray,int]: Specify the generating vector.
+            generating_vector (Union[str, np.ndarray, int]: Specify the generating vector.
 
                 - A `str` should be the name (or path) of a file from the LDData repo at [https://github.com/QMCSoftware/LDData/tree/main/lattice](https://github.com/QMCSoftware/LDData/tree/main/lattice).
                 - A `np.ndarray` of integers with shape $(d,)$ or $(r,d)$ where $d$ is the number of dimensions and $r$ is the number of replications.
