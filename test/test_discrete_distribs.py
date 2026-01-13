@@ -202,7 +202,7 @@ class TestDigitalNetB2(unittest.TestCase):
         dnb2 = DigitalNetB2(
             dimension=2, randomize=False, order="RADICAL INVERSE", seed=7
         )
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ParameterError):
             _ = dnb2.gen_samples(n_min=3, n_max=5, warn=False)  # not powers of 2
 
     def test_deprecated_graycode_emits_warning_and_maps_order(self):
