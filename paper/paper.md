@@ -67,7 +67,7 @@ Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample
 
 # Statement of Need
 
-(Q)MC methods are essential for computational finance [@Lem04a;@wangsloan05;@giles2009multilevel;@zhang2021sentiment], uncertainty quantification [@Seelinger2023;@MUQ;@parno2021muq;@Marzouk2016;@KaaEtal21], machine learning [@DICK2021101587;@pmlr-v80-chen18f], and physics [@AB02;@LanBin14;@bernhard2015quantifying]. While (Q)MC methods are well established [@DicPil10a;@dick2013high], practical implementation demands numerical and algorithmic expertise. `QMCPy` expands MATLAB's Guaranteed Automatic Integration Library (GAIL) [@ChoEtal21a2;@TonEtAl22a] in consolidating a broad range of cutting-edge (Q)MC algorithms into a unified framework [@ChoEtal22a;@ChoEtal24a2;@sorokin2022bounding;@sorokin2025unified;@HicKirSor26a]. `QMCPy` featurures
+(Q)MC methods are essential for computational finance [@Lem04a;@wangsloan05;@giles2009multilevel;@zhang2021sentiment], uncertainty quantification [@Seelinger2023;@MUQ;@parno2021muq;@Marzouk2016;@KaaEtal21], machine learning [@DICK2021101587;@pmlr-v80-chen18f], and physics [@AB02;@LanBin14;@bernhard2015quantifying]. While (Q)MC methods are well established [@DicPil10a;@dick2013high], practical implementation demands numerical and algorithmic expertise. `QMCPy` expands MATLAB's Guaranteed Automatic Integration Library (GAIL) [@ChoEtal21a2;@TonEtAl22a] in consolidating a broad range of cutting-edge (Q)MC algorithms into a unified framework [@ChoEtal22a;@ChoEtal24a2;@sorokin2022bounding;@sorokin2025unified;@HicKirSor26a]. `QMCPy` features
 
 - **intuitive APIs** for (Q)MC components,
 - **flexible integrations** with `NumPy` [@harris2020array], `SciPy` [@2020SciPy-NMeth], and `PyTorch` [@NEURIPS2019_9015],
@@ -123,7 +123,7 @@ MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\
 
     \autoref{fig:stopping_crit} compares (Q)MC SC for Asian option pricing with 100 independent trials per error tolerance $\varepsilon$. The left and middle plots show median lines and shaded regions for 10%-90% quantiles. While MC SC require $n = \mathcal{O}(1/\varepsilon^2)$ samples (and time), QMC SC require only $n = \mathcal{O}(1/\varepsilon)$. (Q)MC SC consistently meet tolerances, with the right plot showing the distribution of (Q)MC errors for a single error tolerance. 
 
-![(Q)QMC SC for Asian option pricing.\label{fig:stopping_crit}](./figs/stopping_crit.png){width=100%}
+![(Q)MC SC for Asian option pricing.\label{fig:stopping_crit}](./figs/stopping_crit.png){width=100%}
 
 # Acknowledgements
 
