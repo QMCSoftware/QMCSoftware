@@ -25,7 +25,7 @@ class TestCubMCCLT(unittest.TestCase):
     def test_keister_2d(self):
         integrand = Keister(IIDStdUniform(dimension=2, seed=7))
         solution, data = CubMCCLT(integrand, abs_tol=tol).integrate()
-        self.assertTrue(abs(solution - keister_2d_exact) < tol)
+        self.assertLess(abs(solution - keister_2d_exact), tol)
 
 
 class TestCubMCG(unittest.TestCase):
@@ -43,7 +43,7 @@ class TestCubMCG(unittest.TestCase):
     def test_keister_2d(self):
         integrand = Keister(IIDStdUniform(dimension=2, seed=7))
         solution, data = CubMCG(integrand, abs_tol=tol).integrate()
-        self.assertTrue(abs(solution - keister_2d_exact) < tol)
+        self.assertLess(abs(solution - keister_2d_exact), tol)
 
 
 class TestCubQMCCLT(unittest.TestCase):
@@ -61,7 +61,7 @@ class TestCubQMCCLT(unittest.TestCase):
     def test_keister_2d(self):
         integrand = Keister(Halton(dimension=2, seed=7, replications=32))
         solution, data = CubQMCCLT(integrand, abs_tol=tol).integrate()
-        self.assertTrue(abs(solution - keister_2d_exact) < tol)
+        self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices_dnb2(self):
         abs_tol, rel_tol = 5e-2, 0
@@ -163,7 +163,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
     def test_keister_2d(self):
         integrand = Keister(Lattice(dimension=2, seed=7))
         solution, data = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
-        self.assertTrue(abs(solution - keister_2d_exact) < tol)
+        self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices(self):
         abs_tol, rel_tol = 5e-3, 0
@@ -209,7 +209,7 @@ class TestCubQMCNetG(unittest.TestCase):
     def test_keister_2d(self):
         integrand = Keister(DigitalNetB2(dimension=2, seed=7))
         solution, data = CubQMCNetG(integrand, abs_tol=tol).integrate()
-        self.assertTrue(abs(solution - keister_2d_exact) < tol)
+        self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices(self):
         abs_tol, rel_tol = 1e-2, 0

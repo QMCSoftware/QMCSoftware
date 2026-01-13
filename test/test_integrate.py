@@ -146,7 +146,7 @@ class IntegrationExampleTest(unittest.TestCase):
         algorithm = CubQMCSobolG(integrand, abs_tol)
         solution, data = algorithm.integrate()
         true_value = integrand.get_exact_value()
-        self.assertTrue(abs(solution - true_value) < abs_tol)
+        self.assertLess(abs(solution - true_value), abs_tol)
 
     def test_european_put(self):
         abs_tol = 1e-2
@@ -162,7 +162,7 @@ class IntegrationExampleTest(unittest.TestCase):
         algorithm = CubQMCLatticeG(integrand, abs_tol)
         solution, data = algorithm.integrate()
         true_value = integrand.get_exact_value()
-        self.assertTrue(abs(solution - true_value) < abs_tol)
+        self.assertLess(abs(solution - true_value), abs_tol)
 
     def test_european_put_bayes_lattice(self):
         abs_tol = 1e-2
@@ -178,7 +178,7 @@ class IntegrationExampleTest(unittest.TestCase):
         algorithm = CubBayesLatticeG(integrand, abs_tol, ptransform="Baker")
         solution, data = algorithm.integrate()
         true_value = integrand.get_exact_value()
-        self.assertTrue(abs(solution - true_value) < abs_tol)
+        self.assertLess(abs(solution - true_value), abs_tol)
 
     def test_european_put_bayes_net(self):
         abs_tol = 5e-2
@@ -194,7 +194,7 @@ class IntegrationExampleTest(unittest.TestCase):
         algorithm = CubBayesNetG(integrand, abs_tol)
         solution, data = algorithm.integrate()
         true_value = integrand.get_exact_value()
-        self.assertTrue(abs(solution - true_value) < abs_tol)
+        self.assertLess(abs(solution - true_value), abs_tol)
 
 
 if __name__ == "__main__":

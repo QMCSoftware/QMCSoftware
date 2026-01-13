@@ -14,7 +14,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubMCG(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_mc_clt(self):
         atol = 1e-2
@@ -25,7 +25,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubMCCLT(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_mc_clt_vec(self):
         atol = 1e-2
@@ -36,7 +36,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubMCCLTVec(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_qmc_sobol_g(self):
         atol = 1e-3
@@ -47,7 +47,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubQMCSobolG(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_qmc_lattice_g(self):
         atol = 1e-3
@@ -58,7 +58,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubQMCLatticeG(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_qmc_bayes_sobol_g(self):
         atol = 1e-3
@@ -69,7 +69,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubQMCBayesNetG(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_qmc_bayes_lattice_g(self):
         atol = 1e-3
@@ -80,7 +80,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubQMCBayesLatticeG(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_qmc_clt_dnb2(self):
         atol = 1e-3
@@ -108,7 +108,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubQMCCLT(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
     def test_cub_qmc_clt_halton(self):
         atol = 1e-3
@@ -121,7 +121,7 @@ class PiProblemTest(unittest.TestCase):
             g=lambda x: (np.sqrt(4 - x**2) * (1.0 / 2 + x**3 * np.cos(x / 2))).sum(-1),
         )
         solution, data = CubQMCCLT(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - np.pi) < atol)
+        self.assertLess(abs(solution - np.pi), atol)
 
 
 if __name__ == "__main__":

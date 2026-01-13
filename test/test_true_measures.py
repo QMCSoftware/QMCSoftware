@@ -48,13 +48,13 @@ class TestTrueMeasure(unittest.TestCase):
         for tm in tms:
             for _tm in [tm] + tm.spawn(1):
                 t = _tm.gen_samples(4)
-                self.assertTrue(t.shape == (4, 2))
-                self.assertTrue(t.dtype == np.float64)
+                self.assertEqual(t.shape, (4, 2))
+                self.assertEqual(t.dtype, np.float64)
                 x = _tm.discrete_distrib.gen_samples(4)
                 xtf, jtf = _tm._jacobian_transform_r(x, return_weights=True)
                 self.assertTrue(xtf.shape == (4, d), jtf.shape == (4,))
                 w = _tm._weight(x)
-                self.assertTrue(w.shape == (4,))
+                self.assertEqual(w.shape, (4,))
                 s = str(_tm)
 
     def test_spawn(self):
@@ -77,7 +77,7 @@ class TestTrueMeasure(unittest.TestCase):
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
                 spawns = tm.spawn(s=s, dimensions=spawn_dim)
-                self.assertTrue(len(spawns) == s)
+                self.assertEqual(len(spawns), s)
                 self.assertTrue(all(type(spawn) == type(tm) for spawn in spawns))
                 self.assertTrue(
                     (np.array([spawn.d for spawn in spawns]) == spawn_dim).all()

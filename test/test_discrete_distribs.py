@@ -47,9 +47,9 @@ class TestDiscreteDistribution(unittest.TestCase):
                     if _dd.mimics == "StdUniform":
                         self.assertTrue((x > 0).all() and (x < 1).all())
                     pdf = _dd.pdf(_dd.gen_samples(4))
-                    self.assertTrue(pdf.shape == (4,))
-                    self.assertTrue(x.shape == (4, 3))
-                    self.assertTrue(x.dtype == np.float64)
+                    self.assertEqual(pdf.shape, (4,))
+                    self.assertEqual(x.shape, (4, 3))
+                    self.assertEqual(x.dtype, np.float64)
                     s = str(_dd)
 
     def test_spawn(self):
@@ -63,7 +63,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
                 spawns = dd.spawn(s=s, dimensions=spawn_dim)
-                self.assertTrue(len(spawns) == s)
+                self.assertEqual(len(spawns), s)
                 self.assertTrue(all(type(spawn) == type(dd) for spawn in spawns))
                 self.assertTrue(
                     (np.array([spawn.d for spawn in spawns]) == spawn_dim).all()

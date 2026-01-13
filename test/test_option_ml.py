@@ -1,5 +1,4 @@
 from qmcpy import *
-import numpy as np
 import unittest
 
 
@@ -19,14 +18,14 @@ class OptionTest(unittest.TestCase):
         integrand = FinancialOption(IIDStdUniform(seed=7), **self.options_args)
         true_value = integrand.get_exact_value_inf_dim()
         solution, data = CubMLMC(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - true_value) < atol)
+        self.assertLess(abs(solution - true_value), atol)
 
     def test_mlmc_cont(self):
         atol = 2.5e-2
         integrand = FinancialOption(IIDStdUniform(seed=7), **self.options_args)
         true_value = integrand.get_exact_value_inf_dim()
         solution, data = CubMLMCCont(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - true_value) < atol)
+        self.assertLess(abs(solution - true_value), atol)
 
     def test_mlqmc(self):
         atol = 1e-3
@@ -35,7 +34,7 @@ class OptionTest(unittest.TestCase):
         )
         true_value = integrand.get_exact_value_inf_dim()
         solution, data = CubMLQMC(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - true_value) < atol)
+        self.assertLess(abs(solution - true_value), atol)
 
     def test_mlqmc_cont(self):
         atol = 1e-3
@@ -44,7 +43,7 @@ class OptionTest(unittest.TestCase):
         )
         true_value = integrand.get_exact_value_inf_dim()
         solution, data = CubMLQMCCont(integrand, abs_tol=atol).integrate()
-        self.assertTrue(abs(solution - true_value) < atol)
+        self.assertLess(abs(solution - true_value), atol)
 
 
 if __name__ == "__main__":
