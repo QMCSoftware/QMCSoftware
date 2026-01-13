@@ -114,7 +114,7 @@ def weighted_walsh_funcs(alpha, xb, t):
 
     Args:
         alpha (int): Weighted walsh functions order.
-        xb (Union[np.ndarray, torch.Tensor]): Jnteger points at which to evaluate the weighted Walsh function.
+        xb (Union[np.ndarray, torch.Tensor]): Integer points at which to evaluate the weighted Walsh function.
         t (int): Number of bits in each integer in xb.
 
     returns:
