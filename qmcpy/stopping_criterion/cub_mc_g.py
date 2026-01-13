@@ -592,7 +592,7 @@ def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
     # """
     if toltype == "combine":  # the linear combination of two tolerances
         # theta == 0 --> relative error tolerance
-        # theta === 1 --> absolute error tolerance
+        # theta == 1 --> absolute error tolerance
         tol = theta * abs_tol + (1 - theta) * rel_tol * abs(mu)
     elif toltype == "max":  # the max case
         tol = max(abs_tol, rel_tol * abs(mu))
