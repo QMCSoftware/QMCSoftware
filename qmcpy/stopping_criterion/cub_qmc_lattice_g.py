@@ -172,7 +172,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
             rel_tol (np.ndarray): Relative error tolerance.
             n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
-            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str, callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
 
                 - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
                     Equivalent to setting

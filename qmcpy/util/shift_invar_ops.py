@@ -105,10 +105,10 @@ def bernoulli_poly(n, x):
 
     Args:
         n (int): Polynomial order.
-        x (Union[np.ndarray,torch.Tensor]): Points at which to evaluate the Bernoulli polynomial.
+        x (Union[np.ndarray, torch.Tensor]): Points at which to evaluate the Bernoulli polynomial.
 
     Returns:
-        y (Union[np.ndarray,torch.Tensor]): Bernoulli polynomial values.
+        y (Union[np.ndarray, torch.Tensor]): Bernoulli polynomial values.
     """
     assert isinstance(n, int)
     assert n in BERNOULLIPOLYSDICT, "n = %d not in BERNOULLIPOLYSDICT" % n

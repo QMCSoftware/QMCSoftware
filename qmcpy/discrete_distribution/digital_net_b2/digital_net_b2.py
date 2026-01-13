@@ -231,13 +231,13 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
     ):
         r"""
         Args:
-            dimension (Union[int,np.ndarray]): Dimension of the generator.
+            dimension (Union[int, np.ndarray]): Dimension of the generator.
 
                 - If an `int` is passed in, use generating vector components at indices 0,...,`dimension`-1.
                 - If an `np.ndarray` is passed in, use generating vector components at these indices.
 
             replications (int): Number of independent randomizations of a pointset.
-            seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
+            seed (Union[None, int, np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are
 
                 - `'LMS DS'`: Linear matrix scramble with digital shift.

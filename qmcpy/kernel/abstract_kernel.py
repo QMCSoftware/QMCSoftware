@@ -86,14 +86,14 @@ class AbstractKernel(object):
         $$\sum_{\ell=1}^p c_{\ell} \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell 0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell 1}} K(\boldsymbol{x}_0,\boldsymbol{x}_1).$$
 
         Args:
-            x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with
-            x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel with
-            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
-            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
-            c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
+            x0 (Union[np.ndarray, torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with
+            x1 (Union[np.ndarray, torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel with
+            beta0 (Union[np.ndarray, torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
+            beta1 (Union[np.ndarray, torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
+            c (Union[np.ndarray, torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
             kwargs (dict): keyword arguments to parsed call
         Returns:
-            k (Union[np.ndarray,torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations.
+            k (Union[np.ndarray, torch.Tensor]): Shape `y.shape=(x0+x1).shape[:-1]` kernel evaluations.
         """
         assert isinstance(x0, self.nptarraytype)
         assert isinstance(x0, self.nptarraytype)
@@ -259,10 +259,10 @@ class AbstractKernel(object):
         $$\tilde{K}(\boldsymbol{x}) = \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \; \mathrm{d} \boldsymbol{z}.$$
 
         Args:
-            x (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with
+            x (Union[np.ndarray, torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with
 
         Returns:
-            tildek (Union[np.ndarray,torch.Tensor]): Shape `y.shape=x.shape[:-1]` integral kernel evaluations.
+            tildek (Union[np.ndarray, torch.Tensor]): Shape `y.shape=x.shape[:-1]` integral kernel evaluations.
         """
         if self.npt == np:
             assert isinstance(x, np.ndarray)
@@ -287,7 +287,7 @@ class AbstractKernel(object):
         $$\tilde{K} = \int_{[0,1]^d} \int_{[0,1]^d} K(\boldsymbol{x},\boldsymbol{z}) \; \mathrm{d} \boldsymbol{x} \; \mathrm{d} \boldsymbol{z}.$$
 
         Returns:
-            tildek (Union[np.ndarray,torch.Tensor]): Double integral kernel evaluations.
+            tildek (Union[np.ndarray, torch.Tensor]): Double integral kernel evaluations.
         """
         raise MethodImplementationError(self, "double_integral_01d")
 
@@ -339,8 +339,8 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
         r"""
         Args:
             d (int): Dimension.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.

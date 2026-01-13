@@ -3,6 +3,7 @@ import numpy as np
 from ..util import ParameterError
 from .scipy_wrapper import SciPyWrapper
 
+
 class TriangularDistribution:
     """
     Triangular distribution matching scipy.stats.triang behavior.
@@ -60,4 +61,7 @@ class Triangular(SciPyWrapper):
     """Convenience TrueMeasure wrapper around TriangularDistribution."""
 
     def __init__(self, sampler, c=0.5, loc=0.0, scale=1.0):
-        super().__init__(sampler=sampler, scipy_distribs=TriangularDistribution(c=c, loc=loc, scale=scale))
+        super().__init__(
+            sampler=sampler,
+            scipy_distribs=TriangularDistribution(c=c, loc=loc, scale=scale),
+        )

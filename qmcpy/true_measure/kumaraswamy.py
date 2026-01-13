@@ -41,12 +41,12 @@ class Kumaraswamy(AbstractTrueMeasure):
     def __init__(self, sampler, a=2, b=2):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            a (Union[float,np.ndarray]): First parameter $\alpha > 0$.
-            b (Union[float,np.ndarray]): Second parameter $\beta > 0$.
+            a (Union[float, np.ndarray]): First parameter $\alpha > 0$.
+            b (Union[float, np.ndarray]): Second parameter $\beta > 0$.
         """
         self.parameters = ["a", "b"]
         self.domain = np.array([[0, 1]])

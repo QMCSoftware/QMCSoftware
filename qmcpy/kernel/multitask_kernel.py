@@ -343,8 +343,8 @@ class KernelMultiTask(AbstractKernel):
         Args:
             base_kernel (AbstractKernel): $K_{\mathrm{base}}$.
             num_tasks (int): Number of tasks $T>1$.
-            factor (Union[np.ndarray,torch.Tensor]): Factor $\mathsf{F}$.
-            diag (Union[np.ndarray,torch.Tensor]): Diagonal parameter $\boldsymbol{v}$.
+            factor (Union[np.ndarray, torch.Tensor]): Factor $\mathsf{F}$.
+            diag (Union[np.ndarray, torch.Tensor]): Diagonal parameter $\boldsymbol{v}$.
             shape_factor (list): Shape of `factor` when `np.isscalar(factor)`.
             shape_diag (list): Shape of `diag` when `np.isscalar(diag)`.
             tfs_factor (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
@@ -470,16 +470,16 @@ class KernelMultiTask(AbstractKernel):
         $$\sum_{\ell=1}^p c_\ell \partial_{\boldsymbol{x}_0}^{\boldsymbol{\beta}_{\ell,0}} \partial_{\boldsymbol{x}_1}^{\boldsymbol{\beta}_{\ell,1}} K((i_0,\boldsymbol{x}_0),(i_1,\boldsymbol{x}_1)).$$
 
         Args:
-            task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$.
-            task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
-            x0 (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel.
-            x1 (Union[np.ndarray,torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel.
-            beta0 (Union[np.ndarray,torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
-            beta1 (Union[np.ndarray,torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
-            c (Union[np.ndarray,torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
+            task0 (Union[int, np.ndarray, torch.Tensor]): First task indices $i_0$.
+            task1 (Union[int, np.ndarray, torch.Tensor]): Second task indices $i_1$.
+            x0 (Union[np.ndarray, torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel.
+            x1 (Union[np.ndarray, torch.Tensor]): Shape `x1.shape=(...,d)` second input to kernel.
+            beta0 (Union[np.ndarray, torch.Tensor]): Shape `beta0.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_0$.
+            beta1 (Union[np.ndarray, torch.Tensor]): Shape `beta1.shape=(p,d)` derivative orders with respect to first inputs, $\boldsymbol{\beta}_1$.
+            c (Union[np.ndarray, torch.Tensor]): Shape `c.shape=(p,)` coefficients of derivatives.
 
         Returns:
-            k (Union[np.ndarray,torch.Tensor]): Kernel evaluations with batched shape, see the doctests for examples.
+            k (Union[np.ndarray, torch.Tensor]): Kernel evaluations with batched shape, see the doctests for examples.
         """
         kmat_x = self.base_kernel.__call__(x0, x1, beta0, beta1, c)
         return self._parsed__call__(task0, task1, kmat_x)
@@ -491,12 +491,12 @@ class KernelMultiTask(AbstractKernel):
         $$\tilde{K}((i_0,\boldsymbol{x}),i_1) = \int_{[0,1]^d} K((i_0,\boldsymbol{x}),(i_1,\boldsymbol{z}) \; \mathrm{d} \boldsymbol{z}.$$
 
         Args:
-            task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$.
-            task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
-            x (Union[np.ndarray,torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with
+            task0 (Union[int, np.ndarray, torch.Tensor]): First task indices $i_0$.
+            task1 (Union[int, np.ndarray, torch.Tensor]): Second task indices $i_1$.
+            x (Union[np.ndarray, torch.Tensor]): Shape `x0.shape=(...,d)` first input to kernel with
 
         Returns:
-            tildek (Union[np.ndarray,torch.Tensor]): Shape `y.shape=x.shape[:-1]` integral kernel evaluations.
+            tildek (Union[np.ndarray, torch.Tensor]): Shape `y.shape=x.shape[:-1]` integral kernel evaluations.
         """
         kint_x = self.base_kernel.single_integral_01d(x)
         return self._parsed__call__(task0, task1, kint_x)
@@ -508,11 +508,11 @@ class KernelMultiTask(AbstractKernel):
         $$\tilde{K}(i_0,i_1) = \int_{[0,1]^d} \int_{[0,1]^d} K((i_0,\boldsymbol{x}),(i_1,\boldsymbol{z})) \; \mathrm{d} \boldsymbol{x} \; \mathrm{d} \boldsymbol{z}.$$
 
         Args:
-            task0 (Union[int,np.ndarray,torch.Tensor]): First task indices $i_0$.
-            task1 (Union[int,np.ndarray,torch.Tensor]): Second task indices $i_1$.
+            task0 (Union[int, np.ndarray, torch.Tensor]): First task indices $i_0$.
+            task1 (Union[int, np.ndarray, torch.Tensor]): Second task indices $i_1$.
 
         Returns:
-            tildek (Union[np.ndarray,torch.Tensor]): Double integral kernel evaluations.
+            tildek (Union[np.ndarray, torch.Tensor]): Double integral kernel evaluations.
         """
         kint_x = self.base_kernel.double_integral_01d()
         return self._parsed__call__(task0, task1, kint_x)

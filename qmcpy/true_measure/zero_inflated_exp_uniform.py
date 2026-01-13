@@ -3,6 +3,7 @@ import numpy as np
 from ..util import ParameterError, DimensionError
 from .scipy_wrapper import SciPyWrapper
 
+
 class _ZeroInflatedExpUniformAdapter:
     def __init__(self, p_zero=0.4, lam=1.5, y_split=0.5):
         if not (0.0 < p_zero < 1.0):
@@ -46,4 +47,7 @@ class _ZeroInflatedExpUniformAdapter:
 
 class ZeroInflatedExpUniform(SciPyWrapper):
     def __init__(self, sampler, p_zero=0.4, lam=1.5, y_split=0.5):
-        super().__init__(sampler=sampler, scipy_distribs=_ZeroInflatedExpUniformAdapter(p_zero, lam, y_split))
+        super().__init__(
+            sampler=sampler,
+            scipy_distribs=_ZeroInflatedExpUniformAdapter(p_zero, lam, y_split),
+        )

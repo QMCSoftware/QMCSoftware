@@ -86,9 +86,9 @@ class AbstractIntegrand(object):
         - If `n` and `n_min` are supplied, then generate samples from the sequence at indices `n`,...,`n_min`-1.
 
         Args:
-            n (Union[None,int]): Number of points to generate.
-            n_min (Union[None,int]): Starting index of sequence.
-            n_max (Union[None,int]): Final index of sequence.
+            n (Union[None, int]): Number of points to generate.
+            n_min (Union[None, int]): Starting index of sequence.
+            n_max (Union[None, int]): Final index of sequence.
             warn (bool): If `False`, disable warnings when generating samples.
 
         Returns:
