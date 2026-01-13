@@ -182,7 +182,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 - `'NUS'`: Nested uniform scrambling.
                 - `'QRNG'`: Deterministic permutation scramble and random digital shift from QRNG [1] (with `generalize=True`). Does *not* support replications>1.
                 - `None`: No randomization. In this case the first point will be the origin. 
-            bases_generating_matrices (Union[str,tuple]: Specify the bases and the generating matrices.
+            bases_generating_matrices (Union[str, tuple]: Specify the bases and the generating matrices.
                 
                 - `"HALTON"` will use Halton generating matrices.
                 - `"FAURE"` will use Faure generating matrices .
@@ -282,6 +282,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                         for b in range(a+1):
                             self.C[k,a,b] = (int(self.C[1,a,b])*((k**(a-b))%p))%p
             self.C = self.C[None,:,:,:]
+            self.faure_base = p
         else:
             self.bases = bases.astype(np.uint64)
             if self.bases.ndim==1: self.bases = self.bases[None,:]
