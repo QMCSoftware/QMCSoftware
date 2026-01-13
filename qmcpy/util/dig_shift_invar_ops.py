@@ -114,11 +114,11 @@ def weighted_walsh_funcs(alpha, xb, t):
 
     Args:
         alpha (int): Weighted walsh functions order.
-        xb (Union[np.ndarray,torch.Tensor]): Jnteger points at which to evaluate the weighted Walsh function.
+        xb (Union[np.ndarray, torch.Tensor]): Jnteger points at which to evaluate the weighted Walsh function.
         t (int): Number of bits in each integer in xb.
 
     returns:
-        y (Union[np.ndarray,torch.Tensor]): Weighted Walsh function values.
+        y (Union[np.ndarray, torch.Tensor]): Weighted Walsh function values.
 
     **References:**
 
@@ -178,7 +178,7 @@ def to_bin(x, t):
 
 
     Args:
-        x (Union[np.ndarray,torch.Tensor]): floating point representation of samples.
+        x (Union[np.ndarray, torch.Tensor]): floating point representation of samples.
         t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
 
     Returns:
@@ -219,7 +219,7 @@ def to_float(x, t):
         tensor([0.0000, 0.1250, 0.2500, 0.3750, 0.5000, 0.6250, 0.7500, 0.8750])
 
     Args:
-        x (Union[np.ndarray,torch.Tensor]): binary representation of samples with `dtype` either `np.uint64` or `torch.int64`.
+        x (Union[np.ndarray, torch.Tensor]): binary representation of samples with `dtype` either `np.uint64` or `torch.int64`.
         t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
 
     Returns:

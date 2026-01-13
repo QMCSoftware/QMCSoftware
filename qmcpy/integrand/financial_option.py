@@ -224,7 +224,7 @@ class FinancialOption(AbstractIntegrand):
     ):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
@@ -239,8 +239,8 @@ class FinancialOption(AbstractIntegrand):
 
                 - `'PCA'` for principal component analysis, or
                 - `'Cholesky'` for cholesky decomposition.
-            level (Union[None,int]): Level for multilevel problems
-            d_coarsest (Union[None,int]): Dimension of the problem on the coarsest level.
+            level (Union[None, int]): Level for multilevel problems
+            d_coarsest (Union[None, int]): Dimension of the problem on the coarsest level.
             asian_mean (str): Either `'ARITHMETIC'` or `'GEOMETRIC'`.
             asian_mean_quadrature_rule (str): Either 'TRAPEZOIDAL' or 'RIGHT'.
             barrier_in_out (str): Either `'IN'` or `'OUT'`.

@@ -231,13 +231,13 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
     ):
         r"""
         Args:
-            dimension (Union[int,np.ndarray]): Dimension of the generator.
+            dimension (Union[int, np.ndarray]): Dimension of the generator.
 
                 - If an `int` is passed in, use generating vector components at indices 0,...,`dimension`-1.
                 - If an `np.ndarray` is passed in, use generating vector components at these indices.
 
             replications (int): Number of independent randomizations of a pointset.
-            seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
+            seed (Union[None, int, np.random.SeedSeq): Seed the random number generator for reproducibility.
             randomize (str): Options are
 
                 - `'LMS DS'`: Linear matrix scramble with digital shift.
@@ -246,7 +246,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 - `'NUS'`: Nested uniform scrambling. Also known as Owen scrambling.
                 - `'FALSE'`: No randomization. In this case the first point will be the origin.
 
-            generating_matrices (Union[str,np.ndarray,int]: Specify the generating matrices.
+            generating_matrices (Union[str, np.ndarray, int]: Specify the generating matrices.
 
                 - A `str` should be the name (or path) of a file from the LDData repo at [https://github.com/QMCSoftware/LDData/tree/main/dnet](https://github.com/QMCSoftware/LDData/tree/main/dnet).
                 - An `np.ndarray` of integers with shape $(d,m_\mathrm{max})$ or $(r,d,m_\mathrm{max})$ where $d$ is the number of dimensions, $r$ is the number of replications, and $2^{m_\mathrm{max}}$ is the maximum number of supported points. Setting `msb=False` will flip the bits of ints in the generating matrices.

@@ -54,8 +54,8 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
         r"""
         Args:
             dimension (int): Dimension of the samples.
-            replications (Union[None,int]): Number of randomizations. This is implemented only for API consistency. Equivalent to reshaping samples.
-            seed (Union[None,int,np.random.SeedSeq): Seed the random number generator for reproducibility.
+            replications (Union[None, int]): Number of randomizations. This is implemented only for API consistency. Equivalent to reshaping samples.
+            seed (Union[None,int, np.random.SeedSeq): Seed the random number generator for reproducibility.
         """
         super(IIDStdUniform, self).__init__(
             int(dimension), replications, seed, d_limit=np.inf, n_limit=np.inf

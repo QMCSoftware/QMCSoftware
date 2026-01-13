@@ -53,7 +53,7 @@ class Genz(AbstractIntegrand):
     def __init__(self, sampler, kind_func="OSCILLATORY", kind_coeff=1):
         """
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
