@@ -100,5 +100,5 @@ class Genz(AbstractIntegrand):
 
     def _spawn(self, level, sampler):
         return Genz(
-            sampler=sampler, kind_func=self.kinda_func, kind_coeff=self.kind_coeff
+            sampler=sampler, kind_func=self.kind_func, kind_coeff=self.kind_coeff
         )

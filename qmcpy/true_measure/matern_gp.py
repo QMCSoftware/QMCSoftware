@@ -102,7 +102,7 @@ class MaternGP(Gaussian):
             points = points[:, None]
         assert (
             points.ndim == 2 and points.shape[0] == sampler.d
-        ), "points should be a two dimenssion array with the number of points equal to the dimension of the sampler"
+        ), "points should be a two dimension array with the number of points equal to the dimension of the sampler"
         mean = np.array(mean)
         if mean.size == 1:
             mean = mean.item() * np.ones(sampler.d)
