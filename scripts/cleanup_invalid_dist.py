@@ -58,7 +58,9 @@ def find_invalid_dists(site_paths):
                     candidates.append(entry)
                     continue
                 lower = name.lower()
-                if (lower.endswith(".dist-info") or lower.endswith(".egg-info")) and ("~" in name or "eaborn" in name):
+                if (lower.endswith(".dist-info") or lower.endswith(".egg-info")) and (
+                    "~" in name or "eaborn" in name
+                ):
                     candidates.append(entry)
         except PermissionError:
             continue
@@ -83,14 +85,32 @@ def remove_paths(paths):
 
 
 def reinstall_seaborn():
-    cmd = [sys.executable, "-m", "pip", "install", "--force-reinstall", "--no-cache-dir", "seaborn"]
+    cmd = [
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "--force-reinstall",
+        "--no-cache-dir",
+        "seaborn",
+    ]
     return subprocess.run(cmd, check=False)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Find and remove invalid distribution artifacts (e.g. ~eaborn) in this Python environment.")
-    parser.add_argument("--apply", action="store_true", help="Actually remove files. Without this flag the script only lists candidates.")
-    parser.add_argument("--reinstall", action="store_true", help="When used with --apply, reinstall seaborn after removal.")
+    parser = argparse.ArgumentParser(
+        description="Find and remove invalid distribution artifacts (e.g. ~eaborn) in this Python environment."
+    )
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="Actually remove files. Without this flag the script only lists candidates.",
+    )
+    parser.add_argument(
+        "--reinstall",
+        action="store_true",
+        help="When used with --apply, reinstall seaborn after removal.",
+    )
     args = parser.parse_args()
 
     site_paths = get_site_paths()

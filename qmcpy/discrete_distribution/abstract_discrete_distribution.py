@@ -63,9 +63,9 @@ class AbstractDiscreteDistribution(object):
         - If `n` and `n_min` are supplied, then generate samples from the sequence at indices `n`,...,`n_min`-1.
 
         Args:
-            n (Union[None,int]): Number of points to generate.
-            n_min (Union[None,int]): Starting index of sequence.
-            n_max (Union[None,int]): Final index of sequence.
+            n (Union[None, int]): Number of points to generate.
+            n_min (Union[None, int]): Starting index of sequence.
+            n_max (Union[None, int]): Final index of sequence.
             return_binary (bool): Only used for `DigitalNetB2`.
                 If `True`, *only* return the integer representation `x_integer` of base 2 digital net.
             warn (bool): If `False`, disable warnings when generating samples.

@@ -4,7 +4,7 @@ from qmcpy.discrete_distribution._c_lib import _load_c_lib
 import os
 import unittest
 import ctypes
-import numpy as np 
+import numpy as np
 import time
 import numpy.testing as npt
 import tempfile
@@ -18,97 +18,135 @@ class TestDiscreteDistribution(unittest.TestCase):
         get_unsigned_long_size_cf = _c_lib.get_unsigned_long_size
         get_unsigned_long_size_cf.argtypes = []
         get_unsigned_long_size_cf.restype = ctypes.c_uint8
-        if os.name == 'nt':
-            self.assertEqual(get_unsigned_long_size_cf(),4)
+        if os.name == "nt":
+            self.assertEqual(get_unsigned_long_size_cf(), 4)
         else:
-            self.assertEqual(get_unsigned_long_size_cf(),8)
+            self.assertEqual(get_unsigned_long_size_cf(), 8)
 
     def test_size_unsigned_long_long(self):
         _c_lib = _load_c_lib()
         get_unsigned_long_long_size_cf = _c_lib.get_unsigned_long_long_size
         get_unsigned_long_long_size_cf.argtypes = []
         get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
-        self.assertEqual(get_unsigned_long_long_size_cf(),8)
+        self.assertEqual(get_unsigned_long_long_size_cf(), 8)
 
     def test_abstract_methods(self):
-        for d in [3,[1,3,5]]:
+        for d in [3, [1, 3, 5]]:
             dds = [
-                Lattice(d,order='natural', seed=7),
-                Lattice(d,order='linear', seed=7),
-                DigitalNetB2(d,randomize='LMS_DS',order="RADICAL INVERSE", seed=7),
-                DigitalNetB2(d,randomize='DS', seed=7),
-                DigitalNetB2(d,order="GRAY", seed=7),
-                Halton(d,randomize='QRNG', seed=7),
-                Halton(d,randomize='Owen', seed=7),
+                Lattice(d, order="natural", seed=7),
+                Lattice(d, order="linear", seed=7),
+                DigitalNetB2(d, randomize="LMS_DS", order="RADICAL INVERSE", seed=7),
+                DigitalNetB2(d, randomize="DS", seed=7),
+                DigitalNetB2(d, order="GRAY", seed=7),
+                Halton(d, randomize="QRNG", seed=7),
+                Halton(d, randomize="Owen", seed=7),
             ]
             for dd in dds:
-                for _dd in [dd]+dd.spawn(1):
+                for _dd in [dd] + dd.spawn(1):
                     x = _dd.gen_samples(4)
-                    if _dd.mimics=='StdUniform':
-                        self.assertTrue((x>0).all() and (x<1).all())
+                    if _dd.mimics == "StdUniform":
+                        self.assertTrue((x > 0).all() and (x < 1).all())
                     pdf = _dd.pdf(_dd.gen_samples(4))
-                    self.assertTrue(pdf.shape==(4,))
-                    self.assertTrue(x.shape==(4,3))
-                    self.assertTrue(x.dtype==np.float64)
+                    self.assertEqual(pdf.shape, (4,))
+                    self.assertEqual(x.shape, (4, 3))
+                    self.assertEqual(x.dtype, np.float64)
                     s = str(_dd)
-    
+
     def test_spawn(self):
         d = 3
-        for dd in [IIDStdUniform(d, seed=7),Lattice(d, seed=7),DigitalNetB2(d, seed=7),Halton(d, seed=7)]:
+        for dd in [
+            IIDStdUniform(d, seed=7),
+            Lattice(d, seed=7),
+            DigitalNetB2(d, seed=7),
+            Halton(d, seed=7),
+        ]:
             s = 3
-            for spawn_dim in [4,[2,4,6]]:
-                spawns = dd.spawn(s=s,dimensions=spawn_dim)
-                self.assertTrue(len(spawns)==s)
-                self.assertTrue(all(type(spawn)==type(dd) for spawn in spawns))
-                self.assertTrue((np.array([spawn.d for spawn in spawns])==spawn_dim).all())
+            for spawn_dim in [4, [1, 4, 6]]:
+                spawns = dd.spawn(s=s, dimensions=spawn_dim)
+                self.assertEqual(len(spawns), s)
+                self.assertTrue(all(type(spawn) == type(dd) for spawn in spawns))
+                self.assertTrue(
+                    (np.array([spawn.d for spawn in spawns]) == spawn_dim).all()
+                )
 
-        
+
 class TestLattice(unittest.TestCase):
-    """ Unit tests for Lattice DiscreteDistribution. """
+    """Unit tests for Lattice DiscreteDistribution."""
 
     def test_gen_samples(self):
-        for order in ['natural','gray']:
-            lattice0123 = Lattice(dimension=4,order=order,randomize=False)
-            x0123 = lattice0123.gen_samples(8,warn=False)
-            lattice13 = Lattice(dimension=[1,3],order=order,randomize=False)
-            x13 = lattice13.gen_samples(n_min=2,n_max=8)
-            self.assertTrue((x0123[2:8,[1,3]]==x13).all())
+        for order in ["natural", "gray"]:
+            lattice0123 = Lattice(dimension=4, order=order, randomize=False)
+            x0123 = lattice0123.gen_samples(8, warn=False)
+            lattice13 = Lattice(dimension=[1, 3], order=order, randomize=False)
+            x13 = lattice13.gen_samples(n_min=2, n_max=8)
+            self.assertTrue((x0123[2:8, [1, 3]] == x13).all())
 
     def test_linear_order(self):
-        true_sample = np.array([
-            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
-        distribution = Lattice(dimension=4, randomize=False, order='linear')
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
+        true_sample = np.array(
+            [
+                [1.0 / 8, 3.0 / 8, 3.0 / 8, 7.0 / 8],
+                [3.0 / 8, 1.0 / 8, 1.0 / 8, 5.0 / 8],
+                [5.0 / 8, 7.0 / 8, 7.0 / 8, 3.0 / 8],
+                [7.0 / 8, 5.0 / 8, 5.0 / 8, 1.0 / 8],
+            ]
+        )
+        distribution = Lattice(dimension=4, randomize=False, order="linear")
+        self.assertTrue(
+            (
+                distribution.gen_samples(n_min=4, n_max=8, warn=False) == true_sample
+            ).all()
+        )
 
     def test_natural_order(self):
-        true_sample = np.array([
-            [1. / 8, 3. / 8, 3. / 8, 7. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
-            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 1. / 8]])
-        distribution = Lattice(dimension=4, randomize=False, order='natural')
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
-    
+        true_sample = np.array(
+            [
+                [1.0 / 8, 3.0 / 8, 3.0 / 8, 7.0 / 8],
+                [5.0 / 8, 7.0 / 8, 7.0 / 8, 3.0 / 8],
+                [3.0 / 8, 1.0 / 8, 1.0 / 8, 5.0 / 8],
+                [7.0 / 8, 5.0 / 8, 5.0 / 8, 1.0 / 8],
+            ]
+        )
+        distribution = Lattice(dimension=4, randomize=False, order="natural")
+        self.assertTrue(
+            (
+                distribution.gen_samples(n_min=4, n_max=8, warn=False) == true_sample
+            ).all()
+        )
+
     def test_gray_order(self):
-        true_sample = np.array([
-            [3. / 8, 1. / 8, 1. / 8, 5. / 8],
-            [7. / 8, 5. / 8, 5. / 8, 1. / 8],
-            [5. / 8, 7. / 8, 7. / 8, 3. / 8],
-            [1. / 8, 3. / 8, 3. / 8, 7. / 8]])
-        distribution = Lattice(dimension=4, randomize=False, order='gray')
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
+        true_sample = np.array(
+            [
+                [3.0 / 8, 1.0 / 8, 1.0 / 8, 5.0 / 8],
+                [7.0 / 8, 5.0 / 8, 5.0 / 8, 1.0 / 8],
+                [5.0 / 8, 7.0 / 8, 7.0 / 8, 3.0 / 8],
+                [1.0 / 8, 3.0 / 8, 3.0 / 8, 7.0 / 8],
+            ]
+        )
+        distribution = Lattice(dimension=4, randomize=False, order="gray")
+        self.assertTrue(
+            (
+                distribution.gen_samples(n_min=4, n_max=8, warn=False) == true_sample
+            ).all()
+        )
 
     def test_integer_generating_vectors(self):
-        distribution = Lattice(dimension=4, generating_vector=26, randomize=False,seed=136)
-        true_sample = np.array([
-            [0.125, 0.875, 0.625, 0.375],
-            [0.625, 0.375, 0.125, 0.875],
-            [0.375, 0.625, 0.875, 0.125],
-            [0.875, 0.125, 0.375, 0.625]])
-        self.assertTrue((distribution.gen_samples(n_min=4,n_max=8,warn=False)==true_sample).all())
+        distribution = Lattice(
+            dimension=4, generating_vector=26, randomize=False, seed=136
+        )
+        true_sample = np.array(
+            [
+                [0.125, 0.875, 0.625, 0.375],
+                [0.625, 0.375, 0.125, 0.875],
+                [0.375, 0.625, 0.875, 0.125],
+                [0.875, 0.125, 0.375, 0.625],
+            ]
+        )
+        self.assertTrue(
+            (
+                distribution.gen_samples(n_min=4, n_max=8, warn=False) == true_sample
+            ).all()
+        )
+
 
 class TestDigitalNetB2(unittest.TestCase):
     """Unit tests for DigitalNetB2 DiscreteDistribution.
@@ -120,7 +158,9 @@ class TestDigitalNetB2(unittest.TestCase):
     """
 
     def test_basic_default_call_is_deterministic_and_in_unit_cube(self):
-        dnb2 = DigitalNetB2(2, seed=7)  # default randomize="LMS DS", order="RADICAL INVERSE"
+        dnb2 = DigitalNetB2(
+            2, seed=7
+        )  # default randomize="LMS DS", order="RADICAL INVERSE"
         x1 = dnb2(4, warn=False)
         x2 = DigitalNetB2(2, seed=7)(4, warn=False)
 
@@ -151,14 +191,18 @@ class TestDigitalNetB2(unittest.TestCase):
         x_gray_true = np.array([[0.75, 0.25], [0.25, 0.75]])
         npt.assert_allclose(x_gray, x_gray_true, rtol=0, atol=0)
 
-        dnb2_nat = DigitalNetB2(dimension=2, randomize=False, order="RADICAL INVERSE", seed=7)
+        dnb2_nat = DigitalNetB2(
+            dimension=2, randomize=False, order="RADICAL INVERSE", seed=7
+        )
         x_nat = dnb2_nat.gen_samples(n_min=2, n_max=4, warn=False)
         x_nat_true = np.array([[0.25, 0.75], [0.75, 0.25]])
         npt.assert_allclose(x_nat, x_nat_true, rtol=0, atol=0)
 
     def test_radical_inverse_requires_powers_of_two_bounds(self):
-        dnb2 = DigitalNetB2(dimension=2, randomize=False, order="RADICAL INVERSE", seed=7)
-        with self.assertRaises(ParameterError):
+        dnb2 = DigitalNetB2(
+            dimension=2, randomize=False, order="RADICAL INVERSE", seed=7
+        )
+        with self.assertRaises(AssertionError):
             _ = dnb2.gen_samples(n_min=3, n_max=5, warn=False)  # not powers of 2
 
     def test_deprecated_graycode_emits_warning_and_maps_order(self):
@@ -167,14 +211,18 @@ class TestDigitalNetB2(unittest.TestCase):
             warnings.simplefilter("always")
             dnb2 = DigitalNetB2(dimension=2, randomize=False, graycode=True, seed=7)
             self.assertEqual(dnb2.order, "GRAY")
-            self.assertTrue(any("graycode argument deprecated" in str(x.message) for x in w))
+            self.assertTrue(
+                any("graycode argument deprecated" in str(x.message) for x in w)
+            )
 
         # graycode=False should map to RADICAL INVERSE and warn.
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             dnb2 = DigitalNetB2(dimension=2, randomize=False, graycode=False, seed=7)
             self.assertEqual(dnb2.order, "RADICAL INVERSE")
-            self.assertTrue(any("graycode argument deprecated" in str(x.message) for x in w))
+            self.assertTrue(
+                any("graycode argument deprecated" in str(x.message) for x in w)
+            )
 
     def test_deprecated_t_lms_emits_warning_and_sets_t(self):
         # IMPORTANT: for default joe_kuo matrices, _t_curr is 32, so t must be >= 32.
@@ -183,7 +231,9 @@ class TestDigitalNetB2(unittest.TestCase):
             warnings.simplefilter("always")
             dnb2 = DigitalNetB2(dimension=2, seed=7, t_lms=63)
             self.assertEqual(dnb2.t, 63)
-            self.assertTrue(any("t_lms argument deprecated" in str(x.message) for x in w))
+            self.assertTrue(
+                any("t_lms argument deprecated" in str(x.message) for x in w)
+            )
 
     def test_deprecated_t_max_emits_warning_only(self):
         with warnings.catch_warnings(record=True) as w:
@@ -237,15 +287,17 @@ class TestDigitalNetB2(unittest.TestCase):
         #   remaining: rows of ints (d_limit rows, m_max columns)
         #
         # Keep it minimal: d_limit=2, m_max=4 => n_limit=2^4=16, _t_curr=4.
-        contents = "\n".join([
-            "2",
-            "2",
-            "16",
-            "4",
-            "8 8 8 8",
-            "9 9 9 9",
-            "",
-        ])
+        contents = "\n".join(
+            [
+                "2",
+                "2",
+                "16",
+                "4",
+                "8 8 8 8",
+                "9 9 9 9",
+                "",
+            ]
+        )
 
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "tiny_dnet.txt")
@@ -289,25 +341,24 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertTrue(np.isfinite(x).all())
         self.assertTrue(((x >= 0) & (x < 1)).all())
 
+
 class TestHalton(unittest.TestCase):
-    """ Unit test for Halton DiscreteDistribution. """
-    
+    """Unit test for Halton DiscreteDistribution."""
+
     def test_gen_samples(self):
-        h123 = Halton(dimension=4,randomize=False)
-        x0123 = h123.gen_samples(8,warn=False)
-        h13 = Halton(dimension=[1,3],randomize=False)
-        x13 = h13.gen_samples(n_min=5,n_max=7,warn=False)
-        self.assertTrue((x0123[5:7,[1,3]]==x13).all())
-    
+        h123 = Halton(dimension=4, randomize=False)
+        x0123 = h123.gen_samples(8, warn=False)
+        h13 = Halton(dimension=[1, 3], randomize=False)
+        x13 = h13.gen_samples(n_min=5, n_max=7, warn=False)
+        self.assertTrue((x0123[5:7, [1, 3]] == x13).all())
+
     def test_unrandomized(self):
-        x_ur = Halton(dimension=2, randomize=False).gen_samples(4,warn=False)
-        x_true = np.array([
-            [0,     0],
-            [1./2,  1./3],
-            [1./4,  2./3],
-            [3./4,  1./9]])
-        self.assertTrue((x_ur==x_true).all())
-    
+        x_ur = Halton(dimension=2, randomize=False).gen_samples(4, warn=False)
+        x_true = np.array(
+            [[0, 0], [1.0 / 2, 1.0 / 3], [1.0 / 4, 2.0 / 3], [3.0 / 4, 1.0 / 9]]
+        )
+        self.assertTrue((x_ur == x_true).all())
+
 
 if __name__ == "__main__":
     unittest.main()

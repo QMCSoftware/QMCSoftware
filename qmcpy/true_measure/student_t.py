@@ -5,6 +5,7 @@ from ..util import ParameterError, DimensionError
 from .scipy_wrapper import SciPyWrapper
 from ..discrete_distribution import DigitalNetB2
 
+
 class _StudentTAdapter:
     """
     Multivariate Student t adapter for SciPyWrapper.

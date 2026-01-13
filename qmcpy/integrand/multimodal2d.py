@@ -36,7 +36,7 @@ class Multimodal2d(AbstractIntegrand):
     def __init__(self, sampler):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
