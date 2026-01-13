@@ -87,7 +87,7 @@ While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` 
 \begin{equation}\label{eq:mu-general}
   \mu := \mathbb{E}[g(\mathbf{T})] = \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t}, \qquad \mathbf{T} \sim \lambda,
 \end{equation}
-where $g$ is the **integrand** and $\lambda$ is the probability density of a random variable $\mathbf{T}$ whose distribution we call the **true measure**. To accommodate LD samples, which are approximately uniform on $[0,1]^d$, a transformation $\boldsymbol{\psi}$ is performed to rewrite $\mu$ as
+where $g$ is the **integrand** and $\lambda$ is the probability density of a random variable $\mathbf{T}$ whose distribution we call the **true measure**. To accommodate LD samples (approximately uniform on $[0,1]^d$), a transformation $\boldsymbol{\psi}$ is performed to rewrite $\mu$ as
 \begin{equation}\label{eq:mu-uniform}
   \mu = \mathbb{E}[f(\mathbf{X})] = \int_{[0,1]^d} f(\mathbf{x}) \, d\mathbf{x}, \qquad \mathbf{X} \sim \mathcal{U}[0,1]^d.
 \end{equation}
@@ -104,7 +104,7 @@ MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\
 1. **Discrete Distributions** generate IID or randomized LD sequences [@sorokin2025unified] including
 
     - **Lattices** with a random shift [@CraPat76;@HicEtal03;@Ric51;@coveyou1967fourier;@WanHic02a].
-    - **Digital Sequences** (including Sobol' and Faure constructions) with a digital shifts (DS), linear matrix scrambling (LMS), or nested uniform scrambling (NUS, also called Owen scrambling) [@Sob67;@dick2005multivariate; @Mat98;@Owe95;@owen2003variance;@dick2011higher;@Nie87;@Nie92;@DicPil10a].
+    - **Digital Sequences** (including Sobol' and Faure constructions) with digital shifts (DS), linear matrix scrambling (LMS), or nested uniform scrambling (NUS, also called Owen scrambling) [@Sob67;@dick2005multivariate; @Mat98;@Owe95;@owen2003variance;@dick2011higher;@Nie87;@Nie92;@DicPil10a].
     - **Halton Sequences** with a digital permutation, DS, LMS, or NUS [@Hal60;@WanHic00;@Mat98;@owen2024gain;@MorCaf94].
 
     We further support higher-order digital sequences which enable QMC convergence like $\mathcal{O}(n^{-\alpha+\delta})$ when $f$ has $\alpha$ degrees of smoothness [@dick2011higher]. Internally, `QMCPy`'s LD generators call our C package `QMCToolsCL` [@QMCToolsCL]. `QMCPy` also integrates with the `LDData` repository [@LDData] which collects lattice generating vectors and digital sequence generating matrices from Frances Kuo's websites [@cools2006constructing;@nuyens2006fast;@KuoGenerators;@JoeKuo03;@joe2008constructing;@SobolDirection], the `Magic Point Shop` [@KuoNuy16a], and `LatNet Builder` [@LatNetBuilder.software].
