@@ -38,7 +38,7 @@ affiliations:
    index: 5
  - name: University of California San Diego, USA
    index: 6
-date: 11 January 2026
+date: 13 January 2026
 bibliography: paper.bib
 csl: joss-simple.csl
 colorlinks: true
@@ -55,7 +55,7 @@ header-includes:
 
 # Summary
 
-Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample averages at independent and identically distributed (IID) random points. Quasi-Monte Carlo (QMC) methods replace IID samples with low-discrepancy (LD) sequences which more uniformly cover the integration domain, leading to faster convergence and reduced computational requirements. \autoref{fig:points} visualizes IID and LD sequences. 
+Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample averages at independent and identically distributed (IID) random points. Quasi-Monte Carlo (QMC) methods replace IID samples with low-discrepancy (LD) sequences, which more uniformly cover the integration domain, leading to faster convergence and reduced computational requirements. \autoref{fig:points} visualizes IID and LD sequences. 
 
 `QMCPy` ([https://qmcsoftware.github.io/QMCSoftware](https://qmcsoftware.github.io/QMCSoftware)) [@QMCPy2026] is our Python package for high-dimensional numerical integration using MC and QMC methods, collectively "(Q)MC." Its object-oriented design enables researchers to easily implement novel (Q)MC algorithms. The framework offers user-friendly APIs, diverse (Q)MC algorithms, adaptive error estimation techniques, and integration with scientific libraries following reproducible research practices [@Cho14a2;@ChoEtal22a]. Compared to previous versions, `QMCPy` v2.2 (which is easily installed with `pip install -U qmcpy`) includes
 
@@ -74,7 +74,7 @@ Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample
 - **robust and adaptive sampling** with theoretically grounded error estimation, and
 - **extensible (Q)MC components** enabling researchers to implement and test new algorithms.
 
-While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol' and Halton, `QMCPy` targets (Q)MC researchers and practitioners requiring additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
+While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol' and Halton, `QMCPy` provides (Q)MC researchers and practitioners an end-to-end research framework with additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
 
 - customizable LD sequences with diverse randomization techniques,
 - efficient generators of LD sequences with multiple independent randomizations,
@@ -87,7 +87,7 @@ While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` 
 \begin{equation}\label{eq:mu-general}
   \mu := \mathbb{E}[g(\mathbf{T})] = \int_{\mathcal{T}} g(\mathbf{t}) \, \lambda(\mathbf{t}) \, d\mathbf{t}, \qquad \mathbf{T} \sim \lambda,
 \end{equation}
-where $g$ is the **integrand** and $\lambda$ is the probability density of a random variable $\mathbf{T}$ whose distribution we call the **true measure**. To accommodate LD samples which are approximately uniform on $[0,1]^d$, a transformation $\boldsymbol{\psi}$ is performed to rewrite $\mu$ as
+where $g$ is the **integrand** and $\lambda$ is the probability density of a random variable $\mathbf{T}$ whose distribution we call the **true measure**. To accommodate LD samples, which are approximately uniform on $[0,1]^d$, a transformation $\boldsymbol{\psi}$ is performed to rewrite $\mu$ as
 \begin{equation}\label{eq:mu-uniform}
   \mu = \mathbb{E}[f(\mathbf{X})] = \int_{[0,1]^d} f(\mathbf{x}) \, d\mathbf{x}, \qquad \mathbf{X} \sim \mathcal{U}[0,1]^d.
 \end{equation}
@@ -97,7 +97,7 @@ If $\mathbf{T} \sim \boldsymbol{\psi}(\mathbf{X})$, then $f = g \circ \boldsymbo
 \begin{equation}\label{eq:mu-hat}
   \widehat{\mu} := \frac{1}{n} \sum_{i=1}^{n} f(\mathbf{X}_i).
 \end{equation}
-MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods choose dependent LD nodes that fill $[0,1]^d$ more evenly, i.e., the discrepancy between the **discrete distribution** of $\mathbf{X}_1,\dots,\mathbf{X}_n$ and the uniform distribution is small. QMC methods can achieve errors like $\mathcal{O}(n^{-1+\delta})$ where $\delta>0$ is arbitrarily small [@WanHic00b;@Wan03a]. A key feature of `QMCPy` are **stopping criteria** that automatically determine $n$ so $|\mu - \widehat{\mu}| \le \varepsilon$ for a user-specified tolerance $\varepsilon>0$, either deterministically or with high probability.
+MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\mu}-\mu|$ like $\mathcal{O}(n^{-1/2})$ [@Nie78]. QMC methods choose dependent LD nodes that fill $[0,1]^d$ more evenly, i.e., the discrepancy between the **discrete distribution** of $\mathbf{X}_1,\dots,\mathbf{X}_n$ and the uniform distribution is small. QMC methods can achieve errors like $\mathcal{O}(n^{-1+\delta})$ where $\delta>0$ is arbitrarily small [@WanHic00b;@Wan03a]. A key feature of `QMCPy` is **stopping criteria** that automatically determine $n$ so $|\mu - \widehat{\mu}| \le \varepsilon$ for a user-specified tolerance $\varepsilon>0$, either deterministically or with high probability.
 
 `QMCPy` contains four main abstract classes:
 
@@ -127,7 +127,7 @@ MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\
 
 # Acknowledgements
 
-The authors acknowledge support from the U.S. National Science Foundation grant DMS-2316011 and Department of Energy Office of Science Graduate Student Research Program. We thank the international (Q)MC research community as well as JOSS reviewers and editors for invaluable and timely feedback and support.
+The authors acknowledge support from the U.S. National Science Foundation grant DMS-2316011 and the Department of Energy Office of Science Graduate Student Research Program. We thank the international (Q)MC research community as well as JOSS reviewers and editors for invaluable and timely feedback and support.
 
 This article has been co-authored by employees of National Technology and Engineering Solutions of Sandia, LLC under Contract No. DE-NA0003525 with the U.S. Department of Energy (DOE). The employees co-own right, title and interest in and to the article and are responsible for its contents. The United States Government retains and the publisher, by accepting the article for publication, acknowledges that the United States Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this article or allow others to do so, for United States Government purposes. The DOE will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan ([https://www.energy.gov/downloads/doe-public-access-plan](https://www.energy.gov/downloads/doe-public-access-plan)).
 
