@@ -28,9 +28,9 @@ def test_non_torch_transforms_basic():
     assert b.shape == a.shape
 
     omega = omega_fftbr(3)
-    assert omega.shape[0] == 2 ** 3
+    assert omega.shape[0] == 2**3
     omega2 = omega_fwht(3)
-    assert omega2.shape[0] == 2 ** 3
+    assert omega2.shape[0] == 2**3
 
 
 def test_torch_fallbacks_raise():

@@ -56,7 +56,7 @@ class AbstractStoppingCriterion(object):
         *Abstract method* to determine the number of samples needed to satisfy the tolerance(s).
 
         Returns:
-            solution (Union[float,np.ndarray]): Approximation to the integral with shape `integrand.d_comb`.
+            solution (Union[float, np.ndarray]): Approximation to the integral with shape `integrand.d_comb`.
             data (Data): A data object.
         """
         raise MethodImplementationError(self, "integrate")

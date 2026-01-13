@@ -67,11 +67,11 @@ class BoxIntegral(AbstractIntegrand):
     def __init__(self, sampler, s=1):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            s (Union[float,np.ndarray]): `s` parameter or parameters. The output shape of `g` is the shape of `s`.
+            s (Union[float, np.ndarray]): `s` parameter or parameters. The output shape of `g` is the shape of `s`.
         """
         self.parameters = ["s"]
         self.s = np.array(s)

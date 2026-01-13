@@ -299,9 +299,9 @@ class KernelShiftInvar(AbstractSIDSIKernel):
         r"""
         Args:
             d (int): Dimension.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
-            alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray, torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
@@ -485,9 +485,9 @@ class KernelShiftInvarCombined(AbstractSIDSIKernel):
         r"""
         Args:
             d (int): Dimension.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
-            alpha (Union[np.ndarray,torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray, torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
@@ -715,9 +715,9 @@ class KernelDigShiftInvar(AbstractSIDSIKernel):
         Args:
             d (int): Dimension.
             t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
-            alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray, torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             tfs_scale (Tuple[callable,callable]): The first argument transforms to the raw value to be optimized; the second applies the inverse transform.
@@ -954,9 +954,9 @@ class KernelDigShiftInvarAdaptiveAlpha(AbstractSIDSIKernel):
         Args:
             d (int): Dimension.
             t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
-            alpha (Union[np.ndarray,torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray, torch.Tensor]): Smoothness parameters $(\alpha_1,\dots,\alpha_d)$ where $\alpha_j \geq 1$ for $j=1,\dots,d$.
             shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
@@ -1165,9 +1165,9 @@ class KernelDigShiftInvarCombined(AbstractSIDSIKernel):
         Args:
             d (int): Dimension.
             t (int): number of bits in binary represtnations. Typically `dnb2.t` where `isinstance(dnb2,DigitalNetB2)`.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
-            alpha (Union[np.ndarray,torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Product weights $(\gamma_1,\dots,\gamma_d)$.
+            alpha (Union[np.ndarray, torch.Tensor]): Weights $\boldsymbol{\alpha}_1,\dots,\boldsymbol{\alpha}_d \in \mathbb{R}_{>0}^4$.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`
