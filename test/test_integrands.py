@@ -78,9 +78,9 @@ class TestIntegrand(unittest.TestCase):
             s = str(integrand)
             for ptransform in ["None", "Baker", "C0", "C1", "C1sin", "C2sin", "C3sin"]:
                 y = integrand.f(x, periodization_transform=ptransform)
-                self.assertTrue(y.shape == (integrand.d_indv + (n,)))
+                self.assertEqual(y.shape, (integrand.d_indv + (n,)))
                 self.assertTrue(np.isfinite(y).all())
-                self.assertTrue(y.dtype == np.float64)
+                self.assertEqual(y.dtype, np.float64)
 
     def test_keister(self, dims=3):
         k = Keister(DigitalNetB2(dims, seed=7))
