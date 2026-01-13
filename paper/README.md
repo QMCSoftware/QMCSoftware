@@ -10,7 +10,14 @@ To render `paper.md` as a PDF,
 docker run --rm     --volume $PWD/paper:/data     --user $(id -u):$(id -g)     --env JOURNAL=joss     openjournals/inara
 ```
 
-* To count number of words, run `wc -w paper/paper.md` in Terminal.
+* To count number of words without header and Acknowledgements, run the following from the repository root (QMCSoftware/) in Terminal:
+
+```bash
+start=$(grep -n '^# Summary' paper/paper.md | cut -d: -f1) && \
+end=$(grep -n '^# Acknowledgements' paper/paper.md | cut -d: -f1) && \
+echo Words between lines $start and $end && \
+awk -v s=$start -v e=$end 'NR>s && NR<e{print}' paper/paper.md | wc -w
+```
 
 <!-- 
 
