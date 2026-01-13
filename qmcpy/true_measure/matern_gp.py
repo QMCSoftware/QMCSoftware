@@ -80,7 +80,7 @@ class MaternGP(Gaussian):
                 Note that when $\nu \notin \{1/2, 3/2, 5/2, \infty \}$ the kernel is around $10$ times slower to evaluate.
             length_scale (Union[float, np.ndarray]): Determines "peakiness", or how correlated two points are based on their distance.
             variance (float): Global scaling factor.
-            mean (Union[float, np.ndarray]): Mean vectorfor multivariante `Gaussian`.
+            mean (Union[float, np.ndarray]): Mean vector for multivariate `Gaussian`.
             nugget (float): Positive nugget to add to diagonal.
             decomp_type (str): Method for decomposition for covariance matrix. Options include
 
