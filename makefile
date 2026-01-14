@@ -261,11 +261,9 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
+	@cp -r paper docs
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
-	@cp paper/paper.md docs/joss_paper.md  
-	@mkdir docs/figs/
-	@cp demos/talk_paper_demos/JOSS2026/JOSS2026.outputs/*.png docs/figs/
 
 runmkdocserve: 
 	@mkdocs serve

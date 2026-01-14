@@ -88,6 +88,10 @@ dist/
 # blogs
 blogs/why_q_in_mc/*.png
 
+# paper
+paper.bib.original
+jats/
+
 # Quarto / Jupyter artifacts
 **/*.quarto_ipynb
 *_files/
