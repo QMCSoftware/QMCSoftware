@@ -269,3 +269,9 @@ runmkdocserve:
 doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
+
+###########################################################
+# PEP8
+############################################################
+check_pep8:
+	@pylint qmcpy --exit-zero --disable=R,C
