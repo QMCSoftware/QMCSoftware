@@ -2,7 +2,6 @@ import unittest
 from __init__ import BaseNotebookTest
 
 
-@unittest.skip("Skipping as it is very slow on Ubuntu")
 class NotebookTests(BaseNotebookTest):
 
     def test_gbm_demo_notebook(self):
