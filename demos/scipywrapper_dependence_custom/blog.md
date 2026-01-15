@@ -3,6 +3,7 @@
 When we first bump into `SciPyWrapper`, the examples live in very nice, controlled worlds. The true measures are clean, the distributions come straight from `scipy.stats`, and most variables behave independently of each other.
 
 My project started from the moments when that story breaks.
+
 * What if the variables you care about are strongly correlated?
 * What if your distribution is not in `scipy.stats` at all, but you still want to drive it with a low discrepancy point set?
 * And what if a user hands you a custom distribution that is quietly wrong?
@@ -11,6 +12,7 @@ This blog walks through the changes I made to `qmcpy.true_measure.SciPyWrapper` 
 
 
 All of the code lives in:
+
 * `qmcpy/true_measure/scipy_wrapper.py`
 * `demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb`
 * `test/test_scipy_wrapper_custom.py`
@@ -27,11 +29,13 @@ All of the code lives in:
 > using a list of frozen `scipy.stats` univariate distributions.
 
 So if you gave it a 3 dimensional `DigitalNetB2` and three frozen continuous distributions, it would apply each inverse CDF (`ppf`) coordinatewise. This works nicely for independent marginals, but it has some limitations:
+
 1. It ignores any dependence between coordinates.  
 2. It assumes everything comes from `scipy.stats` continuous distributions.  
 3. There is no structured way to plug in a completely user defined distribution while still catching obvious mistakes.
 
-The goal of this project is to keep the original behaviour for simple cases, but extend it in two directions:
+The goal of this project is to keep the original behavior for simple cases, but extend it in two directions:
+
 - support joint distributions that encode dependence, including non trivial constructions like zero inflated models and acceptance rejection transforms;
 - support user defined marginals that follow a SciPy like interface, with sanity checks and clear warnings when something looks wrong.
 
@@ -43,7 +47,8 @@ At a high level, the extended `SciPyWrapper` can now work in two modes.
 
 ### 2.1 Independent marginal mode
 
-This is the original behaviour.
+This is the original behavior.
+
 * Input: list of frozen univariate distributions or a single frozen distribution from `scipy.stats`, or user defined univariate distributions that look similar.
 * Transform: apply each `ppf` coordinatewise.
 * Weight: multiply the marginal densities or log densities.
@@ -58,6 +63,7 @@ This is the new piece.
 Instead of giving a list of marginals, you can now pass a *joint* object that knows how to turn a point `u` from `[0, 1]^d` into a sample `x` in the physical space.
 
 The joint object is expected to provide:
+
 - `dim`: the dimension `d`;
 - `transform(u)`: vectorised map from `u` in `[0, 1]^d` to `x` in `R^d`;
 - optional `logpdf(x)` or `pdf(x)`: to supply weights if needed.
@@ -73,10 +79,12 @@ In the rest of the blog, all the “dependent” examples use this joint mode.
 This is the example that checks that the joint transform behaves as expected for a familiar multivariate normal.
 
 We compare:
+
 1. `SciPyWrapper` with two independent standard normal marginals.
 2. `SciPyWrapper` with a 2-dimensional multivariate normal that has correlation `ρ = 0.8`, provided through a joint adapter.
 
 For each case, we generate a few thousand samples from a `DigitalNetB2` sampler and estimate:
+
 - the sample correlation between `X1` and `X2`;
 - the expectation `E[X1 X2]`.
 
@@ -90,6 +98,7 @@ For each case, we generate a few thousand samples from a `DigitalNetB2` sampler 
 - The right panel shows the joint multivariate normal case with `ρ ≈ 0.80`. Now the points are stretched along a diagonal line. The cloud is clearly elongated, and the sample correlation matches the target within a few thousandths. The estimated `E[X1 X2]` is around `0.799`, very close to the analytic value `0.8`.
 
 So this first figure confirms that:
+
 - the joint transform preserves the covariance structure we bake into the multivariate normal;
 - the independent mode still behaves the way it did originally.
 
@@ -100,6 +109,7 @@ So this first figure confirms that:
 The second example moves away from textbook distributions and into something more realistic: a zero inflated exponential marginal combined with a dependent uniform.
 
 The construction is:
+
 - With probability `p_zero`, set `X = 0` and draw `Y` uniformly from `[0, 0.5]`.
 - With probability `1 - p_zero`, draw `X` from an exponential distribution with rate `λ` and draw `Y` uniformly from `[0.5, 1]`.
 
@@ -115,6 +125,7 @@ This is implemented as a joint object `ZeroInflatedExpUniformJoint` that exposes
 - The right panel shows the joint scatter of `(X, Y)`. There is a dense vertical strip at `X = 0` with `Y` between `0` and `0.5`. For positive `X`, the points live in the horizontal band where `Y` is between `0.5` and `1`. The band is thicker near small `X` and thins out for large `X`, simply because the exponential tail decays.
 
 Numerically, the notebook prints:
+
 - Target `P(X = 0)` (which is the parameter `p_zero`) and the empirical estimate. They agree up to three decimal places.
 - Empirical `corr(X, Y)`, which is clearly positive, reflecting the fact that larger `Y` is associated with nonzero `X`.
 
@@ -133,12 +144,14 @@ The target region is the triangle
 \]
 
 The algorithm is:
+
 1. Propose points uniformly on `[0, 1]^2` either from an iid sampler or from `DigitalNetB2`.
 2. Accept only those points with `y ≤ x`.
 
 This automatically introduces dependence between `X` and `Y` because the support ignores the upper left half of the square.
 
 We then compute:
+
 - the sample correlation between `X` and `Y` for both methods;
 - the sample estimate of `E[X Y]` and compare it with the analytic value `0.25`.
 
@@ -148,14 +161,16 @@ We then compute:
 
 ![Figure 3: Acceptance rejection with iid versus QMC](figures/fig03_accept_reject_mc_vs_qmc.png)
 
-- The left panel shows the accepted points when the proposals come from iid uniform draws. The triangle is filled, but there are small gaps and some regions look a bit more crowded than others. This is normal Monte Carlo behaviour.
+- The left panel shows the accepted points when the proposals come from iid uniform draws. The triangle is filled, but there are small gaps and some regions look a bit more crowded than others. This is normal Monte Carlo behavior.
 - The right panel shows the same acceptance region when the proposals come from a digital net. The overall shape is exactly the same, but the fill looks more even. There are fewer “clumps” and voids. The points spread across the triangle in a more uniform way, which is what low discrepancy sequences are designed to do.
 
 The printed statistics highlight that:
+
 - `corr(X, Y)` is around `0.49` for MC and about `0.50` for QMC.
 - The estimates of `E[X Y]` are `0.2485` for MC and `0.2505` for QMC, versus the true value `0.25`.
 
 So both samplers hit the correct dependent target, and in this particular run the QMC estimate lands almost exactly on the analytic value. More importantly, this example shows that the combination of:
+
 - a custom acceptance rejection mapping,
 - a joint transform interface, and
 - a QMC sampler
@@ -207,6 +222,7 @@ This example demonstrates that a user defined marginal can be plugged into the w
 This example is intentionally not pretty. It builds a “bad” custom distribution whose `ppf` and `pdf` have obvious problems, then passes it into `SciPyWrapper`.
 
 Instead of failing silently, the extended wrapper runs a few quick sanity checks during construction:
+
 - Does `ppf` look increasing in probability?
 - Is the numerical integral of `pdf` over the support close to 1?
 - Are there negative values or infinities?
@@ -220,7 +236,7 @@ Custom distribution ppf appears non increasing
 Custom distribution pdf looks poorly normalised
 ```
 
-This is exactly the behaviour we want. It does not block experimentation, but it gives the user a clear signal that their distribution is probably not what they think it is.
+This is exactly the behavior we want. It does not block experimentation, but it gives the user a clear signal that their distribution is probably not what they think it is.
 
 ---
 
@@ -231,6 +247,7 @@ Normals are a great starting point, but they can hide what happens when the data
 This is not the same as using two independent `scipy.stats.t` marginals. Here the dependence is real: the joint distribution has a target correlation built into its shape matrix, and the samples reflect that directly.
 
 In the notebook I print:
+
 - the target correlation (from the shape matrix),
 - the empirical correlation from the samples, and
 - a quick moment check using the fact that when `df > 2` the covariance is
@@ -276,6 +293,7 @@ Running all cells in the notebook will regenerate the five figures from this blo
 The original `SciPyWrapper` already made it easy to plug standard `scipy.stats` marginals into QMCPy. For many applications that was enough. Once we step into more realistic models though, independence and “everything is already in SciPy” become strong assumptions.
 
 Here, I tried to relax those assumptions while keeping the original interface familiar:
+
 - Dependent variables are supported through a joint transform interface that plays nicely with QMCPy’s existing samplers and stopping criteria.
 - Custom user distributions can be passed in using a SciPy style frozen object pattern.
 - Simple sanity checks help catch badly defined distributions so they do not quietly pollute simulation results.
