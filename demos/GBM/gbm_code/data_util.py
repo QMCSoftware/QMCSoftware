@@ -14,8 +14,8 @@ def add_theoretical_results(
 
     Args:
         results_data: List to append theoretical results to
-        theoretical_mean: Theoretical expected value E[S_T]
-        theoretical_std: Theoretical standard deviation of S_T
+        theoretical_mean: Theoretical expected value $E[S_T]$
+        theoretical_std: Theoretical standard deviation of $S_T$
     """
     results_data.append(
         {
@@ -32,29 +32,35 @@ def add_theoretical_results(
 def add_quantlib_results(
     results_data: list,
     sampler_type: str,
-    quantlib_final: npt.NDArray[np.floating],
+    quantlib_final: npt.NDArray[np.floating],  # per replication mean
     theoretical_mean: float,
     theoretical_std: float,
 ) -> None:
     """
-    Compute and add QuantLib simulation results to results data.
+    Add summary statistics for QuantLib simulations based on per-replication means.
+
+    The `quantlib_final` array is expected to contain one value per replication,
+    where each value is the mean of all simulated terminal asset prices S_T in
+    that replication.
 
     Args:
-        results_data: List to append results to
-        sampler_type: Name of the sampler used
-        quantlib_final: Array of final values S_T from QuantLib simulation
-        theoretical_mean: Theoretical expected value for error computation
-        theoretical_std: Theoretical standard deviation for error computation
+        results_data: List to which the QuantLib summary row is appended.
+        sampler_type: Identifier for the sampler used in the QuantLib experiment.
+        quantlib_final: 1D array of per-replication sample means of $S_T$.
+        theoretical_mean: Theoretical expected value $E[S_T]$ used as a benchmark.
+        theoretical_std: Theoretical standard deviation of $S_T$ used as a benchmark.
     """
     ql_emp_mean = np.mean(quantlib_final)
     ql_emp_std = np.std(quantlib_final, ddof=1)
+    ql_mae = np.mean(np.abs(quantlib_final - theoretical_mean))
+
     results_data.append(
         {
             "Method": "QuantLib",
             "Sampler": sampler_type,
             "Mean": ql_emp_mean,
             "Std Dev": ql_emp_std,
-            "Mean Absolute Error": abs(ql_emp_mean - theoretical_mean),
+            "Mean Absolute Error": ql_mae,
             "Std Dev Error": abs(ql_emp_std - theoretical_std),
         }
     )
@@ -63,30 +69,37 @@ def add_quantlib_results(
 def add_qmcpy_results(
     results_data: list,
     sampler_type: str,
-    qmcpy_final: npt.NDArray[np.floating],
+    qmcpy_final: npt.NDArray[np.floating],  # per replication mean
     qp_emp_mean: float,
     theoretical_mean: float,
     theoretical_std: float,
 ) -> None:
     """
-    Compute and add QMCPy simulation results to results data.
+    Add empirical QMCPy results, computed from per-replication means, to results data.
+
+    The mean absolute error (MAE) is computed across replications as
+    the average of the absolute differences between each per-replication
+    mean in `qmcpy_final` and `theoretical_mean`.
 
     Args:
-        results_data: List to append results to
-        sampler_type: Name of the sampler used
-        qmcpy_final: Array of final values S_T from QMCPy simulation
-        qp_emp_mean: Empirical mean already computed from qmcpy_final
-        theoretical_mean: Theoretical expected value for error computation
-        theoretical_std: Theoretical standard deviation for error computation
+        results_data: List to which the QMCPy summary for this sampler is appended.
+        sampler_type: Name or type of the QMCPy sampler used.
+        qmcpy_final: 1D array where each entry is the mean payoff from a single
+            replication of the QMCPy experiment.
+        qp_emp_mean: Overall empirical mean across all replications.
+        theoretical_mean: Theoretical expected value used as a benchmark.
+        theoretical_std: Theoretical standard deviation used as a benchmark.
     """
     qp_emp_std = np.std(qmcpy_final, ddof=1)
+    qp_mae = np.mean(np.abs(qmcpy_final - theoretical_mean))
+
     results_data.append(
         {
             "Method": "QMCPy",
             "Sampler": sampler_type,
             "Mean": qp_emp_mean,
             "Std Dev": qp_emp_std,
-            "Mean Absolute Error": abs(qp_emp_mean - theoretical_mean),
+            "Mean Absolute Error": qp_mae,
             "Std Dev Error": abs(qp_emp_std - theoretical_std),
         }
     )
@@ -114,42 +127,48 @@ def process_sampler_data(
     Returns:
         tuple: (quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp)
     """
-    # Initialize quantlib_paths to None
+
     params_ql["sampler_type"] = sampler_type
     params_qp["sampler_type"] = sampler_type
-    quantlib_paths, quantlib_final = None, None
 
-    # Generate paths for both libraries
+    replications = params_qp["replications"]
+
+    quantlib_paths, ql_gbm = None, None
+
     if sampler_type in ["IIDStdUniform", "Sobol"]:
-        quantlib_paths, ql_gbm = qlu.generate_quantlib_paths(**params_ql)
-        quantlib_final = quantlib_paths[:, -1]
+        ql_means = np.empty(replications)
+        ql_seed = params_ql["seed"]
+
+        for r in range(replications):
+            params_ql["seed"] = ql_seed + r
+            quantlib_paths, ql_gbm = qlu.generate_quantlib_paths(**params_ql)
+            ql_means[r] = quantlib_paths[:, -1].mean()
+
+        params_ql["seed"] = ql_seed
     else:
-        quantlib_paths, ql_gbm = None, None
+        ql_means = None
 
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
 
-    # Handle 3D array (replications, n_paths, n_steps) by taking first replication
     if qmcpy_paths.ndim == 3:
-        qmcpy_paths = qmcpy_paths[0]
+        qp_means = qmcpy_paths[:, :, -1].mean(axis=1)
+    else:
+        qp_means = np.array([qmcpy_paths[:, -1].mean()])
 
-    # Final value statistics
-    qmcpy_final = qmcpy_paths[:, -1]
-    qp_emp_mean = np.mean(qmcpy_final)
-
-    # Add results to data
-    if sampler_type in ["IIDStdUniform", "Sobol"] and quantlib_final is not None:
+    if ql_means is not None:
         add_quantlib_results(
             results_data,
             sampler_type,
-            quantlib_final,
+            ql_means,
             theoretical_mean,
             theoretical_std,
         )
+
     add_qmcpy_results(
         results_data,
         sampler_type,
-        qmcpy_final,
-        qp_emp_mean,
+        qp_means,
+        qp_means.mean(),
         theoretical_mean,
         theoretical_std,
     )
