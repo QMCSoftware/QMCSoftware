@@ -2,12 +2,11 @@ import numpy as np
 
 from qmcpy.util import ParameterError
 from qmcpy.true_measure import SciPyWrapper
-from qmcpy.discrete_distribution import DigitalNetB2
 
 
 class TriangularUserDistribution:
     """
-    Triangular distribution that mirrors scipy.stats.triang.
+    Triangular distribution that mirrors `scipy.stats.triang`.
 
     Support: [loc, loc + scale]
     Mode: loc + c * scale, where 0 < c < 1.

@@ -24,6 +24,7 @@ qmcpy.egg-info/
 *.out
 *.pyc
 *.vrb
+*.npy
 .DS_Store
 .idea/
 .pytest_cache/
@@ -33,6 +34,25 @@ demos/.jupyter
 
 # tests
 .coverage
+*.wgw*
+coverage-data/*
+*coverage*
+/test/booktests/JOSS2026.outputs
+/test/booktests/logs
+/test/booktests/outputs
+/test/booktests/outputs_nb
+/test/booktests/raw.githubusercontent.com
+/test/booktests/runinfo
+
+# Paper or LaTeX
+*.bak*
+*.syn*.gz
+*.pdf
+*.log
+*.fls
+*.fdb_latexmk
+*.bbl
+*.aux
 
 # C
 *.so
@@ -46,6 +66,7 @@ demos/.jupyter
 # Website
 docs/_site
 docs/Gemfile.lock
+site/
 
 # Sphinx
 sphinx/_build/
@@ -58,8 +79,8 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-demos/**.png
-demos/**.eps
+*.png
+*.eps
 
 # release
 /build/
@@ -67,6 +88,10 @@ dist/
 
 # blogs
 blogs/why_q_in_mc/*.png
+
+# paper
+paper.bib.original
+jats/
 
 # Quarto / Jupyter artifacts
 **/*.quarto_ipynb

@@ -62,8 +62,8 @@ ok
 [11/32] tb_digital_net_b2: PASSED
 tb_digital_net_b2 ...     Memory used: 0.10 GB.  Test time: 16.61 s
 ok
-[12/32] tb_joss2025: PASSED
-tb_joss2025 ...     Memory used: 0.09 GB.  Test time: 5.65 s
+[12/32] tb_joss2026: PASSED
+tb_joss2026 ...     Memory used: 0.09 GB.  Test time: 5.65 s
 ok
 [13/32] tb_lebesgue_integration: PASSED
 tb_lebesgue_integration ...     Memory used: 0.10 GB.  Test time: 2.31 s
