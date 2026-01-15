@@ -6,8 +6,14 @@ from .common_kernels import (
     KernelMatern32,
     KernelMatern52,
 )
-from .si_dsi_kernels import KernelShiftInvar,KernelShiftInvarCombined,KernelDigShiftInvar,KernelDigShiftInvarAdaptiveAlpha,KernelDigShiftInvarCombined
-from .multitask_kernel import KernelMultiTask,KernelMultiTaskDerivs
+from .si_dsi_kernels import (
+    KernelShiftInvar,
+    KernelShiftInvarCombined,
+    KernelDigShiftInvar,
+    KernelDigShiftInvarAdaptiveAlpha,
+    KernelDigShiftInvarCombined,
+)
+from .multitask_kernel import KernelMultiTask, KernelMultiTaskDerivs
 
 KernelSI = KernelShiftInvar
 KernelSICombined = KernelShiftInvarCombined

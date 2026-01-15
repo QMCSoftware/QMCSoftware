@@ -1,1 +1,1 @@
-code/latex_util.py
+gbm_code/latex_util.py

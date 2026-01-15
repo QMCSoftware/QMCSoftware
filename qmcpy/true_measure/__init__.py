@@ -9,6 +9,10 @@ from .bernoulli_cont import BernoulliCont
 from .johnsons_su import JohnsonsSU
 from .scipy_wrapper import SciPyWrapper
 from .matern_gp import MaternGP
+from .student_t import StudentT
+from .uniform_triangle import UniformTriangle
+from .zero_inflated_exp_uniform import ZeroInflatedExpUniform
+from .triangular import Triangular
 
 TrueMeasure = AbstractTrueMeasure
 _TrueMeasure = AbstractTrueMeasure

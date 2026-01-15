@@ -15,10 +15,10 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
         s (str): string representation of this qmcpy object
 
     Note:
-        print(qmc_object) is equivalent to print(qmc_object.__repr__()). 
-        See an abstract classes __repr__ method for example call to this method. 
+        print(qmc_object) is equivalent to print(qmc_object.__repr__()).
+        See an abstract classes __repr__ method for example call to this method.
     """
-    with np.printoptions(precision=3,threshold=10):
+    with np.printoptions(precision=3, threshold=10):
         unique_attributes = []
         for attrib in attributes:
             if attrib not in unique_attributes:
@@ -30,8 +30,10 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             if isinstance(val, list) and len(val) == 1:
                 val = copy(val[0])
             elif isinstance(val, list):
-                try: val = np.array(val).copy()
-                except: pass
+                try:
+                    val = np.array(val).copy()
+                except:
+                    pass
             elif isinstance(val, np.ndarray):
                 val = val.copy().squeeze()
                 if val.shape == ():
@@ -39,19 +41,19 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
                 elif val.size == 1:
                     val = val[0].item()
             # printing options
-            s = '    %-15s '%key
-            if isinstance(val, int) or isinstance(val,float): # scalar
-                p = .1 if val<=0 else np.log2(float(val))
-                if (p%1==0) and p!=0: # power of 2
-                    s += '2^(%d)' % int(p)
-                elif isinstance(val, int) or (val%1==0): # int
-                    s += '%d' % int(val)
-                else: # float 
-                    if abs(val) < .001: # exponential format
-                        s += '%.2e' % val
-                    else: # float format
-                        s += '%.3f' % val
+            s = "    %-15s " % key
+            if isinstance(val, int) or isinstance(val, float):  # scalar
+                p = 0.1 if val <= 0 else np.log2(float(val))
+                if (p % 1 == 0) and p != 0:  # power of 2
+                    s += "2^(%d)" % int(p)
+                elif isinstance(val, int) or (val % 1 == 0):  # int
+                    s += "%d" % int(val)
+                else:  # float
+                    if abs(val) < 0.001:  # exponential format
+                        s += "%.2e" % val
+                    else:  # float format
+                        s += "%.3f" % val
             else:
-                s += '%s' % str(val)
-            string += '\n' + s.replace('\n', '\n     %-15s' % ' ')
+                s += "%s" % str(val)
+            string += "\n" + s.replace("\n", "\n     %-15s" % " ")
     return string

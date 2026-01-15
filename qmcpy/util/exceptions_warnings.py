@@ -1,10 +1,11 @@
-import warnings 
+import warnings
 
 # def custom_formatwarning(msg, *args, **kwargs):
 #     # ignore everything except the message
 #     return '%s:%d\n\t%s: %s\n'%(args[1],args[2],args[0].__name__,str(msg))
 
 # warnings.formatwarning = custom_formatwarning
+
 
 class DimensionError(Exception):
     """
@@ -31,9 +32,13 @@ class MethodImplementationError(Exception):
     """
 
     def __init__(self, subclass, method_name):
-        s_f = '%s does not have an implementation of the  %s method. ' + \
-            'See superclass for method description.'
-        super(MethodImplementationError,self).__init__(s_f % (type(subclass).__name__, method_name))
+        s_f = (
+            "%s does not have an implementation of the  %s method. "
+            + "See superclass for method description."
+        )
+        super(MethodImplementationError, self).__init__(
+            s_f % (type(subclass).__name__, method_name)
+        )
 
 
 class ParameterError(Exception):

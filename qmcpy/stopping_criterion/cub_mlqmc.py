@@ -1,7 +1,9 @@
 from .abstract_cub_mlqmc import AbstractCubMLQMC
 from ..util.data import Data
-from ..discrete_distribution import DigitalNetB2,Lattice,Halton
-from ..discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from ..discrete_distribution import DigitalNetB2, Lattice, Halton
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractLDDiscreteDistribution,
+)
 from ..true_measure import Gaussian
 from ..integrand import FinancialOption
 from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
@@ -62,43 +64,44 @@ class CubMLQMC(AbstractCubMLQMC):
             entropy         7
 
     **References:**
-        
-    1.  M.B. Giles and B.J. Waterhouse.  
-        'Multilevel quasi-Monte Carlo path simulation'.  
-        pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics, de Gruyter, 2009.  
+
+    1.  M.B. Giles and B.J. Waterhouse.
+        'Multilevel quasi-Monte Carlo path simulation'.
+        pp.165-181 in Advanced Financial Modelling, in Radon Series on Computational and Applied Mathematics, de Gruyter, 2009.
         [http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf](http://people.maths.ox.ac.uk/~gilesm/files/radon.pdf).
     """
 
-    def __init__(self, 
-                 integrand, 
-                 abs_tol = .05, 
-                 rmse_tol = None, 
-                 n_init = 256, 
-                 n_limit = 1e10,
-                 alpha = .01, 
-                 levels_min = 2,
-                 levels_max = 10,
-                 ):
+    def __init__(
+        self,
+        integrand,
+        abs_tol=0.05,
+        rmse_tol=None,
+        n_init=256,
+        n_limit=1e10,
+        alpha=0.01,
+        levels_min=2,
+        levels_max=10,
+    ):
         r"""
         Args:
             integrand (AbstractIntegrand): The integrand.
             abs_tol (np.ndarray): Absolute error tolerance.
-            rmse_tol (np.ndarray): Root mean squared error tolerance. 
-                If supplied, then absolute tolerance and alpha are ignored in favor of the rmse tolerance. 
-            n_init (int): Initial number of samples. 
+            rmse_tol (np.ndarray): Root mean squared error tolerance.
+                If supplied, then absolute tolerance and alpha are ignored in favor of the rmse tolerance.
+            n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$. 
+            alpha (np.ndarray): Uncertainty level in $(0,1)$.
             levels_min (int): Minimum level of refinement $\geq 2$.
             levels_max (int): Maximum level of refinement $\geq$ `levels_min`.
         """
-        self.parameters = ['rmse_tol','n_init','n_limit','replications']
+        self.parameters = ["rmse_tol", "n_init", "n_limit", "replications"]
         # initialization
         if rmse_tol:
             self.rmse_tol = float(rmse_tol)
-        else: # use absolute tolerance
-            self.rmse_tol =  float(abs_tol) / norm.ppf(1-alpha/2)
-        self.alpha = alpha 
-        assert 0<self.alpha<1
+        else:  # use absolute tolerance
+            self.rmse_tol = float(abs_tol) / norm.ppf(1 - alpha / 2)
+        self.alpha = alpha
+        assert 0 < self.alpha < 1
         self.n_init = n_init
         self.n_limit = n_limit
         self.levels_min = levels_min
@@ -107,57 +110,71 @@ class CubMLQMC(AbstractCubMLQMC):
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
         self.discrete_distrib = self.integrand.discrete_distrib
-        super(CubMLQMC,self).__init__(allowed_distribs=[AbstractLDDiscreteDistribution],allow_vectorized_integrals=False)
-        self.replications = self.discrete_distrib.replications 
-        assert self.replications>=4, "require at least 4 replications"
+        super(CubMLQMC, self).__init__(
+            allowed_distribs=[AbstractLDDiscreteDistribution],
+            allow_vectorized_integrals=False,
+        )
+        self.replications = self.discrete_distrib.replications
+        assert self.replications >= 4, "require at least 4 replications"
 
     def integrate(self):
         t_start = time()
-        data = Data(parameters=[
-            'solution',
-            'n_total',
-            'levels',
-            'n_level',
-            'mean_level',
-            'var_level', 
-            'bias_estimate'])
-        data.levels = int(self.levels_min+1)
-        data.n_level = np.zeros(data.levels,dtype=int)
-        data.eval_level = np.ones(data.levels,dtype=bool)
-        data.mean_level_reps = np.zeros((data.levels,int(self.replications)))
-        data.mean_level = np.tile(0.,data.levels)
-        data.var_level = np.tile(np.inf,data.levels)
-        data.cost_level = np.tile(0.,data.levels)
-        data.var_cost_ratio_level = np.tile(np.inf,data.levels)
+        data = Data(
+            parameters=[
+                "solution",
+                "n_total",
+                "levels",
+                "n_level",
+                "mean_level",
+                "var_level",
+                "bias_estimate",
+            ]
+        )
+        data.levels = int(self.levels_min + 1)
+        data.n_level = np.zeros(data.levels, dtype=int)
+        data.eval_level = np.ones(data.levels, dtype=bool)
+        data.mean_level_reps = np.zeros((data.levels, int(self.replications)))
+        data.mean_level = np.tile(0.0, data.levels)
+        data.var_level = np.tile(np.inf, data.levels)
+        data.cost_level = np.tile(0.0, data.levels)
+        data.var_cost_ratio_level = np.tile(np.inf, data.levels)
         data.bias_estimate = np.inf
         data.level_integrands = []
         while True:
             self.update_data(data)
-            if data.var_level.sum() > (self.rmse_tol**2/2.):
+            if data.var_level.sum() > (self.rmse_tol**2 / 2.0):
                 # double N_l on level with largest V_l/(2^l*N_l)
                 efficient_level = np.argmax(data.var_cost_ratio_level)
                 data.eval_level[efficient_level] = True
-            elif data.bias_estimate > (self.rmse_tol/np.sqrt(2.)):
+            elif data.bias_estimate > (self.rmse_tol / np.sqrt(2.0)):
                 if data.levels == self.levels_max + 1:
-                        warnings.warn("Failed to achieve weak convergence. levels == levels_max.", MaxLevelsWarning)
+                    warnings.warn(
+                        "Failed to achieve weak convergence. levels == levels_max.",
+                        MaxLevelsWarning,
+                    )
                 # add another level
                 self._add_level(data)
             else:
                 # both conditions met
                 break
-            total_next_samples = (self.replications*data.eval_level*data.n_level*2).sum()
+            total_next_samples = (
+                self.replications * data.eval_level * data.n_level * 2
+            ).sum()
             if (data.n_total + total_next_samples) > self.n_limit:
                 warning_s = """
                 Already generated %d samples.
                 Trying to generate %d new samples, which would exceed n_limit = %d.
                 Stopping integration process.
-                Note that error tolerances may no longer be satisfied""" \
-                % (int(data.n_total), int(total_next_samples), int(self.n_limit))
+                Note that error tolerances may no longer be satisfied""" % (
+                    int(data.n_total),
+                    int(total_next_samples),
+                    int(self.n_limit),
+                )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
         data.stopping_crit = self
         data.integrand = self.integrand
         data.true_measure = self.integrand.true_measure
         data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time()-t_start
-        return data.solution,data
+        data.time_integrate = time() - t_start
+        return data.solution, data

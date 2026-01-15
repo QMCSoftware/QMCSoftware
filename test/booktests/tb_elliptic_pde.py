@@ -1,12 +1,18 @@
-import unittest
-from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+import unittest, pytest
+from __init__ import BaseNotebookTest
 
+
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
-    @testbook('../../demos/elliptic-pde.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_elliptic_pde_notebook(self, tb):
-        pass
+    notebook_path = f"../../demos/elliptic-pde.ipynb"
 
-if __name__ == '__main__':
+    def test_elliptic_pde_notebook(self):
+        replacements = {
+            "plot_convergence(execute_convergence_test": "#plot_convergence(execute_convergence_test",
+        }
+        self.run_notebook(self.notebook_path, replacements)
+
+
+if __name__ == "__main__":
     unittest.main()

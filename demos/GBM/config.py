@@ -1,1 +1,1 @@
-code/config.py
+gbm_code/config.py
