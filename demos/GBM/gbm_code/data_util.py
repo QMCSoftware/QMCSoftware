@@ -36,7 +36,7 @@ def add_quantlib_results(
     theoretical_mean: float,
     theoretical_std: float,
 ) -> None:
-    ql_emp_mean = np.mean(quantlib_final)   
+    ql_emp_mean = np.mean(quantlib_final)
     ql_emp_std = np.std(quantlib_final, ddof=1)
     ql_mae = np.mean(np.abs(quantlib_final - theoretical_mean))
 
