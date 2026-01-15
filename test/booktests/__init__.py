@@ -68,7 +68,8 @@ class BaseNotebookTest(unittest.TestCase):
                 os.symlink(f"gbm_code/{module}", symlink_path)
 
     def run_notebook(
-        self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT
+        self, notebook_path, replacements=None, is_overwrite=False, timeout=TB_TIMEOUT,
+        stop_at_pattern=None, skip_patterns=None
     ):
         """Execute a notebook file using nbconvert's ExecutePreprocessor.
 
@@ -77,12 +78,10 @@ class BaseNotebookTest(unittest.TestCase):
             timeout: Execution timeout in seconds
             replacements: Optional dict of {old_str: new_str} to apply to code cells in memory
             is_overwrite: If True, overwrite the notebook file with modified cells
-            stop_at_pattern: Optional string pattern - if provided, uses testbook to stop execution
+            stop_at_pattern: Optional string pattern - if provided, uses `testbook` to stop execution
                            at the first cell containing this pattern
             skip_patterns: Optional list of string patterns - cells containing any of these patterns will be skipped
-        """
-        import nbformat
-        
+        """        
         # If stop_at_pattern or skip_patterns is provided, use testbook for selective execution
         if stop_at_pattern or skip_patterns:
             with open(notebook_path) as f:
@@ -104,7 +103,6 @@ class BaseNotebookTest(unittest.TestCase):
             
             # Write modified notebook to a temp file so testbook uses the replacements
             # Use a hidden file name to avoid polluting the directory
-            import tempfile
             import uuid
             notebook_dir = os.path.dirname(notebook_path)
             temp_path = os.path.join(notebook_dir, f'.tmp_test_{uuid.uuid4().hex[:8]}.ipynb')
