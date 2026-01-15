@@ -359,11 +359,11 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 
 ## CI & Coverage (summary)
 
-- **GitHub Actions:** The main CI workflow is [`.github/workflows/alltests.yml`](../.github/workflows/alltests.yml) (referred to in this document as `alltests.yml`). It runs a matrix across OSes, and calls Makefile targets (e.g. `make tests_fast` / `make tests_no_docker`).
+- **GitHub Actions:** The main CI workflow is `.github/workflows/alltests.yml` (referred to in this document as `alltests.yml`). It runs a matrix across OSes, and calls Makefile targets 
 
+    _Note_: The project CI is configured to upload coverage to Codecov.
 
-    Note: the project CI is configured to upload coverage to Codecov.
-
+A second workflow, `.github/workflows/unittests.yml`, runs a matrix across Python versions and is triggered by updates to `develop` and `master` branches only.
 
 ### Local Coverage Workflow
 
@@ -393,9 +393,10 @@ All test targets use `--cov-append` (pytest) or `coverage run --append` to accum
 
 ## See Also
 
-- [../Makefile](../Makefile) – Full test target definitions
-- [../.github/workflows/alltests.yml](../.github/workflows/alltests.yml) – CI coverage workflow
-- [../scripts/cleanup_invalid_dist.py](../scripts/cleanup_invalid_dist.py) – Artifact cleanup utility
-- [../scripts/pytest_xdist.py](../scripts/pytest_xdist.py) – Parallel execution detection helper
+- `Makefile` – Full test target definitions (in project root)
+- `.github/workflows/alltests.yml` – CI all test workflow
+- `.github/workflows/unittests.yml` - CI unit test workflow
+- `scripts/cleanup_invalid_dist.py` – Artifact cleanup utility
+- `scripts/pytest_xdist.py` – Parallel execution detection helper
 
 

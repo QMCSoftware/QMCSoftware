@@ -137,7 +137,7 @@ class SciPyWrapper(AbstractTrueMeasure):
     r"""
     True measure that wraps SciPy style distributions.
 
-    This class keeps the original behaviour of SciPyWrapper with
+    This class keeps the original behavior of SciPyWrapper with
     independent 1D marginals and adds an optional "joint" mode for
     dependent distributions.
 
@@ -511,6 +511,6 @@ class SciPyWrapper(AbstractTrueMeasure):
         configuration but uses a new sampler.
 
         We simply reuse the original ``scipy_distribs`` argument so the
-        behaviour matches the parent.
+        behavior matches the parent.
         """
         return SciPyWrapper(sampler, self._user_distrib_arg)
