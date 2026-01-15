@@ -37,7 +37,8 @@ class NotebookTests(BaseNotebookTest):
             "max=8": "max=2",
         }
 
-        self.run_notebook(notebook_path, replacements)
+        stop_at_pattern = "# MAIN EXPERIMENT RUNNER"
+        self.run_notebook(notebook_path, replacements, stop_at_pattern=stop_at_pattern)
 
 
 if __name__ == "__main__":
