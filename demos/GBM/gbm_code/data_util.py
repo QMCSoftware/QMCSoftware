@@ -52,7 +52,6 @@ def add_quantlib_results(
     )
 
 
-
 def add_qmcpy_results(
     results_data: list,
     sampler_type: str,
@@ -64,7 +63,6 @@ def add_qmcpy_results(
     qp_emp_std = np.std(qmcpy_final, ddof=1)
     qp_mae = np.mean(np.abs(qmcpy_final - theoretical_mean))
 
-
     results_data.append(
         {
             "Method": "QMCPy",
@@ -75,7 +73,6 @@ def add_qmcpy_results(
             "Std Dev Error": abs(qp_emp_std - theoretical_std),
         }
     )
-
 
 
 # def process_sampler_data(
@@ -142,6 +139,7 @@ def add_qmcpy_results(
 
 #     return quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp
 
+
 def process_sampler_data(
     sampler_type: str,
     results_data: list,
@@ -181,11 +179,10 @@ def process_sampler_data(
             quantlib_paths, ql_gbm = qlu.generate_quantlib_paths(**params_ql)
             ql_means[r] = quantlib_paths[:, -1].mean()
 
-        params_ql["seed"] = ql_seed  
+        params_ql["seed"] = ql_seed
     else:
         ql_means = None
 
-    
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
 
     if qmcpy_paths.ndim == 3:
@@ -193,12 +190,11 @@ def process_sampler_data(
     else:
         qp_means = np.array([qmcpy_paths[:, -1].mean()])
 
-
     if ql_means is not None:
         add_quantlib_results(
             results_data,
             sampler_type,
-            ql_means,         
+            ql_means,
             theoretical_mean,
             theoretical_std,
         )
@@ -206,13 +202,14 @@ def process_sampler_data(
     add_qmcpy_results(
         results_data,
         sampler_type,
-        qp_means,            
+        qp_means,
         qp_means.mean(),
         theoretical_mean,
         theoretical_std,
     )
 
     return quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp
+
 
 def create_timing_dataframe(
     quantlib_results: dict, qmcpy_results: dict, baseline_sampler: str
