@@ -124,26 +124,40 @@ class BaseNotebookTest(unittest.TestCase):
                 try:
                     os.chdir(notebook_dir)
                     with testbook(temp_path, timeout=timeout, execute=False) as tb:
-                        for i, cell in enumerate(tb.cells):
-                            if cell.cell_type == "code":
-                                if stop_at_pattern and stop_at_pattern in cell.source:
-                                    print(
-                                        f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'"
-                                    )
-                                    break
-                                # Check if this cell should be skipped
-                                should_skip = any(
-                                    pattern in cell.source for pattern in skip_patterns
-                                )
-                                if should_skip:
-                                    print(f"Skipping cell {i}: matched skip pattern")
-                                    continue
-                                try:
-                                    tb.execute_cell(i)
-                                except Exception as e:
-                                    raise RuntimeError(
-                                        f"Error executing cell {i} in {notebook_path}: {e}"
-                                    )
+                            for i, cell in enumerate(tb.cells):
+                                if cell.cell_type == "code":
+                                    # Normalize cell source to a single string. Some nbformat/testbook
+                                    # variants represent the source as a list of lines rather than
+                                    # a single string, which makes `pattern in cell.source` fail.
+                                    raw_source = None
+                                    if hasattr(cell, "source"):
+                                        raw_source = cell.source
+                                    elif isinstance(cell, dict):
+                                        raw_source = cell.get("source", "")
+                                    else:
+                                        raw_source = ""
+
+                                    if isinstance(raw_source, (list, tuple)):
+                                        src = "".join(raw_source)
+                                    else:
+                                        src = str(raw_source)
+
+                                    if stop_at_pattern and stop_at_pattern in src:
+                                        print(
+                                            f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'"
+                                        )
+                                        break
+                                    # Check if this cell should be skipped
+                                    should_skip = any(pattern in src for pattern in skip_patterns)
+                                    if should_skip:
+                                        print(f"Skipping cell {i}: matched skip pattern")
+                                        continue
+                                    try:
+                                        tb.execute_cell(i)
+                                    except Exception as e:
+                                        raise RuntimeError(
+                                            f"Error executing cell {i} in {notebook_path}: {e}"
+                                        )
                 finally:
                     os.chdir(original_cwd)
             finally:
