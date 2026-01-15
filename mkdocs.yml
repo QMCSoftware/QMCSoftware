@@ -19,8 +19,8 @@ nav:
       - Pricing Options: demos/pricing_options.ipynb 
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
     - Publication Notebooks:
+      - 2026 JOSS Paper: demos/talk_paper_demos/JOSS2026/joss2026.ipynb
       - 2025 Sorokin Thesis: demos/talk_paper_demos/SorokinThesis2025/sorokin_thesis_2025.ipynb
-      - 2025 JOSS Paper: demos/talk_paper_demos/JOSS2025/joss2025.ipynb
       - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
       - 2025 ParslFest:
         - Parallel Implementation: demos/talk_paper_demos/Parslfest_2025/02_parallel.ipynb
@@ -56,13 +56,17 @@ nav:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
-      - GBM Examples: demos/GBM/examples.ipynb
+      - GBM Examples: demos/GBM/gbm_examples.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 
       - Importance Sampling with True Measures:
         - Some True Measures: demos/some_true_measures.ipynb
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
+  - Blogs: 
+    - SciPyWrapper: demos/scipywrapper_dependence_custom/blog.md
+  - Papers: 
+    - JOSS: paper/paper.md
   - For Developers:
     - Release Manual: RELEASE.md
     - Testing Guidelines: 
@@ -71,16 +75,15 @@ nav:
   - Printable Docs: print_page/
   
 
-
 plugins:
   - search
   - mkdocs-jupyter:
-      ignore_h1_titles: true      # Ignore H1 titles from notebooks
-      execute: false              # Execute notebooks during build
-      include_source: true        # Add download link for source notebooks
-      # theme: dark               # Use dark theme for code cells
-      # include: ["*.ipynb"]  # File patterns to include
-      # execute_ignore: []  # Skip certain files
+      ignore_h1_titles: true       # Ignore H1 titles from notebooks
+      execute: false               # Execute notebooks during build
+      include_source: true         # Add download link for source notebooks
+      # theme: dark                # Use dark theme for code cells
+      # include: ["*.ipynb"]       # File patterns to include
+      # execute_ignore: []         # Skip certain files
       # allow_errors: false        # Fail build on notebook errors
       # kernel_name: python3       # Specify kernel to use
       # show_input: true           # Show input cells by default
@@ -128,7 +131,7 @@ plugins:
        background: white
        shadow: true
        manual: false
-  - print-site # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
+  - print-site  # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
   
 theme:
   palette:
