@@ -473,9 +473,9 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
         r"""
         Args:
             d (int): Dimension.
-            scale (Union[np.ndarray,torch.Tensor]): Scaling factor $S$.
-            lengthscales (Union[np.ndarray,torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
-            alpha (Union[np.ndarray,torch.Tensor]): Scale mixture parameter $\alpha$.
+            scale (Union[np.ndarray, torch.Tensor]): Scaling factor $S$.
+            lengthscales (Union[np.ndarray, torch.Tensor]): Lengthscales $\boldsymbol{\gamma}$.
+            alpha (Union[np.ndarray, torch.Tensor]): Scale mixture parameter $\alpha$.
             shape_scale (list): Shape of `scale` when `np.isscalar(scale)`.
             shape_lengthscales (list): Shape of `lengthscales` when `np.isscalar(lengthscales)`
             shape_alpha (list): Shape of `alpha` when `np.isscalar(alpha)`

@@ -42,12 +42,12 @@ class Uniform(AbstractTrueMeasure):
     def __init__(self, sampler, lower_bound=0, upper_bound=1):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            lower_bound (Union[float,np.ndarray]): Lower bound.
-            upper_bound (Union[float,np.ndarray]): Upper bound.
+            lower_bound (Union[float, np.ndarray]): Lower bound.
+            upper_bound (Union[float, np.ndarray]): Upper bound.
         """
         self.parameters = ["lower_bound", "upper_bound"]
         self.domain = np.array([[0, 1]])

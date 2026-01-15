@@ -65,7 +65,7 @@ class MaternGP(Gaussian):
     ):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
@@ -78,9 +78,9 @@ class MaternGP(Gaussian):
                 - as $\nu \to \infty$ the kernel becomes equivalent to the RBF kernel, see [`sklearn.gaussian_process.kernels.RBF`](https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.kernels.RBF.html#sklearn.gaussian_process.kernels.RBF).
 
                 Note that when $\nu \notin \{1/2, 3/2, 5/2, \infty \}$ the kernel is around $10$ times slower to evaluate.
-            length_scale (Union[float,np.ndarray]): Determines "peakiness", or how correlated two points are based on their distance.
+            length_scale (Union[float, np.ndarray]): Determines "peakiness", or how correlated two points are based on their distance.
             variance (float): Global scaling factor.
-            mean (Union[float,np.ndarray]): Mean vectorfor multivariante `Gaussian`.
+            mean (Union[float, np.ndarray]): Mean vector for multivariate `Gaussian`.
             nugget (float): Positive nugget to add to diagonal.
             decomp_type (str): Method for decomposition for covariance matrix. Options include
 
@@ -102,7 +102,7 @@ class MaternGP(Gaussian):
             points = points[:, None]
         assert (
             points.ndim == 2 and points.shape[0] == sampler.d
-        ), "points should be a two dimenssion array with the number of points equal to the dimension of the sampler"
+        ), "points should be a two dimension array with the number of points equal to the dimension of the sampler"
         mean = np.array(mean)
         if mean.size == 1:
             mean = mean.item() * np.ones(sampler.d)

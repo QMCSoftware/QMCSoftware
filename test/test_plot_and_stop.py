@@ -18,34 +18,34 @@ class FakeAxes:
         self.removed = True
 
     def set_xlim(self, *a, **k):
-        self.calls.append(('set_xlim', a))
+        self.calls.append(("set_xlim", a))
 
     def set_ylim(self, *a, **k):
-        self.calls.append(('set_ylim', a))
+        self.calls.append(("set_ylim", a))
 
     def set_xticks(self, *a, **k):
-        self.calls.append(('set_xticks', a))
+        self.calls.append(("set_xticks", a))
 
     def set_yticks(self, *a, **k):
-        self.calls.append(('set_yticks', a))
+        self.calls.append(("set_yticks", a))
 
     def set_aspect(self, *a, **k):
-        self.calls.append(('set_aspect', a))
+        self.calls.append(("set_aspect", a))
 
     def grid(self, *a, **k):
-        self.calls.append(('grid', a))
+        self.calls.append(("grid", a))
 
     def tick_params(self, *a, **k):
-        self.calls.append(('tick_params', a))
+        self.calls.append(("tick_params", a))
 
     def set_xlabel(self, *a, **k):
-        self.calls.append(('set_xlabel', a))
+        self.calls.append(("set_xlabel", a))
 
     def set_ylabel(self, *a, **k):
-        self.calls.append(('set_ylabel', a))
+        self.calls.append(("set_ylabel", a))
 
     def scatter(self, *a, **k):
-        self.calls.append(('scatter', a))
+        self.calls.append(("scatter", a))
 
 
 class FakeFig:
@@ -60,7 +60,12 @@ def make_fake_matplotlib(nrows, ncols):
     plt = types.ModuleType("matplotlib.pyplot")
     plt.style = types.SimpleNamespace()
     plt.style.use = lambda *a, **k: None
-    plt.rcParams = {'font.family': 'sans-serif', 'axes.prop_cycle': types.SimpleNamespace(by_key=lambda: {'color':['k','b','r']})}
+    plt.rcParams = {
+        "font.family": "sans-serif",
+        "axes.prop_cycle": types.SimpleNamespace(
+            by_key=lambda: {"color": ["k", "b", "r"]}
+        ),
+    }
 
     def subplots(nrows=1, ncols=1, figsize=None, squeeze=False):
         fig = FakeFig()
@@ -81,7 +86,9 @@ class DummySampler(qmcpy.AbstractDiscreteDistribution):
 
     def _gen_samples(self, n_min, n_max, return_binary=False, warn=True):
         n = n_max - n_min
-        return np.tile(np.arange(n)[:, None] / max(1, n - 1), (1, 1, self.d)).reshape(self.replications, n, self.d)
+        return np.tile(np.arange(n)[:, None] / max(1, n - 1), (1, 1, self.d)).reshape(
+            self.replications, n, self.d
+        )
 
     def __repr__(self):
         return "DummySampler"
@@ -91,20 +98,28 @@ def test_plot_proj_with_fake_matplotlib_and_sampler(monkeypatch):
     # Inject fake matplotlib.pyplot
     fake_plt = make_fake_matplotlib(1, 1)
     # Create a proper matplotlib package module with colors submodule
-    fake_matplotlib = types.ModuleType('matplotlib')
+    fake_matplotlib = types.ModuleType("matplotlib")
     fake_matplotlib.pyplot = fake_plt
     fake_matplotlib.colors = types.SimpleNamespace()
-    monkeypatch.setitem(sys.modules, 'matplotlib.pyplot', fake_plt)
-    monkeypatch.setitem(sys.modules, 'matplotlib', fake_matplotlib)
+    monkeypatch.setitem(sys.modules, "matplotlib.pyplot", fake_plt)
+    monkeypatch.setitem(sys.modules, "matplotlib", fake_matplotlib)
 
     sampler = DummySampler(d=3)
-    fig, ax = plot_proj(sampler, n=4, d_horizontal=1, d_vertical=2, math_ind=True, marker_size=1, figfac=1)
+    fig, ax = plot_proj(
+        sampler,
+        n=4,
+        d_horizontal=1,
+        d_vertical=2,
+        math_ind=True,
+        marker_size=1,
+        figfac=1,
+    )
     assert isinstance(fig, FakeFig)
     assert isinstance(ax, np.ndarray)
     # At least one axes should have scatter calls or be removed
     found = False
     for a in ax.flatten():
-        if getattr(a, 'removed', False) or any(c[0] == 'scatter' for c in a.calls):
+        if getattr(a, "removed", False) or any(c[0] == "scatter" for c in a.calls):
             found = True
             break
     assert found
@@ -113,26 +128,28 @@ def test_plot_proj_with_fake_matplotlib_and_sampler(monkeypatch):
 def test_plot_proj_with_callable_sampler(monkeypatch):
     # sampler not instance of AbstractDiscreteDistribution -> uses t_i labels
     fake_plt = make_fake_matplotlib(1, 1)
-    fake_matplotlib = types.ModuleType('matplotlib')
+    fake_matplotlib = types.ModuleType("matplotlib")
     fake_matplotlib.pyplot = fake_plt
     fake_matplotlib.colors = types.SimpleNamespace()
-    monkeypatch.setitem(sys.modules, 'matplotlib.pyplot', fake_plt)
-    monkeypatch.setitem(sys.modules, 'matplotlib', fake_matplotlib)
+    monkeypatch.setitem(sys.modules, "matplotlib.pyplot", fake_plt)
+    monkeypatch.setitem(sys.modules, "matplotlib", fake_matplotlib)
 
     def sampler_callable(n):
         return np.zeros((n, 1))
 
-    fig, ax = plot_proj(sampler_callable, n=3, d_horizontal=0, d_vertical=0, math_ind=False)
+    fig, ax = plot_proj(
+        sampler_callable, n=3, d_horizontal=0, d_vertical=0, math_ind=False
+    )
     assert isinstance(fig, FakeFig)
 
 
 def test_stop_notebook_yes_and_no(monkeypatch):
     # When input is 'yes' nothing should happen
-    monkeypatch.setattr(builtins, 'input', lambda prompt='': 'yes')
+    monkeypatch.setattr(builtins, "input", lambda prompt="": "yes")
     # Should not raise
     stop_notebook("prompt")
 
     # When input is not 'yes' should exit
-    monkeypatch.setattr(builtins, 'input', lambda prompt='': 'no')
+    monkeypatch.setattr(builtins, "input", lambda prompt="": "no")
     with pytest.raises(SystemExit):
         stop_notebook("prompt")

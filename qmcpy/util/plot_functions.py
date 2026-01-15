@@ -22,9 +22,9 @@ def plot_proj(
     """
     Args:
         sampler (DiscreteDistribution,TrueMeasure): The generator of samples to be plotted.
-        n (Union[int,list]): The number of samples or a list of samples(used for extensibility) to be plotted.
-        d_horizontal (Union[int,list]): The dimension or list of dimensions to be plotted on the horizontal axes.
-        d_vertical (Union[int,list]): The dimension or list of dimensions to be plotted on the vertical axes.
+        n (Union[int, list]): The number of samples or a list of samples(used for extensibility) to be plotted.
+        d_horizontal (Union[int, list]): The dimension or list of dimensions to be plotted on the horizontal axes.
+        d_vertical (Union[int, list]): The dimension or list of dimensions to be plotted on the vertical axes.
         math_ind (bool): Setting to `True` will enable user to pass in math indices.
         marker_size (float): The marker size (typographic points are 1/72 in.).
         figfac (float): The figure size factor.

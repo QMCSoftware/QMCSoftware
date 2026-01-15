@@ -44,14 +44,14 @@ class JohnsonsSU(AbstractTrueMeasure):
     def __init__(self, sampler, gamma=1, xi=1, delta=2, lam=2):
         r"""
         Args:
-            sampler (Union[AbstractDiscreteDistribution,AbstractTrueMeasure]): Either
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]): Either
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            gamma (Union[float,np.ndarray]): First parameter $\gamma$.
-            xi (Union[float,np.ndarray]): Second parameter $\xi$.
-            delta (Union[float,np.ndarray]): Third parameter $\delta > 0$.
-            lam (Union[float,np.ndarray]): Fourth parameter $\lambda > 0$.
+            gamma (Union[float, np.ndarray]): First parameter $\gamma$.
+            xi (Union[float, np.ndarray]): Second parameter $\xi$.
+            delta (Union[float, np.ndarray]): Third parameter $\delta > 0$.
+            lam (Union[float, np.ndarray]): Fourth parameter $\lambda > 0$.
         """
         self.parameters = ["gamma", "xi", "delta", "lam"]
         self.domain = np.array([[0, 1]])
