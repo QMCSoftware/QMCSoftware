@@ -12,6 +12,7 @@ import subprocess
 from testbook import testbook
 import nbformat
 import matplotlib
+import uuid
 
 matplotlib.rcParams["text.usetex"] = False  # Disable LaTeX
 
@@ -108,7 +109,6 @@ class BaseNotebookTest(unittest.TestCase):
 
             # Write modified notebook to a temp file so testbook uses the replacements
             # Use a hidden file name to avoid polluting the directory
-            import uuid
 
             notebook_dir = os.path.dirname(notebook_path)
             temp_path = os.path.join(

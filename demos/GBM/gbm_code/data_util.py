@@ -14,8 +14,8 @@ def add_theoretical_results(
 
     Args:
         results_data: List to append theoretical results to
-            theoretical_mean: Theoretical expected value $E[S_T]$
-            theoretical_std: Theoretical standard deviation of $S_T$
+        theoretical_mean: Theoretical expected value $E[S_T]$
+        theoretical_std: Theoretical standard deviation of $S_T$
     """
     results_data.append(
         {
@@ -46,9 +46,9 @@ def add_quantlib_results(
     Args:
         results_data: List to which the QuantLib summary row is appended.
         sampler_type: Identifier for the sampler used in the QuantLib experiment.
-            quantlib_final: 1D array of per-replication sample means of $S_T$.
-            theoretical_mean: Theoretical expected value $E[S_T]$ used as a benchmark.
-            theoretical_std: Theoretical standard deviation of $S_T$ used as a benchmark.
+        quantlib_final: 1D array of per-replication sample means of $S_T$.
+        theoretical_mean: Theoretical expected value $E[S_T]$ used as a benchmark.
+        theoretical_std: Theoretical standard deviation of $S_T$ used as a benchmark.
     """
     ql_emp_mean = np.mean(quantlib_final)
     ql_emp_std = np.std(quantlib_final, ddof=1)
