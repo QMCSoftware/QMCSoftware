@@ -36,6 +36,20 @@ def add_quantlib_results(
     theoretical_mean: float,
     theoretical_std: float,
 ) -> None:
+    """
+    Add summary statistics for QuantLib simulations based on per-replication means.
+
+    The ``quantlib_final`` array is expected to contain one value per replication,
+    where each value is the mean of all simulated terminal asset prices S_T in
+    that replication.
+
+    Args:
+        results_data: List to which the QuantLib summary row is appended.
+        sampler_type: Identifier for the sampler used in the QuantLib experiment.
+        quantlib_final: 1D array of per-replication sample means of S_T.
+        theoretical_mean: Theoretical expected value E[S_T] used as a benchmark.
+        theoretical_std: Theoretical standard deviation of S_T used as a benchmark.
+    """
     ql_emp_mean = np.mean(quantlib_final)
     ql_emp_std = np.std(quantlib_final, ddof=1)
     ql_mae = np.mean(np.abs(quantlib_final - theoretical_mean))
@@ -60,6 +74,22 @@ def add_qmcpy_results(
     theoretical_mean: float,
     theoretical_std: float,
 ) -> None:
+    """
+    Add empirical QMCPy results, computed from per-replication means, to results data.
+
+    The mean absolute error (MAE) is computed across replications as
+    the average of the absolute differences between each per-replication
+    mean in ``qmcpy_final`` and ``theoretical_mean``.
+
+    Args:
+        results_data: List to which the QMCPy summary for this sampler is appended.
+        sampler_type: Name or type of the QMCPy sampler used.
+        qmcpy_final: 1D array where each entry is the mean payoff from a single
+            replication of the QMCPy experiment.
+        qp_emp_mean: Overall empirical mean across all replications.
+        theoretical_mean: Theoretical expected value used as a benchmark.
+        theoretical_std: Theoretical standard deviation used as a benchmark.
+    """
     qp_emp_std = np.std(qmcpy_final, ddof=1)
     qp_mae = np.mean(np.abs(qmcpy_final - theoretical_mean))
 
