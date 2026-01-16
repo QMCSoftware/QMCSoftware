@@ -113,7 +113,7 @@ class BaseNotebookTest(unittest.TestCase):
             temp_path = os.path.join(notebook_dir, f".tmp_test_{uuid.uuid4().hex[:8]}.ipynb")
             try:
                 nbformat.write(nb, temp_path)
-                # Run the  cells until the specified stop pattern is reached. 
+                # Run the cells until the specified stop pattern is reached. 
                 # Execute from the notebook's directory to guarantee import functionality.
                 original_cwd = os.getcwd()
                 skip_patterns = skip_patterns or []
@@ -125,9 +125,14 @@ class BaseNotebookTest(unittest.TestCase):
                                 # Normalize cell source to a single string after handling a list or tuple if needed
                                 raw_source = cell.source if hasattr(cell, "source") else (cell.get("source", "") if isinstance(cell, dict) else "")
                                 src = "".join(raw_source) if isinstance(raw_source, (list, tuple)) else str(raw_source)
-                                if stop_at_pattern and stop_at_pattern in src:
+                                if stop_at_pattern and stop_at_pattern in src:  # stop execution
                                     print(f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'")
                                     break
+                                if any(pattern in src for pattern in skip_patterns):  # skip cell
+                                    print(f"Skipping execution of cell {i}: matched skip pattern")
+                                    continue
+                                # Execute the current cell
+                                tb.execute_cell(i)
                 finally:
                     os.chdir(original_cwd)
             finally:  # Clean up temp file
