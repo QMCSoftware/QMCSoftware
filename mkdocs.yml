@@ -65,8 +65,8 @@ nav:
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
   - Blogs: 
     - SciPyWrapper: demos/scipywrapper_dependence_custom/blog.md
-  - Papers: 
-    - JOSS: paper/paper.md
+  # - Papers: 
+  #   - JOSS: paper/paper.md
   - For Developers:
     - Release Manual: RELEASE.md
     - Testing Guidelines: 

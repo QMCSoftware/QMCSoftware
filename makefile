@@ -257,6 +257,7 @@ uml:
 # run ` mkdocs build -v` to debug
 ##########################################################
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
+	@cp -r paper docs/paper
 	@cp README.md docs/README.md 
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
