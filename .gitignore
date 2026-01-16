@@ -31,6 +31,7 @@ qmcpy.egg-info/
 demos/prob_failure_gp_ci_plots/
 raw.githubusercontent.com/*
 demos/.jupyter
+demos/GBM/outputs/*
 
 # tests
 .coverage
@@ -112,4 +113,3 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
-
