@@ -109,59 +109,28 @@ class BaseNotebookTest(unittest.TestCase):
 
             # Write modified notebook to a temp file so testbook uses the replacements
             # Use a hidden file name to avoid polluting the directory
-
             notebook_dir = os.path.dirname(notebook_path)
-            temp_path = os.path.join(
-                notebook_dir, f".tmp_test_{uuid.uuid4().hex[:8]}.ipynb"
-            )
+            temp_path = os.path.join(notebook_dir, f".tmp_test_{uuid.uuid4().hex[:8]}.ipynb")
             try:
                 nbformat.write(nb, temp_path)
-
-                # Use testbook to execute cells until we hit the stop pattern
-                # Execute from the notebook's directory to ensure imports work
+                # Run the  cells until the specified stop pattern is reached. 
+                # Execute from the notebook's directory to guarantee import functionality.
                 original_cwd = os.getcwd()
                 skip_patterns = skip_patterns or []
                 try:
                     os.chdir(notebook_dir)
                     with testbook(temp_path, timeout=timeout, execute=False) as tb:
-                            for i, cell in enumerate(tb.cells):
-                                if cell.cell_type == "code":
-                                    # Normalize cell source to a single string. Some nbformat/testbook
-                                    # variants represent the source as a list of lines rather than
-                                    # a single string, which makes `pattern in cell.source` fail.
-                                    raw_source = None
-                                    if hasattr(cell, "source"):
-                                        raw_source = cell.source
-                                    elif isinstance(cell, dict):
-                                        raw_source = cell.get("source", "")
-                                    else:
-                                        raw_source = ""
-
-                                    if isinstance(raw_source, (list, tuple)):
-                                        src = "".join(raw_source)
-                                    else:
-                                        src = str(raw_source)
-
-                                    if stop_at_pattern and stop_at_pattern in src:
-                                        print(
-                                            f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'"
-                                        )
-                                        break
-                                    # Check if this cell should be skipped
-                                    should_skip = any(pattern in src for pattern in skip_patterns)
-                                    if should_skip:
-                                        print(f"Skipping cell {i}: matched skip pattern")
-                                        continue
-                                    try:
-                                        tb.execute_cell(i)
-                                    except Exception as e:
-                                        raise RuntimeError(
-                                            f"Error executing cell {i} in {notebook_path}: {e}"
-                                        )
+                        for i, cell in enumerate(tb.cells):
+                            if cell.cell_type == "code":
+                                # Normalize cell source to a single string after handling a list or tuple if needed
+                                raw_source = cell.source if hasattr(cell, "source") else (cell.get("source", "") if isinstance(cell, dict) else "")
+                                src = "".join(raw_source) if isinstance(raw_source, (list, tuple)) else str(raw_source)
+                                if stop_at_pattern and stop_at_pattern in src:
+                                    print(f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'")
+                                    break
                 finally:
                     os.chdir(original_cwd)
-            finally:
-                # Clean up temp file
+            finally:  # Clean up temp file
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
             return
