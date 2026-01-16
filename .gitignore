@@ -12,8 +12,6 @@ coverage.json
 *.csv
 *hparams.yaml
 *.ipynb_checkpoints/
-demos/fgpr_figs/
-demos/GBM/images/*.png
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -27,11 +25,12 @@ qmcpy.egg-info/
 *.npy
 .DS_Store
 .idea/
-.pytest_cache/
-demos/prob_failure_gp_ci_plots/
-raw.githubusercontent.com/*
+.pytest_cache/'raw.githubusercontent.com/*'
 demos/.jupyter
-demos/GBM/outputs/*
+demos/prob_failure_gp_ci_plots/
+demos/fgpr_figs/
+demos/GBM/images/*.png
+demos/GBM/outputs/*.*
 
 # tests
 .coverage
