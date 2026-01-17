@@ -72,9 +72,9 @@ Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample
 - **intuitive APIs** for (Q)MC components,
 - **flexible integrations** with `NumPy` [@harris2020array], `SciPy` [@2020SciPy-NMeth], and `PyTorch` [@NEURIPS2019_9015],
 - **robust and adaptive sampling** with theoretically grounded error estimation, and
-- **extensible (Q)MC components** enabling researchers to implement and test new algorithms.
+- **extensible components** enabling researchers to implement and test new algorithms.
 
-While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol' and Halton, `QMCPy` provides (Q)MC researchers and practitioners an end-to-end research framework with additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
+While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol' and Halton, `QMCPy` provides (Q)MC researchers and practitioners an end-to-end framework with additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
 
 - customizable LD sequences with diverse randomization techniques,
 - efficient generators of LD sequences with multiple independent randomizations,
