@@ -1,5 +1,9 @@
 is_debug = False
 
+# Random seeds for reproducibility
+QMCPY_SEED = 42
+QUANTLIB_SEED = 7
+
 
 def get_experiment_configurations() -> dict:
     """
