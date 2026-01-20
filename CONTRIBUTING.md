@@ -64,7 +64,7 @@ Please see the targets in the makefile for more granular control over tests.
 ## Documentation
 
 ~~~bash
-pip install -e ".[doc]"
+pip install -e ".[docs]"
 ~~~
 
 This installs the documentation extras, including `pylint`.
