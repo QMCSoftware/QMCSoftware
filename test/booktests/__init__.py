@@ -93,6 +93,13 @@ class BaseNotebookTest(unittest.TestCase):
             with open(notebook_path) as f:
                 nb = nbformat.read(f, as_version=4)
 
+            # add skip_patterns to replacements and change each skip pattern to ""
+            if skip_patterns:
+                if not replacements:
+                    replacements = {}
+                for pattern in skip_patterns:
+                    replacements[pattern] = ""
+
             # Apply replacements if provided
             if replacements:
                 for cell in nb.cells:
@@ -116,7 +123,6 @@ class BaseNotebookTest(unittest.TestCase):
                 # Run the cells until the specified stop pattern is reached. 
                 # Execute from the notebook's directory to guarantee import functionality.
                 original_cwd = os.getcwd()
-                skip_patterns = skip_patterns or []
                 try:
                     os.chdir(notebook_dir)
                     with testbook(temp_path, timeout=timeout, execute=False) as tb:
@@ -128,9 +134,7 @@ class BaseNotebookTest(unittest.TestCase):
                                 if stop_at_pattern and stop_at_pattern in src:  # stop execution
                                     print(f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'")
                                     break
-                                if any(pattern in src for pattern in skip_patterns):  # skip cell
-                                    print(f"Skipping execution of cell {i}: matched skip pattern")
-                                    continue
+
                                 # Execute the current cell
                                 tb.execute_cell(i)
                 finally:
