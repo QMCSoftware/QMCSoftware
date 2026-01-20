@@ -41,7 +41,7 @@ This short guide highlights four practical areas:
 
 #### `make tests_no_docker`
 Runs all tests sequentially: doctests, unittests, and generates coverage reports (excludes Docker-dependent tests).
-- **Cleans** invalid distribution artifacts before running (via `scripts/cleanup_invalid_dist.py`)
+- **Cleans** invalid distribution artifacts before running (via `make clean_local_only_files`)
 - **Sequence**: doctests_no_docker → unittests → coverage report
 - **Time**: ~60–120 seconds
 - **Coverage**: Full summary report
@@ -227,7 +227,7 @@ make booktests_no_docker TESTS="tb_quickstart tb_pricing_options"
 ```
 
 ### Environment Cleanup
-The test targets automatically call `scripts/cleanup_invalid_dist.py --apply` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
+The test targets automatically call `make clean_local_only_files` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
 
 ## Reproducibility
 
@@ -260,8 +260,7 @@ make tests_no_docker        # Sequential, safe (60–120s)
 - **Solution**: Install `pytest-xdist`: `pip install pytest-xdist`
 
 **Issue**: Warnings about invalid distributions
-- **Solution**: Cleanup runs automatically; if needed manually: `python scripts/cleanup_invalid_dist.py --apply`
-
+- **Solution**: Cleanup runs automatically; if needed manually: `make clean_local_only_files`
 **Issue**: Coverage numbers seem low or cumulative
 - **Solution**: Reset coverage with `make delcoverage`, then run tests
 
@@ -396,7 +395,7 @@ A second workflow, `.github/workflows/unittests.yml`, runs a matrix across Pytho
 - `Makefile` – Full test target definitions (in project root)
 - `.github/workflows/alltests.yml` – CI all test workflow
 - `.github/workflows/unittests.yml` - CI unit test workflow
-- `scripts/cleanup_invalid_dist.py` – Artifact cleanup utility
+- `make clean_local_only_files` – Artifact cleanup utility
 - `scripts/pytest_xdist.py` – Parallel execution detection helper
 
 
