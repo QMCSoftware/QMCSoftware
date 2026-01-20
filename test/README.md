@@ -229,6 +229,7 @@ make booktests_no_docker TESTS="tb_quickstart tb_pricing_options"
 
 ### Environment Cleanup
 The test targets automatically call `make clean_local_only_files` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
+The test targets automatically call `make clean_local_only_files` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
 
 ## Reproducibility
 
@@ -397,5 +398,5 @@ A second workflow, `.github/workflows/unittests.yml`, runs a matrix across Pytho
 - `Makefile` – Full test target definitions (in project root)
 - `.github/workflows/alltests.yml` – CI all test workflow
 - `.github/workflows/unittests.yml` - CI unit test workflow
-- `scripts/cleanup_invalid_dist.py` – Artifact cleanup utility
+- `make clean_local_only_files` – Artifact cleanup utility
 - `scripts/pytest_xdist.py` – Parallel execution detection helper

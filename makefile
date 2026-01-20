@@ -24,7 +24,7 @@ find_local_only_files:
 	./scripts/find_local_only_folders.sh 
 
 clean_local_only_files:
-	rm -fr test/booktests/.ipynb_checkpoints/
+	rm -fr test/booktests/.ipynb_checkpoints/ .pytest_cache/ .ruff_cache/ __pycache__/ */__pycache__/ */*/__pycache__/ raw.githubusercontent.com/ */raw.githubusercontent.com/ */*/raw.githubusercontent.com/ site/ build/ .pdm-build/ artifacts/ */*/logs/ */*/runinfo/ 
 	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
 	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
 		rm -f "$$f"; > /dev/null 2>&1; \
@@ -158,22 +158,21 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 ##########################################################
 # Combinations of Above Tests
 ##########################################################
-tests: 
+tests:
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
-	python scripts/cleanup_invalid_dist.py --apply || true && \
 	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
 
-# Fast test target: run doctests and unittests concurrently
+# Fast test target: run doctests, unittests, booktests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
-	python scripts/cleanup_invalid_dist.py --apply || true
-	set -e; \
-	( $(MAKE) doctests_no_docker ) & \
-	( $(MAKE) unittests ) & \
-	( $(MAKE) booktests_parallel_no_docker ) & \
+	@make clean_local_only_files && \
+	set -e && \
+	$(MAKE) doctests_no_docker & \
+	$(MAKE) unittests & \
+	$(MAKE) booktests_parallel_no_docker  & \
 	wait
 	$(MAKE) coverage
 
@@ -222,7 +221,7 @@ coverage_html: ensure_artifacts
 	python -m coverage html -d $(UNIT_COV_DIR)/html
 
 delcoverage:
-	@rm -f .coverage coverage.json
+	@rm -f .coverage coverage.json test/booktests/.coverage
 	@rm -rf $(COV_DIR)
 	@rm -rf .pytest_cache
 
@@ -257,6 +256,7 @@ uml:
 # run ` mkdocs build -v` to debug
 ##########################################################
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
+	@cp -r paper docs/paper
 	@cp README.md docs/README.md 
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 

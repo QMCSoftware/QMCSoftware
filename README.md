@@ -2,12 +2,13 @@
 
 [![](https://img.shields.io/badge/qmcpy.org-15bfa9)](https://qmcpy.org/)
 [![Docs](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/docs.yml/badge.svg?branch=master)](https://qmcsoftware.github.io/QMCSoftware/)
-[![Tests](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/alltests.yml/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/alltests.yml)
-[![GitHub stars](https://img.shields.io/github/stars/QMCSoftware/QMCSoftware?style=social)](https://github.com/QMCSoftware/QMCSoftware)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.09705/status.svg)](https://doi.org/10.21105/joss.09705)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3964489.svg)](https://doi.org/10.5281/zenodo.3964489)
 [![](https://img.shields.io/badge/PyPI-fc7303)](https://pypi.org/project/qmcpy/)
-[![codecov on All Tests](https://codecov.io/github/QMCSoftware/QMCSoftware/graph/badge.svg?token=Gqf0grDPQt)](https://codecov.io/github/QMCSoftware/QMCSoftware)
+[![GitHub stars](https://img.shields.io/github/stars/QMCSoftware/QMCSoftware?style=social)](https://github.com/QMCSoftware/QMCSoftware)
+[![Tests](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/alltests.yml/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/alltests.yml)
 [![codecov on Unit Tests](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/unittests.yml/badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/unittests.yml)
+[![codecov on All Tests](https://codecov.io/github/QMCSoftware/QMCSoftware/graph/badge.svg?token=Gqf0grDPQt)](https://codecov.io/github/QMCSoftware/QMCSoftware)
 
 Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. They have four main components: a discrete distribution, a true measure of randomness, an integrand, and a stopping criterion. Information about the integrand is obtained as a sequence of values of the function sampled at the data-sites of the discrete distribution. The stopping criterion tells the algorithm when the user-specified error tolerance has been satisfied. We are developing a framework that allows collaborators in the QMC community to develop plug-and-play modules in an effort to produce more efficient and portable QMC software. Each of the above four components is an abstract class. Abstract classes specify the common properties and methods of all subclasses. The ways in which the four kinds of classes interact with each other are also specified. Subclasses then flesh out different integrands, sampling schemes, and stopping criteria. Besides providing developers a way to link their new ideas with those implemented by the rest of the QMC community, we also aim to provide practitioners with state-of-the-art QMC software for their applications.
 
@@ -16,7 +17,7 @@ Quasi-Monte Carlo (QMC) methods are used to approximate multivariate integrals. 
 The [QMCPy documentation](https://QMCSoftware.github.io/QMCSoftware/) contains a detailed **package reference** documenting functions and classes including thorough doctests. A number of example notebook **demos** are also rendered into the documentation from `QMCSoftware/demos/`. We recommend the following resources to start learning more about QMCPy
 
 - [mathematical description of QMCPy software and components](https://qmcsoftware.github.io/QMCSoftware/components).
-- [Aleksei Sorokin's 2023 PyData Chicago video tutorial](https://www.youtube.com/watch?v=bRcKiLA2yBQ) and [corresponding notebook](https://qmcsoftware.github.io/QMCSoftware/demos/talk_paper_demos/pydata.chi.2023/)
+- [Aleksei Sorokin's 2023 PyData Chicago video tutorial](https://www.youtube.com/watch?v=bRcKiLA2yBQ) and [corresponding notebook](https://qmcsoftware.github.io/QMCSoftware/demos/talk_paper_demos/pydata_chi_2023/)
 - [Fred Hickernell's 2020 MCQMC video tutorial](https://www.youtube.com/watch?v=gL8M_7c-YUE) and [corresponding notebook](https://qmcsoftware.github.io/QMCSoftware/demos/talk_paper_demos/MCQMC_Tutorial_2020/MCQMC_2020_QMC_Software_Tutorial/)
 - The QMCPy [introduction notebook](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro) and [quickstart notebook](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart)
 

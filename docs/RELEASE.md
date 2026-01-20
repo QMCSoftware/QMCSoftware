@@ -100,7 +100,7 @@ If you find errors, please fix them and try another release on TestPyPI until ev
 
 ## PyPI Release 
 
-To make the actual PyPI release that users `pip install qmcpy` with, it is as simple as running 
+Back in the `qmcpy` environment, to make the actual PyPI release that users `pip install qmcpy` with, it is as simple as running 
 
 ```bash 
 pdm publish
