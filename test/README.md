@@ -38,10 +38,11 @@ This short guide highlights four practical areas:
 - **Time**: ~30–60 seconds (depending on CPU cores and notebook complexity)
 - **Coverage**: Full summary report at the end
 - **Use when**: You want comprehensive testing with maximum speed
+- **log files**: in `artifacts/logs/`
 
 #### `make tests_no_docker`
 Runs all tests sequentially: doctests, unittests, and generates coverage reports (excludes Docker-dependent tests).
-- **Cleans** invalid distribution artifacts before running (via `scripts/cleanup_invalid_dist.py`)
+- **Cleans** outdated artifacts before running (via `make clean_local_only_files`)
 - **Sequence**: doctests_no_docker → unittests → coverage report
 - **Time**: ~60–120 seconds
 - **Coverage**: Full summary report
@@ -227,7 +228,7 @@ make booktests_no_docker TESTS="tb_quickstart tb_pricing_options"
 ```
 
 ### Environment Cleanup
-The test targets automatically call `scripts/cleanup_invalid_dist.py --apply` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
+The test targets automatically call `make clean_local_only_files` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
 
 ## Reproducibility
 
@@ -398,5 +399,3 @@ A second workflow, `.github/workflows/unittests.yml`, runs a matrix across Pytho
 - `.github/workflows/unittests.yml` - CI unit test workflow
 - `scripts/cleanup_invalid_dist.py` – Artifact cleanup utility
 - `scripts/pytest_xdist.py` – Parallel execution detection helper
-
-
