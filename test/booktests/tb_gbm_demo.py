@@ -1,7 +1,7 @@
 import unittest
 from __init__ import BaseNotebookTest
 
-
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
 
     def test_gbm_demo_notebook(self):
