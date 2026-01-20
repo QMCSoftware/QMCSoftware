@@ -1,5 +1,5 @@
 import unittest
-from __init__ import BaseNotebookTest
+from base_notebook_test import BaseNotebookTest
 
 
 class NotebookTests(BaseNotebookTest):

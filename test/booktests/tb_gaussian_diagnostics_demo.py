@@ -1,7 +1,7 @@
 import unittest, pytest
 import subprocess
 import os
-from __init__ import BaseNotebookTest
+from base_notebook_test import BaseNotebookTest
 
 
 @pytest.mark.slow

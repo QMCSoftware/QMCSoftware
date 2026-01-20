@@ -3,7 +3,7 @@ import os
 import shutil
 import numpy as np
 from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from base_notebook_test import TB_TIMEOUT, BaseNotebookTest
 
 
 @unittest.skip("Skipping NotebookTests class")

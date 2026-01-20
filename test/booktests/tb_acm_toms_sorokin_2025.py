@@ -5,7 +5,7 @@ from testbook import testbook
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from base_notebook_test import TB_TIMEOUT, BaseNotebookTest
 
 
 @unittest.skip("Skipping NotebookTests class")

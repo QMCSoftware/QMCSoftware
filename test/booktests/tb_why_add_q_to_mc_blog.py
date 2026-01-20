@@ -1,6 +1,6 @@
 import unittest
 from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from base_notebook_test import TB_TIMEOUT, BaseNotebookTest
 import os
 
 

@@ -53,7 +53,7 @@ def generate_test_file(notebook_path, output_dir=None):
     # Generate the test file content
     test_content = f"""import unittest
 from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from base_notebook_test import TB_TIMEOUT, BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
 

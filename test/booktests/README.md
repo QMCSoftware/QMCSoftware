@@ -3,7 +3,7 @@
 ## Contents
 
 - **`.gitignore`**: ignores temporary files and generated test outputs in this directory.
-- **`__init__.py`**: package marker for the `test.booktests` module.
+- **`base_notebook_test.py`**: defines the `BaseNotebookTest` class, which provides common methods for notebook tests.
 - **`generate_test.py`**: script that generates `tb_*.py` test files from notebooks in `demos/`.
 - **`parsl_test_runner.py`**: helper harness used to run Parsl-based notebook tests and coordinate workers.
 - **`README.md`**: this documentation file describing how to run and manage the notebook tests.
@@ -49,4 +49,4 @@ For a demo, see the Jupyter notebook, `demos/talk_paper_demos/Parslfest_2025/`.
 *   GBM notebooks such as `gbm_examples.py` rely on local modules and sometimes have broken symlinks, needing setup for correct imports.
 *   Running notebooks from their directory (via `setUp`) ensures consistent relative paths and imports, which the decorator doesn't reliably handle.
 *   `BaseNotebookTest`'s `setUp/tearDown` methods handle resource management, beneficial for long-running demos.
-*   Shared helper functions in `__init__.py` centralize complex logic (location, symlink fixing, running) for reusability and clarity.
+*   Shared helper functions in `base_notebook_test.py` centralize complex logic (location, symlink fixing, running) for reusability and clarity.

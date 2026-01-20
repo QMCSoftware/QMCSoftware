@@ -1,5 +1,5 @@
 import unittest
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from base_notebook_test import TB_TIMEOUT, BaseNotebookTest
 
 
 class NotebookTests(BaseNotebookTest):

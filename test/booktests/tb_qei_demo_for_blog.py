@@ -1,6 +1,6 @@
 import unittest, pytest
 from testbook import testbook
-from __init__ import BaseNotebookTest
+from base_notebook_test import BaseNotebookTest
 
 
 class NotebookTests(BaseNotebookTest):
