@@ -248,7 +248,7 @@ def generate_summary_report(results, execution_time=0.0, total_test_time=0.0):
     print(f"Ran {total_modules} test modules in {execution_time:.3f}s")
     if total_test_time > 0:
         print(
-            f"Total test time: {total_test_time:.3f}s (overhead: {total_test_time - execution_time:.3f}s)"
+            f"Total test time: {total_test_time:.3f}s (time saved by parallelization: {total_test_time - execution_time:.3f}s)"
         )
     print()
 
