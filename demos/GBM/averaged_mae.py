@@ -6,7 +6,6 @@ import qmcpy_util as qpu
 import config as cf
 import plot_util as pu
 from matplotlib.ticker import FixedLocator, FixedFormatter
-from typing import TYPE_CHECKING
 
 
 def _compute_mae(
