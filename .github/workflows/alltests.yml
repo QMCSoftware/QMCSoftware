@@ -43,7 +43,15 @@ jobs:
       - name: Add 12GB swap (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo fallocate -l 12G /swapfile
+          
+          # Ensure any pre-existing /swapfile isn't active
+          if swapon --show | grep -q '^/swapfile'; then
+            sudo swapoff /swapfile
+          fi
+          sudo rm -f /swapfile
+          
+          # Try fallocate first; fall back to dd if fallocate fails
+          sudo fallocate -l 12G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=12288 status=progress
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
