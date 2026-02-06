@@ -7,10 +7,12 @@ class NotebookTests(BaseNotebookTest):
 
     def test_data_portfolio_allocation(self):
         """Run the data portfolio allocation notebook test"""
-        suite = unittest.TestLoader().loadTestsFromModule(tb_data_portfolio_allocation)
-        runner = unittest.TextTestRunner(verbosity=2)
-        result = runner.run(suite)
-        self.assertTrue(result.wasSuccessful(), "tb_data_portfolio_allocation tests failed")
+        # Force run even if skip decorator is present
+        test_instance = tb_data_portfolio_allocation.NotebookTests()
+        test_instance.setUp()
+        # Call the actual test method directly, bypassing skip
+        notebook_path, _ = test_instance.locate_notebook('../../demos/portfolio/data_portfolio_allocation.ipynb')
+        test_instance.run_notebook(notebook_path)
 
     def test_portfolio_allocation_demo_notebook(self):
         notebook_path, _ = self.locate_notebook('../../demos/portfolio/portfolio_allocation_demo.ipynb')
@@ -29,9 +31,9 @@ class NotebookTests(BaseNotebookTest):
             "(500, 2**18),":"",   
             "(1000, 2**19)":"",
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
-            "start_date = '2014-01-01'": "start_date = '2025-06-01'",
+            "start_date = '2014-01-01'": "start_date = '2019-01-01'",
             "dimensions = [5, 10, 20, 50, 100, 200, 500, 1000]": "dimensions = [5, 10]",
-            "num_ports = 2**14": "num_ports = 8",
+            "num_ports = 2**14": "num_ports = 2**5",
             f'tickers1 = ["AAPL", "AMZN", {old_tick1}]': 'tickers1 = ["AAPL", "AMZN"]',
             f'description1 = ["Apple", "Amazon", {old_desc1}]': 'description1 = ["Apple", "Amazon"]',
             f'tickers2 = ["AAPL", "AMZN", "CSCO",{old_tick2}]': 'tickers2 = ["AAPL", "AMZN", "CSCO"]',
