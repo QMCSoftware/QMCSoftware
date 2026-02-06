@@ -12,7 +12,7 @@ Date: February 6, 2026
 import numpy as np
 
 
-class SimplexTransformations:
+class SimplexTransform:
     """
     A class implementing various transformations from the unit cube to a simplex.
     
@@ -25,7 +25,7 @@ class SimplexTransformations:
     
     def __init__(self, dimension: int = 2):
         """
-        Initialize the SimplexTransformations class.
+        Initialize the SimplexTransform class.
         
         Args:
             dimension (int): The dimension of the space (default: 2)
@@ -47,7 +47,7 @@ class SimplexTransformations:
             
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransformations(dimension=2)
+            >>> transformer = SimplexTransform(dimension=2)
             >>> points = np.array([[0.3, 0.7], [0.8, 0.4]])
             >>> result = transformer.drop(points)
             >>> result
@@ -78,7 +78,7 @@ class SimplexTransformations:
             
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransformations(dimension=2)
+            >>> transformer = SimplexTransform(dimension=2)
             >>> points = np.array([[0.3, 0.7], [0.8, 0.4]])
             >>> result = transformer.sort(points)
             >>> result
@@ -91,3 +91,4 @@ class SimplexTransformations:
             points = points.reshape(1, -1)
             
         return np.sort(points, axis=1)
+
