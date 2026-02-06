@@ -58,7 +58,7 @@ nav:
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - GBM Examples: demos/GBM/examples.ipynb
       - Portfolio Allocation: 
-        - Getting Data: demos/portfolio/data_portfolio_allocation.ipynb
+        - Getting Financial Data: demos/portfolio/data_portfolio_allocation.ipynb
         - Portfolio Allocation Demo: demos/portfolio/portfolio_allocation_demo.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Importance Sampling with True Measures: demos/some_true_measures.ipynb 
