@@ -1,8 +1,16 @@
 import unittest, pytest
 from __init__ import BaseNotebookTest
+import tb_data_portfolio_allocation
 
 #@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
+
+    def test_data_portfolio_allocation(self):
+        """Run the data portfolio allocation notebook test"""
+        suite = unittest.TestLoader().loadTestsFromModule(tb_data_portfolio_allocation)
+        runner = unittest.TextTestRunner(verbosity=2)
+        result = runner.run(suite)
+        self.assertTrue(result.wasSuccessful(), "tb_data_portfolio_allocation tests failed")
 
     def test_portfolio_allocation_demo_notebook(self):
         notebook_path, _ = self.locate_notebook('../../demos/portfolio/portfolio_allocation_demo.ipynb')
