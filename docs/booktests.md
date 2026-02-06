@@ -7,6 +7,7 @@
 - **`generate_test.py`**: script that generates `tb_*.py` test files from notebooks in `demos/`.
 - **`parsl_test_runner.py`**: helper harness used to run Parsl-based notebook tests and coordinate workers.
 - **`READEME.md`**: this documentation file describing how to run and manage the notebook tests.
+- **`logs/`**: directory containing test execution logs from Parsl parallel runs. Each test generates `.out` (stdout) and `.err` (stderr) files. Failed tests may have additional `_retry` log files.
 
 ## Overview
 
