@@ -5,7 +5,6 @@ import os
 import unittest
 import ctypes
 import numpy as np 
-import time
 
 class TestDiscreteDistribution(unittest.TestCase):
 
@@ -164,7 +163,37 @@ class TestHalton(unittest.TestCase):
             [1./4,  2./3],
             [3./4,  1./9]])
         self.assertTrue((x_ur==x_true).all())
-    
+
+
+class TestSimplexTransform(unittest.TestCase):
+    """ Unit tests for SimplexTransform. """
+
+    def test_drop_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.3]), np.array([[0.3]])),
+            2: (np.array([[0.3, 0.7], [0.8, 0.4]]), np.array([[0.3, 0.7]])),
+            3: (np.array([[0.1, 0.4, 0.9], [0.6, 0.2, 0.8]]), np.array([[0.1, 0.4, 0.9]])),
+            4: (np.array([[0.1, 0.2, 0.3, 0.4], [0.2, 0.1, 0.3, 0.4]]), np.array([[0.1, 0.2, 0.3, 0.4]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = SimplexTransform(dimension=dim)
+                result = transformer.drop(points)
+                np.testing.assert_allclose(result, expected)
+
+    def test_sort_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.8]), np.array([[0.8]])),
+            2: (np.array([[0.8, 0.4], [0.3, 0.7]]), np.array([[0.4, 0.8], [0.3, 0.7]])),
+            3: (np.array([[0.7, 0.2, 0.9], [0.6, 0.2, 0.8]]), np.array([[0.2, 0.7, 0.9], [0.2, 0.6, 0.8]])),
+            4: (np.array([[0.9, 0.1, 0.4, 0.2], [0.2, 0.1, 0.3, 0.4]]), np.array([[0.1, 0.2, 0.4, 0.9], [ 0.1, 0.2, 0.3, 0.4]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = SimplexTransform(dimension=dim)
+                result = transformer.sort(points)
+                np.testing.assert_allclose(result, expected)
+ 
 
 if __name__ == "__main__":
     unittest.main()

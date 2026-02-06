@@ -7,6 +7,9 @@ Pillards, T., & Cools, R. (2005). Transforming low-discrepancy sequences from a 
 
 Authors: Larysa Matiukha and Sou-Cheng T. Choi
 Date: February 6, 2026
+
+Unit tests:  
+    python -W ignore -m unittest test.test_discrete_distribs.TestSimplexTransform -v
 """
 
 import numpy as np
@@ -52,8 +55,6 @@ class SimplexTransform:
             >>> result = transformer.drop(points)
             >>> result
             array([[0.3, 0.7]])
-            >>> len(result)  # Only 1 point satisfies x1 <= x2
-            1
         """
         # Check if points satisfy x1 ≤ x2 ≤ ... ≤ xs
         if points.ndim == 1:
@@ -84,8 +85,6 @@ class SimplexTransform:
             >>> result
             array([[0.3, 0.7],
                    [0.4, 0.8]])
-            >>> len(result)  # All points are preserved
-            2
         """
         if points.ndim == 1:
             points = points.reshape(1, -1)
