@@ -3,7 +3,7 @@ from .iid_std_uniform import IIDStdUniform
 from .lattice import Lattice
 from .digital_net_b2 import DigitalNetB2
 from .halton import Halton
-from .simplex import SimplexTransformations
+from .simplex import SimplexTransform
 
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution

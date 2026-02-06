@@ -1,3 +1,3 @@
-from .simplex import SimplexTransformations
+from .simplex import SimplexTransform
 
-__all__ = ["SimplexTransformations"]
+__all__ = ["SimplexTransform"]
