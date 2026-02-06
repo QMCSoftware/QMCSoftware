@@ -2,7 +2,7 @@ import unittest, pytest
 from __init__ import BaseNotebookTest
 import tb_data_portfolio_allocation
 
-#@pytest.mark.slow
+@pytest.mark.slow
 class NotebookTests(BaseNotebookTest):
 
     def test_data_portfolio_allocation(self):
