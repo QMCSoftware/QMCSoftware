@@ -27,6 +27,13 @@ The [QMCPy documentation](https://QMCSoftware.github.io/QMCSoftware/) contains a
 pip install qmcpy
 ```
 
+To build a Conda package from source in this repository:
+
+```bash
+conda build conda.recipe
+conda install --use-local qmcpy
+```
+
 To install from source, please see the [contributing guidelines](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/).
 
 ## Citation

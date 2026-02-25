@@ -1,0 +1,48 @@
+{% set version = load_file_regex(load_file='../qmcpy/__init__.py', regex_pattern='__version__ = "([^"]+)"')[1] %}
+
+package:
+  name: qmcpy
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+  host:
+    - python
+    - pip
+    - pdm-backend
+    - setuptools
+    - wheel
+  run:
+    - python
+    - numpy >=1.17.0
+    - scipy >=1.1.0
+    - qmctoolscl >=1.1.6
+
+test:
+  imports:
+    - qmcpy
+  commands:
+    - python -c "import qmcpy; print(qmcpy.__version__)"
+
+about:
+  summary: Quasi-Monte Carlo point generators, automatic transformations, and adaptive stopping criteria
+  description: |
+    QMCPy provides Quasi-Monte Carlo (QMC) point generators, true measures,
+    integrands, and adaptive stopping criteria for multivariate integration.
+  home: https://github.com/QMCSoftware/QMCSoftware
+  doc_url: https://qmcsoftware.github.io/QMCSoftware/
+  dev_url: https://github.com/QMCSoftware/QMCSoftware
+  license: Apache-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - qmcsoftware

@@ -1,0 +1,60 @@
+name: Conda Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  conda-release:
+    name: Conda Release on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    env:
+      ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-activate-base: true
+          conda-remove-defaults: true
+          use-only-tar-bz2: true
+          channels: conda-forge,defaults
+          channel-priority: strict
+          python-version: "3.12"
+
+      - name: Install conda release tools
+        run: conda install -n base -y conda-build anaconda-client
+
+      - name: Build conda package
+        run: conda build conda.recipe --output-folder conda-artifacts
+
+      - name: Upload package to Anaconda.org
+        run: |
+          if [[ -z "${ANACONDA_API_TOKEN}" ]]; then
+            echo "ANACONDA_API_TOKEN is not set. Add it as a repository secret."
+            exit 1
+          fi
+
+          mapfile -t packages < <(find conda-artifacts -type f \( -name "*.conda" -o -name "*.tar.bz2" \))
+          if [[ ${#packages[@]} -eq 0 ]]; then
+            echo "No conda package files found in conda-artifacts"
+            exit 1
+          fi
+
+          anaconda -t "${ANACONDA_API_TOKEN}" upload --skip-existing "${packages[@]}"

@@ -1,0 +1,42 @@
+name: Conda Package
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - conda.recipe/**
+      - pyproject.toml
+      - pdm_build.py
+      - qmcpy/__init__.py
+      - .github/workflows/conda-package.yml
+  pull_request:
+    paths:
+      - conda.recipe/**
+      - pyproject.toml
+      - pdm_build.py
+      - qmcpy/__init__.py
+      - .github/workflows/conda-package.yml
+
+jobs:
+  conda-build:
+    name: Conda Build (Ubuntu, Python 3.12)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-activate-base: true
+          conda-remove-defaults: true
+          use-only-tar-bz2: true
+          python-version: "3.12"
+
+      - name: Install conda-build
+        run: conda install -n base -y conda-build
+
+      - name: Build conda package
+        run: conda build conda.recipe

@@ -131,6 +131,16 @@ Make a pull request from `develop` into `master` and merge it in.
 
 The PyPI release contains barebones tools from `QMCSoftware/qmcpy/`. The GitHub release contains additional project components such as tests and demos. To create a GitHub release, navigate to [QMCPy's GitHub release page](https://github.com/QMCSoftware/QMCSoftware/releases) and click `Draft a new release`. For `Tag:Select tag`, click `Create new tag` and enter, for example, `v2.1`. The target should be the master branch. Give the release a title like `QMCPy v2.1`. Click `Generate release notes` to automatically collect PR and other release notes. 
 
+## Anaconda Release (GitHub Actions)
+
+Conda packages are released by the GitHub Actions workflow at `.github/workflows/conda-release.yml`.
+
+1. Add an `ANACONDA_API_TOKEN` repository secret in GitHub settings. This token should have upload permission for your Anaconda.org account/channel.
+2. Push a version tag like `v2.2` to trigger the workflow.
+3. The workflow builds packages on Linux, macOS, and Windows, then uploads them to Anaconda.org with `--skip-existing`.
+
+You can also trigger the workflow manually from the GitHub Actions UI via `workflow_dispatch`.
+
 ## Cleanup 
 
 Delete the `tmp` environment with 
