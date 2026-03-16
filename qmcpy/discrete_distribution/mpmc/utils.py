@@ -1,11 +1,8 @@
 import torch
 import math
 from itertools import combinations
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 import numpy as np
 from itertools import product 
-
-
 import torch
 
 def _check_inputs(x, gamma=None):

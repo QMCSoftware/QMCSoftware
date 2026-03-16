@@ -3,6 +3,7 @@ from .iid_std_uniform import IIDStdUniform
 from .lattice import Lattice
 from .digital_net_b2 import DigitalNetB2
 from .digital_net_any_bases import DigitalNetAnyBases,Halton,Faure
+from .mpmc import MPMC
 
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution
@@ -10,11 +11,4 @@ Sobol = DigitalNetB2
 DigitalNet = DigitalNetB2
 Net = DigitalNetB2
 NetB2 = DigitalNetB2
-
-# Import MPMC if PyTorch dependencies are available
-try:
-    from .mpmc import MPMC
-except Exception:  # pragma: no cover - optional dependency
-    MPMC = None
-
 

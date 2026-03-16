@@ -15,8 +15,6 @@ from .utils import (
 from .models import *
 
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 _DISCREPANCY = {
     'L2star': L2star, 'L2ctr': L2ctr, 'L2ext': L2ext, 'L2per': L2per, 'L2sym': L2sym, 'L2asd': L2asd, 'L2mix': L2mix,
     'L2star_weighted': L2star_weighted, 'L2ctr_weighted': L2ctr_weighted, 'L2ext_weighted': L2ext_weighted,
@@ -93,10 +91,12 @@ class MPMC(AbstractLDDiscreteDistribution):
         self.nbatch = int(nbatch) if nbatch is not None else int(replications)
         self.d_max = self.dim  # kept for compat
 
+        self.torch_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         self.weights = None
         if weights is not None:
             # accept list/np/torch → torch.float32 on device
-            self.weights = torch.as_tensor(weights, dtype=torch.float32, device=device)
+            self.weights = torch.as_tensor(weights, dtype=torch.float32, device=self.torch_device)
             if self.weights.dim() != 1 or self.weights.numel() != self.dim:
                 raise ValueError(f"weights must be 1-D length d={self.dim}; got {tuple(self.weights.shape)}")
 
@@ -259,7 +259,7 @@ class MPMC(AbstractLDDiscreteDistribution):
             dim=args.dim, nhid=args.nhid, nlayers=args.nlayers,
             nsamples=args.nsamples, nbatch=args.nbatch,
             radius=args.radius, loss_fn=args.loss_fn, weights=args.weights
-        ).to(device)
+        ).to(self.torch_device)
 
         optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         best_loss = float('inf')
