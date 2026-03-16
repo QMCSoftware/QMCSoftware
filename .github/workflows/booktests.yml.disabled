@@ -1,0 +1,132 @@
+name: Booktests
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'demos/**/*.ipynb'
+      - '.github/workflows/booktests.yml'
+      - 'test/booktests/*.py'
+      - 'pyproject.toml'
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'demos/**/*.ipynb'
+      - '.github/workflows/booktests.yml'
+      - 'tests/booktests/**.py'
+      - 'pyproject.toml'
+      
+jobs:
+  booktests:
+    name: Booktests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-latest", "ubuntu-latest"]
+    env:
+      ACTIONS_STEP_DEBUG: false   # true to enable debug logging
+    steps:
+      - uses: actions/checkout@v4
+
+      # -----------------------------------------------------------
+      # 1. Install Miniconda
+      # -----------------------------------------------------------
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          auto-activate-base: true
+
+      # -----------------------------------------------------------
+      # 2. Add swap space (Linux only)
+      # -----------------------------------------------------------
+      - name: Add 12GB swap
+        if: runner.os == 'Linux'
+        run: |
+          sudo fallocate -l 12G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
+      # -----------------------------------------------------------
+      # 3. Free disk + conda cache early
+      # -----------------------------------------------------------
+      - name: Free space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+
+      - name: Free space (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          conda clean --all --yes
+          pip cache purge || true
+
+      - name: Show runner resources
+        run: |
+          echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
+          free -h || vm_stat
+          df -h
+
+      # -----------------------------------------------------------
+      # 4. Install dependencies
+      # -----------------------------------------------------------
+      - name: Install base dependencies
+        run: pip install -e .[test]
+
+      # -----------------------------------------------------------
+      # 5. Install minimal LaTeX (OS-specific)
+      # -----------------------------------------------------------
+      - name: Install minimal LaTeX (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super ghostscript
+
+      - name: Install minimal LaTeX (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask basictex
+          eval "$(/usr/libexec/path_helper)"
+          sudo tlmgr update --self
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+
+      - name: Check for missing booktest files
+        run: make check_booktests
+
+      - name: Generate missing booktest files
+        run: make generate_booktests
+
+      # -----------------------------------------------------------
+      # 6. Install additional dependencies (Torch, GP, etc.)
+      # -----------------------------------------------------------     
+      - name: Install additional test dependencies
+        run: |
+          pip install -e .[test_torch]
+          pip install -e .[test_gpytorch]
+          pip install -e .[test_botorch]
+          pip install -e .[test_umbridge]
+          conda clean --all --yes
+
+      # -----------------------------------------------------------
+      # 7. Run notebook tests sequentially (-j1)
+      # -----------------------------------------------------------
+      - name: Run notebook tests
+        shell: bash -l {0}
+        env:
+          MPLBACKEND: Agg   # ensures headless, low-memory matplotlib
+        run: make booktests_parallel_no_docker #TESTS="tb_quickstart"
+
+
+# Filter for GitHub Actions runs: 
+#     branch:booktests_choi workflow:Booktests is:success
+#
+# e.g., https://github.com/QMCSoftware/QMCSoftware/actions/runs/19772814355

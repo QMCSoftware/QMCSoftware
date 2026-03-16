@@ -5,7 +5,8 @@ from .financial_option import (
     EuropeanOption,
     BarrierOption,
     LookbackOption,
-    DigitalOption)
+    DigitalOption,
+)
 from .keister import Keister
 from .linear0 import Linear0
 from .custom_fun import CustomFun
