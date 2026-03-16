@@ -136,25 +136,10 @@ class MPMC(AbstractLDDiscreteDistribution):
     # --------------------------
     # Core API
     # --------------------------
-    def gen_samples(self, n=None, warn=True, return_unrandomized=False):
-        """
-        Generate samples.
-
-        Args:
-            n (int): number of points per set.
-            return_unrandomized (bool): if SHIFT randomization, also return the base points.
-        Returns:
-            - If nbatch == 1:
-                - randomize='FALSE': ndarray (n, d)
-                - randomize='SHIFT' & return_unrandomized=False: ndarray (n, d)
-                - randomize='SHIFT' & return_unrandomized=True: (ndarray (n,d), ndarray (n,d))  
-            - If nbatch > 1:
-                - shapes include the leading (nbatch, ...).
-        """
-        if n is None:
-            raise ValueError("Must provide n number of points to generate.")
-        n = int(n)
-
+    def _gen_samples(self, n_min, n_max, return_binary, warn):
+        assert n_min==0, "MPMC requires n_min=0 as it does not support indexing subsequencing"
+        assert return_binary is False, "MPMC requires return_binary=True"
+        n = int(n_max-n_min)
         # training config
         args = SimpleNamespace(
             lr=self.lr,
@@ -174,12 +159,10 @@ class MPMC(AbstractLDDiscreteDistribution):
         # try to load pregenerated points
         x = self._maybe_load_pregenerated(n)
         if x is None:
-            x = self.train(args)  # (nbatch, n, d)
+            x = self._train(args)  # (nbatch, n, d)
 
         # randomization
         if self.randomize == 'FALSE':
-            if return_unrandomized:
-                warnings.warn("return_unrandomized ignored when randomize='FALSE'.", stacklevel=1)
             return x[0] if self.nbatch == 1 else x
 
         # SHIFT
@@ -188,10 +171,6 @@ class MPMC(AbstractLDDiscreteDistribution):
             xr0, x0 = xr[0], x[0]
             return (xr0, x0) if return_unrandomized else xr0
         return (xr, x) if return_unrandomized else xr
-
-    def pdf(self, x):
-        """ pdf of a standard uniform """
-        return np.ones(x.shape[:-1], dtype=float)
 
     def __repr__(self):
         out = f"{self.__class__.__name__} Generator Object\n"
@@ -250,7 +229,7 @@ class MPMC(AbstractLDDiscreteDistribution):
     # --------------------------
     # Training
     # --------------------------
-    def train(self, args: SimpleNamespace):
+    def _train(self, args: SimpleNamespace):
         """
         Returns:
             x (np.ndarray): shape `(nbatch, nsamples, dim)`
