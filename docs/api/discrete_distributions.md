@@ -32,6 +32,10 @@
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
 
+## `MPMC: Message Passing Monte Carlo`
+
+::: qmcpy.discrete_distribution.mpmc.mpmc.MPMC
+
 ## UML Specific
 
 ![](./umls/discrete_distribution_specific.svg)

@@ -144,11 +144,11 @@ class MPMC(AbstractLDDiscreteDistribution):
             n (int): number of points per set.
             return_unrandomized (bool): if SHIFT randomization, also return the base points.
         Returns:
-            If nbatch == 1:
+            - If nbatch == 1:
                 - randomize='FALSE': ndarray (n, d)
                 - randomize='SHIFT' & return_unrandomized=False: ndarray (n, d)
-                - randomize='SHIFT' & return_unrandomized=True: (ndarray (n,d), ndarray (n,d))
-            If nbatch > 1:
+                - randomize='SHIFT' & return_unrandomized=True: (ndarray (n,d), ndarray (n,d))  
+            - If nbatch > 1:
                 - shapes include the leading (nbatch, ...).
         """
         if n is None:
@@ -253,7 +253,7 @@ class MPMC(AbstractLDDiscreteDistribution):
     def train(self, args: SimpleNamespace):
         """
         Returns:
-            np.ndarray: shape (nbatch, nsamples, dim)
+            x (np.ndarray): shape `(nbatch, nsamples, dim)`
         """
         model = MPMC_net(
             dim=args.dim, nhid=args.nhid, nlayers=args.nlayers,
