@@ -70,7 +70,9 @@ doctests_botorch: ensure_artifacts
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
 doctests_mpmc:
-	python -m pytest --cov qmcpy/ --cov-report term --cov-report json --no-header --cov-append \
+	@mkdir -p $(DOCTEST_COV_DIR)/mpmc
+	COVERAGE_FILE=$(DOCTEST_COV_DIR)/mpmc/.coverage \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/mpmc/coverage.json --no-header --cov-append \
 		--doctest-modules qmcpy/discrete_distribution/mpmc/*.py \
 
 doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issues/96
