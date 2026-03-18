@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - add-pypistats-dev
     paths:
       - ".github/workflows/pypi-stats.yml"
       - "scripts/pypi_stats.py"
