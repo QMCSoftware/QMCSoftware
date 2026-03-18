@@ -1,9 +1,11 @@
-import numpy as np 
+import numpy as np
+
 
 def get_npt(x):
-    if isinstance(x,np.ndarray):
+    if isinstance(x, np.ndarray):
         return np
     else:
         import torch
-        assert isinstance(x,torch.Tensor)
+
+        assert isinstance(x, torch.Tensor)
         return torch

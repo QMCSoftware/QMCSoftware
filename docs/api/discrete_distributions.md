@@ -18,7 +18,15 @@
 
 ## `Halton`
 
-::: qmcpy.discrete_distribution.halton.Halton
+::: qmcpy.discrete_distribution.digital_net_any_bases.halton.Halton
+
+## `Faure`
+
+::: qmcpy.discrete_distribution.digital_net_any_bases.faure.Faure
+
+## `DigitalNetAnyBases`
+
+::: qmcpy.discrete_distribution.digital_net_any_bases.digital_net_any_bases.DigitalNetAnyBases
 
 ## `IIDStdUniform`
 
