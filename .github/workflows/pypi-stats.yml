@@ -17,15 +17,28 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: pypi-stats-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   update-pypi-stats:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out develop
+      - name: Choose target branch
+        id: branch
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "target=develop" >> "$GITHUB_OUTPUT"
+          else
+            echo "target=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out target branch
         uses: actions/checkout@v4
         with:
-          ref: develop
+          ref: ${{ steps.branch.outputs.target }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -38,6 +51,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install pypistats
 
+      - name: Verify files
+        run: |
+          pwd
+          ls
+          ls scripts
+
       - name: Generate report
         run: python scripts/pypi_stats.py
 
@@ -48,8 +67,7 @@ jobs:
           git add stats/ README.md
           git diff --cached --quiet || git commit -m "Update PyPI stats report"
 
-      - name: Push changes to develop
-        run: git push origin HEAD:develop
-
+      - name: Push changes
+        run: git push origin HEAD:${{ steps.branch.outputs.target }}
 
         
