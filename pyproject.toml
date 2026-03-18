@@ -118,6 +118,7 @@ dev = [ # brew install weasyprint
     "jupyterlab >= 4.0.0",
     "jupyterlab_execute_time >= 3.2.0",
     "ipynbname >= 2025.8.0.0",
+    "pypistats >= 1.0.0", 
     "sympy >= 1.14.0",
     "matplotlib >= 3.9.0",
     "tueplots >= 0.2.0",
