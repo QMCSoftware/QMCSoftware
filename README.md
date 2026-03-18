@@ -41,6 +41,10 @@ https://qmcsoftware.github.io/QMCSoftware/
 
 We maintain a list of [publications on the development and use of QMCPy](https://qmcpy.org/publications/) as well as a [list of select references upon which QMCPy was built](https://qmcsoftware.github.io/QMCSoftware/community/#select-references).
 
+### Package usage stats
+
+PyPI download statistics are tracked automatically in [stats/pypi_downloads.md](stats/pypi_downloads.md).
+
 ## Development
 
 Want to contribute to QMCPy? Please see our [guidelines for contributors](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/) which includes instructions on installation for developers, running tests, and compiling documentation.
