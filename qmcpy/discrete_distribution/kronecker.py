@@ -96,6 +96,8 @@ class Kronecker(AbstractLDDiscreteDistribution):
     """
         
     def __init__(self, dimension=1, alpha="CBC", delta=None, replications=None, randomize=True, seed=None):
+        self.parameters = ["randomize", "alpha", "n_limit"]
+        self.input_alpha = alpha
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.randomize = randomize
@@ -157,7 +159,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
             self.delta = delta
         else:
             self.delta = np.zeros((self.replications, self.d))
-            
+
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         # returns replications x (n_max-n_min) x d (dimension) array of samples
 
