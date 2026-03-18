@@ -1,4 +1,5 @@
 from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from ..util import ParameterError
 import numpy as np
 import warnings
 from sympy import nextprime
@@ -123,17 +124,40 @@ class Kronecker(AbstractLDDiscreteDistribution):
         elif type(alpha) == str and alpha.lower() == 'suzuki':
             self.alpha = SUZUKI(dimension)
         else:
+            alpha = np.asarray(alpha, dtype=float)
+            if alpha.ndim != 1:
+                raise ParameterError("alpha must be a 1D array-like")
+            if len(alpha) < dimension:
+                raise ParameterError(
+                    f"alpha length {len(alpha)} is less than dimension {dimension}"
+                )
             self.alpha = alpha[:dimension]
 
         super(Kronecker,self).__init__(dimension,replications,seed,d_limit=dimension,n_limit=np.inf) 
 
+        # validate delta first if provided
+        if delta is not None:
+            delta = np.asarray(delta, dtype=float)
+            if delta.ndim == 1:
+                if len(delta) != self.d:
+                    raise ParameterError("delta must have length equal to dimension")
+                delta = np.tile(delta, (self.replications, 1))
+            elif delta.ndim == 2:
+                if delta.shape != (self.replications, self.d):
+                    raise ParameterError(
+                        "delta must have shape (replications, dimension)"
+                    )
+            else:
+                raise ParameterError("delta must be 1D or 2D array-like")
+
+        # now apply randomization logic
         if self.randomize:
-            self.delta = self.rng.uniform(size =(self.replications, self.d))
+            self.delta = self.rng.uniform(size=(self.replications, self.d))
         elif delta is not None:
-            self.delta = delta * np.ones((self.replications, self.d))
+            self.delta = delta
         else:
             self.delta = np.zeros((self.replications, self.d))
-
+            
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         # returns replications x (n_max-n_min) x d (dimension) array of samples
 
