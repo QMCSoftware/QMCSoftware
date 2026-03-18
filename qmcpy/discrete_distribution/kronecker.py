@@ -2,18 +2,7 @@ from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..util import ParameterError
 import numpy as np
 import warnings
-from sympy import nextprime
 
-PRIMES = np.array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41, 
-                   43,  47,  53,  59,  61,  67,  71,  73,  79,  83,  89,  97, 101,
-                   103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167,
-                   173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239,
-                   241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313,
-                   317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397,
-                   401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467,
-                   479, 487, 491, 499, 503, 509, 521, 523, 541])
-
-RICHTMYER = np.sqrt(PRIMES) % 1
 SUZUKI = lambda d: 2 ** (np.arange(1, d + 1) / (d + 1))
 CBC = np.array([4.224371872086318813e-01,
 3.605965189622313272e-01,
@@ -28,6 +17,57 @@ CBC = np.array([4.224371872086318813e-01,
 1.773740893160189180e-01,
 1.958399682530986008e-01,
 3.216346950830996643e-01], dtype=np.float64)
+
+PRIMES = np.array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41, 
+                   43,  47,  53,  59,  61,  67,  71,  73,  79,  83,  89,  97, 101,
+                   103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167,
+                   173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239,
+                   241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313,
+                   317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397,
+                   401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467,
+                   479, 487, 491, 499, 503, 509, 521, 523, 541])
+
+# For generating more primes if needed for higher dimensions
+def _is_prime(n):
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    k = 3
+    while k * k <= n:
+        if n % k == 0:
+            return False
+        k += 2
+    return True
+
+
+def _next_prime(n):
+    candidate = max(2, int(n) + 1)
+    if candidate == 2:
+        return 2
+    if candidate % 2 == 0:
+        candidate += 1
+    while not _is_prime(candidate):
+        candidate += 2
+    return candidate
+
+
+def _get_primes(dimension):
+    if dimension <= len(PRIMES):
+        return PRIMES[:dimension]
+    primes = list(PRIMES)
+    current = int(primes[-1])
+    while len(primes) < dimension:
+        current = _next_prime(current)
+        primes.append(current)
+    return np.array(primes, dtype=np.int64)
+
+def _richtmyer_alpha(dimension):
+    if dimension <= len(PRIMES):
+        return np.sqrt(PRIMES[:dimension]) % 1
+    return np.sqrt(_get_primes(dimension)) % 1
 
 class Kronecker(AbstractLDDiscreteDistribution):
     r"""
@@ -102,28 +142,18 @@ class Kronecker(AbstractLDDiscreteDistribution):
         self.mimics = 'StdUniform'
         self.randomize = randomize
                 
-        if type(alpha) == str and alpha.lower() == 'cbc':
+        if isinstance(alpha, str) and alpha.lower() == 'cbc':
             if dimension <= len(CBC):
                 self.alpha = CBC[:dimension]
             else:
                 warnings.warn(
-                    f"CBC generating vector only supports dimension <= {len(CBC)}; "
-                    "falling back to Richtmyer.",
-                    RuntimeWarning
+                    f"CBC generating vector only supports dimension <= {len(CBC)}; falling back to Richtmyer.",
+                    RuntimeWarning,
                 )
-                if dimension <= len(PRIMES):
-                    self.alpha = RICHTMYER[:dimension]
-                else:
-                    self.alpha = np.append(
-                        RICHTMYER,
-                        [np.sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)]
-                    )        
-        elif type(alpha) == str and alpha.lower() == 'richtmyer':
-                if dimension <= len(PRIMES):
-                    self.alpha = RICHTMYER[:dimension]
-                else:
-                    self.alpha = np.append(RICHTMYER, [np.sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)])
-        elif type(alpha) == str and alpha.lower() == 'suzuki':
+                self.alpha = _richtmyer_alpha(dimension)        
+        elif isinstance(alpha, str) and alpha.lower() == 'richtmyer':
+            self.alpha = _richtmyer_alpha(dimension)
+        elif isinstance(alpha, str) and alpha.lower() == 'suzuki':
             self.alpha = SUZUKI(dimension)
         else:
             alpha = np.asarray(alpha, dtype=float)
