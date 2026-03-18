@@ -15,6 +15,71 @@ RICHTMYER = sqrt(PRIMES) % 1
 SUZUKI = lambda d : 2**(arange(1,d+1)/(d+1))
 
 class Kronecker(AbstractLDDiscreteDistribution):
+    r"""
+    Kronecker sequence (additive recurrence sequence) for quasi-Monte Carlo.
+
+    A Kronecker sequence is defined by
+    $$
+    \bolsymbol{x}_i =  i \boldsymbol{\alpha} + \boldsymbol{\delta} \bmod \boldsymbol{1} \in [0,1)^d, \quad i = 0,1,2,\dots,
+    $$
+    where $\boldsymbol{\alpha} \in \mathbb{R}^d$ is a generating vector and $\boldsymbol{\delta} \in [0,1)^d$
+    is an optional shift. The fractional part is taken componentwise.
+
+    These sequences are simple, extensible low-discrepancy sequences when
+    $\boldsymbol{\alpha}$ has components that are irrational and well-distributed.
+
+    Parameters:
+        dimension (int):
+            Dimension $d$ of the sequence.
+
+        alpha (str or array-like):
+            Generating vector $\boldsymbol{\alpha}$.
+            
+            Options:
+            - "RICHTMYER": uses $\boldsymbol{\alpha}_j = \sqrt{p_j} \bmod 1$, where $p_j$ are primes.
+              This is the classical Richtmyer construction.
+            - "SUZUKI": uses a deterministic construction
+              $\boldsymbol{\alpha}_j = 2^{j/(d+1)}$.
+            - array-like: user-specified generating vector.
+
+        delta (array-like, optional):
+            Shift vector $\boldsymbol{\delta}$. If `randomize=True`, this is ignored and
+            a random shift is generated. Otherwise, a fixed shift is used.
+
+        replications (int, optional):
+            Number of independent randomizations (replications).
+
+        randomize (bool):
+            If True, apply a random shift $\boldsymbol{\delta} \sim \mathrm{Uniform}([0,1)^d)$.
+            If False, use the provided `delta` or zero shift.
+
+        seed (int, optional):
+            Random seed for reproducibility.
+
+    Notes:
+        - The Kronecker sequence is fully extensible in $n$ (no restriction to powers of 2).
+        - Quality depends strongly on the choice of $\boldsymbol{\alpha}$.
+        - Random shifting preserves unbiasedness for integration.
+
+    Examples:
+        >>> dd = Kronecker(dimension=2, seed=7)
+        >>> dd(4)
+        array([[...]])
+
+        First point (n = 0):
+        >>> dd(1)
+        array([[...]])
+
+        Multiple replications:
+        >>> x = Kronecker(3, seed=7, replications=2)(4)
+        >>> x.shape
+        (2, 4, 3)
+
+    References:
+        - Richtmyer, R. D. (1951). "The evaluation of definite integrals and a quasi-Monte Carlo method."
+        - Niederreiter, H. (1992). *Random Number Generation and Quasi-Monte Carlo Methods*.
+    """
+        
     def __init__(self, dimension=1, alpha="RICHTMYER", delta=None, replications=None, randomize=True, seed=None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
