@@ -135,7 +135,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
                 )
             self.alpha = alpha[:dimension]
 
-        super(Kronecker,self).__init__(dimension,replications,seed,d_limit=dimension,n_limit=np.inf) 
+        super().__init__(dimension,replications,seed,d_limit=np.inf,n_limit=np.inf) 
 
         # validate delta first if provided
         if delta is not None:
@@ -224,9 +224,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
     def _spawn(self, child_seed, dimension):
         return Kronecker(
                 dimension=dimension,
-                alpha = self.alpha,
+                alpha = self.input_alpha,
                 randomize=self.randomize,
                 seed=child_seed,
-                d_max=self.d_max,
-                m_max=self.m_max,
                 replications=self.replications)
