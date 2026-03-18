@@ -1,5 +1,6 @@
 from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 import numpy as np
+import warnings
 from sympy import nextprime
 
 PRIMES = np.array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41, 
@@ -13,6 +14,19 @@ PRIMES = np.array([2,   3,   5,   7,  11,  13,  17,  19,  23,  29,  31,  37,  41
 
 RICHTMYER = np.sqrt(PRIMES) % 1
 SUZUKI = lambda d: 2 ** (np.arange(1, d + 1) / (d + 1))
+CBC = np.array([4.224371872086318813e-01,
+3.605965189622313272e-01,
+3.486721371284548510e-01,
+4.520388055082059653e-01,
+2.550750763977845947e-01,
+2.205289926147350477e-01,
+2.071242872822959824e-01,
+3.049354991086913325e-01,
+3.872168854974577523e-01,
+2.275808872220986823e-01,
+1.773740893160189180e-01,
+1.958399682530986008e-01,
+3.216346950830996643e-01], dtype=np.float64)
 
 class Kronecker(AbstractLDDiscreteDistribution):
     r"""
@@ -80,16 +94,32 @@ class Kronecker(AbstractLDDiscreteDistribution):
         - Niederreiter, H. (1992). *Random Number Generation and Quasi-Monte Carlo Methods*.
     """
         
-    def __init__(self, dimension=1, alpha="RICHTMYER", delta=None, replications=None, randomize=True, seed=None):
+    def __init__(self, dimension=1, alpha="CBC", delta=None, replications=None, randomize=True, seed=None):
         # attributes required for cub_qmc_clt.py
         self.mimics = 'StdUniform'
         self.randomize = randomize
-        
-        if type(alpha) == str and alpha.lower() == 'richtmyer':
+                
+        if type(alpha) == str and alpha.lower() == 'cbc':
+            if dimension <= len(CBC):
+                self.alpha = CBC[:dimension]
+            else:
+                warnings.warn(
+                    f"CBC generating vector only supports dimension <= {len(CBC)}; "
+                    "falling back to Richtmyer.",
+                    RuntimeWarning
+                )
                 if dimension <= len(PRIMES):
                     self.alpha = RICHTMYER[:dimension]
                 else:
-                    self.alpha = np.append(RICHTMYER, [np.sqrt(np.nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)])
+                    self.alpha = np.append(
+                        RICHTMYER,
+                        [np.sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)]
+                    )        
+        elif type(alpha) == str and alpha.lower() == 'richtmyer':
+                if dimension <= len(PRIMES):
+                    self.alpha = RICHTMYER[:dimension]
+                else:
+                    self.alpha = np.append(RICHTMYER, [np.sqrt(nextprime(PRIMES[-1], ith=x)) % 1 for x in range(1, dimension - len(PRIMES) + 1)])
         elif type(alpha) == str and alpha.lower() == 'suzuki':
             self.alpha = SUZUKI(dimension)
         else:
