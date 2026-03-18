@@ -10,7 +10,7 @@ on:
       - "README.md"
       - "pyproject.toml"
   schedule:
-    - cron: "17 6 * * 1"   # Every Monday 06:17 UTC
+    - cron: "17 6 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -49,3 +49,6 @@ jobs:
 
       - name: Push changes to develop
         run: git push origin HEAD:develop
+
+
+        
