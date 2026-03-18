@@ -4,53 +4,48 @@ on:
   push:
     branches:
       - develop
-      - add-pypistats-dev
     paths:
       - ".github/workflows/pypi-stats.yml"
       - "scripts/pypi_stats.py"
       - "README.md"
       - "pyproject.toml"
   schedule:
-    - cron: "17 6 * * 1"
+    - cron: "17 6 * * 1"   # Every Monday 06:17 UTC
   workflow_dispatch:
 
 permissions:
   contents: write
-
-concurrency:
-  group: pypi-stats
-  cancel-in-progress: true
 
 jobs:
   update-pypi-stats:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Check out develop
         uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install pypistats
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "pypistats>=1.0.0"
+          pip install pypistats
 
-      - name: Generate stats report
-        run: |
-          python scripts/pypi_stats.py
+      - name: Generate report
+        run: python scripts/pypi_stats.py
 
-      - name: Commit updated report
+      - name: Commit updated report if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stats/pypi_downloads.md
-          git diff --cached --quiet || git commit -m "Update PyPI download stats"
+          git add stats/ README.md
+          git diff --cached --quiet || git commit -m "Update PyPI stats report"
 
-      - name: Push changes
-        run: |
-          git push
-
+      - name: Push changes to develop
+        run: git push origin HEAD:develop
