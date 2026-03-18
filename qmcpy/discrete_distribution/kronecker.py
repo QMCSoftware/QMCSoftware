@@ -3,7 +3,6 @@ from ..util import ParameterError
 import numpy as np
 import warnings
 
-SUZUKI = lambda d: 2 ** (np.arange(1, d + 1) / (d + 1))
 CBC = np.array([4.224371872086318813e-01,
 3.605965189622313272e-01,
 3.486721371284548510e-01,
@@ -69,13 +68,16 @@ def _richtmyer_alpha(dimension):
         return np.sqrt(PRIMES[:dimension]) % 1
     return np.sqrt(_get_primes(dimension)) % 1
 
+def _suzuki_alpha(dimension):
+    return 2 ** (np.arange(1, dimension + 1) / (dimension + 1))
+
 class Kronecker(AbstractLDDiscreteDistribution):
     r"""
     Kronecker sequence (additive recurrence sequence) for quasi-Monte Carlo.
 
     A Kronecker sequence is defined by
     $$
-    \bolsymbol{x}_i =  i \boldsymbol{\alpha} + \boldsymbol{\delta} \bmod \boldsymbol{1} \in [0,1)^d, \quad i = 0,1,2,\dots,
+    \boldsymbol{x}_i =  i \boldsymbol{\alpha} + \boldsymbol{\delta} \bmod \boldsymbol{1} \in [0,1)^d, \quad i = 0,1,2,\dots,
     $$
     where $\boldsymbol{\alpha} \in \mathbb{R}^d$ is a generating vector and $\boldsymbol{\delta} \in [0,1)^d$
     is an optional shift. The fractional part is taken componentwise.
@@ -91,6 +93,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
             Generating vector $\boldsymbol{\alpha}$.
             
             Options:
+            - "CBC": uses the first $d$ components of a known good Component-by-Component (CBC) generating vector.
             - "RICHTMYER": uses $\boldsymbol{\alpha}_j = \sqrt{p_j} \bmod 1$, where $p_j$ are primes.
               This is the classical Richtmyer construction.
             - "SUZUKI": uses a deterministic construction
@@ -139,7 +142,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
         self.parameters = ["randomize", "alpha", "n_limit"]
         self.input_alpha = alpha
         # attributes required for cub_qmc_clt.py
-        self.mimics = 'StdUniform'
+        self.mimics = "StdUniform"
         self.randomize = randomize
                 
         if isinstance(alpha, str) and alpha.lower() == 'cbc':
@@ -153,8 +156,8 @@ class Kronecker(AbstractLDDiscreteDistribution):
                 self.alpha = _richtmyer_alpha(dimension)        
         elif isinstance(alpha, str) and alpha.lower() == 'richtmyer':
             self.alpha = _richtmyer_alpha(dimension)
-        elif isinstance(alpha, str) and alpha.lower() == 'suzuki':
-            self.alpha = SUZUKI(dimension)
+        elif isinstance(alpha, str) and alpha.lower() == "suzuki":
+            self.alpha = _suzuki_alpha(dimension)        
         else:
             alpha = np.asarray(alpha, dtype=float)
             if alpha.ndim != 1:
@@ -165,7 +168,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
                 )
             self.alpha = alpha[:dimension]
 
-        super().__init__(dimension,replications,seed,d_limit=np.inf,n_limit=np.inf) 
+        super().__init__(dimension, replications,seed, d_limit=np.inf, n_limit=np.inf) 
 
         # validate delta first if provided
         if delta is not None:
@@ -192,10 +195,12 @@ class Kronecker(AbstractLDDiscreteDistribution):
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         # returns replications x (n_max-n_min) x d (dimension) array of samples
+        if return_binary:
+           raise ParameterError("Kronecker does not support return_binary=True")
 
         i = np.arange(n_min,n_max).reshape((n_max-n_min, 1))
 
-        points = ((i * self.alpha) + self.delta[:,None,:]) % 1
+        points = ((i * self.alpha) + self.delta[:, None, :]) % 1
 
         return points
 
@@ -208,7 +213,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
             n (int): the number of sample points
             k_tilde (tuple(function, float)): the function takes in 2 arguments: the sample points and the coordinate weights.
                 The float is the integral over the unit hypercube.
-            gamme (ndarray): shape (1xd)
+            gamma (ndarray): shape (1xd)
 
         Returns:
             float
@@ -253,8 +258,10 @@ class Kronecker(AbstractLDDiscreteDistribution):
     
     def _spawn(self, child_seed, dimension):
         return Kronecker(
-                dimension=dimension,
-                alpha = self.input_alpha,
-                randomize=self.randomize,
-                seed=child_seed,
-                replications=self.replications)
+            dimension=dimension,
+            alpha=self.input_alpha,
+            delta=self.delta[0],
+            replications=self.replications,
+            randomize=self.randomize,
+            seed=child_seed,
+        )
