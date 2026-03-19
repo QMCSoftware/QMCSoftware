@@ -186,7 +186,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
                     ```
             fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions.
             check_cone (bool): Whether or not to check if the function falls in the cone.
-            ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
+            ptransform (str): Periodization transform, see the options in `AbstractIntegrand.f`.
         """
         super(CubQMCLatticeG, self).__init__(
             integrand,
