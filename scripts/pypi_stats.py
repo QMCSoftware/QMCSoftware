@@ -137,7 +137,6 @@ python -c "import pypistats; print(pypistats.overall('{package}', total='daily',
 def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 
-    _recent_payload = ensure_dict(pypistats.recent(PACKAGE, format="json"))
     overall_payload = ensure_dict(
         pypistats.overall(PACKAGE, total="daily", mirrors="with", format="json")
     )
