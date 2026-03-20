@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - add-pypistats-dev
     paths:
       - ".github/workflows/pypi-stats.yml"
       - "scripts/pypi_stats.py"
@@ -51,12 +50,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install pypistats
 
-      - name: Verify files
-        run: |
-          pwd
-          ls
-          ls scripts
-
       - name: Generate report
         run: python scripts/pypi_stats.py
 
@@ -64,10 +57,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stats/ README.md
+          git add stats/pypi_downloads.md
           git diff --cached --quiet || git commit -m "Update PyPI stats report"
 
       - name: Push changes
         run: git push origin HEAD:${{ steps.branch.outputs.target }}
-
-        
