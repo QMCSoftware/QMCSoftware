@@ -1,4 +1,6 @@
 # General Python
+.pdm-python
+*raw.githubusercontent.com*
 packages.svg
 .pypirc
 test_readme.py
@@ -9,7 +11,6 @@ coverage.json
 *.npz
 *hparams.yaml
 *.ipynb_checkpoints/
-demos/fgpr_figs/
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -20,15 +21,37 @@ qmcpy.egg-info/
 *.out
 *.pyc
 *.vrb
+*.npy
 .DS_Store
 .idea/
-.pytest_cache/
-demos/prob_failure_gp_ci_plots/
-raw.githubusercontent.com/*
+.pytest_cache/'raw.githubusercontent.com/*'
 demos/.jupyter
+demos/prob_failure_gp_ci_plots/
+demos/fgpr_figs/
+demos/GBM/images/*.png
+demos/GBM/outputs/*.*
 
 # tests
 .coverage
+*.wgw*
+coverage-data/*
+*coverage*
+/test/booktests/JOSS2026.outputs
+/test/booktests/logs
+/test/booktests/outputs
+/test/booktests/outputs_nb
+/test/booktests/raw.githubusercontent.com
+/test/booktests/runinfo
+
+# Paper or LaTeX
+*.bak*
+*.syn*.gz
+*.pdf
+*.log
+*.fls
+*.fdb_latexmk
+*.bbl
+*.aux
 
 # C
 *.so
@@ -37,11 +60,12 @@ demos/.jupyter
 *.pyd
 
 # R
-*.Rhistory 
+*.Rhistory
 
 # Website
 docs/_site
 docs/Gemfile.lock
+site/
 
 # Sphinx
 sphinx/_build/
@@ -54,10 +78,8 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-demos/**.png
-demos/**.eps
-
-
+*.png
+*.eps
 
 # release
 /build/
@@ -66,16 +88,26 @@ dist/
 # blogs
 blogs/why_q_in_mc/*.png
 
+# paper
+paper.bib.original
+jats/
+
+# Quarto / Jupyter artifacts
+**/*.quarto_ipynb
+*_files/
+*_cache/
+*.ipynb_checkpoints/
+
+## --- User-specific  file exclusions ---
 # alegresor
 *.vscode
-_ags* 
+_ags*
 _ags/*
 
-# Fred's private stuff, not for tracking
+# Fred
 *Fred*
 
-# SC Choi's file exclusion
+# SC Choi
 .vscode/settings.json
-
-# Downloaded files
-raw.githubusercontent.com*
+/sc_*
+sc_*

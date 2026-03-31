@@ -16,9 +16,21 @@
 
 ::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvar
 
+## `KernelShiftInvarCombined` 
+
+::: qmcpy.kernel.si_dsi_kernels.KernelShiftInvarCombined
+
 ## `KernelDigShiftInvar` 
 
 ::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvar
+
+## `KernelDigShiftInvarAdaptiveAlpha` 
+
+::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvarAdaptiveAlpha
+
+## `KernelDigShiftInvarCombined` 
+
+::: qmcpy.kernel.si_dsi_kernels.KernelDigShiftInvarCombined
 
 ## `KernelGaussian` 
 
