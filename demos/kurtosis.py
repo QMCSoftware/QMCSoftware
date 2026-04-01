@@ -1,197 +1,18 @@
-import qmctoolscl 
-import math
 import numpy as np
-from scipy.stats import kurtosis,norm
-import pandas as pd
 import multiprocess
-import os
 from mpi4py import MPI
-
-""" Faure code """
-class Faure:
-    def __init__(self, d, p, m, seed=11):
-        """
-        Initialize Faure sequence generator
-        
-        Parameters:
-        -----------
-        d : int
-            Dimension of the sequence
-        p: int
-            smallest prime >=d. the base used to generate the points
-        m : int
-            Exponent for number of points (n = p^m)
-        seed : int
-            Random seed for reproducibility
-        """
-        self.d = d
-        self.m = m
-        if hasattr(seed, 'generate_state'):
-            self.seed = int(seed.generate_state(1)[0])
-        else:
-            self.seed = int(seed)
-        
-        # Find prime base
-        self.p = p
-        self.n = int(self.p ** m)
-        
-        # Calculate number of digits needed 
-        eps = np.finfo(np.float64).tiny
-        self.t = int(np.ceil(np.emath.logn(p,p-1)-np.emath.logn(p,eps)))
-        self.t = max(m, min(self.t, 64))
-        
-        # Construct generating matrices (used by both NUS and LMS)
-        self._construct_generating_matrices()
-        
-        self.bases = np.full(d, self.p, dtype=np.uint64)
-    
-    
-    def _construct_generating_matrices(self):
-        """Construct base generating matrices"""
-        self.C = np.ones((self.d,1,1),dtype=np.uint64)*np.eye(self.m,dtype=np.uint64)
-        
-        if self.d > 1:
-            for a in range(self.m):
-                for b in range(a+1):
-                    self.C[1, a, b] = math.comb(a, b) % self.p
-        
-        if self.d > 2:
-            for k in range(2, self.d):
-                for a in range(self.m):
-                    for b in range(a+1):
-                        self.C[k, a, b] = (int(self.C[1,a,b])*((k**(a-b))%self.p))%self.p
-    
-    def gen_samples(self, r, method="LMS"):
-        """
-        Generate randomized Faure samples
-        
-        Parameters:
-        -----------
-        r : int
-            Number of independent randomizations to generate
-        method : str, default="LMS"
-            Randomization method: "NUS" or "LMS"
-            
-        Returns:
-        --------
-        samples : ndarray of shape (r, n, d)
-            Array of randomized Faure points in [0,1]^d
-        """
-        if method == "NUS":
-            xrdig = self._apply_nus(r)
-        elif method == "LMS":
-            xrdig = self._apply_lms(r)
-        else:
-            raise ValueError(f"method must be 'NUS' or 'LMS', got '{method}'")
-        
-        # Convert digits to floats
-        samples = np.zeros((r, self.n, self.d), dtype=np.float64)
-        qmctoolscl.gdn_integer_to_float(
-            np.uint64(r), np.uint64(self.n), np.uint64(self.d), np.uint64(1), 
-            np.uint64(self.t), self.bases, xrdig, samples
-        )
-        
-        return samples
-    
-    def _apply_nus(self, r):
-        """Apply Nested Uniform Scrambling"""
-        # Generate unrandomized points
-        xdig = np.zeros((self.n, self.d, self.m), dtype=np.uint64)
-        qmctoolscl.gdn_gen_natural(
-            np.uint64(1), np.uint64(self.n), np.uint64(self.d), np.uint64(1),
-            np.uint64(self.m), np.uint64(self.m), np.uint64(0), 
-            self.bases, self.C, xdig
-        )
-        
-        # Apply NUS
-        base_seed_seq = np.random.SeedSequence(self.seed)
-        seeds = base_seed_seq.spawn(r * self.d)
-        rngs = np.array([np.random.Generator(np.random.SFC64(s)) for s in seeds]).reshape(r,self.d)
-        root_nodes = np.array([qmctoolscl.NUSNode_gdn() for i in range(r*self.d)]).reshape(r,self.d)
-        xrdig = np.zeros((r, self.n, self.d, self.t), dtype=np.uint64)
-        qmctoolscl.gdn_nested_uniform_scramble(
-            np.uint64(r), np.uint64(self.n), np.uint64(self.d), 
-            np.uint64(1), np.uint64(1), np.uint64(self.m), np.uint64(self.t), 
-            rngs, root_nodes, self.bases[None], xdig[None], xrdig
-        )
-        
-        return xrdig
-    
-    def _apply_lms(self, r):
-        """Apply Linear Matrix Scrambling"""
-        rng = np.random.Generator(np.random.SFC64(self.seed))
-        
-        # Get scrambling matrix
-        S = qmctoolscl.gdn_get_linear_scramble_matrix(
-            rng, np.uint64(r), np.uint64(self.d), np.uint64(self.m), 
-            np.uint64(self.t), np.uint64(1), self.bases[None]
-        )
-        
-        # Apply LMS to C
-        C_lms = np.zeros((r, self.d, self.m, self.t), dtype=np.uint64)
-        qmctoolscl.gdn_linear_matrix_scramble(
-            np.uint64(r), np.uint64(self.d), np.uint64(self.m), 
-            np.uint64(1), np.uint64(1), np.uint64(self.m), np.uint64(self.t), 
-            self.bases, S, self.C, C_lms
-        )
-        
-        # Generate points with scrambled C
-        xdig = np.zeros((r, self.n, self.d, self.t), dtype=np.uint64)
-        qmctoolscl.gdn_gen_natural(
-            np.uint64(r), np.uint64(self.n), np.uint64(self.d), np.uint64(1),
-            np.uint64(self.m), np.uint64(self.t), np.uint64(0), 
-            self.bases, C_lms, xdig
-        )
-        
-        # Apply digital permutations
-        perms = qmctoolscl.gdn_get_digital_permutations(
-            rng, np.uint64(r), np.uint64(self.d), np.uint64(self.t), 
-            np.uint64(1), self.bases
-        )
-        
-        xrdig = np.zeros((r, self.n, self.d, self.t), dtype=np.uint64)
-        qmctoolscl.gdn_digital_permutation(
-            np.uint64(r), np.uint64(self.n), np.uint64(self.d), 
-            np.uint64(r), np.uint64(1), np.uint64(self.t), np.uint64(self.t), 
-            np.uint64(self.p), perms, xdig, xrdig
-        )
-        
-        return xrdig
+import qmcpy as qp
 
 """ Kurtosis Calculation Function"""
-def kurt_calc(unique_p,p,d,m,gs,child_seed, m_repeat, R_fixed, method = "NUS"):
-    print(f"unique_p_val={unique_p}, m_repeat={m_repeat}\n")
+def kurt_calc(unique_p,p,d,m,child_seed, m_repeat,r_repeat, r_split, R_fixed, method = "NUS"):
+    print(f"unique_p_val={unique_p}, m_repeat={m_repeat}, r_repeat={r_repeat}\n")
     max_index = 0
     for j in range (len(d)):
         if (p[j] == unique_p) and (d[j] > d[max_index]):
             max_index = j
-    samples = Faure(d[max_index],unique_p,(m - 1),seed=child_seed).gen_samples(R_fixed,method=method)
-    x_qmc_norm = norm.ppf(samples)
-    len_d = np.sum(p == unique_p)
-    d_ind = np.where(p == unique_p) [0]
-    kurt_arr = np.empty((len(gs),len_d,m))
-    for i in range(len_d):
-        for n in range (m):
-            w_qmc = x_qmc_norm[:, :int(unique_p**n), :d[d_ind[i]]].sum(axis = 2) / np.sqrt(d[d_ind[i]])
-            counter = 0
-            for g in gs.values():
-                y = g(w_qmc).mean(axis = 1)
-                kurt_arr[counter, i, n] = kurtosis(y, bias=False,fisher=False)
-                counter = counter + 1
-    np.save(f"tmp_{int(unique_p)}_{m_repeat}.npy", kurt_arr)
+    samples = qp.Faure(d[max_index],randomize=method, replications= (int (R_fixed / r_split)), seed=child_seed).gen_samples(unique_p**(m-1))
+    np.save(f"tmp_{int(unique_p)}_{m_repeat}_{r_repeat}.npy", samples)
 
-""" The ridge functions """
-def g_jmp(w):
-    return w >= 1
-
-def g_knk(w):
-    return ((np.minimum(np.maximum(-2, w), 1)) + 2) / 3
-
-def g_smo(w):
-    return norm.cdf(w + 1)
-
-def g_fin(w):
-    return np.minimum(1, ((np.sqrt(np.maximum(w + 2, 0))) / 2))
 
 """ Running the experiments """
 
@@ -199,14 +20,7 @@ if __name__ == "__main__":
     """ The parameters for the experiment """
     alpha = 0.05 # Significance level, confidence level = 1 - alpha
 
-    # The ridge functions:
-    gs = {
-    "jmp": g_jmp,
-    "knk": g_knk,
-    "smo": g_smo,
-    "fin": g_fin,}
-
-    d = np.array([1,2,4,6]) # The different d's to test on
+    d = np.array([1,2]) # The different d's to test on
 
     #kappa = 6 # kurtosis bound
 
@@ -214,9 +28,11 @@ if __name__ == "__main__":
 
     #R_vary = (R_1_min * np.arange(1, 11)).astype(int) # The different number of replications to test
 
-    R_fixed = 1000 # The fixed R to be used for the kurtosis experiments
+    R_fixed = 200 # The fixed R to be used for the kurtosis experiments
 
-    M = 100  # The number of times the experiments will be independently repeated
+    R_split = 5 # The number of R batches to parralelize over
+
+    M = 2  # The number of times the experiments will be independently repeated
 
     m = 4 # m different n's will be tested where n is the number of RQMC samples per replication
 
@@ -241,23 +57,23 @@ if __name__ == "__main__":
 
     global_seed = 7
     parent_seed = np.random.SeedSequence(global_seed)
-    all_seeds = np.empty((len(unique_p), M), dtype=object)
+    all_seeds = np.empty((len(unique_p), M, R_split), dtype=object)
     for i in range(len(unique_p)):
         for m_repeat in range(M):
-            all_seeds[i, m_repeat] = parent_seed.spawn(1)[0]
+            for r_repeat in range (R_split):
+                all_seeds[i, m_repeat, r_repeat] = parent_seed.spawn(1)[0]
     
     """ Using the ridge functions """
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
     args = [
-    (unique_p[i], p, d, m, gs, all_seeds[i, m_repeat], m_repeat, R_fixed)
+    (unique_p[i], p, d, m, all_seeds[i, m_repeat,r_repeat], m_repeat,r_repeat, R_split, R_fixed)
     for i in range(len(unique_p))
     for m_repeat in range(M)
-    if unique_p[i] == 7
-    and m_repeat == 3]
+    for r_repeat in range (R_split)]
     # split args across MPI nodes
     my_args = [args[i] for i in range(len(args)) if i % size == rank]
     print(f"Node {rank}/{size} running {len(my_args)} jobs")
-    with multiprocess.Pool() as pool:
+    with multiprocess.Pool(processes = 11) as pool:
         pool.starmap(kurt_calc, my_args)
