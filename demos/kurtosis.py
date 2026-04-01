@@ -12,6 +12,7 @@ def kurt_calc(unique_p,p,d,m,child_seed, m_repeat,r_repeat, r_split, R_fixed, me
             max_index = j
     samples = qp.Faure(d[max_index],randomize=method, replications= (int (R_fixed / r_split)), seed=child_seed).gen_samples(unique_p**(m-1))
     np.save(f"tmp_{int(unique_p)}_{m_repeat}_{r_repeat}.npy", samples)
+    print(f"Saved tmp_{int(unique_p)}_{m_repeat}_{r_repeat}.npy\n")
 
 
 """ Running the experiments """
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     """ The parameters for the experiment """
     alpha = 0.05 # Significance level, confidence level = 1 - alpha
 
-    d = np.array([1,2]) # The different d's to test on
+    d = np.array([1,2,4,6]) # The different d's to test on
 
     #kappa = 6 # kurtosis bound
 
@@ -28,11 +29,11 @@ if __name__ == "__main__":
 
     #R_vary = (R_1_min * np.arange(1, 11)).astype(int) # The different number of replications to test
 
-    R_fixed = 200 # The fixed R to be used for the kurtosis experiments
+    R_fixed = 1000 # The fixed R to be used for the kurtosis experiments
 
     R_split = 5 # The number of R batches to parralelize over
 
-    M = 2  # The number of times the experiments will be independently repeated
+    M = 4 # The number of times the experiments will be independently repeated
 
     m = 4 # m different n's will be tested where n is the number of RQMC samples per replication
 
@@ -71,7 +72,9 @@ if __name__ == "__main__":
     (unique_p[i], p, d, m, all_seeds[i, m_repeat,r_repeat], m_repeat,r_repeat, R_split, R_fixed)
     for i in range(len(unique_p))
     for m_repeat in range(M)
-    for r_repeat in range (R_split)]
+    for r_repeat in range (R_split)
+    if unique_p[i] == 7
+    and m_repeat != 0]
     # split args across MPI nodes
     my_args = [args[i] for i in range(len(args)) if i % size == rank]
     print(f"Node {rank}/{size} running {len(my_args)} jobs")
