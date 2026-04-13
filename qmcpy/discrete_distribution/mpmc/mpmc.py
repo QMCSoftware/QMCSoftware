@@ -135,7 +135,7 @@ class MPMC(AbstractLDDiscreteDistribution):
     # --------------------------
     # Core API
     # --------------------------
-    def _gen_samples(self, n_min, n_max, return_binary, warn):
+    def _gen_samples(self, n_min, n_max, return_binary, warn, return_unrandomized=False):
         assert n_min==0, "MPMC requires n_min=0 as it does not support indexing subsequencing"
         assert return_binary is False, "MPMC requires return_binary=True"
         n = int(n_max-n_min)
@@ -157,15 +157,17 @@ class MPMC(AbstractLDDiscreteDistribution):
 
         x = self._train(args)  # (nbatch, n, d)
 
-        # randomization
         if self.randomize == 'FALSE':
-            return x[0] if self.nbatch == 1 else x
+            if self.nbatch == 1:
+                return x[0]
+            return x
 
-        # SHIFT
         xr = (x + self.shift[:, None, :]) % 1.0
+
         if self.nbatch == 1:
             xr0, x0 = xr[0], x[0]
             return (xr0, x0) if return_unrandomized else xr0
+
         return (xr, x) if return_unrandomized else xr
 
     def __repr__(self):
