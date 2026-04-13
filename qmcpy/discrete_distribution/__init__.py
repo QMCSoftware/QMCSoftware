@@ -4,6 +4,7 @@ from .lattice import Lattice
 from .digital_net_b2 import DigitalNetB2
 from .digital_net_any_bases import DigitalNetAnyBases,Halton,Faure
 from .mpmc import MPMC
+from .kronecker import Kronecker
 
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution

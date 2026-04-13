@@ -182,6 +182,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
                 - `'NUS'`: Nested uniform scrambling.
                 - `'QRNG'`: Deterministic permutation scramble and random digital shift from QRNG [1] (with `generalize=True`). Does *not* support replications>1.
                 - `None`: No randomization. In this case the first point will be the origin. 
+            
             bases_generating_matrices (Union[str, tuple]): Specify the bases and the generating matrices.
                 
                 - `"HALTON"` will use Halton generating matrices.
@@ -235,21 +236,8 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
         assert self.randomize in ["LMS DP","LMS DS","LMS","DP","DS","NUS","QRNG","FALSE"]
         if self.randomize=="QRNG":
             assert self.type_bases_generating_matrices=="HALTON", "QRNG randomization is only applicable for the Halton generator."
-            from .._c_lib import _load_c_lib
             assert self.replications==1, "QRNG requires replications=1"
             self.randu_d_32 = self.rng.uniform(size=(self.d,32))
-            _c_lib = _load_c_lib()
-            import ctypes
-            self.halton_cf_qrng = _c_lib.halton_qrng
-            self.halton_cf_qrng.argtypes = [
-                ctypes.c_int,  # n
-                ctypes.c_int,  # d
-                ctypes.c_int, # n0
-                ctypes.c_int, # generalized
-                np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # res
-                np.ctypeslib.ndpointer(ctypes.c_double, flags='C_CONTIGUOUS'), # randu_d_32
-                np.ctypeslib.ndpointer(ctypes.c_int, flags='C_CONTIGUOUS')]  # dvec
-            self.halton_cf_qrng.restype = None
         self.alpha = alpha
         assert self.alpha>=1
         assert self.alpha%1==0
@@ -391,7 +379,7 @@ class DigitalNetAnyBases(AbstractLDDiscreteDistribution):
             return x
         if self.randomize=="QRNG": # no replications
             x = np.zeros((self.d,n),dtype=np.double)                        
-            self.halton_cf_qrng(n,self.d,int(n_min),True,x,self.randu_d_32,np.int32(self.dvec)) 
+            qmctoolscl.util.halton_qrng_c(n,self.d,int(n_min),True,x,self.randu_d_32,np.int32(self.dvec)) 
             return x.T[None,:,:]
         r = np.uint64(self.replications)
         xdig_new = np.empty((r,n,d,t),dtype=np.uint64)

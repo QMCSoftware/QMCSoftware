@@ -28,6 +28,10 @@
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.digital_net_any_bases.DigitalNetAnyBases
 
+## `Kronecker`
+
+::: qmcpy.discrete_distribution.kronecker.Kronecker
+
 ## `IIDStdUniform`
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
