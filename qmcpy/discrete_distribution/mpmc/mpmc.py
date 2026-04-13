@@ -8,18 +8,17 @@ import torch.optim as optim
 import warnings
 
 from .utils import (
-    L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix,
+    L2star, L2ctr, L2ext, L2per, L2sym, L2mix,
     L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted,
-    L2sym_weighted, L2asd_weighted, L2mix_weighted,
+    L2sym_weighted, L2mix_weighted,
 )
 from .models import *
 
 
 _DISCREPANCY = {
-    'L2star': L2star, 'L2ctr': L2ctr, 'L2ext': L2ext, 'L2per': L2per, 'L2sym': L2sym, 'L2asd': L2asd, 'L2mix': L2mix,
+    'L2star': L2star, 'L2ctr': L2ctr, 'L2ext': L2ext, 'L2per': L2per, 'L2sym': L2sym, 'L2mix': L2mix,
     'L2star_weighted': L2star_weighted, 'L2ctr_weighted': L2ctr_weighted, 'L2ext_weighted': L2ext_weighted,
-    'L2per_weighted': L2per_weighted, 'L2sym_weighted': L2sym_weighted, 'L2asd_weighted': L2asd_weighted,
-    'L2mix_weighted': L2mix_weighted,
+    'L2per_weighted': L2per_weighted, 'L2sym_weighted': L2sym_weighted, 'L2mix_weighted': L2mix_weighted,
 }
 
 class MPMC(AbstractLDDiscreteDistribution):
@@ -156,10 +155,7 @@ class MPMC(AbstractLDDiscreteDistribution):
             weights=self.weights,
         )
 
-        # try to load pregenerated points
-        x = self._maybe_load_pregenerated(n)
-        if x is None:
-            x = self._train(args)  # (nbatch, n, d)
+        x = self._train(args)  # (nbatch, n, d)
 
         # randomization
         if self.randomize == 'FALSE':
@@ -196,35 +192,6 @@ class MPMC(AbstractLDDiscreteDistribution):
             loss_fn=self.loss_fn,
             weights=self.weights.detach().cpu().tolist() if self.weights is not None else None,
         )
-
-    # --------------------------
-    # Helpers
-    # --------------------------
-    def _maybe_load_pregenerated(self, n):
-        """Return (nbatch, n, d) array if pregenerated exists; else None."""
-        head = "https://raw.githubusercontent.com/QMCSoftware/LDData/refs/heads/main/pregenerated_pointsets/mpmc/"
-        fname = f"dim_{self.dim}.nsamples_{n}.nbatch_{self.nbatch}.Lf{self.loss_fn}.b_{{b}}.txt"
-
-        ds = np.lib.npyio.DataSource()
-        # check batch 1; if absent, bail fast
-        test_link = head + fname.format(b=1)
-        if not ds.exists(test_link):
-            return None
-
-        batches = []
-        for b in range(1, self.nbatch + 1):
-            link = head + fname.format(b=b)
-            if not ds.exists(link):
-                warnings.warn(f"Missing pregenerated batch file: {link}; will train instead.", stacklevel=1)
-                return None
-            with ds.open(link) as fh:
-                # files have 15-line headers
-                data = np.loadtxt(fh, skiprows=15)
-            if data.shape != (n, self.dim):
-                warnings.warn(f"Pregenerated file shape {data.shape} mismatches (n,d)=({n},{self.dim}); will train instead.", stacklevel=1)
-                return None
-            batches.append(data)
-        return np.asarray(batches, dtype=np.float64)
 
     # --------------------------
     # Training

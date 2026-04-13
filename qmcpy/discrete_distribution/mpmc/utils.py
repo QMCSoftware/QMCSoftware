@@ -176,26 +176,3 @@ def L2mix_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
     t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
     return _sqrt_safe(t1 - t2 + t3)
 
-# -----------------------------------------
-# L2 AVERAGE-SQUARED 
-# -----------------------------------------
-def L2asd(x: torch.Tensor) -> torch.Tensor:
-    B, N, d = _check_inputs(x)
-    t1 = (1.0 / 3.0) ** d
-    p = torch.prod((1.0 + 2.0 * x - 2.0 * x**2) / 4.0, dim=2)
-    t2 = (2.0 / N) * torch.sum(p, dim=1)
-    xi, xj = _pairwise(x)
-    q = torch.prod((1.0 - torch.abs(xi - xj)) / 2.0, dim=3)
-    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
-    return _sqrt_safe(t1 - t2 + t3)
-
-def L2asd_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
-    B, N, d = _check_inputs(x, gamma)
-    g = gamma
-    t1 = torch.prod(1.0 + g / 3.0)
-    p = torch.prod(1.0 + (g.view(1, 1, d) / 4.0) * (1.0 + 2.0 * x - 2.0 * x**2), dim=2)
-    t2 = (2.0 / N) * torch.sum(p, dim=1)
-    xi, xj = _pairwise(x)
-    q = torch.prod(1.0 + (g.view(1, 1, 1, d) / 2.0) * (1.0 - torch.abs(xi - xj)), dim=3)
-    t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
-    return _sqrt_safe(t1 - t2 + t3)

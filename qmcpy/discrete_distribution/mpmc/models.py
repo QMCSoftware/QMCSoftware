@@ -4,9 +4,9 @@ from torch_cluster import radius_graph
 from torch_geometric.nn import MessagePassing, InstanceNorm
 
 from .utils import (
-    L2star, L2ctr, L2ext, L2per, L2sym, L2asd, L2mix,
+    L2star, L2ctr, L2ext, L2per, L2sym, L2mix,
     L2star_weighted, L2ctr_weighted, L2sym_weighted, L2per_weighted,
-    L2ext_weighted, L2asd_weighted, L2mix_weighted,
+    L2ext_weighted, L2mix_weighted,
 )
 
 
@@ -72,8 +72,8 @@ class MPMC_net(nn.Module):
         self.batch = batch
         self.edge_index = radius_graph(self.x, r=radius, loop=True, batch=batch).to(self.torch_device)
 
-        all_losses = {'L2star', 'L2ctr', 'L2ext', 'L2per', 'L2sym', 'L2asd', 'L2mix', 'L2star_weighted', 
-                      'L2ctr_weighted', 'L2ext_weighted', 'L2per_weighted', 'L2sym_weighted', 'L2asd_weighted', 'L2mix_weighted'}
+        all_losses = {'L2star', 'L2ctr', 'L2ext', 'L2per', 'L2sym', 'L2mix', 'L2star_weighted', 
+                      'L2ctr_weighted', 'L2ext_weighted', 'L2per_weighted', 'L2sym_weighted', 'L2mix_weighted'}
         if loss_fn in all_losses:
             self.loss_fn = globals()[loss_fn]
         else:
