@@ -88,7 +88,7 @@ class MPMC_net(nn.Module):
             X = self.convs[i](X,edge_index,self.batch)
         X = torch.sigmoid(self.dec(X))  ## clamping with sigmoid needed so that warnock's formula is well-defined
         X = X.view(self.nbatch, self.nsamples, self.dim)
-        if (self.weights == None):
+        if self.weights is None:
             loss = torch.mean(self.loss_fn(X))
         else:
             loss = torch.mean(self.loss_fn(X, self.weights))
