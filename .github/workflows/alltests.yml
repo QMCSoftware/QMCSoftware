@@ -40,17 +40,40 @@ jobs:
       - name: Add 12GB swap (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo fallocate -l 12G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
+          set -euxo pipefail
+          echo "=== Existing swap devices ==="
+          swapon --show || true
+
+          current_swap_mb=$(free -m | awk '/^Swap:/ {print $2}')
+          if [ "${current_swap_mb:-0}" -ge 12000 ]; then
+            echo "Sufficient swap already present (${current_swap_mb} MB). Skipping swap creation."
+            free -h
+            exit 0
+          fi
+
+          SWAPFILE=/tmp/qmcsoftware_swapfile
+
+          if [ -f "$SWAPFILE" ]; then
+            sudo swapoff "$SWAPFILE" || true
+            sudo rm -f "$SWAPFILE"
+          fi
+
+          sudo fallocate -l 12G "$SWAPFILE"
+          sudo chmod 600 "$SWAPFILE"
+          sudo mkswap "$SWAPFILE"
+          sudo swapon "$SWAPFILE"
+
+          echo "=== Swap after setup ==="
+          swapon --show
           free -h
+
       - name: Add 12GB swap (macOS)
         if: runner.os == 'macOS'
         run: |
           # Create and mount a temporary swapfile
           sudo mkfile 12g /private/var/vm/tempswapfile
           sudo chmod 600 /private/var/vm/tempswapfile
+
       - name: Configure pagefile (Windows) via CIM (12GB)
         if: runner.os == 'Windows'
         shell: pwsh

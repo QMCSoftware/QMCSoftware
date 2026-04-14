@@ -1,6 +1,6 @@
 from qmcpy import *
 from qmcpy.util import *
-from qmcpy.discrete_distribution._c_lib import _load_c_lib
+import qmctoolscl
 import os
 import unittest
 import ctypes
@@ -14,21 +14,13 @@ import warnings
 class TestDiscreteDistribution(unittest.TestCase):
 
     def test_size_unsigned_long(self):
-        _c_lib = _load_c_lib()
-        get_unsigned_long_size_cf = _c_lib.get_unsigned_long_size
-        get_unsigned_long_size_cf.argtypes = []
-        get_unsigned_long_size_cf.restype = ctypes.c_uint8
         if os.name == "nt":
-            self.assertEqual(get_unsigned_long_size_cf(), 4)
+            self.assertEqual(qmctoolscl.util.get_unsigned_long_size_c(), 4)
         else:
-            self.assertEqual(get_unsigned_long_size_cf(), 8)
+            self.assertEqual(qmctoolscl.util.get_unsigned_long_size_c(), 8)
 
     def test_size_unsigned_long_long(self):
-        _c_lib = _load_c_lib()
-        get_unsigned_long_long_size_cf = _c_lib.get_unsigned_long_long_size
-        get_unsigned_long_long_size_cf.argtypes = []
-        get_unsigned_long_long_size_cf.restype = ctypes.c_uint8
-        self.assertEqual(get_unsigned_long_long_size_cf(), 8)
+        self.assertEqual(qmctoolscl.util.get_unsigned_long_long_size_c(), 8)
 
     def test_abstract_methods(self):
         for d in [3, [1, 3, 5]]:
