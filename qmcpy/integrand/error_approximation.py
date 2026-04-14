@@ -5,6 +5,7 @@ from .other_qmc_integrals import QMCIntegrals
 from ..util import ParameterError
 import numpy as np
 
+
 class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality for point sets later
     r"""
     
@@ -24,10 +25,12 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
         #This will change when point set functionality is added, since n is already determined for them
         self.n = n
         #More valid integrands to be added later
-        self.valid_integrands = ['genz_oscillatory', 'genz_corner_peak', 'ra_sum', 'ra_prod', 'ra_sin', 'keister']
+        self.valid_integrands = ['sum_ueu','mc2','piece_lin_gauss','ind_sum_normal','smooth_gauss','ridge_johnson_su','genz_oscillatory', 'genz_corner_peak', 'ra_sum', 'ra_prod', 'ra_sin', 'keister']
         self.true_values = {}
         for integrand_type in self.valid_integrands:
-            if integrand_type == 'genz_oscillatory':
+            if integrand_type in ['sum_ueu','mc2','piece_lin_gauss','ind_sum_normal','smooth_gauss','ridge_johnson_su']:
+                self.true_values[integrand_type] = 0
+            elif integrand_type == 'genz_oscillatory':
                 kind_func = 'OSCILLATORY'
                 integrand = Genz(DigitalNetB2(dimension=self.d, seed=7), kind_func=kind_func, kind_coeff=2)
                 self.true_values[integrand_type] = integrand(2**21).mean()
@@ -35,38 +38,49 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
                 kind_func = 'CORNER PEAK'
                 integrand = Genz(DigitalNetB2(dimension=self.d, seed=7), kind_func=kind_func, kind_coeff=2)
                 self.true_values[integrand_type] = integrand(2**21).mean()
-            elif integrand_type == 'ra_sum' or integrand_type == 'ra_prod' or integrand_type == 'ra_sin':
+            elif integrand_type in ['ra_sum','ra_prod','ra_sin']:
                 self.true_values[integrand_type] = 1.0
             elif integrand_type == 'keister':
                 integrand = Keister(DigitalNetB2(dimension=self.d, seed=7))
                 self.true_values[integrand_type] = integrand(2**21).mean()
             #More integrands to be added later
         
-    def error_approx(self, err_type, integrands, repetitions=30, genz_coeff=2):
+    def error_approx(self, err_type, integrands=['sum_ueu','mc2','piece_lin_gauss','ind_sum_normal','smooth_gauss','ridge_johnson_su'], repetitions=30, genz_coeff=2, filename='err_approx.csv'):
         r"""
         Args:
-            err_type (str): Type of error approximation to compute. Options are:
+            err_type     (str): Type of error approximation to compute. Options are:
                 - 'abs': Absolute error for n samples.
                 - 'rel': Relative error for n samples.
                 - 'mae': Mean absolute error over repetitions with random shifts.
                 - 'rmse': Root mean square error over repetitions with random shifts.
-            integrands (list): List of integrand objects to evaluate. Options are:
-                - 'all': All integrands available
-                - 'genz': All Genz integrands
-                    - 'genz_oscillatory': Genz oscillatory integrand
-                    - 'genz_corner_peak': Genz corner peak integrand
+            integrands (list): Optional. List of integrand objects to evaluate. If unspecified, defaults to the main 6. Options are:
+                - 'all': All integrands available  
+
+                - Main 6:
+                - 'sum_ueu'
+                - 'mc2'
+                - 'piece_lin_gauss'
+                - 'ind_sum_normal'
+                - 'smooth_gauss'
+                - 'ridge_johnson_su' 
+                  - Genz:
+                  - 'genz': All Genz integrands
+                  - 'genz_oscillatory': Genz oscillatory integrand
+                  - 'genz_corner_peak': Genz corner peak integrand
+                - Roos-Arnold:
                 - 'ra': All Roos-Arnold integrands
-                    - 'ra_sum': Roos-Arnold sum integrand
-                    - 'ra_prod': Roos-Arnold product integrand
-                    - 'ra_sin': Roos-Arnold sine integrand
-                - 'keister': Keister integrand
+                - 'ra_sum': Roos-Arnold sum integrand
+                - 'ra_prod': Roos-Arnold product integrand
+                - 'ra_sin': Roos-Arnold sine integrand
+                  - 'keister': Keister integrand
             repetitions (int): Optional. Number of random shift repetitions for 'mae' and 'rmse' error types.
                 - Defaults to 30.
             genz_coeff (int): Optional. The type of coefficients to use for genz integrands, as described in genz.py
                 - Must be 1, 2, or 3, defaults to 2.
+            filename (string): Name of the output csv file, defaults to err_approx.csv
 
         Returns:
-            errors (list): List of lists of errors corresponding to each sample size for each integrand.
+            errors (csv file): Each integrand is a row and each sample size is a column, both in the same order they were called in.
         """
         #Clean up inputs
         err_type = str(err_type).lower().strip()
@@ -105,19 +119,15 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
             elif integrand_type == 'genz_corner_peak':
                 integrand = Genz(self.sampler, kind_func = 'CORNER PEAK', kind_coeff=genz_coeff)
                 err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
-            elif integrand_type == 'ra_sum':
-                integrand = QMCIntegrals(self.sampler, kind_func='RA SUM')
-                err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
-            elif integrand_type == 'ra_prod':
-                integrand = QMCIntegrals(self.sampler, kind_func='RA PROD')
-                err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
-            elif integrand_type == 'ra_sin':
-                integrand = QMCIntegrals(self.sampler, kind_func='RA SIN')
-                err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
+
             elif integrand_type == 'keister':
                 integrand = Keister(self.sampler)
                 err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
-            #More integrands to be added later
+
+            else:
+                integrand = QMCIntegrals(self.sampler, kind_func=integrand_type)
+                err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
+        np.savetxt(filename, [err_dict[str(type)] for type in integrand_types], delimiter=', ')
         return [err_dict[str(type)] for type in integrand_types]
         
     def err(self, integrand_type, integrand, repetitions, err_type):
