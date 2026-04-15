@@ -1,3 +1,11 @@
+---
+jupyter:
+	jupytext:
+		text_representation:
+			extension: .md
+			format_name: markdown
+---
+
 # True Measures
 
 ## UML Overview
