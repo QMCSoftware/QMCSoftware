@@ -229,7 +229,6 @@ make booktests_no_docker TESTS="tb_quickstart tb_pricing_options"
 
 ### Environment Cleanup
 The test targets automatically call `make clean_local_only_files` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
-The test targets automatically call `make clean_local_only_files` to remove corrupted distribution artifacts (e.g., invalid seaborn entries).
 
 ## Reproducibility
 
