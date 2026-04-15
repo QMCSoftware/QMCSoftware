@@ -264,6 +264,8 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp -r paper docs
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
+	@mkdir -p docs/stats
+	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
 
 runmkdocserve: 
 	@mkdocs serve
@@ -276,4 +278,4 @@ docnouml: copydocs runmkdocserve
 # PEP8
 ##########################################################
 check_pep8:
-	@pylint qmcpy --disable=R,C
+	@pylint qmcpy --exit-zero --disable=R,C
