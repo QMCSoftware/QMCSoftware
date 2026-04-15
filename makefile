@@ -1,6 +1,9 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 
+# set environment variable for documentation
+export JUPYTER_PLATFORM_DIRS=1
+
 ##########################################################
 # Coverage artifacts (local-only; should be gitignored)
 ##########################################################
@@ -268,7 +271,7 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
 
 runmkdocserve: 
-	@mkdocs serve
+	@JUPYTER_PLATFORM_DIRS=1 mkdocs serve
 	
 doc: uml copydocs runmkdocserve
 
