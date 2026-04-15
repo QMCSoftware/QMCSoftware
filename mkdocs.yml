@@ -75,7 +75,7 @@ nav:
   
 
 plugins:
-  - search
+  - material/search
   - mkdocs-jupyter:
       ignore_h1_titles: true       # Ignore H1 titles from notebooks
       execute: false               # Execute notebooks during build
@@ -130,6 +130,7 @@ plugins:
       background: white
       shadow: true
       manual: false
+  - autorefs  # explicitly listed so print-site stays last (mkdocstrings auto-injects this)
   - print-site:  # Enables PDF generation (saves docs to print_page/). See https://tinyurl.com/52ba83ax
       add_to_navigation: true
   
