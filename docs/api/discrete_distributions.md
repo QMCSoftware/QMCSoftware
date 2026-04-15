@@ -26,7 +26,7 @@
 
 ## `DigitalNetAnyBases`
 
-::: qmcpy.discrete_distribution.digital_net_any_bases.digital_net_any_bases.DigitalNetAnyBases
+::: qmcpy.discrete_distribution.digital_net_any_bases.DigitalNetAnyBases
 
 ## `Kronecker`
 
