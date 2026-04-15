@@ -510,7 +510,7 @@ class PFGPCIData(Data):
         elif self.d == 2 and not trace_only and self.saved_gps != []:
             fig, gs = self.plot_2d(**kwargs)
         else:
-            from matplotlib import pyplot, gridspec
+            from matplotlib import gridspec
 
             fig = pyplot.figure(constrained_layout=False, figsize=(8, 4))
             gs = gridspec.GridSpec(1, 2, figure=fig)

@@ -1,12 +1,9 @@
 from .abstract_kernel import AbstractKernelScaleLengthscales
-from ..util.transforms import tf_exp_eps, tf_exp_eps_inv, tf_identity
+from ..util.transforms import tf_exp_eps, tf_exp_eps_inv, tf_identity,
 from ..util.shift_invar_ops import BERNOULLIPOLYSDICT, bernoulli_poly
-from ..util.transforms import tf_identity, tf_exp_eps, tf_exp_eps_inv
 from ..util.dig_shift_invar_ops import (
     to_bin,
-    weighted_walsh_funcs,
-    bin_from_numpy_to_torch,
-    to_float,
+    weighted_walsh_funcs
 )
 from ..util import ParameterError
 import numpy as np
