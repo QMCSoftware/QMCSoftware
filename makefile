@@ -276,4 +276,4 @@ docnouml: copydocs runmkdocserve
 # PEP8
 ##########################################################
 check_pep8:
-	@pylint qmcpy --exit-zero --disable=R,C
+	@pylint qmcpy --disable=R,C

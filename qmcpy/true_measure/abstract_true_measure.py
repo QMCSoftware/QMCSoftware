@@ -1,4 +1,4 @@
-from ..util import MethodImplementationError, _univ_repr, DimensionError, ParameterError
+from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
