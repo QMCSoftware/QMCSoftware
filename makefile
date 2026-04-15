@@ -261,6 +261,7 @@ uml:
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
 	@cp -r paper docs/paper
 	@cp README.md docs/README.md 
+	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
@@ -282,3 +283,10 @@ docnouml: copydocs runmkdocserve
 ##########################################################
 check_pep8:
 	@pylint qmcpy --exit-zero --disable=R,C
+
+pep8: update_pep8_badge
+
+update_pep8_badge:
+	@mkdir -p $(LOG_DIR) docs/assets
+	@make check_pep8 > $(LOG_DIR)/pylint.out
+	@python3 scripts/update_pep8_badge.py $(LOG_DIR)/pylint.out docs/assets/pep8-badge.json docs/assets/pep8-badge.svg
