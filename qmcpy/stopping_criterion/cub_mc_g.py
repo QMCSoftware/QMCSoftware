@@ -260,8 +260,8 @@ class CubMCG(AbstractStoppingCriterion):
         n_limit=2**30,
         inflate=1.2,
         alpha=0.01,
-        control_variates=[],
-        control_variate_means=[],
+        control_variates=None,
+        control_variate_means=None,
     ):
         r"""
         Args:
@@ -275,6 +275,10 @@ class CubMCG(AbstractStoppingCriterion):
             control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
             control_variate_means (np.ndarray): Means of each control variate.
         """
+        if control_variates is None:
+            control_variates = []
+        if control_variate_means is None:
+            control_variate_means = []
         self.parameters = [
             "abs_tol",
             "rel_tol",
@@ -420,7 +424,6 @@ class CubMCG(AbstractStoppingCriterion):
                     Note that error tolerances may no longer be satisfied""" % (
                         int(data.n_total),
                         int(n),
-                        int(self.n_limit),
                         int(self.n_limit),
                         int(self.n_limit - data.n_total),
                     )
@@ -589,7 +592,6 @@ def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
     if toltype == "combine":  # the linear combination of two tolerances
         # theta == 0 --> relative error tolerance
         # theta == 1 --> absolute error tolerance
-        tol = theta * abs_tol + (1 - theta) * rel_tol * abs(mu)
+        return theta * abs_tol + (1 - theta) * rel_tol * abs(mu)
     elif toltype == "max":  # the max case
-        tol = max(abs_tol, rel_tol * abs(mu))
-    return tol
+        return max(abs_tol, rel_tol * abs(mu))
