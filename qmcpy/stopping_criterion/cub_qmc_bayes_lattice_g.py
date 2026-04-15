@@ -247,7 +247,7 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             else:
                 raise ParameterError("Bernoulli order not implemented")
 
-            kernel_func = lambda x: bern_poly(x)
+            kernel_func = bern_poly
         else:
             b = order
             kernel_func = (
