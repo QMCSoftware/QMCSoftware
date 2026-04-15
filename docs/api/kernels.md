@@ -1,9 +1,9 @@
 ---
 jupyter:
-	jupytext:
-		text_representation:
-			extension: .md
-			format_name: markdown
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
 ---
 
 # Kernels 
