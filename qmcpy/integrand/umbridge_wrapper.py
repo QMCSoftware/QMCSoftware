@@ -4,7 +4,7 @@ from ..true_measure import Uniform
 from ..util import ParameterError
 import numpy as np
 import os
-import umbridge
+
 
 class UMBridgeWrapper(AbstractIntegrand):
     """
@@ -20,8 +20,13 @@ class UMBridgeWrapper(AbstractIntegrand):
         >>> um_bridge_config = {"d": dnb2.d}
         >>> integrand = UMBridgeWrapper(true_measure,um_bridge_model,um_bridge_config,parallel=False)
         >>> y = integrand(2**10)
-        >>> y.shape
-        (31, 1024)
+        >>> with np.printoptions(formatter={"float":lambda x: "%.1e"%x}):
+        ...     y.mean(-1)
+        array([0.0e+00, 3.9e+00, 1.5e+01, 3.2e+01, 5.5e+01, 8.3e+01, 1.2e+02,
+               1.5e+02, 2.0e+02, 2.4e+02, 2.9e+02, 3.4e+02, 3.9e+02, 4.3e+02,
+               4.7e+02, 5.0e+02, 5.3e+02, 5.6e+02, 5.9e+02, 6.2e+02, 6.4e+02,
+               6.6e+02, 6.9e+02, 7.2e+02, 7.6e+02, 7.9e+02, 8.3e+02, 8.6e+02,
+               9.0e+02, 9.4e+02, 9.7e+02])
         >>> _ = os.system('docker rm -f muqbppytest > /dev/null')
 
         Custom model with independent replications
@@ -72,6 +77,7 @@ class UMBridgeWrapper(AbstractIntegrand):
 
                 Setting `parallel=True` is equivalent to `parallel = os.cpu_count()`.
         """
+        import umbridge
 
         self.parameters = []
         self.true_measure = true_measure
