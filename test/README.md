@@ -38,11 +38,10 @@ This short guide highlights four practical areas:
 - **Time**: ~30–60 seconds (depending on CPU cores and notebook complexity)
 - **Coverage**: Full summary report at the end
 - **Use when**: You want comprehensive testing with maximum speed
-- **log files**: in `artifacts/logs/`
+- **log files**: in `test/booktests/logs/`
 
 #### `make tests_no_docker`
 Runs all tests sequentially: doctests, unittests, and generates coverage reports (excludes Docker-dependent tests).
-- **Cleans** outdated artifacts before running (via `make clean_local_only_files`)
 - **Sequence**: doctests_no_docker → unittests → coverage report
 - **Time**: ~60–120 seconds
 - **Coverage**: Full summary report
