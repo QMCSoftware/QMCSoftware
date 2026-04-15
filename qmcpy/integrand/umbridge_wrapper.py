@@ -3,7 +3,8 @@ from ..discrete_distribution import DigitalNetB2
 from ..true_measure import Uniform
 from ..util import ParameterError
 import numpy as np
-
+import os
+import umbridge
 
 class UMBridgeWrapper(AbstractIntegrand):
     """
