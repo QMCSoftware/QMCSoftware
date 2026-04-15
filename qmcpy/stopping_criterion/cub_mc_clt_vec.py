@@ -5,7 +5,6 @@ from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
-from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun, Genz, SensitivityIndices
 from ..util import MaxSamplesWarning, ParameterWarning, ParameterError
 import numpy as np

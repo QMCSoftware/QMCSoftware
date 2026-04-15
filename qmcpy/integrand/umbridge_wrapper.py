@@ -1,9 +1,6 @@
 from .abstract_integrand import AbstractIntegrand
-from ..discrete_distribution import DigitalNetB2
-from ..true_measure import Uniform
 from ..util import ParameterError
 import numpy as np
-import os
 
 
 class UMBridgeWrapper(AbstractIntegrand):
@@ -77,7 +74,6 @@ class UMBridgeWrapper(AbstractIntegrand):
 
                 Setting `parallel=True` is equivalent to `parallel = os.cpu_count()`.
         """
-        import umbridge
 
         self.parameters = []
         self.true_measure = true_measure

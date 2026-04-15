@@ -5,7 +5,6 @@ Can be called from the Makefile or used standalone.
 """
 
 import os
-import sys
 import argparse
 from pathlib import Path
 

@@ -3,7 +3,6 @@ from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
 import numpy as np
-from typing import Union
 
 
 class AbstractTrueMeasure(object):

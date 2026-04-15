@@ -1,10 +1,6 @@
 from .abstract_integrand import AbstractIntegrand
 from ..discrete_distribution import DigitalNetB2
-from ..true_measure import Gaussian, Lebesgue, Uniform
-from ..discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
-from ..true_measure.abstract_true_measure import AbstractTrueMeasure
+from ..true_measure import Gaussian
 from ..util import ParameterError
 import numpy as np
 

@@ -1,7 +1,7 @@
 from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ...util import ParameterError, ParameterWarning
 import qmctoolscl
-from os.path import dirname, abspath, isfile
+from os.path import dirname, abspath
 import numpy as np
 from numpy.lib.npyio import DataSource
 import warnings

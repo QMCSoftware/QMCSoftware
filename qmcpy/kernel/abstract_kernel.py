@@ -1,11 +1,9 @@
 from ..util import MethodImplementationError
 import numpy as np
-from typing import Union
 from ..util.transforms import (
     tf_exp_eps,
     tf_exp_eps_inv,
     parse_assign_param,
-    tf_identity,
     insert_batch_dims,
 )
 

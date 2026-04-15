@@ -1,6 +1,6 @@
 from .abstract_integrand import AbstractIntegrand
-from ..true_measure import GeometricBrownianMotion
 from ..discrete_distribution import DigitalNetB2
+from ..true_measure import GeometricBrownianMotion
 from ..util import ParameterError
 import numpy as np
 from scipy.stats import norm

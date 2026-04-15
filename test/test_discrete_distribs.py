@@ -3,9 +3,7 @@ from qmcpy.util import *
 import qmctoolscl
 import os
 import unittest
-import ctypes
 import numpy as np
-import time
 import numpy.testing as npt
 import tempfile
 import warnings

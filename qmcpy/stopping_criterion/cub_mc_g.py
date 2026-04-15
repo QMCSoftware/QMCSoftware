@@ -1,15 +1,11 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
-from ..discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
+from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
 from ..integrand import FinancialOption, Linear0, AbstractIntegrand
-from ..true_measure import Gaussian, Uniform
-from ..discrete_distribution import IIDStdUniform
 from ..util import MaxSamplesWarning, ParameterError
 import numpy as np
 from scipy.optimize import root_scalar
