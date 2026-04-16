@@ -386,7 +386,7 @@ class KernelMultiTask(AbstractKernel):
             factor_endsize_ops = [len(self.lti0)]
             diag_endsize_ops = [self.num_tasks]
         else:
-            raise Exception(
+            raise ValueError(
                 "invalid method = %s, must be in ['LOW RANK','CHOLESKY']" % self.method
             )
         self.raw_factor = self.parse_assign_param(
@@ -445,7 +445,7 @@ class KernelMultiTask(AbstractKernel):
             L[..., self.lti0, self.lti1] = self.factor
             taskmat = self.npt.einsum("...ij,...kj->...ik", L, L)
         else:
-            raise Exception(
+            raise ValueError(
                 "invalid method = %s, must be in ['LOW RANK','CHOLESKY']" % self.method
             )
         return taskmat
