@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - main
+      - doc_choi  # temporary
   workflow_dispatch:
 
 permissions:
