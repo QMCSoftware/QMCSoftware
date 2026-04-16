@@ -67,7 +67,7 @@ class SuggesterSimple(Suggester):
         assert d == self.sampler.d
         try:
             x = self.sampler(n_min=self.n_min, n_max=n_max)
-        except:
+        except Exception:
             x = self.sampler(n)
         self.n_min = n_max
         return x
