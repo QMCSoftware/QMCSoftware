@@ -126,62 +126,47 @@ class TestIntegrand(unittest.TestCase):
         spawned = ig.spawn(levels=0)
         self.assertEqual(len(spawned), 1)
 
-    # BayesianLRCoeffs tests
-    def test_bayesian_lr_coeffs_basic_evaluation(self):
-        ig = BayesianLRCoeffs(
+
+class TestBayesianLRCoeffs(unittest.TestCase):
+    """Tests for BayesianLRCoeffs methods not covered by unit tests."""
+
+    def setUp(self):
+        self.ig = BayesianLRCoeffs(
             DigitalNetB2(3, seed=7),
             feature_array=np.arange(8).reshape((4, 2)),
             response_vector=[0, 0, 1, 1],
         )
-        y = ig(64)
+
+    def test_basic_evaluation(self):
+        y = self.ig(64)
         # shape is (2, num_coeffs, n) = (2, 3, 64)
         self.assertEqual(y.shape, (2, 3, 64))
 
-    def test_bayesian_lr_coeffs_bound_fun(self):
-        ig = BayesianLRCoeffs(
-            DigitalNetB2(3, seed=7),
-            feature_array=np.arange(8).reshape((4, 2)),
-            response_vector=[0, 0, 1, 1],
-        )
+    def test_bound_fun(self):
         bound_low = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])
         bound_high = np.array([[0.2, 0.3, 0.4], [0.6, 0.7, 0.8]])
-        low, high = ig.bound_fun(bound_low, bound_high)
+        low, high = self.ig.bound_fun(bound_low, bound_high)
         self.assertEqual(low.shape, (3,))
         self.assertEqual(high.shape, (3,))
         self.assertTrue((low <= high).all())
 
-    def test_bayesian_lr_coeffs_bound_fun_denominator_spans_zero(self):
-        ig = BayesianLRCoeffs(
-            DigitalNetB2(3, seed=7),
-            feature_array=np.arange(8).reshape((4, 2)),
-            response_vector=[0, 0, 1, 1],
-        )
+    def test_bound_fun_denominator_spans_zero(self):
         # den_bounds_low <= 0 <= den_bounds_high  → (-inf, +inf) bounds
         bound_low = np.array([[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3]])
         bound_high = np.array([[0.2, 0.3, 0.4], [0.1, 0.2, 0.3]])
-        low, high = ig.bound_fun(bound_low, bound_high)
+        low, high = self.ig.bound_fun(bound_low, bound_high)
         self.assertTrue(np.all(low == -np.inf) or np.any(np.isinf(low)))
 
-    def test_bayesian_lr_coeffs_dependency(self):
-        ig = BayesianLRCoeffs(
-            DigitalNetB2(3, seed=7),
-            feature_array=np.arange(8).reshape((4, 2)),
-            response_vector=[0, 0, 1, 1],
-        )
+    def test_dependency(self):
         comb_flags = np.array([True, False, True])
-        dep = ig.dependency(comb_flags)
+        dep = self.ig.dependency(comb_flags)
         self.assertEqual(dep.shape, (2, 3))
 
-    def test_bayesian_lr_coeffs_spawn(self):
-        ig = BayesianLRCoeffs(
-            DigitalNetB2(3, seed=7),
-            feature_array=np.arange(8).reshape((4, 2)),
-            response_vector=[0, 0, 1, 1],
-        )
-        spawned = ig.spawn(levels=[0])
+    def test_spawn(self):
+        spawned = self.ig.spawn(levels=[0])
         self.assertEqual(len(spawned), 1)
 
-    def test_bayesian_lr_coeffs_invalid_dimension(self):
+    def test_invalid_dimension(self):
         # Dimension 2 but feature_array has 2 features → expects d=3
         self.assertRaises(
             ParameterError,
@@ -191,7 +176,7 @@ class TestIntegrand(unittest.TestCase):
             [0, 0, 1, 1],
         )
 
-    def test_bayesian_lr_coeffs_invalid_response_vector(self):
+    def test_invalid_response_vector(self):
         # Response vector with non-binary values
         self.assertRaises(
             ParameterError,
