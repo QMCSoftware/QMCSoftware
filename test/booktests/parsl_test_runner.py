@@ -6,18 +6,6 @@ import re
 import platform
 from pathlib import Path
 
-# Use ThreadPoolExecutor on macOS (avoids interchange.py spawn issue)
-# Use HighThroughputExecutor on Linux for better performance
-if platform.system() == "Darwin":
-    from parsl.config import Config
-    from parsl.executors import ThreadPoolExecutor
-
-    config = Config(
-        executors=[ThreadPoolExecutor(max_threads=8, label="local_threads")]
-    )
-else:
-    pass
-
 
 @bash_app
 def run_single_test(test_file, stdout="test_output.txt", stderr="test_error.txt"):
