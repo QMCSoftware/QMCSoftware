@@ -637,7 +637,7 @@ class FinancialOption(AbstractIntegrand):
             elif self.call_put == "PUT":
                 val = f2 * norm.cdf(-d2) - f1 * norm.cdf(-d1)
         else:
-            raise Exception(
+            raise NotImplementedError(
                 "get_exact_value_inf_dim not implemented for option = %s" % self.option
             )
         return val
