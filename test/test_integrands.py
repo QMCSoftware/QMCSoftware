@@ -89,6 +89,42 @@ class TestIntegrand(unittest.TestCase):
         y = k.f(x)
         self.assertAlmostEqual(y.mean(), exact_integ, places=2)
 
+    def test_FourBranch2d(self):
+        fb = FourBranch2d(DigitalNetB2(2, seed=7))
+        x = fb.discrete_distrib.gen_samples(2**10)
+        y = fb.f(x)
+        self.assertEqual(y.shape, (2**10,))
+        self.assertTrue(np.isfinite(y).all())
+    
+    def test_multimodal2d(self):
+        mm = Multimodal2d(DigitalNetB2(2, seed=7))
+        x = mm.discrete_distrib.gen_samples(2**10)
+        y = mm.f(x)
+        self.assertEqual(y.shape, (2**10,))
+        self.assertTrue(np.isfinite(y).all())
+
+    def test_genz_oscillatory_all_coeffs(self):
+        for kind_coeff in [1, 2, 3]:
+            ig = Genz(DigitalNetB2(2, seed=7), kind_func="OSCILLATORY", kind_coeff=kind_coeff)
+            y = ig(32)
+            self.assertEqual(y.shape, (32,))
+
+    def test_genz_corner_peak_all_coeffs(self):
+        for kind_coeff in [1, 2, 3]:
+            ig = Genz(DigitalNetB2(2, seed=7), kind_func="CORNER PEAK", kind_coeff=kind_coeff)
+            y = ig(32)
+            self.assertEqual(y.shape, (32,))
+
+    def test_genz_invalid_kind_func(self):
+        self.assertRaises(ParameterError, Genz, DigitalNetB2(2, seed=7), kind_func="INVALID")
+
+    def test_genz_invalid_kind_coeff(self):
+        self.assertRaises(ParameterError, Genz, DigitalNetB2(2, seed=7), kind_coeff=4)
+
+    def test_genz_spawn(self):
+        ig = Genz(DigitalNetB2(2, seed=7), kind_func="CORNER PEAK", kind_coeff=2)
+        spawned = ig.spawn(levels=0)
+        self.assertEqual(len(spawned), 1)
 
 if __name__ == "__main__":
     unittest.main()
