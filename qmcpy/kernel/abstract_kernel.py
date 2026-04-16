@@ -323,7 +323,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
         d,
         scale=1.0,
         lengthscales=1.0,
-        shape_scale=[1],
+        shape_scale=None,
         shape_lengthscales=None,
         tfs_scale=(tf_exp_eps_inv, tf_exp_eps),
         tfs_lengthscales=(tf_exp_eps_inv, tf_exp_eps),
@@ -332,7 +332,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
         requires_grad_lengthscales=True,
         device="cpu",
         compile_call=False,
-        comiple_call_kwargs={},
+        comiple_call_kwargs=None,
     ):
         r"""
         Args:
@@ -350,6 +350,10 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method.
             comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
+        if shape_scale is None:
+            shape_scale = [1]
+        if comiple_call_kwargs is None:
+            comiple_call_kwargs = {}
         super().__init__(
             d=d,
             torchify=torchify,
