@@ -12,6 +12,6 @@ except ImportError:
 
     class ExactGPyTorchRegressionModel(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ImportError(
                 "ExactGPyTorchRegressionModel requires torch and gpytorch but no installations found"
             )
