@@ -26,7 +26,7 @@ jobs:
           use-only-tar-bz2: true
       - name: Install lint dependency
         run: |
-          python -m pip install pylint
+          python -m pip install 'pylint>=3,<4'
       - name: Run check_pep8
         run: |
           set -o pipefail
