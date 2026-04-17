@@ -24,9 +24,9 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-      - name: Install lint dependency
+      - name: Install project with lint dependencies
         run: |
-          python -m pip install pylint
+          python -m pip install -e ".[docs]"
       - name: Run check_pep8
         run: |
           set -o pipefail
