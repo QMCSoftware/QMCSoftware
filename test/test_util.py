@@ -2,13 +2,18 @@ import unittest
 import numpy as np
 from qmcpy.util import (
     _univ_repr,
+    NotYetImplemented,
     ParameterError,
     MethodImplementationError,
 )
 from qmcpy.util.data import Data
+from qmcpy.util.dig_shift_invar_ops import to_bin, to_float, weighted_walsh_funcs
+from qmcpy.util.latnetbuilder_linker import latnetbuilder_linker
+from qmcpy.util.shift_invar_ops import bernoulli_poly
 from qmcpy.util.torch_numpy_ops import get_npt
 from qmcpy.util.transforms import (
     insert_batch_dims,
+    parse_assign_param,
     tf_exp,
     tf_exp_inv,
     tf_square,
@@ -94,7 +99,7 @@ class TestTransforms(unittest.TestCase):
         result = tf_explinear(x)
         self.assertEqual(result.shape, (3,))
         self.assertTrue(np.all(np.isfinite(result)))
-        
+
     def test_tf_explinear_inv(self):
         """tf_explinear_inv should apply inverse explinear transform."""
         x = np.array([0.5, 1.0, 2.0])
@@ -109,17 +114,90 @@ class TestTransforms(unittest.TestCase):
         # For large x, should return approximately x
         np.testing.assert_allclose(result[1], x[1], rtol=1e-10)
 
+    def test_parse_assign_param_numpy_constraints(self):
+        """parse_assign_param should respect numpy constraints."""
+        raw = parse_assign_param(
+            pname="sigma",
+            param=2.0,
+            shape_param=[1],
+            requires_grad_param=False,
+            tfs_param=(tf_identity, tf_identity),
+            endsize_ops=[1, 2],
+            constraints=["POSITIVE"],
+            torchify=False,
+            npt=np,
+            nptkwargs={},
+        )
+        np.testing.assert_allclose(raw, np.array([2.0]))
+
+        with self.assertRaises(AssertionError):
+            parse_assign_param(
+                pname="k",
+                param=1.5,
+                shape_param=[1],
+                requires_grad_param=False,
+                tfs_param=(tf_identity, tf_identity),
+                endsize_ops=[1],
+                constraints=["INTEGER"],
+                torchify=False,
+                npt=np,
+                nptkwargs={},
+            )
+
+
+class TestDigShiftInvarOps(unittest.TestCase):
+    """Tests for digital shift invariant utility helpers."""
+
+    def test_digital_shift_roundtrip_and_dtype_errors(self):
+        """to_bin and to_float should roundtrip float inputs."""
+        xf = np.array([0.0, 0.125, 0.25, 0.875], dtype=float)
+        xb = to_bin(xf, t=3)
+        self.assertEqual(xb.dtype, np.uint64)
+        x_back = to_float(xb, t=3)
+        np.testing.assert_allclose(x_back, xf)
+
+        with self.assertRaises(ParameterError):
+            to_bin(np.array([1 + 2j], dtype=np.complex128), t=3)
+
+    def test_weighted_walsh_funcs_and_bernoulli_poly_input_checks(self):
+        """weighted_walsh_funcs and bernoulli_poly should validate inputs."""
+        xb = np.array([[0, 1], [2, 3]], dtype=np.uint64)
+        y = weighted_walsh_funcs(alpha=2, xb=xb, t=2)
+        self.assertEqual(y.shape, xb.shape)
+        self.assertTrue(np.isfinite(y).all())
+
+        with self.assertRaises(AssertionError):
+            weighted_walsh_funcs(alpha=5, xb=xb, t=2)
+
+        yb = bernoulli_poly(2, np.array([0.0, 0.5, 1.0]))
+        self.assertEqual(yb.shape, (3,))
+        with self.assertRaises(AssertionError):
+            bernoulli_poly(11, np.array([0.1]))
+
+
+class TestLatnetbuilderLinker(unittest.TestCase):
+    """Tests for latnetbuilder linker utility."""
+
+    def test_latnetbuilder_linker_not_implemented(self):
+        """latnetbuilder_linker should currently raise NotYetImplemented."""
+        with self.assertRaises(NotYetImplemented):
+            latnetbuilder_linker()
+
 
 class TestUnivRepr(unittest.TestCase):
     """Tests for _univ_repr utility function."""
 
+    @staticmethod
+    def _make_mock(**attrs):  
+        """helper function to create a mock object with specified attributes."""
+        obj = type("MockObject", (), {})()
+        for key, value in attrs.items():
+            setattr(obj, key, value)
+        return obj
+
     def test_univ_repr_scalar_values(self):
         """_univ_repr should format scalar values nicely."""
-        class MockObject:
-            pass
-        obj = MockObject()
-        obj.n_samples = 128
-        obj.dimension = 5
+        obj = self._make_mock(n_samples=128, dimension=5)
         result = _univ_repr(obj, "MockClass", ["n_samples", "dimension"])
         self.assertIn("MockClass", result)
         self.assertIn("n_samples", result)
@@ -127,34 +205,33 @@ class TestUnivRepr(unittest.TestCase):
 
     def test_univ_repr_power_of_two(self):
         """_univ_repr should recognize powers of 2."""
-        class MockObject:
-            pass
-        obj = MockObject()
-        obj.n = 512  # 2^9
+        obj = self._make_mock(n=512)  # 2^9
         result = _univ_repr(obj, "Test", ["n"])
         self.assertIn("2^(9)", result)
 
     def test_univ_repr_array_values(self):
         """_univ_repr should handle numpy arrays."""
-        class MockObject:
-            pass
-        obj = MockObject()
-        obj.data = np.array([1.0, 2.0, 3.0])
+        obj = self._make_mock(data=np.array([1.0, 2.0, 3.0]))
         result = _univ_repr(obj, "Test", ["data"])
         self.assertIn("Test", result)
 
     def test_univ_repr_list_values(self):
         """_univ_repr should handle list values."""
-        class MockObject:
-            pass
-        obj = MockObject()
-        obj.seeds = [1, 2, 3]
+        obj = self._make_mock(seeds=[1, 2, 3])
         result = _univ_repr(obj, "Test", ["seeds"])
         self.assertIn("Test", result)
 
 
 class TestData(unittest.TestCase):
     """Tests for Data class."""
+
+    @staticmethod
+    def _make_data(parameters=None, **attrs):
+        data = Data(parameters or [])
+        data.time_integrate = 0.0
+        for key, value in attrs.items():
+            setattr(data, key, value)
+        return data
 
     def test_data_init(self):
         """Data should initialize with parameters list."""
@@ -163,56 +240,37 @@ class TestData(unittest.TestCase):
 
     def test_data_repr_empty(self):
         """Data.__repr__ should generate proper string with empty params."""
-        d = Data([])
-        d.time_integrate = 0.0
+        d = self._make_data()
         result = str(d)
         self.assertIn("Data", result)
 
     def test_data_repr_with_values(self):
         """Data.__repr__ should show attributes when parameters are set."""
-        d = Data(["test_param"])
-        d.test_param = 42
+        d = self._make_data(parameters=["test_param"], test_param=42)
         d.time_integrate = 0.5
         result = str(d)
         self.assertIn("Data", result)
         self.assertIn("test_param", result)
 
-    def test_data_repr_with_stopping_crit(self):
-        """Data.__repr__ should show stopping criterion if set."""
-        d = Data([])
-        d.time_integrate = 0.0
-        d.stopping_crit = "test_crit"
-        result = str(d)
-        self.assertIn("Data", result)
-        self.assertIn("test_crit", result)
-
-    def test_data_repr_with_integrand(self):
-        """Data.__repr__ should show integrand if set."""
-        d = Data([])
-        d.time_integrate = 0.0
-        d.integrand = "test_integrand"
-        result = str(d)
-        self.assertIn("test_integrand", result)
-
-    def test_data_repr_with_true_measure(self):
-        """Data.__repr__ should show true_measure if set."""
-        d = Data([])
-        d.time_integrate = 0.0
-        d.true_measure = "test_measure"
-        result = str(d)
-        self.assertIn("test_measure", result)
-
-    def test_data_repr_with_discrete_distrib(self):
-        """Data.__repr__ should show discrete_distrib if set."""
-        d = Data([])
-        d.time_integrate = 0.0
-        d.discrete_distrib = "test_distrib"
-        result = str(d)
-        self.assertIn("test_distrib", result)
+    def test_data_repr_with_optional_attributes(self):
+        """Data.__repr__ should show optional related objects if set."""
+        for attr, value in [
+            ("stopping_crit", "test_crit"),
+            ("integrand", "test_integrand"),
+            ("true_measure", "test_measure"),
+            ("discrete_distrib", "test_distrib"),
+        ]:
+            with self.subTest(attr=attr):
+                d = self._make_data(**{attr: value})
+                result = str(d)
+                self.assertIn(value, result)
 
 
 class TestExceptionsWarnings(unittest.TestCase):
     """Tests for exception and warning classes."""
+
+    class _TestClass:
+        pass
 
     def test_parameter_error_instantiation(self):
         """ParameterError should be instantiable with message."""
@@ -231,25 +289,19 @@ class TestExceptionsWarnings(unittest.TestCase):
 
     def test_method_implementation_error_instantiation(self):
         """MethodImplementationError needs subclass and method_name."""
-        class TestClass:
-            pass
-        err = MethodImplementationError(TestClass(), "test_method")
-        self.assertIn("TestClass", str(err))
+        err = MethodImplementationError(self._TestClass(), "test_method")
+        self.assertIn("_TestClass", str(err))
         self.assertIn("test_method", str(err))
 
     def test_method_implementation_error_inheritance(self):
         """MethodImplementationError should inherit from Exception."""
-        class TestClass:
-            pass
-        err = MethodImplementationError(TestClass(), "test")
+        err = MethodImplementationError(self._TestClass(), "test")
         self.assertIsInstance(err, Exception)
 
     def test_method_implementation_error_raised(self):
         """MethodImplementationError should be raised and caught."""
-        class TestClass:
-            pass
         with self.assertRaises(MethodImplementationError):
-            raise MethodImplementationError(TestClass(), "test")
+            raise MethodImplementationError(self._TestClass(), "test")
 
 
 if __name__ == "__main__":
