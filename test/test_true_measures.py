@@ -3,6 +3,8 @@ from qmcpy.util import *
 import numpy as np
 import scipy.stats
 import unittest
+from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
+from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
 
 
 class TestTrueMeasure(unittest.TestCase):
@@ -131,6 +133,57 @@ class TestMatern(unittest.TestCase):
         kernel2 = gp.kernels.Matern(length_scale=4, nu=2.5)
         cov2 = 0.01 * kernel2.__call__(points) + 1e-6 * np.eye(m2.covariance.shape[-1])
         assert np.allclose(cov2, m2.covariance)
+
+class TestUniformTriangle(unittest.TestCase):
+    """Tests for UniformTriangle and _UniformTriangleAdapter."""
+
+    def test_basic_usage_and_dim_error(self):
+        tm = UniformTriangle(sampler=DigitalNetB2(2, seed=7))
+        x = tm(8)
+        self.assertEqual(x.shape, (8, 2))
+        self.assertTrue(np.all(x[:, 1] <= x[:, 0]))
+
+        with self.assertRaises(DimensionError):
+            tm._joint.transform(np.ones((4, 3)))
+
+    def test_adapter_transform(self):
+        adapter = _UniformTriangleAdapter()
+        u = np.array([[0.25, 0.5], [0.64, 0.75], [0.01, 0.9]])
+        x = adapter.transform(u)
+        self.assertEqual(x.shape, (3, 2))
+        # y = u2 * sqrt(u1) <= sqrt(u1) = x  always since u2 in [0,1]
+        self.assertTrue(np.all(x[:, 1] <= x[:, 0] + 1e-12))
+
+    def test_adapter_transform_dim_error(self):
+        adapter = _UniformTriangleAdapter()
+        # Wrong last dimension (3 instead of 2)
+        self.assertRaises(DimensionError, adapter.transform, np.ones((4, 3)))
+
+    def test_adapter_logpdf_inside(self):
+        adapter = _UniformTriangleAdapter()
+        # Points inside the triangle (y <= x, x in [0,1])
+        x = np.array([[0.5, 0.3], [0.8, 0.0], [1.0, 0.5]])
+        lp = adapter.logpdf(x)
+        self.assertEqual(lp.shape, (3,))
+        self.assertTrue(np.all(np.isfinite(lp)))
+
+    def test_adapter_logpdf_outside(self):
+        adapter = _UniformTriangleAdapter()
+        # Points outside the triangle (y > x)
+        x = np.array([[0.3, 0.5]])
+        lp = adapter.logpdf(x)
+        self.assertEqual(lp[0], -np.inf)
+
+    def test_adapter_logpdf_dim_error(self):
+        adapter = _UniformTriangleAdapter()
+        self.assertRaises(DimensionError, adapter.logpdf, np.ones((4, 3)))
+
+    def test_adapter_logpdf_batched(self):
+        adapter = _UniformTriangleAdapter()
+        u = np.random.default_rng(42).uniform(size=(5, 2))
+        x = adapter.transform(u)
+        lp = adapter.logpdf(x)
+        self.assertEqual(lp.shape, (5,))
 
 
 class TestGaussian(unittest.TestCase):
