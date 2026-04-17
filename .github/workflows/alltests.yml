@@ -315,5 +315,16 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
+
+      # -----------------------------------------------------------
+      # Upload coverage to Codecov
+      # -----------------------------------------------------------
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: alltests
+          fail_ci_if_error: false
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests
