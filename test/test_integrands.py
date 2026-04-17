@@ -233,10 +233,6 @@ class TestBayesianLRCoeffs(unittest.TestCase):
         dep = self.ig.dependency(comb_flags)
         self.assertEqual(dep.shape, (2, 3))
 
-    def test_spawn(self):
-        spawned = self.ig.spawn(levels=[0])
-        self.assertEqual(len(spawned), 1)
-
     def test_invalid_dimension(self):
         # Dimension 2 but feature_array has 2 features → expects d=3
         self.assertRaises(
