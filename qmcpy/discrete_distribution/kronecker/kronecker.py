@@ -1,5 +1,5 @@
-from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
-from ..util import ParameterError
+from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from ...util import ParameterError
 import numpy as np
 import warnings
 
