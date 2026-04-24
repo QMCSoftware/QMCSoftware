@@ -4,6 +4,7 @@ Each tb_*.py file tests a single demo notebook.
 """
 
 import unittest, gc
+from pathlib import Path
 import psutil
 import gc
 import time
@@ -18,6 +19,14 @@ matplotlib.rcParams["text.usetex"] = False  # Disable LaTeX
 
 TB_TIMEOUT = 3600
 subprocess.run(["pip", "install", "-q", "psutil", "testbook", "parsl"], check=False)
+
+
+def notebook_test_path(notebook_path):
+    """Return a testbook-safe absolute notebook path string."""
+    path = Path(notebook_path)
+    if not path.is_absolute():
+        path = Path(__file__).resolve().parent / path
+    return path.resolve(strict=False).as_posix()
 
 
 class BaseNotebookTest(unittest.TestCase):
@@ -46,10 +55,9 @@ class BaseNotebookTest(unittest.TestCase):
     # -- Shared helpers for notebook tests -------------------------------------------------
     def locate_notebook(self, rel_path):
         """Return absolute notebook path and its directory. Skip test if missing."""
-        notebook_path = os.path.join(os.path.dirname(__file__), rel_path)
+        notebook_path = notebook_test_path(rel_path)
         if not os.path.exists(notebook_path):
             self.skipTest(f"Notebook not found at {notebook_path}")
-        notebook_path = os.path.abspath(notebook_path)
         return notebook_path, os.path.dirname(notebook_path)
 
     def fix_gbm_symlinks(self, notebook_dir, symlinks_to_fix=None):
@@ -85,9 +93,10 @@ class BaseNotebookTest(unittest.TestCase):
             replacements: Optional dict of {old_str: new_str} to apply to code cells in memory
             is_overwrite: If True, overwrite the notebook file with modified cells
             stop_at_pattern: Optional string pattern - if provided, uses `testbook` to stop execution
-                           at the first cell containing this pattern
+                at the first cell containing this pattern
             skip_patterns: Optional list of string patterns - cells containing any of these patterns will be skipped
         """
+        notebook_path = notebook_test_path(notebook_path)
         # If stop_at_pattern or skip_patterns is provided, use testbook for selective execution
         if stop_at_pattern or skip_patterns:
             with open(notebook_path) as f:
