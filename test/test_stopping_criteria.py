@@ -2,6 +2,7 @@
 
 import builtins
 import importlib
+import warnings
 from qmcpy import *
 from qmcpy.util import *
 import numpy as np
@@ -415,6 +416,7 @@ class TestResumeFeature(unittest.TestCase):
     """Tests for the resume parameter of integrate() across all stopping criteria."""
 
     def setUp(self):
+        warnings.filterwarnings("ignore", category=MaxSamplesWarning)
         self.seed = 7
         self.dimension = 2
         self.loose_abs_tol = 0.2
