@@ -130,7 +130,7 @@ class CubMLMC(AbstractCubMLMC):
             allow_vectorized_integrals=False,
         )
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
         data = Data(
             parameters=[

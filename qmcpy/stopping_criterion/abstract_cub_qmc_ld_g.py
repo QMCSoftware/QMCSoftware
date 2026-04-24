@@ -171,59 +171,75 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         beta = self.vlstsq(x4beta, y4beta)
         return beta
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "time_integrate",
-            ]
-        )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (0,))
-        if self.ncv > 0:
-            data.ycvfull = np.empty(self.integrand.d_indv + (self.ncv, 0))
-        data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
-        data.muhat = np.tile(np.nan, self.integrand.d_indv)
-        data.beta = np.tile(np.nan, self.integrand.d_indv + (self.ncv,))
+        first_resume_iter = False
+        if resume is not None:
+            data = resume
+            # Reset flags so all components are re-evaluated against the new tolerance.
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            # Set n_min to n_total so the next actual batch starts after the prior samples.
+            data.n_min = int(data.n_total)
+            # Restore the transform state stored by the previous integrate() call.
+            ytildefull = data._ytildefull
+            kappanumap = data._kappanumap
+            if self.ncv > 0:
+                ycvtildefull = data._ycvtildefull
+            first_resume_iter = True
+        else:
+            data = Data(
+                parameters=[
+                    "solution",
+                    "comb_bound_low",
+                    "comb_bound_high",
+                    "comb_bound_diff",
+                    "comb_flags",
+                    "n_total",
+                    "n",
+                    "time_integrate",
+                ]
+            )
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (0,))
+            if self.ncv > 0:
+                data.ycvfull = np.empty(self.integrand.d_indv + (self.ncv, 0))
+            data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
+            data.muhat = np.tile(np.nan, self.integrand.d_indv)
+            data.beta = np.tile(np.nan, self.integrand.d_indv + (self.ncv,))
         while True:
             m = int(np.log2(data.n_max))
-            xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull, xnext], 0)
-            ynext = self.integrand.f(
-                xnext,
-                periodization_transform=self.ptransform,
-                compute_flags=data.compute_flags,
-            )
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            if self.ncv > 0:
-                ycvnext = [None] * self.ncv
-                for k in range(self.ncv):
-                    ycvnext_k = self.cv[k].f(
-                        xnext,
-                        periodization_transform=self.ptransform,
-                        compute_flags=data.compute_flags,
-                    )
-                    ycvnext_k[~data.compute_flags] = np.nan
-                    ycvnext[k] = ycvnext_k
-                ycvnext = np.stack(ycvnext, -2)
-                data.ycvfull = np.concatenate([data.ycvfull, ycvnext], -1)
             mllstart = m - self.r_lag - 1
             nllstart = 2**mllstart
-            if data.n_min == 0:  # first iteration
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
+                data.xfull = np.concatenate([data.xfull, xnext], 0)
+                ynext = self.integrand.f(
+                    xnext,
+                    periodization_transform=self.ptransform,
+                    compute_flags=data.compute_flags,
+                )
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+                if self.ncv > 0:
+                    ycvnext = [None] * self.ncv
+                    for k in range(self.ncv):
+                        ycvnext_k = self.cv[k].f(
+                            xnext,
+                            periodization_transform=self.ptransform,
+                            compute_flags=data.compute_flags,
+                        )
+                        ycvnext_k[~data.compute_flags] = np.nan
+                        ycvnext[k] = ycvnext_k
+                    ycvnext = np.stack(ycvnext, -2)
+                    data.ycvfull = np.concatenate([data.ycvfull, ycvnext], -1)
+            if not first_resume_iter and data.n_min == 0:  # first fresh iteration
                 n = int(2**m)
                 ytildefull = self.ft(ynext) / np.sqrt(n)
                 kappanumap = self._update_kappanumap(
@@ -248,7 +264,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
                         0,
                         m,
                     )
-            else:  # any iteration after the first
+            elif not first_resume_iter:  # any iteration after the first
                 mnext = int(m - 1)
                 n = int(2**mnext)
                 if not self.update_beta:  # do not update the beta coefficients
@@ -401,6 +417,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
         data.stopping_crit = self

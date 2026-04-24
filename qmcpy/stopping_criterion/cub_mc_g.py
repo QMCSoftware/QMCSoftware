@@ -338,8 +338,82 @@ class CubMCG(AbstractStoppingCriterion):
             ), "Control variate means should have shape (len(control variates),d_indv)."
             self.parameters += ["cv", "cv_mu"]
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
+        if resume is not None:
+            data = resume
+            # Reuse previous pilot variance; skip fresh pilot step.
+            sigma_up = self.inflate * data.sighat0
+            if self.rel_tol == 0:
+                self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
+                toloversig = self.abs_tol / sigma_up
+                n_mu, data.bound_half_width = self._nchebe(
+                    toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up
+                )
+                data.n_mu = int(n_mu)
+                prev_n_total = int(data.n_total)
+                if (prev_n_total + data.n_mu) > self.n_limit:
+                    data.n_mu = max(1, self.n_limit - prev_n_total)
+                x = self.discrete_distrib(n=data.n_mu)
+                data.xfull = np.concatenate([data.xfull, x], 0)
+                y = self.integrand.f(x)
+                data.yfull = np.concatenate([data.yfull, y], -1)
+                if self.ncv > 0:
+                    ycv = [None] * self.ncv
+                    for k in range(self.ncv):
+                        ycv[k] = self.cv[k].f(x)
+                    ycv = np.stack(ycv, 0)
+                    data.ycvfull = np.concatenate([data.ycvfull, ycv], 1)
+                    y = y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
+                data.solution = y.mean()
+                data.n_total = prev_n_total + data.n_mu
+            else:
+                # rel_tol > 0: just run a fresh iteration appending to previous data
+                alphai = (self.alpha - self.alpha_sigma) / (2 * (1 - self.alpha_sigma))
+                eps1 = self._ncbinv(self.n_init, alphai, self.kurtmax)
+                data.bound_half_width = sigma_up * eps1
+                data.tau = 1.0
+                n = self.n_init
+                while True:
+                    if (data.n_total + n) > self.n_limit:
+                        n = max(1, self.n_limit - int(data.n_total))
+                    x = self.discrete_distrib(n=n)
+                    data.xfull = np.concatenate([data.xfull, x], 0)
+                    y = self.integrand.f(x)
+                    data.yfull = np.concatenate([data.yfull, y], -1)
+                    if self.ncv > 0:
+                        ycv = [None] * self.ncv
+                        for k in range(self.ncv):
+                            ycv[k] = self.cv[k].f(x)
+                        ycv = np.stack(ycv, 0)
+                        data.ycvfull = np.concatenate([data.ycvfull, ycv], 1)
+                        y = y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
+                    data.solution = y.mean()
+                    data.n_total += n
+                    if data.n_total >= self.n_limit:
+                        break
+                    lb_tol = _tol_fun(self.abs_tol, self.rel_tol, 0.0, data.solution - data.bound_half_width, "max")
+                    ub_tol = _tol_fun(self.abs_tol, self.rel_tol, 0.0, data.solution + data.bound_half_width, "max")
+                    delta_plus = (lb_tol + ub_tol) / 2.0
+                    if delta_plus >= data.bound_half_width:
+                        delta_minus = (lb_tol - ub_tol) / 2.0
+                        data.solution += delta_minus
+                        break
+                    else:
+                        data.bound_half_width = np.minimum(data.bound_half_width / 2.0, np.maximum(self.abs_tol, 0.95 * self.rel_tol * abs(data.solution)))
+                        data.tau += 1
+                    toloversig = data.bound_half_width / sigma_up
+                    alphai = (2 ** data.tau * (self.alpha - self.alpha_sigma) / (1 - self.alpha_sigma))
+                    n = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
+            data.bound_low = data.solution - data.bound_half_width
+            data.bound_high = data.solution + data.bound_half_width
+            data.bound_diff = data.bound_high - data.bound_low
+            data.stopping_crit = self
+            data.integrand = self.integrand
+            data.true_measure = self.integrand.true_measure
+            data.discrete_distrib = self.true_measure.discrete_distrib
+            data.time_integrate = time() - t_start
+            return data.solution, data
         data = Data(
             parameters=[
                 "solution",

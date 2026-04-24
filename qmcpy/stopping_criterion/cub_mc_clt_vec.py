@@ -224,35 +224,43 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         self.set_tolerance(abs_tol, rel_tol)
         self.z_star = -norm.ppf(self.alphas_indv / 2)
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "time_integrate",
-            ]
-        )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (0,))
+        if resume is not None:
+            data = resume
+            # Reset flags so the tighter tolerance is re-evaluated from existing samples.
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+        else:
+            data = Data(
+                parameters=[
+                    "solution",
+                    "comb_bound_low",
+                    "comb_bound_high",
+                    "comb_bound_diff",
+                    "comb_flags",
+                    "n_total",
+                    "n",
+                    "time_integrate",
+                ]
+            )
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (0,))
+        first_resume_iter = resume is not None
         while True:
-            xnext = self.discrete_distrib(n=data.n_max - data.n_min)
-            data.xfull = np.concatenate([data.xfull, xnext], 0)
-            ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            data.n[data.compute_flags] = data.n_max
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n=data.n_max - data.n_min)
+                data.xfull = np.concatenate([data.xfull, xnext], 0)
+                ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+                data.n[data.compute_flags] = data.n_max
             yfullfinite = np.isfinite(data.yfull)
             data.solution_indv = data.yfull.mean(-1, where=yfullfinite)
             data.sigmahat = data.yfull.std(-1, ddof=1, where=yfullfinite)
@@ -305,6 +313,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
         data.stopping_crit = self

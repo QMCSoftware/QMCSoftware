@@ -211,8 +211,52 @@ class CubMCCLT(AbstractStoppingCriterion):
             self.parameters += ["cv", "cv_mu"]
         self.z_star = -norm.ppf(self.alpha / 2.0)
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
+        if resume is not None:
+            data = resume
+            prev_n_total = int(data.n_total)
+            # Reuse previous pilot variance; skip fresh pilot step.
+            tol_up = np.maximum(self.abs_tol, abs(data.solution0) * self.rel_tol)
+            n_mu_temp = np.ceil(
+                data.sighat0 ** 2 * (self.z_star * self.inflate / tol_up) ** 2
+            )
+            data.n_mu = int(np.maximum(self.n_init, n_mu_temp))
+            if (prev_n_total + data.n_mu) > self.n_limit:
+                warnings.warn(
+                    "Trying to generate %d new samples would exceed n_limit = %d. "
+                    "Will instead generate %d new samples." % (
+                        int(data.n_mu), int(self.n_limit),
+                        int(max(1, self.n_limit - prev_n_total)),
+                    ), MaxSamplesWarning
+                )
+                data.n_mu = max(1, self.n_limit - prev_n_total)
+            x = self.discrete_distrib(n=data.n_mu)
+            data.xfull = np.concatenate([data.xfull, x], 0)
+            y = self.integrand.f(x)
+            data.yfull = np.concatenate([data.yfull, y], -1)
+            if self.ncv > 0:
+                ycv = [None] * self.ncv
+                for k in range(self.ncv):
+                    ycv[k] = self.cv[k].f(x)
+                ycv = np.stack(ycv, 0)
+                data.ycvfull = np.concatenate([data.ycvfull, ycv], 1)
+                y = y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
+            data.sighat = y.std(ddof=1)
+            data.solution = y.mean()
+            data.bound_half_width = (
+                self.z_star * self.inflate * data.sighat / np.sqrt(data.n_mu)
+            )
+            data.bound_low = data.solution - data.bound_half_width
+            data.bound_high = data.solution + data.bound_half_width
+            data.bound_diff = data.bound_high - data.bound_low
+            data.n_total = prev_n_total + data.n_mu
+            data.stopping_crit = self
+            data.integrand = self.integrand
+            data.true_measure = self.integrand.true_measure
+            data.discrete_distrib = self.true_measure.discrete_distrib
+            data.time_integrate = time() - t_start
+            return data.solution, data
         data = Data(
             parameters=[
                 "solution",

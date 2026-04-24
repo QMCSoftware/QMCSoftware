@@ -294,44 +294,54 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
                 else:
                     print("unknown type check requested !")
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "time_integrate",
-            ]
-        )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (0,))
-        data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
-        data.muhat = np.tile(np.nan, self.integrand.d_indv)
+        first_resume_iter = False
+        if resume is not None:
+            data = resume
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n_min = int(data.n_total)
+            ytildefull = data._ytildefull
+            first_resume_iter = True
+        else:
+            data = Data(
+                parameters=[
+                    "solution",
+                    "comb_bound_low",
+                    "comb_bound_high",
+                    "comb_bound_diff",
+                    "comb_flags",
+                    "n_total",
+                    "n",
+                    "time_integrate",
+                ]
+            )
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (0,))
+            data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
+            data.muhat = np.tile(np.nan, self.integrand.d_indv)
         while True:
             m = int(np.log2(data.n_max))
-            xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull, xnext], 0)
-            ynext = self.integrand.f(
-                xnext,
-                periodization_transform=self.ptransform,
-                compute_flags=data.compute_flags,
-            )
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            if data.n_min == 0:  # first iteration
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
+                data.xfull = np.concatenate([data.xfull, xnext], 0)
+                ynext = self.integrand.f(
+                    xnext,
+                    periodization_transform=self.ptransform,
+                    compute_flags=data.compute_flags,
+                )
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+            if not first_resume_iter and data.n_min == 0:  # first fresh iteration
                 ytildefull = self.ft(ynext) / np.sqrt(2**m)
-            else:  # any iteration after the first
+            elif not first_resume_iter:  # any iteration after the first
                 mnext = int(m - 1)
                 ytildeomega = (
                     self.omega(mnext)
@@ -385,6 +395,8 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            # Save transform state so this computation can be resumed later.
+            data._ytildefull = ytildefull
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
@@ -399,6 +411,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
         data.stopping_crit = self

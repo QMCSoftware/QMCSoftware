@@ -279,7 +279,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             self.alphas_indv / 2, df=self.integrand.discrete_distrib.replications - 1
         )
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
         data = Data(
             parameters=[

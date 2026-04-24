@@ -141,7 +141,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
         self.replications = self.discrete_distrib.replications
         assert self.replications >= 4, "require at least 4 replications"
 
-    def integrate(self):
+    def integrate(self, resume=None):
         t_start = time()
         data = self._construct_data()
         # Loop over coarser tolerances
