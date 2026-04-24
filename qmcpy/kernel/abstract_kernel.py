@@ -28,7 +28,7 @@ class AbstractKernel(object):
             instance = super().__new__(cls)
         return instance
 
-    def __init__(self, d, torchify, device, compile_call, comiple_call_kwargs):
+    def __init__(self, d, torchify, device, compile_call, compile_call_kwargs):
         super().__init__()
         # dimension
         assert d % 1 == 0 and d > 0, "dimension d must be a positive int"
@@ -55,7 +55,7 @@ class AbstractKernel(object):
             import torch
 
             self.compiled_parsed___call__ = torch.compile(
-                self.parsed___call__, **comiple_call_kwargs
+                self.parsed___call__, **compile_call_kwargs
             )
         else:
             self.compiled_parsed___call__ = self.parsed___call__
@@ -332,7 +332,7 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
         requires_grad_lengthscales=True,
         device="cpu",
         compile_call=False,
-        comiple_call_kwargs=None,
+        compile_call_kwargs=None,
     ):
         r"""
         Args:
@@ -348,18 +348,18 @@ class AbstractKernelScaleLengthscales(AbstractKernel):
             requires_grad_lengthscales (bool): If `True` and `torchify`, set `requires_grad=True` for `lengthscales`.
             device (torch.device): If `torchify`, put things onto this device.
             compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method.
-            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
+            compile_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
         if shape_scale is None:
             shape_scale = [1]
-        if comiple_call_kwargs is None:
-            comiple_call_kwargs = {}
+        if compile_call_kwargs is None:
+            compile_call_kwargs = {}
         super().__init__(
             d=d,
             torchify=torchify,
             device=device,
             compile_call=compile_call,
-            comiple_call_kwargs=comiple_call_kwargs,
+            compile_call_kwargs=compile_call_kwargs,
         )
         self.raw_scale = self.parse_assign_param(
             pname="scale",

@@ -359,7 +359,7 @@ class KernelMultiTask(AbstractKernel):
             torchify=base_kernel.torchify,
             device=base_kernel.device,
             compile_call=False,
-            comiple_call_kwargs={},
+            compile_call_kwargs={},
         )
         self.base_kernel = base_kernel
         self.AUTOGRADKERNEL = base_kernel.AUTOGRADKERNEL

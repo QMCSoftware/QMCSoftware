@@ -56,6 +56,14 @@ jupyter:
 
 ::: qmcpy.true_measure.kumaraswamy.Kumaraswamy
 
+## `AcceptanceRejection`
+
+::: qmcpy.true_measure.acceptance_rejection.AcceptanceRejection
+
+## `AcceptanceRejectionReal`
+
+::: qmcpy.true_measure.acceptance_rejection.AcceptanceRejectionReal
+
 ## UML Specific
 
 ![](./umls/true_measure_specific.svg)
