@@ -403,6 +403,11 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            # Save transform state so this computation can be resumed later.
+            data._ytildefull = ytildefull
+            data._kappanumap = kappanumap
+            if self.ncv > 0:
+                data._ycvtildefull = ycvtildefull
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
