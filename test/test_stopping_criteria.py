@@ -577,36 +577,6 @@ class TestCubBayesNetG(unittest.TestCase):
         self.assertTrue(success)
 
 
-class TestCubMCL(unittest.TestCase):
-    """Unit tests for CubMCML StoppingCriterion."""
-
-    def test_raise_distribution_compatibility_error(self):
-        integrand = FinancialOption(Lattice(seed=7))
-        self.assertRaises(DistributionCompatibilityError, CubMCML, integrand)
-
-    def test_n_max(self):
-        integrand = FinancialOption(
-            IIDStdUniform(seed=7), start_price=30, strike_price=30
-        )
-        algorithm = CubMCML(integrand, rmse_tol=0.001, n_limit=2**10)
-        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-
-
-class TestCubQMCML(unittest.TestCase):
-    """Unit tests for CubQMCML StoppingCriterion."""
-
-    def test_raise_distribution_compatibility_error(self):
-        integrand = FinancialOption(IIDStdUniform(seed=7))
-        self.assertRaises(DistributionCompatibilityError, CubQMCML, integrand)
-
-    def test_n_max(self):
-        integrand = FinancialOption(
-            Lattice(replications=32, seed=7), start_price=30, strike_price=30
-        )
-        algorithm = CubQMCML(integrand, abs_tol=tol, n_limit=2**10)
-        self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-
-
 class TestMultilevelStoppingCriteria(unittest.TestCase):
     def _iid_financial_option(self):
         return FinancialOption(
@@ -617,6 +587,37 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
         return FinancialOption(
             Lattice(replications=32, seed=7), start_price=30, strike_price=30
         )
+
+    def test_raise_distribution_compatibility_error(self):
+        cases = [
+            ("CubMCML", CubMCML, Lattice(seed=7)),
+            ("CubQMCML", CubQMCML, IIDStdUniform(seed=7)),
+        ]
+        for label, cls, sampler in cases:
+            with self.subTest(stopping_criterion=label):
+                integrand = FinancialOption(sampler)
+                with self.assertRaises(DistributionCompatibilityError):
+                    cls(integrand)
+
+    def test_n_max(self):
+        cases = [
+            (
+                "CubMCML",
+                CubMCML,
+                FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30),
+                {"rmse_tol": 0.001, "n_limit": 2**10},
+            ),
+            (
+                "CubQMCML",
+                CubQMCML,
+                FinancialOption(Lattice(replications=32, seed=7), start_price=30, strike_price=30),
+                {"abs_tol": tol, "n_limit": 2**10},
+            ),
+        ]
+        for label, cls, integrand, kwargs in cases:
+            with self.subTest(stopping_criterion=label):
+                algorithm = cls(integrand, **kwargs)
+                self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
     def test_multilevel_parameter_validation(self):
         cases = [
