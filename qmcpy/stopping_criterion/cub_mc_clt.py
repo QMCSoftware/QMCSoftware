@@ -271,10 +271,12 @@ class CubMCCLT(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
+        trace = self._make_trace_logger()
         data = self._prepare_resume_data(
             resume, self._validate_resume, self._restore_resume_state
         )
         if data is not None:
+            trace.resume(data)
             prev_n_total = int(data.n_total)
             prev_n_mu = prev_n_total - int(self.n_init)
             # Reuse previous pilot variance; skip fresh pilot step.
@@ -319,6 +321,7 @@ class CubMCCLT(AbstractStoppingCriterion):
             data.integrand = self.integrand
             data.true_measure = self.integrand.true_measure
             data.discrete_distrib = self.true_measure.discrete_distrib
+            trace.iteration(data)
             data.time_integrate = time() - t_start
             return data.solution, data
         data = Data(parameters=["solution", "bound_low", "bound_high", "bound_diff", "n_total", "time_integrate"])
@@ -389,6 +392,7 @@ class CubMCCLT(AbstractStoppingCriterion):
         data.integrand = self.integrand
         data.true_measure = self.integrand.true_measure
         data.discrete_distrib = self.true_measure.discrete_distrib
+        trace.iteration(data)
         data.time_integrate = time() - t_start
         return data.solution, data
 

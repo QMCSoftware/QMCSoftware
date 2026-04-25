@@ -390,8 +390,10 @@ class CubMCG(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
+        trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is not None:
+            trace.resume(data)
             # Reuse previous pilot variance; skip fresh pilot step.
             sigma_up = self.inflate * data.sighat0
             if self.rel_tol == 0:
@@ -417,6 +419,7 @@ class CubMCG(AbstractStoppingCriterion):
                         data.ycvfull = np.concatenate([data.ycvfull, ycv], 1)
                 data.n_mu = prev_n_mu + n_new
                 self._update_main_stage_solution(data)
+                trace.iteration(data)
             else:
                 # rel_tol > 0: reuse the accumulated main-stage samples first, then add more only if needed.
                 alphai = (self.alpha - self.alpha_sigma) / (2 * (1 - self.alpha_sigma))
@@ -426,6 +429,7 @@ class CubMCG(AbstractStoppingCriterion):
                 self._update_main_stage_solution(data)
                 while True:
                     if data.n_total >= self.n_limit:
+                        trace.iteration(data)
                         break
                     lb_tol = _tol_fun(
                         self.abs_tol,
@@ -445,7 +449,9 @@ class CubMCG(AbstractStoppingCriterion):
                     if delta_plus >= data.bound_half_width:
                         delta_minus = (lb_tol - ub_tol) / 2.0
                         data.solution += delta_minus
+                        trace.iteration(data)
                         break
+                    trace.iteration(data)
                     candidate_tol = np.maximum(
                         self.abs_tol, 0.95 * self.rel_tol * abs(data.solution)
                     )
@@ -536,6 +542,7 @@ class CubMCG(AbstractStoppingCriterion):
                 y = y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
             data.solution = y.mean()
             data.n_total = self.n_init + data.n_mu
+            trace.iteration(data)
         else:  # self.rel_tol > 0
             alphai = (self.alpha - self.alpha_sigma) / (2 * (1 - self.alpha_sigma))  # uncertainty to do iteration
             eps1 = self._ncbinv(self.n_init, alphai, self.kurtmax)
@@ -567,6 +574,7 @@ class CubMCG(AbstractStoppingCriterion):
                 data.solution = y.mean()
                 data.n_total += n
                 if data.n_total >= self.n_limit:
+                    trace.iteration(data)
                     break
                 lb_tol = _tol_fun(
                     self.abs_tol,
@@ -587,8 +595,10 @@ class CubMCG(AbstractStoppingCriterion):
                     # stopping criterion met
                     delta_minus = (lb_tol - ub_tol) / 2.0
                     data.solution += delta_minus  # adjust solution a bit
+                    trace.iteration(data)
                     break
                 else:
+                    trace.iteration(data)
                     candidate_tol = np.maximum(
                         self.abs_tol, 0.95 * self.rel_tol * abs(data.solution)
                     )

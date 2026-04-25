@@ -147,7 +147,10 @@ class CubMLMC(AbstractCubMLMC):
 
     def integrate(self, resume=None):
         t_start = time()
+        trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+        if data is not None:
+            trace.resume(data, step_value=int(data.levels + 1))
         if data is None:
             data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "cost_per_sample", "alpha", "beta", "gamma"])
             data.levels = int(self.levels_min)
@@ -159,9 +162,17 @@ class CubMLMC(AbstractCubMLMC):
             data.beta = np.maximum(0, self.beta0)
             data.gamma = np.maximum(0, self.gamma0)
             data.level_integrands = []
+
+        def _update_trace_solution():
+            valid = data.n_level > 0
+            if np.any(valid):
+                data.solution = (data.sum_level[0, valid] / data.n_level[valid]).sum()
+
         while data.diff_n_level.sum() > 0:
             self._update_data(data)
             data.n_total += data.diff_n_level.sum()
+            _update_trace_solution()
+            trace.iteration(data, step_value=int(data.levels + 1))
             # set optimal number of additional samples
             n_samples = self._get_next_samples(data)
             data.diff_n_level = np.maximum(0, n_samples - data.n_level)

@@ -17,6 +17,7 @@ from qmcpy.util.data import Data
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from qmcpy.integrand.abstract_integrand import AbstractIntegrand
 from qmcpy.stopping_criterion.abstract_stopping_criterion import (
+    _IterationTraceLogger,
     AbstractStoppingCriterion,
     print_diagnostic,
 )
@@ -100,6 +101,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             "Data",
             (),
             {
+                "_iter_count": 2,
                 "solution": [1.25],
                 "m": np.array(4),
                 "n_total": 16,
@@ -112,9 +114,11 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             print_diagnostic("resume", data, table_header=True)
         output = stream.getvalue()
         self.assertIn("stage", output)
+        self.assertIn("iter", output)
         self.assertIn("resume", output)
         self.assertIn("1.2500000", output)
         self.assertIn("(2, 3)", output)
+        self.assertRegex(output, r"resume\s+2\s+1\.2500000\s+None\s+16\s+4")
 
     def test_print_diagnostic_formats_missing_values_as_nan_and_none(self):
         data = type("Data", (), {"solution": float("nan"), "xfull": None})()
@@ -125,6 +129,90 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertIn("start", output)
         self.assertIn("nan", output)
         self.assertIn("None", output)
+
+    def test_print_diagnostic_can_disable_iteration_throttling(self):
+        data = type(
+            "Data",
+            (),
+            {
+                "solution": [1.25],
+                "_iter_count": 11,
+                "m": 13,
+                "n_total": 16,
+                "n_min": None,
+                "xfull": np.zeros((2, 3)),
+            },
+        )()
+        throttled = io.StringIO()
+        with redirect_stdout(throttled):
+            print_diagnostic("ITER", data)
+        self.assertEqual(throttled.getvalue(), "")
+
+        unthrottled = io.StringIO()
+        with redirect_stdout(unthrottled):
+            print_diagnostic("ITER", data, throttle_iterations=False)
+        output = unthrottled.getvalue()
+        self.assertIn("ITER", output)
+        self.assertIn("1.2500000", output)
+        self.assertRegex(output, r"ITER\s+11\s+1\.2500000\s+None\s+16\s+13")
+
+    def test_print_diagnostic_can_hide_optional_columns(self):
+        data = type(
+            "Data",
+            (),
+            {
+                "_iter_count": 1,
+                "solution": [1.25],
+                "n_total": 16,
+            },
+        )()
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            print_diagnostic(
+                "ITER",
+                data,
+                table_header=True,
+                visible_columns=("stage", "iter", "solution", "n_total"),
+            )
+        output = stream.getvalue()
+        self.assertIn("stage", output)
+        self.assertIn("iter", output)
+        self.assertIn("n_total", output)
+        self.assertNotIn("n_min", output)
+        self.assertNotIn("xfull.shape", output)
+
+    def test_resume_trace_blanks_resume_iter_and_continues_count(self):
+        logger = _IterationTraceLogger(
+            type(
+                "SC",
+                (),
+                {
+                    "trace_iterations": True,
+                    "trace_label": "resume-test",
+                    "trace_throttle_iterations": False,
+                },
+            )()
+        )
+        data = type(
+            "Data",
+            (),
+            {
+                "_iter_count": 6,
+                "solution": [1.25],
+                "n_total": 16,
+                "n_min": 8,
+                "m": 13,
+                "xfull": np.zeros((16, 2)),
+            },
+        )()
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            logger.resume(data, step_value=13)
+            logger.iteration(data, step_value=14)
+        output = stream.getvalue()
+        self.assertRegex(output, r"RESUME\s+1\.2500000\s+8\s+16\s+13")
+        self.assertNotIn("RESUME       None", output)
+        self.assertRegex(output, r"ITER\s+7\s+1\.2500000\s+8\s+16\s+14")
 
     def test_init_requires_integrand(self):
         with self.assertRaises(ParameterError):

@@ -301,6 +301,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
     def integrate(self, resume=None):
         t_start = time()
         first_resume_iter = False
+        trace = self._make_trace_logger()
         if resume is not None:
             data = resume
             self._validate_resume(data)
@@ -309,6 +310,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
             data.n_min = int(data.n_total)
             ytildefull = data._ytildefull
             first_resume_iter = True
+            trace.resume(data, step_value=int(np.log2(max(1, int(data.n_total)))))
         else:
             data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
             data.flags_indv = np.tile(False, self.integrand.d_indv)
@@ -391,6 +393,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
             data.compute_flags = ~data.flags_indv
             # Save transform state so this computation can be resumed later.
             data._ytildefull = ytildefull
+            trace.iteration(data, step_value=m)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:

@@ -132,7 +132,10 @@ class CubMLQMC(AbstractCubMLQMC):
 
     def integrate(self, resume=None):
         t_start = time()
+        trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+        if data is not None:
+            trace.resume(data, step_value=int(data.levels))
         if data is None:
             data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
             data.levels = int(self.levels_min + 1)
@@ -147,6 +150,7 @@ class CubMLQMC(AbstractCubMLQMC):
             data.level_integrands = []
         while True:
             self.update_data(data)
+            trace.iteration(data, step_value=int(data.levels))
             if data.var_level.sum() > (self.rmse_tol**2 / 2.0):
                 # double N_l on level with largest V_l/(2^l*N_l)
                 efficient_level = np.argmax(data.var_cost_ratio_level)

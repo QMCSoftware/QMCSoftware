@@ -1,4 +1,4 @@
-from .abstract_stopping_criterion import AbstractStoppingCriterion, print_diagnostic
+from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
@@ -184,25 +184,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
     def integrate(self, resume=None):
         t_start = time()
         first_resume_iter = False
-        trace_iterations = bool(getattr(self, "trace_iterations", False))
-        trace_label = str(getattr(self, "trace_label", ""))
-        trace_header_printed = False
-        trace_table_header_printed = False
-
-        def _print_trace_header_once():
-            nonlocal trace_header_printed
-            if trace_iterations and (not trace_header_printed) and trace_label:
-                print(f"=== {trace_label} iteration log ===")
-                trace_header_printed = True
-
-        def _trace_row(stage, m_value):
-            nonlocal trace_table_header_printed
-            if not trace_iterations:
-                return
-            _print_trace_header_once()
-            data.m = int(m_value)
-            print_diagnostic(stage, data, table_header=not trace_table_header_printed)
-            trace_table_header_printed = True
+        trace = self._make_trace_logger()
 
         if resume is not None:
             data = resume
@@ -218,11 +200,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             if self.ncv > 0:
                 ycvtildefull = data._ycvtildefull
             first_resume_iter = True
-            if trace_iterations:
-                _print_trace_header_once()
-                data.m = int(np.log2(max(1, int(data.n_total))))
-                print_diagnostic("RESUME", data, table_header=not trace_table_header_printed)
-                trace_table_header_printed = True
+            trace.resume(data, step_value=int(np.log2(max(1, int(data.n_total)))))
         else:
             data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
             data.flags_indv = np.tile(False, self.integrand.d_indv)
@@ -428,7 +406,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
-            _trace_row("ITER", m)
+            trace.iteration(data, step_value=m)
             # Save transform state so this computation can be resumed later.
             data._ytildefull = ytildefull
             data._kappanumap = kappanumap

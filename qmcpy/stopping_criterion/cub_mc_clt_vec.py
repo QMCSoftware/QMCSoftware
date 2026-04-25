@@ -226,11 +226,13 @@ class CubMCCLTVec(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
+        trace = self._make_trace_logger()
         if resume is not None:
             data = resume
             # Reset flags so the tighter tolerance is re-evaluated from existing samples.
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
+            trace.resume(data)
         else:
             data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
             data.flags_indv = np.tile(False, self.integrand.d_indv)
@@ -288,6 +290,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            trace.iteration(data)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:

@@ -14,10 +14,93 @@ import numpy as np
 IS_PRINT_DIAGNOSTIC = False
 
 
-def print_diagnostic(label, data, table_header=False):
-    """Print diagnostic information for integration state.
+class _IterationTraceLogger(object):
 
-    When ``table_header`` is True, this prints a compact table header before the row.
+    def __init__(self, stopping_criterion):
+        self.enabled = bool(getattr(stopping_criterion, "trace_iterations", False))
+        self.label = str(getattr(stopping_criterion, "trace_label", ""))
+        self.throttle_iterations = bool(
+            getattr(stopping_criterion, "trace_throttle_iterations", True)
+        )
+        self.header_printed = False
+        self.table_header_printed = False
+        self.iter_count = 0
+        self.visible_columns = None
+
+    def _print_header_once(self):
+        if self.enabled and (not self.header_printed) and self.label:
+            print(f"=== {self.label} iteration log ===")
+            self.header_printed = True
+
+    def _get_visible_columns(self, data):
+        if self.visible_columns is not None:
+            return self.visible_columns
+        visible_columns = ["stage", "iter", "solution"]
+        if getattr(data, "n_min", None) is not None:
+            visible_columns.append("n_min")
+        visible_columns.append("n_total")
+        if getattr(data, "m", None) is not None:
+            visible_columns.append("m")
+        xfull = getattr(data, "xfull", None)
+        if getattr(xfull, "shape", None) is not None:
+            visible_columns.append("xfull.shape")
+        self.visible_columns = tuple(visible_columns)
+        return self.visible_columns
+
+    def emit(self, stage, data, step_value=None, increment=False):
+        if not self.enabled:
+            return
+        self._print_header_once()
+        if increment:
+            self.iter_count += 1
+            data._iter_count = self.iter_count
+        else:
+            data._iter_count = None
+        if step_value is not None:
+            data.m = int(step_value)
+        visible_columns = self._get_visible_columns(data)
+        print_diagnostic(
+            stage,
+            data,
+            table_header=not self.table_header_printed,
+            throttle_iterations=self.throttle_iterations,
+            visible_columns=visible_columns,
+        )
+        self.table_header_printed = True
+
+    def resume(self, data, step_value=None):
+        previous_iter_count = getattr(data, "_iter_count", None)
+        if previous_iter_count is not None:
+            try:
+                self.iter_count = int(previous_iter_count)
+            except (TypeError, ValueError):
+                pass
+        self.emit("RESUME", data, step_value=step_value, increment=False)
+
+    def iteration(self, data, step_value=None):
+        self.emit("ITER", data, step_value=step_value, increment=True)
+
+
+def print_diagnostic(
+    label,
+    data,
+    table_header=False,
+    throttle_iterations=True,
+    visible_columns=None,
+):
+    """Print diagnostic information for an integration state.
+
+    Args:
+        label (str): Stage label shown in the first column.
+        data (object): Integration state carrying fields such as ``solution``,
+            ``n_total``, ``n_min``, ``m``, and ``xfull``.
+        table_header (bool, optional): Whether to print the compact table
+            header before the row. Defaults to False.
+        throttle_iterations (bool, optional): Whether to apply the current
+            iteration-log throttling rules for ``ITER`` rows. Defaults to True.
+            If False, every iteration row is printed.
+        visible_columns (tuple[str, ...] | list[str] | None, optional): Ordered
+            columns to print. Defaults to all supported columns.
     """
     solution = getattr(data, "solution", None)
     m = getattr(data, "m", None)
@@ -37,7 +120,9 @@ def print_diagnostic(label, data, table_header=False):
             return obj
 
     solution_display = safe_get_first_element(solution)
+    iter_count = getattr(data, "_iter_count", None)
     m_display = int(safe_get_first_element(m)) if m is not None else None
+    iter_display = int(iter_count) if iter_count is not None else None
     n_total_display = int(n_total) if n_total is not None else None
     xfull_shape = getattr(xfull, "shape", None)
 
@@ -51,28 +136,59 @@ def print_diagnostic(label, data, table_header=False):
     else:
         solution_formatted = f"{'nan':>10}"
     n_min_formatted = f"{int(n_min):>10}" if n_min is not None else f"{'None':>10}"
+    iter_formatted = f"{iter_display:>4}" if iter_display is not None else " " * 4
     m_formatted = f"{m_display:>4}" if m_display is not None else f"{'None':>4}"
 
-    if table_header:
-        print(
-            f"{'stage':<12} {'solution':>10} {'n_total':>10} {'n_min':>10} "
-            f"{'m':>4} {'xfull.shape':>16}"
+    throttle = iter_display
+    if throttle_iterations and label == "ITER" and throttle is not None:
+        if throttle > 1000 and throttle % 100 != 0:
+            return
+        if 10 < throttle <= 1000 and throttle % 10 != 0:
+            return
+    if visible_columns is None:
+        visible_columns = (
+            "stage",
+            "iter",
+            "solution",
+            "n_min",
+            "n_total",
+            "m",
+            "xfull.shape",
         )
-        print("-" * 72)
-    print(
-        f"{label:<12} {solution_formatted} {n_total_formatted} "
-        f"{n_min_formatted} {m_formatted} {str(xfull_shape):>16}"
-    )
+    header_values = {
+        "stage": f"{'stage':<12}",
+        "iter": f"{'iter':>4}",
+        "solution": f"{'solution':>10}",
+        "n_min": f"{'n_min':>10}",
+        "n_total": f"{'n_total':>10}",
+        "m": f"{'m':>4}",
+        "xfull.shape": f"{'xfull.shape':>16}",
+    }
+    row_values = {
+        "stage": f"{label:<12}",
+        "iter": iter_formatted,
+        "solution": solution_formatted,
+        "n_min": n_min_formatted,
+        "n_total": n_total_formatted,
+        "m": m_formatted,
+        "xfull.shape": f"{str(xfull_shape):>16}",
+    }
+    if table_header:
+        header_line = " ".join(header_values[column] for column in visible_columns)
+        print(header_line)
+        print("-" * len(header_line))
+    print(" ".join(row_values[column] for column in visible_columns))
 
 
 class AbstractStoppingCriterion(object):
 
     def __init__(self, allowed_distribs, allow_vectorized_integrals):
-        """
+        """Initialize a stopping criterion base class.
+
         Args:
             allowed_distribs (list): Allowed discrete distribution classes.
-            allow_vectorized_integrals (bool): Whether or not to allow integrands with vectorized outputs,
-                i.e., those with `integrand.d_indv!=()`.
+            allow_vectorized_integrals (bool): Whether to allow integrands with
+                vectorized outputs, meaning ``integrand.d_indv != ()``.
         """
         sname = type(self).__name__
         prefix = "A concrete implementation of StoppingCriterion must have "
@@ -109,19 +225,42 @@ class AbstractStoppingCriterion(object):
             self.parameters = []
 
     def integrate(self, resume=None):
-        """
-        *Abstract method* to determine the number of samples needed to satisfy the tolerance(s).
+        """Determine the samples needed to satisfy the target tolerance.
 
         Args:
-            resume (Data, optional): Existing integration state to resume from, if supported.
+            resume (Data, optional): Existing integration state to resume from,
+                if supported. Defaults to None.
 
         Returns:
-            solution (Union[float, np.ndarray]): Approximation to the integral with shape `integrand.d_comb`.
-            data (Data): A data object.
+            tuple[Union[float, np.ndarray], Data]: Approximation to the integral
+                with shape ``integrand.d_comb`` and the corresponding data
+                object.
         """
         raise MethodImplementationError(self, "integrate")
 
+    def _make_trace_logger(self):
+        """Create an iteration trace logger for this stopping criterion.
+
+        Returns:
+            _IterationTraceLogger: Trace logger configured from the stopping
+                criterion's optional trace attributes.
+        """
+        return _IterationTraceLogger(self)
+
     def _prepare_resume_data(self, resume, validate_resume, restore_resume):
+        """Validate and restore a resume checkpoint before integration.
+
+        Args:
+            resume (Data or None): Resume checkpoint passed to ``integrate``.
+            validate_resume (callable): Validator taking ``resume`` and raising
+                on incompatible state.
+            restore_resume (callable): Restorer taking ``resume`` and mutating
+                the current stopping criterion into a compatible resumed state.
+
+        Returns:
+            Data or None: The validated resume checkpoint, or None when no
+            checkpoint was supplied.
+        """
         if resume is None:
             return None
         validate_resume(resume)
@@ -239,14 +378,17 @@ class AbstractStoppingCriterion(object):
         return alphas_indv, identity_dependency
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        """
-        Reset the tolerances.
+        """Reset the tolerances.
 
         Args:
-            abs_tol (float): Absolute tolerance (if applicable). Reset if supplied, ignored otherwise.
-            rel_tol (float): Relative tolerance (if applicable). Reset if supplied, ignored otherwise.
-            rmse_tol (float): RMSE tolerance (if applicable). Reset if supplied, ignored if not.
-                If `rmse_tol` is not supplied but `abs_tol` is, then `rmse_tol = abs_tol / norm.ppf(1-alpha/2)`.
+            abs_tol (float): Absolute tolerance, when supported. If supplied,
+                reset it; otherwise ignore it.
+            rel_tol (float): Relative tolerance, when supported. If supplied,
+                reset it; otherwise ignore it.
+            rmse_tol (float): RMSE tolerance, when supported. If supplied,
+                reset it; otherwise ignore it. If ``rmse_tol`` is not supplied
+                but ``abs_tol`` is, then ``rmse_tol = abs_tol / norm.ppf(1 -
+                alpha / 2)``.
         """
         raise MethodImplementationError(self, "integrate")
 

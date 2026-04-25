@@ -131,6 +131,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
         self.theta_init = theta_init
         self.theta = theta_init
         self.n_tols = n_tols
+        self._active_trace = None
         self.alpha = alpha
         self.inflate = inflate
         assert self.inflate >= 1
@@ -156,21 +157,27 @@ class CubMLQMCCont(AbstractCubMLQMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
-        if data is not None:
-            self._integrate(data, skip_level_reset=True)
-        else:
-            data = self._construct_data()
-            # Loop over coarser tolerances
-            for t in range(self.n_tols):
-                self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
-                self._integrate(data)
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
-        return data.solution, data
+        trace = self._make_trace_logger()
+        self._active_trace = trace
+        try:
+            data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+            if data is not None:
+                trace.resume(data, step_value=int(data.levels))
+                self._integrate(data, skip_level_reset=True)
+            else:
+                data = self._construct_data()
+                # Loop over coarser tolerances
+                for t in range(self.n_tols):
+                    self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
+                    self._integrate(data)
+            data.stopping_crit = self
+            data.integrand = self.integrand
+            data.true_measure = self.integrand.true_measure
+            data.discrete_distrib = self.true_measure.discrete_distrib
+            data.time_integrate = time() - t_start
+            return data.solution, data
+        finally:
+            self._active_trace = None
 
     def _construct_data(self):
         data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
@@ -186,7 +193,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
         data.level_integrands = []
         return data
 
-    def _integrate(self, data, skip_level_reset=False):
+    def _integrate(self, data, skip_level_reset=False, trace=None):
+        trace = getattr(self, "_active_trace", None) if trace is None else trace
         # self.theta = self.theta_init
         if not skip_level_reset:
             data.levels = int(self.levels_min + 1)
@@ -195,6 +203,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
         while not converged:
             # Ensure that we have samples on the finest level
             self.update_data(data)
+            if trace is not None:
+                trace.iteration(data, step_value=int(data.levels))
             self._update_theta(data)
 
             while self._varest(data) > (1 - self.theta) * self.rmse_tol**2:
@@ -219,6 +229,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     return
 
                 self.update_data(data)
+                if trace is not None:
+                    trace.iteration(data, step_value=int(data.levels))
                 self._update_theta(data)
 
             # Check for convergence

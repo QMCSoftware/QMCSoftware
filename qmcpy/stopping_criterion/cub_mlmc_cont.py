@@ -137,6 +137,7 @@ class CubMLMCCont(AbstractCubMLMC):
         self.alpha0 = -1
         self.beta0 = -1
         self.gamma0 = -1
+        self._active_trace = None
         self.alpha = alpha
         self.inflate = inflate
         assert self.inflate >= 1
@@ -157,21 +158,27 @@ class CubMLMCCont(AbstractCubMLMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
-        if data is not None:
-            self._integrate(data, skip_level_reset=True)
-        else:
-            data = self._construct_data()
-            # Loop over coarser tolerances
-            for t in range(self.n_tols):
-                self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
-                self._integrate(data)
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
-        return data.solution, data
+        trace = self._make_trace_logger()
+        self._active_trace = trace
+        try:
+            data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+            if data is not None:
+                trace.resume(data, step_value=int(data.levels + 1))
+                self._integrate(data, skip_level_reset=True)
+            else:
+                data = self._construct_data()
+                # Loop over coarser tolerances
+                for t in range(self.n_tols):
+                    self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
+                    self._integrate(data)
+            data.stopping_crit = self
+            data.integrand = self.integrand
+            data.true_measure = self.integrand.true_measure
+            data.discrete_distrib = self.true_measure.discrete_distrib
+            data.time_integrate = time() - t_start
+            return data.solution, data
+        finally:
+            self._active_trace = None
 
     def _construct_data(self):
         data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "cost_per_sample", "alpha", "beta", "gamma"])
@@ -186,11 +193,20 @@ class CubMLMCCont(AbstractCubMLMC):
         data.level_integrands = []
         return data
 
-    def _integrate(self, data, skip_level_reset=False):
+    def _integrate(self, data, skip_level_reset=False, trace=None):
+        trace = getattr(self, "_active_trace", None) if trace is None else trace
         self.theta = self.theta_init
         if not skip_level_reset:
             data.levels = int(self.levels_min)
         self._update_data(data)  # Take warm-up samples if none have been taken so far
+        valid = data.n_level[: data.levels + 1] > 0
+        if np.any(valid):
+            data.solution = (
+                data.sum_level[0, : data.levels + 1][valid]
+                / data.n_level[: data.levels + 1][valid]
+            ).sum()
+        if trace is not None:
+            trace.iteration(data, step_value=int(data.levels + 1))
 
         converged = False
         while not converged:
@@ -200,6 +216,14 @@ class CubMLMCCont(AbstractCubMLMC):
                 # This takes n_init warm-up samples at the finest level
                 data.diff_n_level = np.hstack((data.diff_n_level, self.n_init))
                 self._update_data(data)
+                valid = data.n_level[: data.levels + 1] > 0
+                if np.any(valid):
+                    data.solution = (
+                        data.sum_level[0, : data.levels + 1][valid]
+                        / data.n_level[: data.levels + 1][valid]
+                    ).sum()
+                if trace is not None:
+                    trace.iteration(data, step_value=int(data.levels + 1))
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 # data.diff_n_level = self._get_next_samples(data)
                 # data.diff_n_level[:data.levels] = 0
@@ -231,6 +255,14 @@ class CubMLMCCont(AbstractCubMLMC):
             # Take additional samples
             self._update_data(data)
             data.n_total += data.diff_n_level.sum()
+            valid = data.n_level[: data.levels + 1] > 0
+            if np.any(valid):
+                data.solution = (
+                    data.sum_level[0, : data.levels + 1][valid]
+                    / data.n_level[: data.levels + 1][valid]
+                ).sum()
+            if trace is not None:
+                trace.iteration(data, step_value=int(data.levels + 1))
 
             # Check for convergence
             converged = self._rmse(data) < self.rmse_tol
