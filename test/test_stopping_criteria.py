@@ -1,17 +1,215 @@
 """Unit tests for subclasses of StoppingCriterion in QMCPy"""
 
 import builtins
+import io
 import importlib
 import warnings
 from qmcpy import *
 from qmcpy.util import *
 import numpy as np
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
+from qmcpy.discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
+from qmcpy.integrand.abstract_integrand import AbstractIntegrand
+from qmcpy.stopping_criterion.abstract_stopping_criterion import (
+    AbstractStoppingCriterion,
+    print_diagnostic,
+)
 
 keister_2d_exact = 1.808186429263620
 tol = 0.005
 rel_tol = 0
+
+
+class _DummyDiscreteDistribution(AbstractDiscreteDistribution):
+    def __init__(self):
+        pass
+
+
+class _OtherDummyDiscreteDistribution(AbstractDiscreteDistribution):
+    def __init__(self):
+        pass
+
+
+class _DummyIntegrand(AbstractIntegrand):
+    def __init__(self, true_measure, discrete_distrib, d_indv=(), d_comb=(), dependency=None):
+        self.true_measure = true_measure
+        self.discrete_distrib = discrete_distrib
+        self.d_indv = d_indv
+        self.d_comb = d_comb
+        self._dependency = dependency or (lambda flags: flags)
+
+    def dependency(self, comb_flags):
+        return self._dependency(comb_flags)
+
+
+class _DummyStoppingCriterion(AbstractStoppingCriterion):
+    def __init__(
+        self,
+        integrand=None,
+        true_measure=None,
+        discrete_distrib=None,
+        allowed_distribs=None,
+        allow_vectorized_integrals=False,
+        parameters=None,
+    ):
+        if integrand is not None:
+            self.integrand = integrand
+        if true_measure is not None:
+            self.true_measure = true_measure
+        if discrete_distrib is not None:
+            self.discrete_distrib = discrete_distrib
+        if parameters is not None:
+            self.parameters = parameters
+        super().__init__(
+            allowed_distribs or [_DummyDiscreteDistribution], allow_vectorized_integrals
+        )
+
+
+class TestAbstractStoppingCriterion(unittest.TestCase):
+    def test_print_diagnostic_formats_header_and_values(self):
+        data = type(
+            "Data",
+            (),
+            {
+                "solution": [1.25],
+                "m": np.array(4),
+                "n_total": 16,
+                "n_min": None,
+                "xfull": np.zeros((2, 3)),
+            },
+        )()
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            print_diagnostic("resume", data, table_header=True)
+        output = stream.getvalue()
+        self.assertIn("stage", output)
+        self.assertIn("resume", output)
+        self.assertIn("1.2500000", output)
+        self.assertIn("(2, 3)", output)
+
+    def test_print_diagnostic_formats_missing_values_as_nan_and_none(self):
+        data = type("Data", (), {"solution": float("nan"), "xfull": None})()
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            print_diagnostic("start", data)
+        output = stream.getvalue()
+        self.assertIn("start", output)
+        self.assertIn("nan", output)
+        self.assertIn("None", output)
+
+    def test_init_requires_integrand(self):
+        with self.assertRaises(ParameterError):
+            _DummyStoppingCriterion()
+
+    def test_init_requires_matching_true_measure(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib)
+        with self.assertRaises(ParameterError):
+            _DummyStoppingCriterion(
+                integrand=integrand,
+                true_measure=object(),
+                discrete_distrib=distrib,
+            )
+
+    def test_init_requires_matching_discrete_distribution(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib)
+        with self.assertRaises(ParameterError):
+            _DummyStoppingCriterion(
+                integrand=integrand,
+                true_measure=integrand.true_measure,
+                discrete_distrib=_DummyDiscreteDistribution(),
+            )
+
+    def test_init_requires_allowed_distribution_type(self):
+        distrib = _OtherDummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib)
+        with self.assertRaises(DistributionCompatibilityError):
+            _DummyStoppingCriterion(
+                integrand=integrand,
+                true_measure=integrand.true_measure,
+                discrete_distrib=distrib,
+            )
+
+    def test_init_rejects_vectorized_integrals_when_not_supported(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib, d_indv=(2,), d_comb=(2,))
+        with self.assertRaises(ParameterError):
+            _DummyStoppingCriterion(
+                integrand=integrand,
+                true_measure=integrand.true_measure,
+                discrete_distrib=distrib,
+            )
+
+    def test_default_parameters_and_repr(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib)
+        sc = _DummyStoppingCriterion(
+            integrand=integrand,
+            true_measure=integrand.true_measure,
+            discrete_distrib=distrib,
+        )
+        self.assertEqual(sc.parameters, [])
+        self.assertIn("AbstractStoppingCriterion", repr(sc))
+
+    def test_abstract_methods_raise(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib)
+        sc = _DummyStoppingCriterion(
+            integrand=integrand,
+            true_measure=integrand.true_measure,
+            discrete_distrib=distrib,
+        )
+        with self.assertRaises(MethodImplementationError):
+            sc.integrate()
+        with self.assertRaises(MethodImplementationError):
+            sc.set_tolerance(abs_tol=0.1)
+
+    def test_compute_indv_alphas_with_identity_dependency(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(
+            object(),
+            distrib,
+            d_indv=(2,),
+            d_comb=(2,),
+            dependency=lambda flags: flags,
+        )
+        sc = _DummyStoppingCriterion(
+            integrand=integrand,
+            true_measure=integrand.true_measure,
+            discrete_distrib=distrib,
+            allow_vectorized_integrals=True,
+        )
+        alphas_indv, identity_dependency = sc._compute_indv_alphas(np.array([0.2, 0.4]))
+        self.assertTrue(identity_dependency)
+        self.assertTrue(np.allclose(alphas_indv, [0.2, 0.4]))
+
+    def test_compute_indv_alphas_with_non_identity_dependency(self):
+        distrib = _DummyDiscreteDistribution()
+
+        def dependency(flags):
+            return np.array([False, False, True]) if not flags[0] else np.array([True, False, False])
+
+        integrand = _DummyIntegrand(
+            object(),
+            distrib,
+            d_indv=(3,),
+            d_comb=(2,),
+            dependency=dependency,
+        )
+        sc = _DummyStoppingCriterion(
+            integrand=integrand,
+            true_measure=integrand.true_measure,
+            discrete_distrib=distrib,
+            allow_vectorized_integrals=True,
+        )
+        alphas_indv, identity_dependency = sc._compute_indv_alphas(np.array([0.3, 0.6]))
+        self.assertFalse(identity_dependency)
+        self.assertTrue(np.allclose(alphas_indv, [0.15, 0.15, 0.3]))
 
 class TestStoppingCriterionImportFallbacks(unittest.TestCase):
     def test_import_fallback_classes(self):
