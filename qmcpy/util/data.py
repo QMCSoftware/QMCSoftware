@@ -16,13 +16,17 @@ class Data(object):
     def save(self, path, compress=False):
         """Save this Data object to disk using pickle.
 
-        Parameters
-        ----------
-        path : str or pathlib.Path
-            File path to save to. If ``compress=True``, a ``.gz`` suffix is
-            appended automatically when not already present.
-        compress : bool, optional
-            Gzip-compress the saved file. Default is ``False``.
+        Warning:
+            Pickle and dill files are not secure against untrusted input. Only
+            save and later load checkpoint files that you created or fully
+            trust.
+
+        Args:
+            path (str or pathlib.Path): File path to save to. If
+                ``compress=True``, a ``.gz`` suffix is appended automatically
+                when not already present.
+            compress (bool, optional): Gzip-compress the saved file. Defaults
+                to False.
         """
         path = str(path)
         if compress and not path.endswith(".gz"):
@@ -35,16 +39,16 @@ class Data(object):
     def load(cls, path):
         """Load a Data object from disk.
 
-        Parameters
-        ----------
-        path : str or pathlib.Path
-            Path to the saved file. Files ending in ``.gz`` are decompressed
-            automatically.
+        Warning:
+            Loading pickle or dill files can execute arbitrary code. Only load
+            checkpoint files that you created or fully trust.
 
-        Returns
-        -------
-        Data
-            The loaded Data object.
+        Args:
+            path (str or pathlib.Path): Path to the saved file. Files ending
+                in ``.gz`` are decompressed automatically.
+
+        Returns:
+            Data: The loaded Data object.
         """
         path = str(path)
         open_fn = gzip.open if path.endswith(".gz") else open
