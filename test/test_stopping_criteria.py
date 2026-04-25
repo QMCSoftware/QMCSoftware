@@ -452,18 +452,8 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
 
     def test_n_max(self):
         cases = [
-            (
-                "CubMCML",
-                CubMCML,
-                FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30),
-                {"rmse_tol": 0.001, "n_limit": 2**10},
-            ),
-            (
-                "CubQMCML",
-                CubQMCML,
-                FinancialOption(Lattice(replications=32, seed=7), start_price=30, strike_price=30),
-                {"abs_tol": tol, "n_limit": 2**10},
-            ),
+            ("CubMCML", CubMCML, FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30), {"rmse_tol": 0.001, "n_limit": 2**10}),
+            ("CubQMCML", CubQMCML, FinancialOption(Lattice(replications=32, seed=7), start_price=30, strike_price=30), {"abs_tol": tol, "n_limit": 2**10}),
         ]
         for label, cls, integrand, kwargs in cases:
             with self.subTest(stopping_criterion=label):
@@ -524,12 +514,8 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
                         data.diff_n_level = np.zeros_like(data.n_level)
                         stack.enter_context(patch.object(sc, "_update_data"))
                         stack.enter_context(patch.object(sc, "_update_theta"))
-                        stack.enter_context(
-                            patch.object(sc, "_get_next_samples", return_value=data.n_level.copy())
-                        )
-                        stack.enter_context(
-                            patch.object(sc, "_rmse", return_value=sc.rmse_tol * 2)
-                        )
+                        stack.enter_context(patch.object(sc, "_get_next_samples", return_value=data.n_level.copy()))
+                        stack.enter_context(patch.object(sc, "_rmse", return_value=sc.rmse_tol * 2))
                         add_level = stack.enter_context(patch.object(sc, "_add_level"))
                         with self.assertWarns(MaxLevelsWarning):
                             sc._integrate(data)
@@ -542,9 +528,7 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
                         stack.enter_context(patch.object(sc, "update_data"))
                         stack.enter_context(patch.object(sc, "_update_theta"))
                         stack.enter_context(patch.object(sc, "_varest", return_value=0.0))
-                        stack.enter_context(
-                            patch.object(sc, "_rmse", return_value=sc.rmse_tol * 2)
-                        )
+                        stack.enter_context(patch.object(sc, "_rmse", return_value=sc.rmse_tol * 2))
                         add_level = stack.enter_context(patch.object(sc, "_add_level"))
                         with self.assertWarns(MaxLevelsWarning):
                             sc._integrate(data, skip_level_reset=True)
@@ -620,9 +604,7 @@ class TestResumeFeature(unittest.TestCase):
 
     def test_resume_none_is_equivalent_to_fresh_start(self):
         """resume=None must behave identically to a fresh start."""
-        make_sc = self._keister_builder(
-            CubQMCLatticeG, self._lattice_distribution, self.tight_abs_tol
-        )
+        make_sc = self._keister_builder(CubQMCLatticeG, self._lattice_distribution, self.tight_abs_tol)
         sol1, _ = make_sc().integrate()
         sol2, _ = make_sc().integrate(resume=None)
         self.assertTrue(np.allclose(sol1, sol2, rtol=1e-5))
@@ -631,12 +613,7 @@ class TestResumeFeature(unittest.TestCase):
         """Resume solutions should match a fresh run at tighter tolerance."""
         cases = [
             ("CubMCCLT", CubMCCLT, self._iid_distribution, ()),
-            (
-                "CubMCCLTVec",
-                CubMCCLTVec,
-                self._iid_distribution,
-                (ImportError, NotImplementedError),
-            ),
+            ("CubMCCLTVec", CubMCCLTVec, self._iid_distribution, (ImportError, NotImplementedError)),
             ("CubMCG", CubMCG, self._iid_distribution, ()),
             ("CubQMCLatticeG", CubQMCLatticeG, self._lattice_distribution, ()),
             ("CubQMCNetG", CubQMCNetG, self._net_distribution, ()),
@@ -648,12 +625,8 @@ class TestResumeFeature(unittest.TestCase):
             with self.subTest(stopping_criterion=label):
                 self._assert_resume_behavior(
                     label,
-                    self._keister_builder(
-                        stopping_criterion, distribution_factory, self.loose_abs_tol
-                    ),
-                    self._keister_builder(
-                        stopping_criterion, distribution_factory, self.tight_abs_tol
-                    ),
+                    self._keister_builder(stopping_criterion, distribution_factory, self.loose_abs_tol),
+                    self._keister_builder(stopping_criterion, distribution_factory, self.tight_abs_tol),
                     compare_to_fresh=True,
                     rtol=0.5,
                     skip_exceptions=skip_exceptions,
@@ -672,18 +645,8 @@ class TestResumeFeature(unittest.TestCase):
             with self.subTest(stopping_criterion=label):
                 self._assert_resume_behavior(
                     label,
-                    self._multilevel_builder(
-                        stopping_criterion,
-                        integrand_factory,
-                        tol_kwarg,
-                        self.loose_abs_tol,
-                    ),
-                    self._multilevel_builder(
-                        stopping_criterion,
-                        integrand_factory,
-                        tol_kwarg,
-                        self.tight_abs_tol,
-                    ),
+                    self._multilevel_builder(stopping_criterion, integrand_factory, tol_kwarg, self.loose_abs_tol),
+                    self._multilevel_builder(stopping_criterion, integrand_factory, tol_kwarg, self.tight_abs_tol),
                 )
 
     def test_continuation_resume_uses_target_tol_without_level_reset(self):

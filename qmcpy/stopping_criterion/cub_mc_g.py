@@ -279,15 +279,7 @@ class CubMCG(AbstractStoppingCriterion):
             control_variates = []
         if control_variate_means is None:
             control_variate_means = []
-        self.parameters = [
-            "abs_tol",
-            "rel_tol",
-            "n_init",
-            "n_limit",
-            "inflate",
-            "alpha",
-            "kurtmax",
-        ]
+        self.parameters = ["abs_tol", "rel_tol", "n_init", "n_limit", "inflate", "alpha", "kurtmax"]
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -358,17 +350,11 @@ class CubMCG(AbstractStoppingCriterion):
             if not hasattr(data.stopping_crit, "beta"):
                 raise ParameterError("resume data missing control variate coefficients.")
             if data.ycvfull.shape != (self.ncv, int(data.n_total)):
-                raise ParameterError(
-                    "resume data ycvfull shape must be (ncv, n_total)."
-                )
+                raise ParameterError("resume data ycvfull shape must be (ncv, n_total).")
             if not self._resume_value_equal(self.cv_mu, data.stopping_crit.cv_mu):
-                raise ParameterError(
-                    "resume data has incompatible control variate means."
-                )
+                raise ParameterError("resume data has incompatible control variate means.")
             if len(data.stopping_crit.cv) != self.ncv:
-                raise ParameterError(
-                    "resume data has incompatible control variate count."
-                )
+                raise ParameterError("resume data has incompatible control variate count.")
             for current_cv, saved_cv in zip(self.cv, data.stopping_crit.cv):
                 self._validate_resume_object(
                     "control_variate",
@@ -404,9 +390,7 @@ class CubMCG(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = self._prepare_resume_data(
-            resume, self._validate_resume, self._restore_resume_state
-        )
+        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is not None:
             # Reuse previous pilot variance; skip fresh pilot step.
             sigma_up = self.inflate * data.sighat0
@@ -475,15 +459,7 @@ class CubMCG(AbstractStoppingCriterion):
                         * (self.alpha - self.alpha_sigma)
                         / (1 - self.alpha_sigma)
                     )
-                    n = int(
-                        self._nchebe(
-                            toloversig,
-                            alphai,
-                            self.kurtmax,
-                            self.n_limit,
-                            sigma_up,
-                        )[0]
-                    )
+                    n = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
                     existing_n_mu = int(data.n_total) - int(self.n_init)
                     n = max(0, n - existing_n_mu)
                     if (data.n_total + n) > self.n_limit:
@@ -544,12 +520,7 @@ class CubMCG(AbstractStoppingCriterion):
                 warning_s = """
                 Already generated %d samples.
                 Trying to generate %d new samples would exceed n_limit = %d.
-                Will instead generate %d new samples to reach n_limit.""" % (
-                    int(self.n_init),
-                    int(data.n_mu),
-                    int(self.n_limit),
-                    int(self.n_limit - self.n_init),
-                )
+                Will instead generate %d new samples to reach n_limit.""" % (int(self.n_init), int(data.n_mu), int(self.n_limit), int(self.n_limit - self.n_init))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 data.n_mu = self.n_limit - self.n_init
             x = self.discrete_distrib(n=data.n_mu)
@@ -566,9 +537,7 @@ class CubMCG(AbstractStoppingCriterion):
             data.solution = y.mean()
             data.n_total = self.n_init + data.n_mu
         else:  # self.rel_tol > 0
-            alphai = (self.alpha - self.alpha_sigma) / (
-                2 * (1 - self.alpha_sigma)
-            )  # uncertainty to do iteration
+            alphai = (self.alpha - self.alpha_sigma) / (2 * (1 - self.alpha_sigma))  # uncertainty to do iteration
             eps1 = self._ncbinv(self.n_init, alphai, self.kurtmax)
             data.bound_half_width = sigma_up * eps1
             data.tau = 1.0  # step of the iteration
@@ -581,12 +550,7 @@ class CubMCG(AbstractStoppingCriterion):
                     Already generated %d samples.
                     Trying to generate %d new samples would exceeds n_limit = %d.
                     Will instead generate %d samples to meet n_limit total samples. 
-                    Note that error tolerances may no longer be satisfied""" % (
-                        int(data.n_total),
-                        int(n),
-                        int(self.n_limit),
-                        int(self.n_limit - data.n_total),
-                    )
+                    Note that error tolerances may no longer be satisfied""" % (int(data.n_total), int(n), int(self.n_limit), int(self.n_limit - data.n_total))
                     warnings.warn(warning_s, MaxSamplesWarning)
                     n = self.n_limit - data.n_total
                 x = self.discrete_distrib(n=n)
@@ -639,11 +603,7 @@ class CubMCG(AbstractStoppingCriterion):
                     * (self.alpha - self.alpha_sigma)
                     / (1 - self.alpha_sigma)
                 )
-                n = int(
-                    self._nchebe(
-                        toloversig, alphai, self.kurtmax, self.n_limit, sigma_up
-                    )[0]
-                )
+                n = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
         data.bound_low = data.solution - data.bound_half_width
         data.bound_high = data.solution + data.bound_half_width
         data.bound_diff = data.bound_high - data.bound_low
@@ -676,9 +636,7 @@ class CubMCG(AbstractStoppingCriterion):
         # Berry-Esseen function, whose solution is the sample size needed
         logsqrtnCLT = np.log(norm.ppf(1 - alpha / 2) / toloversig)
         # sample size by CLT
-        rsdata = root_scalar(
-            BEfun2, x0=logsqrtnCLT, method="toms748", bracket=(-_b, _b)
-        )
+        rsdata = root_scalar(BEfun2, x0=logsqrtnCLT, method="toms748", bracket=(-_b, _b))
         nbe = np.ceil(np.exp(2 * rsdata.root))
         # calculate Berry-Esseen n by fsolve function (scipy)
         ncb = np.minimum(
@@ -718,9 +676,7 @@ class CubMCG(AbstractStoppingCriterion):
         # Berry-Esseen inequality
         logsqrtb_clt = np.log(np.sqrt(norm.ppf(1 - alpha1 / 2) / np.sqrt(n1)))
         # use CLT to get tolerance
-        rsdata = root_scalar(
-            BEfun, x0=logsqrtb_clt, method="toms748", bracket=(-_b, _b)
-        )
+        rsdata = root_scalar(BEfun, x0=logsqrtb_clt, method="toms748", bracket=(-_b, _b))
         NBE_inv = np.exp(2 * rsdata.root)
         # use fsolve to get Berry-Esseen tolerance
         eps = np.minimum(NCheb_inv, NBE_inv)
