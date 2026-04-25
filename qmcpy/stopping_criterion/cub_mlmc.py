@@ -132,29 +132,38 @@ class CubMLMC(AbstractCubMLMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "cost_per_sample",
-                "alpha",
-                "beta",
-                "gamma",
-            ]
-        )
-        data.levels = int(self.levels_min)
-        data.n_level = np.zeros(data.levels + 1, dtype=int)
-        data.sum_level = np.zeros((2, data.levels + 1))
-        data.cost_level = np.zeros(data.levels + 1)
-        data.diff_n_level = self.n_init * np.ones(data.levels + 1, dtype=int)
-        data.alpha = np.maximum(0, self.alpha0)
-        data.beta = np.maximum(0, self.beta0)
-        data.gamma = np.maximum(0, self.gamma0)
-        data.level_integrands = []
+        if resume is not None:
+            data = resume
+            # Undo the final data.levels += 1 stored in the returned data so the
+            # internal loop convention (0-indexed last level) is restored.
+            data.levels -= 1
+            # Recompute the optimal allocation for the new (tighter) rmse_tol.
+            n_samples = self._get_next_samples(data)
+            data.diff_n_level = np.maximum(0, n_samples - data.n_level[: data.levels + 1])
+        else:
+            data = Data(
+                parameters=[
+                    "solution",
+                    "n_total",
+                    "levels",
+                    "n_level",
+                    "mean_level",
+                    "var_level",
+                    "cost_per_sample",
+                    "alpha",
+                    "beta",
+                    "gamma",
+                ]
+            )
+            data.levels = int(self.levels_min)
+            data.n_level = np.zeros(data.levels + 1, dtype=int)
+            data.sum_level = np.zeros((2, data.levels + 1))
+            data.cost_level = np.zeros(data.levels + 1)
+            data.diff_n_level = self.n_init * np.ones(data.levels + 1, dtype=int)
+            data.alpha = np.maximum(0, self.alpha0)
+            data.beta = np.maximum(0, self.beta0)
+            data.gamma = np.maximum(0, self.gamma0)
+            data.level_integrands = []
         while data.diff_n_level.sum() > 0:
             self._update_data(data)
             data.n_total += data.diff_n_level.sum()

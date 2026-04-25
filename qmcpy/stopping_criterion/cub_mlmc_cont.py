@@ -144,13 +144,21 @@ class CubMLMCCont(AbstractCubMLMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = self._construct_data()
-        # Loop over coarser tolerances
-        for t in range(self.n_tols):
-            self.rmse_tol = (
-                self.inflate ** (self.n_tols - t - 1) * self.target_tol
-            )  # Set new target tolerance
-            self._integrate(data)
+        if resume is not None:
+            data = resume
+            # Undo the final data.levels += 1 stored in the returned data.
+            data.levels -= 1
+            # Jump straight to the target tolerance in a single _integrate call.
+            self.rmse_tol = self.target_tol
+            self._integrate(data, skip_level_reset=True)
+        else:
+            data = self._construct_data()
+            # Loop over coarser tolerances
+            for t in range(self.n_tols):
+                self.rmse_tol = (
+                    self.inflate ** (self.n_tols - t - 1) * self.target_tol
+                )  # Set new target tolerance
+                self._integrate(data)
         data.stopping_crit = self
         data.integrand = self.integrand
         data.true_measure = self.integrand.true_measure
@@ -184,9 +192,10 @@ class CubMLMCCont(AbstractCubMLMC):
         data.level_integrands = []
         return data
 
-    def _integrate(self, data):
+    def _integrate(self, data, skip_level_reset=False):
         self.theta = self.theta_init
-        data.levels = int(self.levels_min)
+        if not skip_level_reset:
+            data.levels = int(self.levels_min)
         self._update_data(data)  # Take warm-up samples if none have been taken so far
 
         converged = False

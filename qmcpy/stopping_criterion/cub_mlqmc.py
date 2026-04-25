@@ -118,27 +118,33 @@ class CubMLQMC(AbstractCubMLQMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "bias_estimate",
-            ]
-        )
-        data.levels = int(self.levels_min + 1)
-        data.n_level = np.zeros(data.levels, dtype=int)
-        data.eval_level = np.ones(data.levels, dtype=bool)
-        data.mean_level_reps = np.zeros((data.levels, int(self.replications)))
-        data.mean_level = np.tile(0.0, data.levels)
-        data.var_level = np.tile(np.inf, data.levels)
-        data.cost_level = np.tile(0.0, data.levels)
-        data.var_cost_ratio_level = np.tile(np.inf, data.levels)
-        data.bias_estimate = np.inf
-        data.level_integrands = []
+        if resume is not None:
+            data = resume
+            # eval_level is all-False at end of a converged run; the loop's first
+            # update_data call is a no-op, then the algorithm re-evaluates variance
+            # and bias against the new (tighter) rmse_tol and samples accordingly.
+        else:
+            data = Data(
+                parameters=[
+                    "solution",
+                    "n_total",
+                    "levels",
+                    "n_level",
+                    "mean_level",
+                    "var_level",
+                    "bias_estimate",
+                ]
+            )
+            data.levels = int(self.levels_min + 1)
+            data.n_level = np.zeros(data.levels, dtype=int)
+            data.eval_level = np.ones(data.levels, dtype=bool)
+            data.mean_level_reps = np.zeros((data.levels, int(self.replications)))
+            data.mean_level = np.tile(0.0, data.levels)
+            data.var_level = np.tile(np.inf, data.levels)
+            data.cost_level = np.tile(0.0, data.levels)
+            data.var_cost_ratio_level = np.tile(np.inf, data.levels)
+            data.bias_estimate = np.inf
+            data.level_integrands = []
         while True:
             self.update_data(data)
             if data.var_level.sum() > (self.rmse_tol**2 / 2.0):

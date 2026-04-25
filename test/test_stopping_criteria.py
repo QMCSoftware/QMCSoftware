@@ -707,18 +707,29 @@ class TestResumeFeature(unittest.TestCase):
 
     def test_mc_ml_resume(self):
         """Test CubMCML resume functionality."""
-        try:
-            iid1 = IIDStdUniform(self.dimension, seed=self.seed)
-            sc1 = CubMCML(FinancialOption(iid1, start_price=30, strike_price=30),
+        iid1 = IIDStdUniform(self.dimension, seed=self.seed)
+        sc1 = CubMCML(FinancialOption(iid1, start_price=30, strike_price=30),
+                      rmse_tol=self.loose_abs_tol, n_limit=self.n_limit)
+        sol1, data1 = sc1.integrate()
+        iid2 = IIDStdUniform(self.dimension, seed=self.seed)
+        sc2 = CubMCML(FinancialOption(iid2, start_price=30, strike_price=30),
+                      rmse_tol=self.tight_abs_tol, n_limit=self.n_limit)
+        sol2, data2 = sc2.integrate(resume=data1)
+        self.assertTrue(hasattr(data2, 'n_total'))
+        self.assertTrue(data2.n_total >= data1.n_total)
+
+    def test_mc_ml_cont_resume(self):
+        """Test CubMCMLCont resume functionality."""
+        iid1 = IIDStdUniform(self.dimension, seed=self.seed)
+        sc1 = CubMCMLCont(FinancialOption(iid1, start_price=30, strike_price=30),
                           rmse_tol=self.loose_abs_tol, n_limit=self.n_limit)
-            sol1, data1 = sc1.integrate()
-            iid2 = IIDStdUniform(self.dimension, seed=self.seed)
-            sc2 = CubMCML(FinancialOption(iid2, start_price=30, strike_price=30),
+        sol1, data1 = sc1.integrate()
+        iid2 = IIDStdUniform(self.dimension, seed=self.seed)
+        sc2 = CubMCMLCont(FinancialOption(iid2, start_price=30, strike_price=30),
                           rmse_tol=self.tight_abs_tol, n_limit=self.n_limit)
-            sol2, data2 = sc2.integrate(resume=data1)
-            self.assertTrue(hasattr(data2, 'n_total'))
-        except Exception as e:
-            self.skipTest(f"CubMCML resume skipped: {e}")
+        sol2, data2 = sc2.integrate(resume=data1)
+        self.assertTrue(hasattr(data2, 'n_total'))
+        self.assertTrue(data2.n_total >= data1.n_total)
 
     def test_qmc_lattice_resume(self):
         """Test CubQMCLatticeG resume functionality."""
@@ -770,29 +781,25 @@ class TestResumeFeature(unittest.TestCase):
 
     def test_qmc_ml_resume(self):
         """Test CubQMCML resume functionality."""
-        try:
-            sc1 = CubQMCML(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
-                           abs_tol=self.loose_abs_tol, n_limit=self.n_limit)
-            sol1, data1 = sc1.integrate()
-            sc2 = CubQMCML(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
-                           abs_tol=self.tight_abs_tol, n_limit=self.n_limit)
-            sol2, data2 = sc2.integrate(resume=data1)
-            self.assertTrue(hasattr(data2, 'n_total'))
-        except Exception as e:
-            self.skipTest(f"CubQMCML resume skipped: {e}")
+        sc1 = CubQMCML(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
+                       abs_tol=self.loose_abs_tol, n_limit=self.n_limit)
+        sol1, data1 = sc1.integrate()
+        sc2 = CubQMCML(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
+                       abs_tol=self.tight_abs_tol, n_limit=self.n_limit)
+        sol2, data2 = sc2.integrate(resume=data1)
+        self.assertTrue(hasattr(data2, 'n_total'))
+        self.assertTrue(data2.n_total >= data1.n_total)
 
     def test_qmc_ml_cont_resume(self):
         """Test CubQMCMLCont resume functionality."""
-        try:
-            sc1 = CubQMCMLCont(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
-                               abs_tol=self.loose_abs_tol, n_limit=self.n_limit)
-            sol1, data1 = sc1.integrate()
-            sc2 = CubQMCMLCont(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
-                               abs_tol=self.tight_abs_tol, n_limit=self.n_limit)
-            sol2, data2 = sc2.integrate(resume=data1)
-            self.assertTrue(hasattr(data2, 'n_total'))
-        except Exception as e:
-            self.skipTest(f"CubQMCMLCont resume skipped: {e}")
+        sc1 = CubQMCMLCont(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
+                           abs_tol=self.loose_abs_tol, n_limit=self.n_limit)
+        sol1, data1 = sc1.integrate()
+        sc2 = CubQMCMLCont(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
+                           abs_tol=self.tight_abs_tol, n_limit=self.n_limit)
+        sol2, data2 = sc2.integrate(resume=data1)
+        self.assertTrue(hasattr(data2, 'n_total'))
+        self.assertTrue(data2.n_total >= data1.n_total)
 
     def test_bayesian_lattice_resume(self):
         """Test CubBayesLatticeG resume functionality."""
