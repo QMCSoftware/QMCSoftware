@@ -281,6 +281,10 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
+        if resume is not None:
+            raise ParameterError(
+                "CubQMCRepStudentT does not support resume. "
+            )
         data = Data(
             parameters=[
                 "solution",

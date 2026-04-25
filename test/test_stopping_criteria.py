@@ -654,6 +654,7 @@ class TestResumeFeature(unittest.TestCase):
                         abs_tol=self.loose_abs_tol, rel_tol=self.rel_tol,
                         n_init=self.n_init, n_limit=self.n_limit)
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubMCCLT(Keister(IIDStdUniform(self.dimension, seed=self.seed)),
                         abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
                         n_init=self.n_init, n_limit=self.n_limit)
@@ -663,7 +664,7 @@ class TestResumeFeature(unittest.TestCase):
                         n_init=self.n_init, n_limit=self.n_limit)
         sol3, data3 = sc3.integrate()
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
         self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
 
     def test_mc_clt_vec_resume(self):
@@ -673,6 +674,7 @@ class TestResumeFeature(unittest.TestCase):
                                abs_tol=self.loose_abs_tol, rel_tol=self.rel_tol,
                                n_init=self.n_init, n_limit=self.n_limit)
             sol1, data1 = sc1.integrate()
+            old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
             sc2 = CubMCCLTVec(Keister(IIDStdUniform(self.dimension, seed=self.seed)),
                                abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
                                n_init=self.n_init, n_limit=self.n_limit)
@@ -682,9 +684,9 @@ class TestResumeFeature(unittest.TestCase):
                                n_init=self.n_init, n_limit=self.n_limit)
             sol3, data3 = sc3.integrate()
             self.assertTrue(hasattr(data2, 'n_total'))
-            self.assertTrue(data2.n_total >= data1.n_total)
+            self.assertTrue(data2.n_total >= old_n_total)
             self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
-        except Exception as e:
+        except (ImportError, NotImplementedError) as e:
             self.skipTest(f"CubMCCLTVec resume skipped: {e}")
 
     def test_mc_g_resume(self):
@@ -693,6 +695,7 @@ class TestResumeFeature(unittest.TestCase):
                      abs_tol=self.loose_abs_tol, rel_tol=self.rel_tol,
                      n_init=self.n_init, n_limit=self.n_limit)
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubMCG(Keister(IIDStdUniform(self.dimension, seed=self.seed)),
                      abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
                      n_init=self.n_init, n_limit=self.n_limit)
@@ -702,7 +705,7 @@ class TestResumeFeature(unittest.TestCase):
                      n_init=self.n_init, n_limit=self.n_limit)
         sol3, data3 = sc3.integrate()
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
         self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
 
     def test_mc_ml_resume(self):
@@ -711,12 +714,13 @@ class TestResumeFeature(unittest.TestCase):
         sc1 = CubMCML(FinancialOption(iid1, start_price=30, strike_price=30),
                       rmse_tol=self.loose_abs_tol, n_limit=self.n_limit)
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         iid2 = IIDStdUniform(self.dimension, seed=self.seed)
         sc2 = CubMCML(FinancialOption(iid2, start_price=30, strike_price=30),
                       rmse_tol=self.tight_abs_tol, n_limit=self.n_limit)
         sol2, data2 = sc2.integrate(resume=data1)
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
 
     def test_mc_ml_cont_resume(self):
         """Test CubMCMLCont resume functionality."""
@@ -724,12 +728,13 @@ class TestResumeFeature(unittest.TestCase):
         sc1 = CubMCMLCont(FinancialOption(iid1, start_price=30, strike_price=30),
                           rmse_tol=self.loose_abs_tol, n_limit=self.n_limit)
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         iid2 = IIDStdUniform(self.dimension, seed=self.seed)
         sc2 = CubMCMLCont(FinancialOption(iid2, start_price=30, strike_price=30),
                           rmse_tol=self.tight_abs_tol, n_limit=self.n_limit)
         sol2, data2 = sc2.integrate(resume=data1)
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
 
     def test_qmc_lattice_resume(self):
         """Test CubQMCLatticeG resume functionality."""
@@ -739,6 +744,7 @@ class TestResumeFeature(unittest.TestCase):
             n_init=self.n_init, n_limit=self.n_limit,
         )
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubQMCLatticeG(
             Keister(Lattice(self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
@@ -752,7 +758,7 @@ class TestResumeFeature(unittest.TestCase):
         )
         sol3, data3 = sc3.integrate()
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
         self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
 
     def test_qmc_net_resume(self):
@@ -763,6 +769,7 @@ class TestResumeFeature(unittest.TestCase):
             n_init=self.n_init, n_limit=self.n_limit,
         )
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubQMCNetG(
             Keister(DigitalNetB2(self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
@@ -776,7 +783,7 @@ class TestResumeFeature(unittest.TestCase):
         )
         sol3, data3 = sc3.integrate()
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
         self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
 
     def test_qmc_ml_resume(self):
@@ -784,22 +791,24 @@ class TestResumeFeature(unittest.TestCase):
         sc1 = CubQMCML(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
                        abs_tol=self.loose_abs_tol, n_limit=self.n_limit)
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubQMCML(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
                        abs_tol=self.tight_abs_tol, n_limit=self.n_limit)
         sol2, data2 = sc2.integrate(resume=data1)
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
 
     def test_qmc_ml_cont_resume(self):
         """Test CubQMCMLCont resume functionality."""
         sc1 = CubQMCMLCont(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
                            abs_tol=self.loose_abs_tol, n_limit=self.n_limit)
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubQMCMLCont(FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30),
                            abs_tol=self.tight_abs_tol, n_limit=self.n_limit)
         sol2, data2 = sc2.integrate(resume=data1)
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
 
     def test_bayesian_lattice_resume(self):
         """Test CubBayesLatticeG resume functionality."""
@@ -809,6 +818,7 @@ class TestResumeFeature(unittest.TestCase):
             n_init=self.n_init, n_limit=self.n_limit,
         )
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubBayesLatticeG(
             Keister(Lattice(self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
@@ -822,7 +832,7 @@ class TestResumeFeature(unittest.TestCase):
         )
         sol3, data3 = sc3.integrate()
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
         self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
 
     def test_bayesian_net_resume(self):
@@ -833,6 +843,7 @@ class TestResumeFeature(unittest.TestCase):
             n_init=self.n_init, n_limit=self.n_limit,
         )
         sol1, data1 = sc1.integrate()
+        old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
         sc2 = CubBayesNetG(
             Keister(DigitalNetB2(self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
@@ -846,5 +857,19 @@ class TestResumeFeature(unittest.TestCase):
         )
         sol3, data3 = sc3.integrate()
         self.assertTrue(hasattr(data2, 'n_total'))
-        self.assertTrue(data2.n_total >= data1.n_total)
+        self.assertTrue(data2.n_total >= old_n_total)
         self.assertTrue(np.allclose(sol2, sol3, rtol=0.5))
+
+    def test_qmc_rep_student_t_resume_raises(self):
+        """CubQMCRepStudentT must raise ParameterError when resume is not None."""
+        sc = CubQMCRepStudentT(
+            Keister(DigitalNetB2(self.dimension, replications=16, seed=self.seed)),
+            abs_tol=self.loose_abs_tol, rel_tol=self.rel_tol,
+        )
+        _, data = sc.integrate()
+        sc2 = CubQMCRepStudentT(
+            Keister(DigitalNetB2(self.dimension, replications=16, seed=self.seed)),
+            abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
+        )
+        self.assertRaises(ParameterError, sc2.integrate, data)
+
