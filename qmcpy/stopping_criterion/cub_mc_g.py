@@ -413,13 +413,7 @@ class CubMCG(AbstractStoppingCriterion):
             if self.rel_tol == 0:
                 self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
                 toloversig = self.abs_tol / sigma_up
-                n_mu, data.bound_half_width = self._nchebe(
-                    toloversig,
-                    self.alpha_mu,
-                    self.kurtmax,
-                    self.n_limit,
-                    sigma_up,
-                )
+                n_mu, data.bound_half_width = self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up)
                 prev_n_total = int(data.n_total)
                 prev_n_mu = prev_n_total - int(self.n_init)
                 target_n_mu = int(n_mu)
@@ -517,16 +511,7 @@ class CubMCG(AbstractStoppingCriterion):
             data.discrete_distrib = self.true_measure.discrete_distrib
             data.time_integrate = time() - t_start
             return data.solution, data
-        data = Data(
-            parameters=[
-                "solution",
-                "bound_low",
-                "bound_high",
-                "bound_diff",
-                "n_total",
-                "time_integrate",
-            ]
-        )
+        data = Data(parameters=["solution", "bound_low", "bound_high", "bound_diff", "n_total", "time_integrate"])
         data.xfull = np.empty((0, self.integrand.d))
         data.yfull = np.empty(0)
         if self.ncv > 0:
@@ -552,13 +537,7 @@ class CubMCG(AbstractStoppingCriterion):
         if self.rel_tol == 0:
             self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             toloversig = self.abs_tol / sigma_up
-            n_mu, data.bound_half_width = self._nchebe(
-                toloversig,
-                self.alpha_mu,
-                self.kurtmax,
-                self.n_limit,
-                sigma_up,
-            )
+            n_mu, data.bound_half_width = self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up)
             data.n_mu = int(n_mu)
             if (self.n_init + data.n_mu) > self.n_limit:
                 # cannot generate this many new samples

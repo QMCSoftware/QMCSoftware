@@ -174,20 +174,7 @@ class CubMLMCCont(AbstractCubMLMC):
         return data.solution, data
 
     def _construct_data(self):
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "cost_per_sample",
-                "alpha",
-                "beta",
-                "gamma",
-            ]
-        )
+        data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "cost_per_sample", "alpha", "beta", "gamma"])
         data.levels = int(self.levels_min)
         data.n_level = np.zeros(data.levels + 1, dtype=int)
         data.sum_level = np.zeros((2, data.levels + 1))

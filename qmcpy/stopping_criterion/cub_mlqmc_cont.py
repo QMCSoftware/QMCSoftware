@@ -173,17 +173,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
         return data.solution, data
 
     def _construct_data(self):
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "bias_estimate",
-            ]
-        )
+        data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
         data.levels = int(self.levels_min + 1)
         data.n_level = np.zeros(data.levels, dtype=int)
         data.eval_level = np.ones(data.levels, dtype=bool)

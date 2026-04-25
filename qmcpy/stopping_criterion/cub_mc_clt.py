@@ -321,16 +321,7 @@ class CubMCCLT(AbstractStoppingCriterion):
             data.discrete_distrib = self.true_measure.discrete_distrib
             data.time_integrate = time() - t_start
             return data.solution, data
-        data = Data(
-            parameters=[
-                "solution",
-                "bound_low",
-                "bound_high",
-                "bound_diff",
-                "n_total",
-                "time_integrate",
-            ]
-        )
+        data = Data(parameters=["solution", "bound_low", "bound_high", "bound_diff", "n_total", "time_integrate"])
         data.xfull = np.empty((0, self.integrand.d))
         data.yfull = np.empty(0)
         if self.ncv > 0:

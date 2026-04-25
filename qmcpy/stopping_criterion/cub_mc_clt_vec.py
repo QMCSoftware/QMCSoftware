@@ -232,18 +232,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
         else:
-            data = Data(
-                parameters=[
-                    "solution",
-                    "comb_bound_low",
-                    "comb_bound_high",
-                    "comb_bound_diff",
-                    "comb_flags",
-                    "n_total",
-                    "n",
-                    "time_integrate",
-                ]
-            )
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
             data.n = np.tile(self.n_init, self.integrand.d_indv)

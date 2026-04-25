@@ -134,17 +134,7 @@ class CubMLQMC(AbstractCubMLQMC):
         t_start = time()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is None:
-            data = Data(
-                parameters=[
-                    "solution",
-                    "n_total",
-                    "levels",
-                    "n_level",
-                    "mean_level",
-                    "var_level",
-                    "bias_estimate",
-                ]
-            )
+            data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
             data.levels = int(self.levels_min + 1)
             data.n_level = np.zeros(data.levels, dtype=int)
             data.eval_level = np.ones(data.levels, dtype=bool)

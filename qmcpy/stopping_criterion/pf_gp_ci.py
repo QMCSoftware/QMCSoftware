@@ -417,14 +417,7 @@ class PFGPCIData(Data):
         )
         self.saved_gps = [self.gpyt_model.state_dict()]
         super(PFGPCIData, self).__init__(
-            parameters=[
-                "solution",
-                "error_bound",
-                "bound_low",
-                "bound_high",
-                "n_total",
-                "time_integrate",
-            ]
+            parameters=["solution", "error_bound", "bound_low", "bound_high", "n_total", "time_integrate"]
         )
 
     def update_data(self, batch_count, xdraw, ydrawtf):
