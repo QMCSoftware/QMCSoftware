@@ -218,14 +218,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
             alpha (np.ndarray): Uncertainty level in $(0,1)$.
         """
-        self.parameters = [
-            "inflate",
-            "alpha",
-            "abs_tol",
-            "rel_tol",
-            "n_init",
-            "n_limit",
-        ]
+        self.parameters = ["inflate", "alpha", "abs_tol", "rel_tol", "n_init", "n_limit"]
         # Input Checks
         if np.log2(n_init) % 1 != 0:
             warnings.warn(
@@ -282,22 +275,8 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
     def integrate(self, resume=None):
         t_start = time()
         if resume is not None:
-            raise ParameterError(
-                "CubQMCRepStudentT does not support resume. "
-            )
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "n_rep",
-                "time_integrate",
-            ]
-        )
+            raise ParameterError("CubQMCRepStudentT does not support resume.")
+        data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "n_rep", "time_integrate"])
         data.flags_indv = np.tile(False, self.integrand.d_indv)
         data.compute_flags = np.tile(True, self.integrand.d_indv)
         data.n_rep = np.tile(self.n_init, self.integrand.d_indv)
@@ -305,12 +284,8 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         data.n_max = self.n_init
         data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
         data.xfull = np.empty((self.discrete_distrib.replications, 0, self.integrand.d))
-        data.yfull = np.empty(
-            self.integrand.d_indv + (self.discrete_distrib.replications, 0)
-        )
-        data._ysums = np.zeros(
-            self.integrand.d_indv + (self.discrete_distrib.replications,), dtype=float
-        )
+        data.yfull = np.empty(self.integrand.d_indv + (self.discrete_distrib.replications, 0))
+        data._ysums = np.zeros(self.integrand.d_indv + (self.discrete_distrib.replications,), dtype=float)
         while True:
             xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
             data.xfull = np.concatenate([data.xfull, xnext], 1)
@@ -322,12 +297,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             data.muhats = data._ysums / data.n_rep[..., None]
             data.solution_indv = data.muhats.mean(-1)
             data.sigmahat = data.muhats.std(-1, ddof=1)
-            data.ci_half_width = (
-                self.t_star
-                * self.inflate
-                * data.sigmahat
-                / np.sqrt(self.discrete_distrib.replications)
-            )
+            data.ci_half_width = self.t_star * self.inflate * data.sigmahat / np.sqrt(self.discrete_distrib.replications)
             data.indv_bound_low = data.solution_indv - data.ci_half_width
             data.indv_bound_high = data.solution_indv + data.ci_half_width
             data.n = self.discrete_distrib.replications * data.n_rep
@@ -344,16 +314,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                 self.rel_tols[fidxs],
             )
             data.solution = np.tile(np.nan, data.comb_bound_low.shape)
-            data.solution[fidxs] = (
-                1
-                / 2
-                * (
-                    slow
-                    + shigh
-                    + self.error_fun(slow, abs_tols, rel_tols)
-                    - self.error_fun(shigh, abs_tols, rel_tols)
-                )
-            )
+            data.solution[fidxs] = 0.5 * (slow + shigh + self.error_fun(slow, abs_tols, rel_tols) - self.error_fun(shigh, abs_tols, rel_tols))
             data.comb_flags = np.tile(False, data.comb_bound_low.shape)
             data.comb_flags[fidxs] = (shigh - slow) <= (
                 self.error_fun(slow, abs_tols, rel_tols)
@@ -368,11 +329,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                 Already generated %d samples.
                 Trying to generate %d new samples would exceeds n_limit = %d.
                 No more samples will be generated.
-                Note that error tolerances may not be satisfied. """ % (
-                    int(data.n_total),
-                    int(data.n_total),
-                    int(self.n_limit),
-                )
+                Note that error tolerances may not be satisfied. """ % (int(data.n_total), int(data.n_total), int(self.n_limit))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
             data.n_min = data.n_max
