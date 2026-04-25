@@ -260,7 +260,7 @@ make tests_no_docker        # Sequential, safe (60–120s)
 - **Solution**: Install `pytest-xdist`: `pip install pytest-xdist`
 
 **Issue**: Warnings about invalid distributions
-- **Solution**: Cleanup runs automatically; if needed manually: `make clean_local_only_files`
+- **Solution**: Cleanup runs automatically; if needed manually: `python scripts/cleanup_invalid_dist.py --apply`
 
 **Issue**: Coverage numbers seem low or cumulative
 - **Solution**: Reset coverage with `make delcoverage`, then run tests

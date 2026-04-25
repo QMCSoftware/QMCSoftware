@@ -268,7 +268,7 @@ class PFGPCI(AbstractStoppingCriterion):
             else self.failure_threshold - y
         )
 
-    def integrate(self, seed=None, refit=False):
+    def integrate(self, seed=None, refit=False, resume=None):
         t0 = time.time()
         dnb2 = DigitalNetB2(self.d, randomize="DS", order="GRAY", seed=seed)
         data = PFGPCIData(

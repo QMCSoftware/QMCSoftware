@@ -8,6 +8,61 @@ from ..util import (
 import numpy as np
 
 
+# Optional diagnostic hook for resume-aware stopping criteria.
+IS_PRINT_DIAGNOSTIC = False
+
+
+def print_diagnostic(label, data, table_header=False):
+    """Print diagnostic information for integration state.
+
+    When ``table_header`` is True, this prints a compact table header before the row.
+    """
+    solution = getattr(data, "solution", None)
+    m = getattr(data, "m", None)
+    n_total = getattr(data, "n_total", None)
+    n_min = getattr(data, "n_min", None)
+    xfull = getattr(data, "xfull", None)
+
+    def safe_get_first_element(obj):
+        try:
+            if isinstance(obj, (list, tuple, np.ndarray)) and obj is not None:
+                if hasattr(obj, "shape") and obj.shape == ():
+                    return obj
+                if len(obj) > 0:
+                    return obj[0]
+            return obj
+        except (TypeError, AttributeError):
+            return obj
+
+    solution_display = safe_get_first_element(solution)
+    m_display = int(safe_get_first_element(m)) if m is not None else None
+    n_total_display = int(n_total) if n_total is not None else None
+    xfull_shape = getattr(xfull, "shape", None)
+
+    n_total_formatted = (
+        f"{n_total_display:>10}" if n_total_display is not None else f"{'None':>10}"
+    )
+    if solution_display is not None and not (
+        isinstance(solution_display, float) and solution_display != solution_display
+    ):
+        solution_formatted = f"{solution_display:>10.7f}"
+    else:
+        solution_formatted = f"{'nan':>10}"
+    n_min_formatted = f"{int(n_min):>10}" if n_min is not None else f"{'None':>10}"
+    m_formatted = f"{m_display:>4}" if m_display is not None else f"{'None':>4}"
+
+    if table_header:
+        print(
+            f"{'stage':<12} {'solution':>10} {'n_total':>10} {'n_min':>10} "
+            f"{'m':>4} {'xfull.shape':>16}"
+        )
+        print("-" * 72)
+    print(
+        f"{label:<12} {solution_formatted} {n_total_formatted} "
+        f"{n_min_formatted} {m_formatted} {str(xfull_shape):>16}"
+    )
+
+
 class AbstractStoppingCriterion(object):
 
     def __init__(self, allowed_distribs, allow_vectorized_integrals):
@@ -51,9 +106,12 @@ class AbstractStoppingCriterion(object):
         if not hasattr(self, "parameters"):
             self.parameters = []
 
-    def integrate(self):
+    def integrate(self, resume=None):
         """
         *Abstract method* to determine the number of samples needed to satisfy the tolerance(s).
+
+        Args:
+            resume (Data, optional): Existing integration state to resume from, if supported.
 
         Returns:
             solution (Union[float, np.ndarray]): Approximation to the integral with shape `integrand.d_comb`.
