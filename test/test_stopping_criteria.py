@@ -721,35 +721,17 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(hasattr(checkpoint, "_kappanumap"))
         del checkpoint._kappanumap
 
-        tight_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.tight_abs_tol,
-            rel_tol=self.rel_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
-        )
+        tight_sc = CubQMCLatticeG(Keister(Lattice(dimension=self.dimension, seed=self.seed)), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol, n_init=self.n_init, n_limit=self.n_limit)
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
     def test_bayes_resume_rejects_missing_transform_state(self):
-        loose_sc = CubBayesLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")),
-            abs_tol=self.loose_abs_tol,
-            rel_tol=self.rel_tol,
-            n_init=2**5,
-            n_limit=self.n_limit,
-        )
+        loose_sc = CubBayesLatticeG(Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")), abs_tol=self.loose_abs_tol, rel_tol=self.rel_tol, n_init=2**5, n_limit=self.n_limit)
         _, checkpoint = loose_sc.integrate()
         self.assertTrue(hasattr(checkpoint, "_ytildefull"))
         del checkpoint._ytildefull
 
-        tight_sc = CubBayesLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")),
-            abs_tol=self.tight_abs_tol,
-            rel_tol=self.rel_tol,
-            n_init=2**5,
-            n_limit=self.n_limit,
-        )
+        tight_sc = CubBayesLatticeG(Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol, n_init=2**5, n_limit=self.n_limit)
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 

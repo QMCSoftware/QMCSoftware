@@ -157,18 +157,14 @@ class CubMLMCCont(AbstractCubMLMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = self._prepare_resume_data(
-            resume, self._validate_resume, self._restore_resume_state
-        )
+        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is not None:
             self._integrate(data, skip_level_reset=True)
         else:
             data = self._construct_data()
             # Loop over coarser tolerances
             for t in range(self.n_tols):
-                self.rmse_tol = (
-                    self.inflate ** (self.n_tols - t - 1) * self.target_tol
-                )  # Set new target tolerance
+                self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
                 self._integrate(data)
         data.stopping_crit = self
         data.integrand = self.integrand

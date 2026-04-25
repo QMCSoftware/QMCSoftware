@@ -310,18 +310,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
             ytildefull = data._ytildefull
             first_resume_iter = True
         else:
-            data = Data(
-                parameters=[
-                    "solution",
-                    "comb_bound_low",
-                    "comb_bound_high",
-                    "comb_bound_diff",
-                    "comb_flags",
-                    "n_total",
-                    "n",
-                    "time_integrate",
-                ]
-            )
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
             data.n = np.tile(self.n_init, self.integrand.d_indv)
@@ -427,11 +416,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         return data.solution, data
 
     def _validate_resume(self, data):
-        self._validate_resume_with_state(
-            data,
-            required_fields=self._RESUME_REQUIRED_FIELDS,
-            state_fields=self._RESUME_STATE_FIELDS,
-        )
+        self._validate_resume_with_state(data, required_fields=self._RESUME_REQUIRED_FIELDS, state_fields=self._RESUME_STATE_FIELDS)
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
         assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."

@@ -132,9 +132,7 @@ class CubMLQMC(AbstractCubMLQMC):
 
     def integrate(self, resume=None):
         t_start = time()
-        data = self._prepare_resume_data(
-            resume, self._validate_resume, self._restore_resume_state
-        )
+        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is None:
             data = Data(
                 parameters=[

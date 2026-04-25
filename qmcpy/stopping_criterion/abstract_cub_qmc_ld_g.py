@@ -179,11 +179,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         state_fields = self._RESUME_STATE_FIELDS
         if self.ncv > 0:
             state_fields = state_fields + ("_ycvtildefull",)
-        self._validate_resume_with_state(
-            data,
-            required_fields=self._RESUME_REQUIRED_FIELDS,
-            state_fields=state_fields,
-        )
+        self._validate_resume_with_state(data, required_fields=self._RESUME_REQUIRED_FIELDS, state_fields=state_fields)
 
     def integrate(self, resume=None):
         t_start = time()
@@ -225,23 +221,10 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             if trace_iterations:
                 _print_trace_header_once()
                 data.m = int(np.log2(max(1, int(data.n_total))))
-                print_diagnostic(
-                    "RESUME", data, table_header=not trace_table_header_printed
-                )
+                print_diagnostic("RESUME", data, table_header=not trace_table_header_printed)
                 trace_table_header_printed = True
         else:
-            data = Data(
-                parameters=[
-                    "solution",
-                    "comb_bound_low",
-                    "comb_bound_high",
-                    "comb_bound_diff",
-                    "comb_flags",
-                    "n_total",
-                    "n",
-                    "time_integrate",
-                ]
-            )
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
             data.n = np.tile(self.n_init, self.integrand.d_indv)
