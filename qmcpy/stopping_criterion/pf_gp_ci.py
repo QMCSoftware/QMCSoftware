@@ -9,7 +9,7 @@ from ..util.data import Data
 
 from ..util import ExactGPyTorchRegressionModel
 
-from ..util import MaxSamplesWarning
+from ..util import MaxSamplesWarning, ParameterError
 import warnings
 import time
 import numpy as np
@@ -268,8 +268,10 @@ class PFGPCI(AbstractStoppingCriterion):
             else self.failure_threshold - y
         )
 
-    def integrate(self, seed=None, refit=False):
+    def integrate(self, seed=None, refit=False, resume=None):
         t0 = time.time()
+        if resume is not None:
+            raise ParameterError("PFGPCI does not support resume. ")
         dnb2 = DigitalNetB2(self.d, randomize="DS", order="GRAY", seed=seed)
         data = PFGPCIData(
             self,
