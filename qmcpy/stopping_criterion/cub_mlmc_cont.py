@@ -14,6 +14,10 @@ import warnings
 
 
 class CubMLMCCont(AbstractCubMLMC):
+    _RESUME_REQUIRED_FIELDS = (
+        "levels", "n_level", "sum_level", "diff_n_level", "cost_level", "level_integrands"
+    )
+
     r"""
     Multilevel IID Monte Carlo stopping criterion with continuation.
 
@@ -142,14 +146,21 @@ class CubMLMCCont(AbstractCubMLMC):
             allow_vectorized_integrals=False,
         )
 
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+
+    def _restore_resume_state(self, data):
+        # Undo the final data.levels += 1 stored in the returned data.
+        data.levels -= 1
+        # Jump straight to the target tolerance in a single _integrate call.
+        self.rmse_tol = self.target_tol
+
     def integrate(self, resume=None):
         t_start = time()
-        if resume is not None:
-            data = resume
-            # Undo the final data.levels += 1 stored in the returned data.
-            data.levels -= 1
-            # Jump straight to the target tolerance in a single _integrate call.
-            self.rmse_tol = self.target_tol
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is not None:
             self._integrate(data, skip_level_reset=True)
         else:
             data = self._construct_data()

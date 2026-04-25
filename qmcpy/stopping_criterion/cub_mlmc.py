@@ -14,6 +14,10 @@ import warnings
 
 
 class CubMLMC(AbstractCubMLMC):
+    _RESUME_REQUIRED_FIELDS = (
+        "levels", "n_level", "sum_level", "diff_n_level", "cost_level", "level_integrands"
+    )
+
     """
     Multilevel IID Monte Carlo stopping criterion.
 
@@ -130,17 +134,23 @@ class CubMLMC(AbstractCubMLMC):
             allow_vectorized_integrals=False,
         )
 
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+
+    def _restore_resume_state(self, data):
+        # Undo the final data.levels += 1 stored in the returned data so the
+        # internal loop convention (0-indexed last level) is restored.
+        data.levels -= 1
+        # Recompute the optimal allocation for the new (tighter) rmse_tol.
+        n_samples = self._get_next_samples(data)
+        data.diff_n_level = np.maximum(0, n_samples - data.n_level[: data.levels + 1])
+
     def integrate(self, resume=None):
         t_start = time()
-        if resume is not None:
-            data = resume
-            # Undo the final data.levels += 1 stored in the returned data so the
-            # internal loop convention (0-indexed last level) is restored.
-            data.levels -= 1
-            # Recompute the optimal allocation for the new (tighter) rmse_tol.
-            n_samples = self._get_next_samples(data)
-            data.diff_n_level = np.maximum(0, n_samples - data.n_level[: data.levels + 1])
-        else:
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is None:
             data = Data(
                 parameters=[
                     "solution",

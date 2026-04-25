@@ -9,6 +9,10 @@ import warnings
 
 
 class AbstractCubQMCLDG(AbstractStoppingCriterion):
+    _RESUME_REQUIRED_FIELDS = (
+        "solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n", "n_max", "xfull", "yfull"
+    )
+    _RESUME_STATE_FIELDS = ("_ytildefull", "_kappanumap")
 
     def __init__(
         self,
@@ -171,6 +175,16 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         beta = self.vlstsq(x4beta, y4beta)
         return beta
 
+    def _validate_resume(self, data):
+        state_fields = self._RESUME_STATE_FIELDS
+        if self.ncv > 0:
+            state_fields = state_fields + ("_ycvtildefull",)
+        self._validate_resume_with_state(
+            data,
+            required_fields=self._RESUME_REQUIRED_FIELDS,
+            state_fields=state_fields,
+        )
+
     def integrate(self, resume=None):
         t_start = time()
         first_resume_iter = False
@@ -196,6 +210,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
 
         if resume is not None:
             data = resume
+            self._validate_resume(data)
             # Reset flags so all components are re-evaluated against the new tolerance.
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)

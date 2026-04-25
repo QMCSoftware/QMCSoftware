@@ -13,6 +13,11 @@ import warnings
 
 
 class CubMLQMC(AbstractCubMLQMC):
+    _RESUME_REQUIRED_FIELDS = (
+        "levels", "n_level", "eval_level", "mean_level_reps", "mean_level",
+        "var_level", "cost_level", "var_cost_ratio_level", "bias_estimate", "level_integrands"
+    )
+
     """
     Multilevel Quasi-Monte Carlo stopping criterion.
 
@@ -116,14 +121,21 @@ class CubMLQMC(AbstractCubMLQMC):
         self.replications = self.discrete_distrib.replications
         assert self.replications >= 4, "require at least 4 replications"
 
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+
+    def _restore_resume_state(self, data):
+        # eval_level is all-False at end of a converged run; the loop's first
+        # update_data call is a no-op, then the algorithm re-evaluates variance
+        # and bias against the new (tighter) rmse_tol and samples accordingly.
+        pass
+
     def integrate(self, resume=None):
         t_start = time()
-        if resume is not None:
-            data = resume
-            # eval_level is all-False at end of a converged run; the loop's first
-            # update_data call is a no-op, then the algorithm re-evaluates variance
-            # and bias against the new (tighter) rmse_tol and samples accordingly.
-        else:
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is None:
             data = Data(
                 parameters=[
                     "solution",

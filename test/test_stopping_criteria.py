@@ -1,27 +1,62 @@
 """Unit tests for subclasses of StoppingCriterion in QMCPy"""
 
 import builtins
-import io
 import importlib
-import warnings
-from qmcpy import *
-from qmcpy.util import *
-import numpy as np
+import io
+import os
+import tempfile
 import unittest
+import warnings
+import numpy as np
 from contextlib import ExitStack, redirect_stdout
 from unittest.mock import patch
-from qmcpy.discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
+
+from qmcpy import *
+from qmcpy.util import *
+from qmcpy.util.data import Data
+from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from qmcpy.integrand.abstract_integrand import AbstractIntegrand
 from qmcpy.stopping_criterion.abstract_stopping_criterion import (
     AbstractStoppingCriterion,
     print_diagnostic,
 )
 
+
+# Test functions and parameters
 keister_2d_exact = 1.808186429263620
 tol = 0.005
 rel_tol = 0
+
+_ISHIGAMI_A = 7
+_ISHIGAMI_B = 0.1
+_ISHIGAMI_INDICES = np.array(
+    [
+        [True, False, False],
+        [False, True, False],
+        [False, False, True],
+        [True, True, False],
+        [True, False, True],
+        [False, True, True],
+    ],
+    dtype=bool,
+)
+
+
+def _sensitivity_converges(distrib_factory, sc_class, abs_tol, sc_kwargs=None, n_tries=3):
+    """Return True if at least one of n_tries Ishigami sensitivity-index runs meets abs_tol."""
+    if sc_kwargs is None:
+        sc_kwargs = {}
+    true_solution = Ishigami._exact_sensitivity_indices(
+        _ISHIGAMI_INDICES, _ISHIGAMI_A, _ISHIGAMI_B
+    )
+    for _ in range(n_tries):
+        si = SensitivityIndices(
+            Ishigami(distrib_factory(), _ISHIGAMI_A, _ISHIGAMI_B), _ISHIGAMI_INDICES
+        )
+        solution, _ = sc_class(si, abs_tol=abs_tol, rel_tol=0, **sc_kwargs).integrate()
+        if (abs(solution.squeeze() - true_solution) < abs_tol).all():
+            return True
+    return False
 
 
 class _DummyDiscreteDistribution(AbstractDiscreteDistribution):
@@ -47,15 +82,7 @@ class _DummyIntegrand(AbstractIntegrand):
 
 
 class _DummyStoppingCriterion(AbstractStoppingCriterion):
-    def __init__(
-        self,
-        integrand=None,
-        true_measure=None,
-        discrete_distrib=None,
-        allowed_distribs=None,
-        allow_vectorized_integrals=False,
-        parameters=None,
-    ):
+    def __init__(self, integrand=None, true_measure=None, discrete_distrib=None, allowed_distribs=None, allow_vectorized_integrals=False, parameters=None):
         if integrand is not None:
             self.integrand = integrand
         if true_measure is not None:
@@ -64,9 +91,7 @@ class _DummyStoppingCriterion(AbstractStoppingCriterion):
             self.discrete_distrib = discrete_distrib
         if parameters is not None:
             self.parameters = parameters
-        super().__init__(
-            allowed_distribs or [_DummyDiscreteDistribution], allow_vectorized_integrals
-        )
+        super().__init__(allowed_distribs or [_DummyDiscreteDistribution], allow_vectorized_integrals)
 
 
 class TestAbstractStoppingCriterion(unittest.TestCase):
@@ -285,88 +310,19 @@ class TestCubQMCCLT(unittest.TestCase):
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices_dnb2(self):
-        abs_tol, rel_tol = 5e-2, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(DigitalNetB2(3, seed=7, replications=32), a, b), indices
-            )
-            solution, data = CubQMCCLT(
-                si_ishigami, abs_tol=abs_tol, rel_tol=rel_tol
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: DigitalNetB2(3, seed=7, replications=32), CubQMCCLT, abs_tol=5e-2
+        ))
 
     def test_sobol_indices_lattice(self):
-        abs_tol, rel_tol = 5e-2, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(Lattice(3, seed=7, replications=32), a, b), indices
-            )
-            solution, data = CubQMCCLT(
-                si_ishigami, abs_tol=abs_tol, rel_tol=rel_tol
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: Lattice(3, seed=7, replications=32), CubQMCCLT, abs_tol=5e-2
+        ))
 
     def test_sobol_indices_halton(self):
-        abs_tol, rel_tol = 5e-2, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(Halton(3, seed=7, replications=32), a, b), indices
-            )
-            solution, data = CubQMCCLT(
-                si_ishigami, abs_tol=abs_tol, rel_tol=rel_tol
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: Halton(3, seed=7, replications=32), CubQMCCLT, abs_tol=5e-2
+        ))
 
 
 class TestCubQMCLatticeG(unittest.TestCase):
@@ -387,32 +343,9 @@ class TestCubQMCLatticeG(unittest.TestCase):
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices(self):
-        abs_tol, rel_tol = 5e-3, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(Lattice(3, seed=7), a, b), indices
-            )
-            solution, data = CubQMCLatticeG(
-                si_ishigami, abs_tol=abs_tol, rel_tol=rel_tol
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: Lattice(3, seed=7), CubQMCLatticeG, abs_tol=5e-3
+        ))
 
 
 class TestCubQMCNetG(unittest.TestCase):
@@ -433,32 +366,9 @@ class TestCubQMCNetG(unittest.TestCase):
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices(self):
-        abs_tol, rel_tol = 1e-2, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(DigitalNetB2(3, seed=7), a, b), indices
-            )
-            solution, data = CubQMCNetG(
-                si_ishigami, abs_tol=abs_tol, rel_tol=rel_tol
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: DigitalNetB2(3, seed=7), CubQMCNetG, abs_tol=1e-2
+        ))
 
 
 class TestCubBayesLatticeG(unittest.TestCase):
@@ -470,16 +380,12 @@ class TestCubBayesLatticeG(unittest.TestCase):
 
     def test_n_max_single_level(self):
         integrand = Keister(Lattice(dimension=2, seed=7, order="RADICAL INVERSE"))
-        algorithm = CubBayesLatticeG(
-            integrand, abs_tol=0.0001, n_init=2**8, n_limit=2**9
-        )
+        algorithm = CubBayesLatticeG(integrand, abs_tol=0.0001, n_init=2**8, n_limit=2**9)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
 
     def test_keister_2d(self):
         integrand = Keister(Lattice(dimension=2, seed=7, order="RADICAL INVERSE"))
-        solution, data = CubBayesLatticeG(
-            integrand, abs_tol=tol, n_init=2**5
-        ).integrate()
+        solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2**5).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices_bayes_lattice(self, dims=3, abs_tol=1e-2):
@@ -490,45 +396,17 @@ class TestCubBayesLatticeG(unittest.TestCase):
 
         keister_d = Keister(Lattice(dimension=dims, order="RADICAL INVERSE", seed=7))
         keister_indices = SobolIndices(keister_d, indices="singletons")
-        sc = CubBayesLatticeG(
-            keister_indices, order=1, abs_tol=abs_tol, ptransform="Baker"
-        )
+        sc = CubBayesLatticeG(keister_indices, order=1, abs_tol=abs_tol, ptransform="Baker")
         solution, data = sc.integrate()
 
         self.assertTrue(solution.shape, (dims, dims, 1))
         self.assertTrue(abs(solution - solution_).max() < abs_tol)
 
     def test_sobol_indices(self):
-        abs_tol, rel_tol = 5e-2, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(Lattice(3, seed=7, order="natural"), a, b), indices
-            )
-            solution, data = CubBayesLatticeG(
-                si_ishigami,
-                abs_tol=abs_tol,
-                rel_tol=rel_tol,
-                order=1,
-                ptransform="Baker",
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: Lattice(3, seed=7, order="natural"), CubBayesLatticeG,
+            abs_tol=5e-2, sc_kwargs={"order": 1, "ptransform": "Baker"},
+        ))
 
 
 class TestCubBayesNetG(unittest.TestCase):
@@ -549,44 +427,17 @@ class TestCubBayesNetG(unittest.TestCase):
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices(self):
-        abs_tol, rel_tol = 1e-2, 0
-        a, b = 7, 0.1
-        indices = np.array(
-            [
-                [True, False, False],
-                [False, True, False],
-                [False, False, True],
-                [True, True, False],
-                [True, False, True],
-                [False, True, True],
-            ],
-            dtype=bool,
-        )
-        true_solution = Ishigami._exact_sensitivity_indices(indices, a, b)
-        for i in range(3):
-            si_ishigami = SensitivityIndices(
-                Ishigami(DigitalNetB2(3, seed=7), a, b), indices
-            )
-            solution, data = CubBayesNetG(
-                si_ishigami, abs_tol=abs_tol, rel_tol=rel_tol
-            ).integrate()
-            abs_error = abs(solution.squeeze() - true_solution)
-            success = (abs_error < abs_tol).all()
-            if success:
-                break
-        self.assertTrue(success)
+        self.assertTrue(_sensitivity_converges(
+            lambda: DigitalNetB2(3, seed=7), CubBayesNetG, abs_tol=1e-2
+        ))
 
 
 class TestMultilevelStoppingCriteria(unittest.TestCase):
     def _iid_financial_option(self):
-        return FinancialOption(
-            IIDStdUniform(seed=7), start_price=30, strike_price=30
-        )
+        return FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
 
     def _qmc_financial_option(self):
-        return FinancialOption(
-            Lattice(replications=32, seed=7), start_price=30, strike_price=30
-        )
+        return FinancialOption(Lattice(replications=32, seed=7), start_price=30, strike_price=30)
 
     def test_raise_distribution_compatibility_error(self):
         cases = [
@@ -725,46 +576,18 @@ class TestResumeFeature(unittest.TestCase):
         return DigitalNetB2(self.dimension, replications=16, seed=self.seed)
 
     def _iid_financial_option(self):
-        return FinancialOption(
-            IIDStdUniform(self.dimension, seed=self.seed),
-            start_price=30,
-            strike_price=30,
-        )
+        return FinancialOption(IIDStdUniform(self.dimension, seed=self.seed), start_price=30, strike_price=30)
 
     def _qmc_financial_option(self):
-        return FinancialOption(
-            Lattice(replications=32, seed=self.seed),
-            start_price=30,
-            strike_price=30,
-        )
+        return FinancialOption(Lattice(replications=32, seed=self.seed), start_price=30, strike_price=30)
 
     def _keister_builder(self, stopping_criterion, distribution_factory, abs_tol):
-        return lambda: stopping_criterion(
-            Keister(distribution_factory()),
-            abs_tol=abs_tol,
-            rel_tol=self.rel_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
-        )
+        return lambda: stopping_criterion(Keister(distribution_factory()), abs_tol=abs_tol, rel_tol=self.rel_tol, n_init=self.n_init, n_limit=self.n_limit)
 
-    def _multilevel_builder(
-        self, stopping_criterion, integrand_factory, tol_kwarg, tol
-    ):
-        return lambda: stopping_criterion(
-            integrand_factory(),
-            **{tol_kwarg: tol},
-            n_limit=self.n_limit,
-        )
+    def _multilevel_builder(self, stopping_criterion, integrand_factory, tol_kwarg, tol):
+        return lambda: stopping_criterion(integrand_factory(), **{tol_kwarg: tol}, n_limit=self.n_limit)
 
-    def _assert_resume_behavior(
-        self,
-        label,
-        loose_builder,
-        tight_builder,
-        compare_to_fresh=False,
-        rtol=0.5,
-        skip_exceptions=(),
-    ):
+    def _assert_resume_behavior(self, label, loose_builder, tight_builder, compare_to_fresh=False, rtol=0.5, skip_exceptions=()):
         def _run_assertions():
             sc1 = loose_builder()
             _, data1 = sc1.integrate()
@@ -878,34 +701,63 @@ class TestResumeFeature(unittest.TestCase):
                     captured["levels"] = resume_data.levels
                     captured["skip_level_reset"] = skip_level_reset
 
-                with patch.object(sc, "_integrate", side_effect=fake_integrate):
+                with patch.object(sc, "_validate_resume"), \
+                     patch.object(sc, "_integrate", side_effect=fake_integrate):
                     sc.integrate(resume=data)
 
                 self.assertEqual(captured["levels"], expected_levels)
                 self.assertTrue(captured["skip_level_reset"])
                 self.assertEqual(sc.rmse_tol, sc.target_tol)
 
-    def _qmc_rep_student_t(self):
-        return CubQMCRepStudentT(
-            Keister(self._net_rep_distribution()),
+    def test_qmc_resume_rejects_missing_transform_state(self):
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.loose_abs_tol,
+            rel_tol=self.rel_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "_kappanumap"))
+        del checkpoint._kappanumap
+
+        tight_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol,
             rel_tol=self.rel_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
         )
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
+
+    def test_bayes_resume_rejects_missing_transform_state(self):
+        loose_sc = CubBayesLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")),
+            abs_tol=self.loose_abs_tol,
+            rel_tol=self.rel_tol,
+            n_init=2**5,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "_ytildefull"))
+        del checkpoint._ytildefull
+
+        tight_sc = CubBayesLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")),
+            abs_tol=self.tight_abs_tol,
+            rel_tol=self.rel_tol,
+            n_init=2**5,
+            n_limit=self.n_limit,
+        )
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
+
+    def _qmc_rep_student_t(self):
+        return CubQMCRepStudentT(Keister(self._net_rep_distribution()), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol)
 
     def _pfgpci(self):
-        return PFGPCI(
-            Ishigami(DigitalNetB2(3, seed=self.seed)),
-            failure_threshold=0,
-            failure_above_threshold=False,
-            abs_tol=self.tight_abs_tol,
-            n_init=8,
-            n_limit=16,
-            n_batch=4,
-            n_approx=2**8,
-            gpytorch_train_iter=1,
-            verbose=False,
-            n_ref_approx=0,
-        )
+        return PFGPCI(Ishigami(DigitalNetB2(3, seed=self.seed)), failure_threshold=0, failure_above_threshold=False, abs_tol=self.tight_abs_tol, n_init=8, n_limit=16, n_batch=4, n_approx=2**8, gpytorch_train_iter=1, verbose=False, n_ref_approx=0)
 
     def test_unsupported_resume_raises_parameter_error(self):
         """Stopping criteria without resume support must raise ParameterError."""
@@ -922,6 +774,127 @@ class TestResumeFeature(unittest.TestCase):
                     self.skipTest(f"{label} unavailable: {exc}")
                 with self.assertRaises(ParameterError):
                     sc.integrate(resume=object())
+
+class TestResumeCheckpointing(unittest.TestCase):
+    def setUp(self):
+        warnings.filterwarnings("ignore", category=MaxSamplesWarning)
+        self.seed = 13
+        self.dimension = 2
+        self.n_init = 32
+        self.n_limit = 2048
+        self.loose_abs_tol = 0.2
+        self.tight_abs_tol = 0.05
+
+    def _make_integrand(self, dimension=None, seed=None):
+        return Keister(IIDStdUniform(dimension=self.dimension if dimension is None else dimension, seed=self.seed if seed is None else seed))
+
+    def test_cub_mc_clt_resume_reuses_existing_main_stage_samples(self):
+        loose_sc = CubMCCLT(
+            self._make_integrand(),
+            abs_tol=self.loose_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+
+        tight_sc = CubMCCLT(
+            self._make_integrand(),
+            abs_tol=self.tight_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, resumed = tight_sc.integrate(resume=checkpoint)
+
+        y_main = resumed.yfull[self.n_init :]
+        self.assertEqual(int(resumed.n_total), resumed.yfull.shape[-1])
+        self.assertEqual(int(resumed.n_mu), y_main.shape[-1])
+        self.assertTrue(np.allclose(resumed.solution, y_main.mean()))
+        self.assertTrue(np.allclose(resumed.sighat, y_main.std(ddof=1)))
+
+    def test_cub_mc_g_resume_reuses_existing_main_stage_samples(self):
+        loose_sc = CubMCG(
+            self._make_integrand(),
+            abs_tol=self.loose_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+
+        tight_sc = CubMCG(
+            self._make_integrand(),
+            abs_tol=self.tight_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, resumed = tight_sc.integrate(resume=checkpoint)
+
+        y_main = resumed.yfull[self.n_init :]
+        self.assertEqual(int(resumed.n_total), resumed.yfull.shape[-1])
+        self.assertEqual(int(resumed.n_mu), y_main.shape[-1])
+        self.assertTrue(np.allclose(resumed.solution, y_main.mean()))
+
+    def test_resume_rejects_incompatible_dimension(self):
+        loose_sc = CubMCCLT(
+            self._make_integrand(),
+            abs_tol=self.loose_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+
+        incompatible_sc = CubMCCLT(
+            self._make_integrand(dimension=3),
+            abs_tol=self.tight_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        with self.assertRaises(ParameterError):
+            incompatible_sc.integrate(resume=checkpoint)
+
+    def test_data_save_load_round_trip_plain_and_gzip(self):
+        data = Data(parameters=["value"])
+        data.value = np.array([1.0, 2.0, 3.0])
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            plain_path = os.path.join(tmpdir, "checkpoint.pkl")
+            gzip_path = os.path.join(tmpdir, "checkpoint.pkl.gz")
+
+            data.save(plain_path)
+            loaded_plain = Data.load(plain_path)
+            self.assertTrue(np.array_equal(loaded_plain.value, data.value))
+
+            data.save(gzip_path, compress=True)
+            loaded_gzip = Data.load(gzip_path)
+            self.assertTrue(np.array_equal(loaded_gzip.value, data.value))
+
+    def test_resume_after_save_load_continues_rng_stream(self):
+        loose_sc = CubMCCLT(
+            self._make_integrand(),
+            abs_tol=self.loose_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = os.path.join(tmpdir, "resume.pkl.gz")
+            checkpoint.save(path, compress=True)
+            loaded = Data.load(path)
+
+        old_n_total = int(loaded.n_total)
+        tight_sc = CubMCCLT(
+            self._make_integrand(),
+            abs_tol=self.tight_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, resumed = tight_sc.integrate(resume=loaded)
+        n_new = int(resumed.n_total) - old_n_total
+        if n_new <= 0:
+            self.skipTest("resume checkpoint already satisfied the tighter tolerance")
+        self.assertFalse(
+            np.allclose(resumed.xfull[old_n_total:], resumed.xfull[:n_new])
+        )
 
 if __name__ == "__main__":
     unittest.main()
