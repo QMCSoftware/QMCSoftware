@@ -1,5 +1,5 @@
 Stopping Criteria Check: Loose + Resume
-generated: 2026-04-25 15:29:46
+generated: 2026-04-25 15:53:37
 
 [CubMCCLT] status=ok
   loose_solution: 1.75555494
@@ -7,7 +7,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 532
   resume_n_total: 4665
   resume_n_new: 4133
-  resume_time: 0.0003
+  resume_time: 0.0004
 
   loose_iteration_log:
     === CubMCCLT-LOOSE iteration log ===
@@ -19,7 +19,7 @@ generated: 2026-04-25 15:29:46
     === CubMCCLT-RESUME iteration log ===
     stage        iter   solution    n_total      xfull.shape
     --------------------------------------------------------
-    RESUME             1.7555549        532         (532, 2)
+    RESUME          1  1.7555549        532         (532, 2)
     ITER            2  1.7992462       4665        (4665, 2)
 
 [CubMCCLTVec] status=ok
@@ -40,12 +40,11 @@ generated: 2026-04-25 15:29:46
     === CubMCCLTVec-RESUME iteration log ===
     stage        iter   solution      n_min    n_total      xfull.shape
     -------------------------------------------------------------------
-    RESUME             1.8532938          0        256         (256, 2)
-    ITER            2  1.8532938          0        256         (256, 2)
-    ITER            3  1.8532938        256        512         (512, 2)
-    ITER            4  1.8234874        512       1024        (1024, 2)
-    ITER            5  1.8410841       1024       2048        (2048, 2)
-    ITER            6  1.8144951       2048       4096        (4096, 2)
+    RESUME          1  1.8532938          0        256         (256, 2)
+    ITER            2  1.8532938        256        512         (512, 2)
+    ITER            3  1.8234874        512       1024        (1024, 2)
+    ITER            4  1.8410841       1024       2048        (2048, 2)
+    ITER            5  1.8144951       2048       4096        (4096, 2)
 
 [CubMCG] status=ok
   loose_solution: 1.83104000
@@ -53,7 +52,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 1699
   resume_n_total: 11778
   resume_n_new: 10079
-  resume_time: 0.0030
+  resume_time: 0.0031
 
   loose_iteration_log:
     === CubMCG-LOOSE iteration log ===
@@ -65,7 +64,7 @@ generated: 2026-04-25 15:29:46
     === CubMCG-RESUME iteration log ===
     stage        iter   solution    n_total      xfull.shape
     --------------------------------------------------------
-    RESUME             1.8310400       1699        (1699, 2)
+    RESUME          1  1.8310400       1699        (1699, 2)
     ITER            2  1.8068884      11778       (11778, 2)
 
 [CubQMCLatticeG] status=ok
@@ -86,8 +85,7 @@ generated: 2026-04-25 15:29:46
     === CubQMCLatticeG-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             1.8113722        256        256    8         (256, 2)
-    ITER            2  1.8113722        256        256    8         (256, 2)
+    RESUME          1  1.8113722        256        256    8         (256, 2)
 
 [CubQMCNetG] status=ok
   loose_solution: 1.80466605
@@ -107,8 +105,7 @@ generated: 2026-04-25 15:29:46
     === CubQMCNetG-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             1.8046660        256        256    8         (256, 2)
-    ITER            2  1.8046660        256        256    8         (256, 2)
+    RESUME          1  1.8046660        256        256    8         (256, 2)
 
 [CubQMCLatticeG_hard_d2] status=ok
   loose_solution: 1.80820113
@@ -116,7 +113,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 8192
   resume_n_total: 1048576
   resume_n_new: 1040384
-  resume_time: 0.1377
+  resume_time: 0.1469
 
   loose_iteration_log:
     === CubQMCLatticeG_hard_d2-LOOSE iteration log ===
@@ -133,15 +130,14 @@ generated: 2026-04-25 15:29:46
     === CubQMCLatticeG_hard_d2-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             1.8082011       8192       8192   13        (8192, 2)
-    ITER            7  1.8082011       8192       8192   13        (8192, 2)
-    ITER            8  1.8081977       8192      16384   14       (16384, 2)
-    ITER            9  1.8081730      16384      32768   15       (32768, 2)
-    ITER           10  1.8081805      32768      65536   16       (65536, 2)
-    ITER           11  1.8081802      65536     131072   17      (131072, 2)
-    ITER           12  1.8081853     131072     262144   18      (262144, 2)
-    ITER           13  1.8081868     262144     524288   19      (524288, 2)
-    ITER           14  1.8081860     524288    1048576   20     (1048576, 2)
+    RESUME          6  1.8082011       8192       8192   13        (8192, 2)
+    ITER            7  1.8081977       8192      16384   14       (16384, 2)
+    ITER            8  1.8081730      16384      32768   15       (32768, 2)
+    ITER            9  1.8081805      32768      65536   16       (65536, 2)
+    ITER           10  1.8081802      65536     131072   17      (131072, 2)
+    ITER           11  1.8081853     131072     262144   18      (262144, 2)
+    ITER           12  1.8081868     262144     524288   19      (524288, 2)
+    ITER           13  1.8081860     524288    1048576   20     (1048576, 2)
 
 [CubQMCLatticeG_hard_d4] status=ok
   loose_solution: 2.16604512
@@ -149,7 +145,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 65536
   resume_n_total: 1048576
   resume_n_new: 983040
-  resume_time: 0.1641
+  resume_time: 0.1871
 
   loose_iteration_log:
     === CubQMCLatticeG_hard_d4-LOOSE iteration log ===
@@ -169,12 +165,11 @@ generated: 2026-04-25 15:29:46
     === CubQMCLatticeG_hard_d4-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             2.1660451      65536      65536   16       (65536, 4)
-    ITER           10  2.1660451      65536      65536   16       (65536, 4)
-    ITER           11  2.1660102      65536     131072   17      (131072, 4)
-    ITER           12  2.1659529     131072     262144   18      (262144, 4)
-    ITER           13  2.1659274     262144     524288   19      (524288, 4)
-    ITER           14  2.1659239     524288    1048576   20     (1048576, 4)
+    RESUME          9  2.1660451      65536      65536   16       (65536, 4)
+    ITER           10  2.1660102      65536     131072   17      (131072, 4)
+    ITER           11  2.1659529     131072     262144   18      (262144, 4)
+    ITER           12  2.1659274     262144     524288   19      (524288, 4)
+    ITER           13  2.1659239     524288    1048576   20     (1048576, 4)
 
 [CubQMCNetG_hard_d2] status=ok
   loose_solution: 1.80820015
@@ -182,7 +177,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 8192
   resume_n_total: 262144
   resume_n_new: 253952
-  resume_time: 0.0372
+  resume_time: 0.0386
 
   loose_iteration_log:
     === CubQMCNetG_hard_d2-LOOSE iteration log ===
@@ -199,13 +194,12 @@ generated: 2026-04-25 15:29:46
     === CubQMCNetG_hard_d2-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             1.8082002       8192       8192   13        (8192, 2)
-    ITER            7  1.8082002       8192       8192   13        (8192, 2)
-    ITER            8  1.8081727       8192      16384   14       (16384, 2)
-    ITER            9  1.8082044      16384      32768   15       (32768, 2)
-    ITER           10  1.8081893      32768      65536   16       (65536, 2)
-    ITER           11  1.8081882      65536     131072   17      (131072, 2)
-    ITER           12  1.8081875     131072     262144   18      (262144, 2)
+    RESUME          6  1.8082002       8192       8192   13        (8192, 2)
+    ITER            7  1.8081727       8192      16384   14       (16384, 2)
+    ITER            8  1.8082044      16384      32768   15       (32768, 2)
+    ITER            9  1.8081893      32768      65536   16       (65536, 2)
+    ITER           10  1.8081882      65536     131072   17      (131072, 2)
+    ITER           11  1.8081875     131072     262144   18      (262144, 2)
 
 [CubQMCNetG_hard_d4] status=ok
   loose_solution: 2.16596652
@@ -213,7 +207,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 65536
   resume_n_total: 262144
   resume_n_new: 196608
-  resume_time: 0.0369
+  resume_time: 0.0394
 
   loose_iteration_log:
     === CubQMCNetG_hard_d4-LOOSE iteration log ===
@@ -233,10 +227,9 @@ generated: 2026-04-25 15:29:46
     === CubQMCNetG_hard_d4-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             2.1659665      65536      65536   16       (65536, 4)
-    ITER           10  2.1659665      65536      65536   16       (65536, 4)
-    ITER           11  2.1659676      65536     131072   17      (131072, 4)
-    ITER           12  2.1659329     131072     262144   18      (262144, 4)
+    RESUME          9  2.1659665      65536      65536   16       (65536, 4)
+    ITER           10  2.1659676      65536     131072   17      (131072, 4)
+    ITER           11  2.1659329     131072     262144   18      (262144, 4)
 
 [CubBayesLatticeG] status=ok
   loose_solution: 1.81990647
@@ -244,7 +237,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 32
   resume_n_total: 64
   resume_n_new: 32
-  resume_time: 0.0011
+  resume_time: 0.0012
 
   loose_iteration_log:
     === CubBayesLatticeG-LOOSE iteration log ===
@@ -256,9 +249,8 @@ generated: 2026-04-25 15:29:46
     === CubBayesLatticeG-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             1.8199065         32         32    5          (32, 2)
-    ITER            2  1.8199065         32         32    5          (32, 2)
-    ITER            3  1.8074038         32         64    6          (64, 2)
+    RESUME          1  1.8199065         32         32    5          (32, 2)
+    ITER            2  1.8074038         32         64    6          (64, 2)
 
 [CubBayesNetG] status=ok
   loose_solution: 1.72877943
@@ -266,7 +258,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 32
   resume_n_total: 128
   resume_n_new: 96
-  resume_time: 0.0025
+  resume_time: 0.0029
 
   loose_iteration_log:
     === CubBayesNetG-LOOSE iteration log ===
@@ -278,10 +270,9 @@ generated: 2026-04-25 15:29:46
     === CubBayesNetG-RESUME iteration log ===
     stage        iter   solution      n_min    n_total    m      xfull.shape
     ------------------------------------------------------------------------
-    RESUME             1.7287794         32         32    5          (32, 2)
-    ITER            2  1.7287794         32         32    5          (32, 2)
-    ITER            3  1.7781467         32         64    6          (64, 2)
-    ITER            4  1.8037482         64        128    7         (128, 2)
+    RESUME          1  1.7287794         32         32    5          (32, 2)
+    ITER            2  1.7781467         32         64    6          (64, 2)
+    ITER            3  1.8037482         64        128    7         (128, 2)
 
 [CubMCML] status=ok
   loose_solution: 3.65313405
@@ -289,7 +280,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 4136
   resume_n_total: 118176
   resume_n_new: 114040
-  resume_time: 0.0052
+  resume_time: 0.0053
 
   loose_iteration_log:
     === CubMCML-LOOSE iteration log ===
@@ -303,7 +294,7 @@ generated: 2026-04-25 15:29:46
     === CubMCML-RESUME iteration log ===
     stage        iter   solution    n_total    m
     --------------------------------------------
-    RESUME             3.6531340       4136    3
+    RESUME          3  3.6531340       4136    3
     ITER            4  3.4958255     118176    3
 
 [CubMCMLCont] status=ok
@@ -312,7 +303,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 2835
   resume_n_total: 62935
   resume_n_new: 60100
-  resume_time: 0.0027
+  resume_time: 0.0035
 
   loose_iteration_log:
     === CubMCMLCont-LOOSE iteration log ===
@@ -343,7 +334,7 @@ generated: 2026-04-25 15:29:46
     === CubMCMLCont-RESUME iteration log ===
     stage        iter   solution    n_total    m
     --------------------------------------------
-    RESUME             3.6338298       2835    3
+    RESUME         20  3.6338298       2835    3
     ITER           21  3.6338298       1915    3
     ITER           22  3.5201719      62935    3
 
@@ -353,7 +344,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 49152
   resume_n_total: 57344
   resume_n_new: 8192
-  resume_time: 0.0015
+  resume_time: 0.0013
 
   loose_iteration_log:
     === CubQMCML-LOOSE iteration log ===
@@ -367,9 +358,8 @@ generated: 2026-04-25 15:29:46
     === CubQMCML-RESUME iteration log ===
     stage        iter   solution    n_total    m
     --------------------------------------------
-    RESUME             3.4318601      49152    3
-    ITER            4  3.4318601      49152    3
-    ITER            5  3.4327578      57344    3
+    RESUME          3  3.4318601      49152    3
+    ITER            4  3.4327578      57344    3
 
 [CubQMCMLCont] status=ok
   loose_solution: 3.44559707
@@ -377,7 +367,7 @@ generated: 2026-04-25 15:29:46
   old_n_total: 32768
   resume_n_total: 57344
   resume_n_new: 24576
-  resume_time: 0.0020
+  resume_time: 0.0023
 
   loose_iteration_log:
     === CubQMCMLCont-LOOSE iteration log ===
@@ -399,10 +389,9 @@ generated: 2026-04-25 15:29:46
     === CubQMCMLCont-RESUME iteration log ===
     stage        iter   solution    n_total    m
     --------------------------------------------
-    RESUME             3.4455971      32768    3
-    ITER           12  3.4455971      32768    3
-    ITER           13  3.4318601      49152    3
-    ITER           14  3.4327578      57344    3
+    RESUME         11  3.4455971      32768    3
+    ITER           12  3.4318601      49152    3
+    ITER           13  3.4327578      57344    3
 
 [CubQMCRepStudentT] status=error
 
@@ -412,4 +401,4 @@ generated: 2026-04-25 15:29:46
 [PFGPCI] status=error
 
 
-  error: ParameterError: PFGPCI does not support resume. 
+  error: ParameterError: PFGPCI does not support resume.

@@ -1,5 +1,5 @@
 Stopping Criteria Check: Fresh Tight Run
-generated: 2026-04-25 15:29:46
+generated: 2026-04-25 15:53:37
 
 [CubMCCLT] status=ok
   fresh_solution: 1.79924623
@@ -30,7 +30,7 @@ generated: 2026-04-25 15:29:46
 [CubMCG] status=ok
   fresh_solution: 1.80688842
   fresh_n_total: 11778
-  fresh_time: 0.0028
+  fresh_time: 0.0032
 
   fresh_iteration_log:
     === CubMCG-FRESH iteration log ===
@@ -41,7 +41,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCLatticeG] status=ok
   fresh_solution: 1.81137224
   fresh_n_total: 256
-  fresh_time: 0.0003
+  fresh_time: 0.0004
 
   fresh_iteration_log:
     === CubQMCLatticeG-FRESH iteration log ===
@@ -52,7 +52,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCNetG] status=ok
   fresh_solution: 1.80466605
   fresh_n_total: 256
-  fresh_time: 0.0003
+  fresh_time: 0.0004
 
   fresh_iteration_log:
     === CubQMCNetG-FRESH iteration log ===
@@ -63,7 +63,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCLatticeG_hard_d2] status=ok
   fresh_solution: 1.80818596
   fresh_n_total: 1048576
-  fresh_time: 0.1449
+  fresh_time: 0.1458
 
   fresh_iteration_log:
     === CubQMCLatticeG_hard_d2-FRESH iteration log ===
@@ -86,7 +86,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCLatticeG_hard_d4] status=ok
   fresh_solution: 2.16592390
   fresh_n_total: 1048576
-  fresh_time: 0.1814
+  fresh_time: 0.1861
 
   fresh_iteration_log:
     === CubQMCLatticeG_hard_d4-FRESH iteration log ===
@@ -109,7 +109,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCNetG_hard_d2] status=ok
   fresh_solution: 1.80818750
   fresh_n_total: 262144
-  fresh_time: 0.0410
+  fresh_time: 0.0386
 
   fresh_iteration_log:
     === CubQMCNetG_hard_d2-FRESH iteration log ===
@@ -130,7 +130,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCNetG_hard_d4] status=ok
   fresh_solution: 2.16593288
   fresh_n_total: 262144
-  fresh_time: 0.0525
+  fresh_time: 0.0529
 
   fresh_iteration_log:
     === CubQMCNetG_hard_d4-FRESH iteration log ===
@@ -151,7 +151,7 @@ generated: 2026-04-25 15:29:46
 [CubBayesLatticeG] status=ok
   fresh_solution: 1.80740379
   fresh_n_total: 64
-  fresh_time: 0.0012
+  fresh_time: 0.0014
 
   fresh_iteration_log:
     === CubBayesLatticeG-FRESH iteration log ===
@@ -163,7 +163,7 @@ generated: 2026-04-25 15:29:46
 [CubBayesNetG] status=ok
   fresh_solution: 1.80374817
   fresh_n_total: 128
-  fresh_time: 0.0028
+  fresh_time: 0.0029
 
   fresh_iteration_log:
     === CubBayesNetG-FRESH iteration log ===
@@ -188,7 +188,7 @@ generated: 2026-04-25 15:29:46
 [CubMCMLCont] status=ok
   fresh_solution: 3.51049459
   fresh_n_total: 62508
-  fresh_time: 0.0063
+  fresh_time: 0.0061
 
   fresh_iteration_log:
     === CubMCMLCont-FRESH iteration log ===
@@ -218,7 +218,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCML] status=ok
   fresh_solution: 3.43275778
   fresh_n_total: 57344
-  fresh_time: 0.0086
+  fresh_time: 0.0081
 
   fresh_iteration_log:
     === CubQMCML-FRESH iteration log ===
@@ -232,7 +232,7 @@ generated: 2026-04-25 15:29:46
 [CubQMCMLCont] status=ok
   fresh_solution: 3.42973313
   fresh_n_total: 90112
-  fresh_time: 0.0112
+  fresh_time: 0.0109
 
   fresh_iteration_log:
     === CubQMCMLCont-FRESH iteration log ===
@@ -255,11 +255,11 @@ generated: 2026-04-25 15:29:46
 [CubQMCRepStudentT] status=ok
   fresh_solution: 1.81009025
   fresh_n_total: 4096
-  fresh_time: 0.0007
+  fresh_time: 0.0006
 
 
 [PFGPCI] status=ok
-  fresh_solution: 0.10156250
+  fresh_solution: 0.16796875
   fresh_n_total: 16
-  fresh_time: 0.0191
+  fresh_time: 0.0217
 

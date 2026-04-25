@@ -123,7 +123,6 @@ def enable_diagnostics(stopping_criterion, label, throttle_iterations=True):
     Returns:
         object: The same stopping criterion instance.
     """
-    _asc.IS_PRINT_DIAGNOSTIC = True
     setattr(stopping_criterion, "trace_iterations", True)
     setattr(stopping_criterion, "trace_label", label)
     setattr(stopping_criterion, "trace_throttle_iterations", throttle_iterations)

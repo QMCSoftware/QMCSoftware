@@ -208,11 +208,14 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         stream = io.StringIO()
         with redirect_stdout(stream):
             logger.resume(data, step_value=13)
+            # Simulate new samples being drawn: update n_total so state differs
+            data.n_total = 20
+            data.xfull = np.zeros((20, 2))
             logger.iteration(data, step_value=14)
         output = stream.getvalue()
-        self.assertRegex(output, r"RESUME\s+1\.2500000\s+8\s+16\s+13")
+        self.assertRegex(output, r"RESUME\s+6\s+1\.2500000\s+8\s+16\s+13")
         self.assertNotIn("RESUME       None", output)
-        self.assertRegex(output, r"ITER\s+7\s+1\.2500000\s+8\s+16\s+14")
+        self.assertRegex(output, r"ITER\s+7\s+1\.2500000\s+8\s+20\s+14")
 
     def test_init_requires_integrand(self):
         with self.assertRaises(ParameterError):

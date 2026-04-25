@@ -26,6 +26,17 @@ class _IterationTraceLogger(object):
         self.table_header_printed = False
         self.iter_count = 0
         self.visible_columns = None
+        self.pending_resume_signature = None
+
+    @staticmethod
+    def _state_signature(data):
+        xfull = getattr(data, "xfull", None)
+        return (
+            getattr(data, "n_min", None),
+            getattr(data, "n_total", None),
+            getattr(data, "m", None),
+            getattr(xfull, "shape", None),
+        )
 
     def _print_header_once(self):
         if self.enabled and (not self.header_printed) and self.label:
@@ -47,13 +58,15 @@ class _IterationTraceLogger(object):
         self.visible_columns = tuple(visible_columns)
         return self.visible_columns
 
-    def emit(self, stage, data, step_value=None, increment=False):
+    def emit(self, stage, data, step_value=None, increment=False, iter_value=None):
         if not self.enabled:
             return
         self._print_header_once()
         if increment:
             self.iter_count += 1
             data._iter_count = self.iter_count
+        elif iter_value is not None:
+            data._iter_count = int(iter_value)
         else:
             data._iter_count = None
         if step_value is not None:
@@ -75,9 +88,24 @@ class _IterationTraceLogger(object):
                 self.iter_count = int(previous_iter_count)
             except (TypeError, ValueError):
                 pass
-        self.emit("RESUME", data, step_value=step_value, increment=False)
+        self.emit(
+            "RESUME",
+            data,
+            step_value=step_value,
+            increment=False,
+            iter_value=self.iter_count if self.iter_count > 0 else None,
+        )
+        self.pending_resume_signature = self._state_signature(data)
 
     def iteration(self, data, step_value=None):
+        current_signature = self._state_signature(data)
+        if (
+            self.pending_resume_signature is not None
+            and current_signature == self.pending_resume_signature
+        ):
+            self.pending_resume_signature = None
+            return
+        self.pending_resume_signature = None
         self.emit("ITER", data, step_value=step_value, increment=True)
 
 
@@ -390,7 +418,7 @@ class AbstractStoppingCriterion(object):
                 but ``abs_tol`` is, then ``rmse_tol = abs_tol / norm.ppf(1 -
                 alpha / 2)``.
         """
-        raise MethodImplementationError(self, "integrate")
+        raise MethodImplementationError(self, "set_tolerance")
 
     def __repr__(self):
         return _univ_repr(self, "AbstractStoppingCriterion", self.parameters)

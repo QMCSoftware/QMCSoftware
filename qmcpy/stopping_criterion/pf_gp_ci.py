@@ -271,7 +271,7 @@ class PFGPCI(AbstractStoppingCriterion):
     def integrate(self, seed=None, refit=False, resume=None):
         t0 = time.time()
         if resume is not None:
-            raise ParameterError("PFGPCI does not support resume. ")
+            raise ParameterError("PFGPCI does not support resume.")
         dnb2 = DigitalNetB2(self.d, randomize="DS", order="GRAY", seed=seed)
         data = PFGPCIData(
             self,
