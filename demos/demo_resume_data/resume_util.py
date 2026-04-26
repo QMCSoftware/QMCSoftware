@@ -2,6 +2,7 @@
 
 from contextlib import redirect_stdout
 import io
+import math
 from time import strftime
 
 from qmcpy import CubQMCLatticeG, Genz, Lattice
@@ -9,6 +10,7 @@ from qmcpy.stopping_criterion import abstract_stopping_criterion as _asc
 
 
 TRACE_ITERATIONS = True
+TRACE_THROTTLE_ITERATIONS = True
 
 
 def format_value(value, ndigits=8):
@@ -42,7 +44,15 @@ def _format_problem_inputs(stopping_criterion):
     def add_scalar(label, value, *, ndigits=6):
         if value is None:
             return
-        lines.append(f"{label}: {format_value(value, ndigits=ndigits)}")
+        try:
+            fval = float(value)
+            if fval != 0 and abs(fval) < 10 ** (-ndigits):
+                formatted = f"{fval:.2e}"
+            else:
+                formatted = format_value(value, ndigits=ndigits)
+        except (TypeError, ValueError):
+            formatted = str(value)
+        lines.append(f"{label}: {formatted}")
 
     def add_int(label, value):
         if value is None:
@@ -64,15 +74,16 @@ def _format_problem_inputs(stopping_criterion):
     return "\n".join(lines)
 
 
-def make_oscillatory_solver(
+def make_CubQMCLatticeG_solver(
     abs_tol,
     rel_tol=0,
     seed=7,
     dimension=3,
     trace_label="",
-    trace_iterations=True,
+    trace_iterations=None,
+    trace_throttle_iterations=None,
 ):
-    """Build a CubQMCLatticeG solver for the standard oscillatory demo case.
+    """Build a CubQMCLatticeG solver for the demo case.
 
     Args:
         abs_tol (float): Absolute error tolerance.
@@ -81,8 +92,11 @@ def make_oscillatory_solver(
         dimension (int, optional): Integrand dimension. Defaults to 3.
         trace_label (str, optional): Label for the iteration log. Defaults to
             an empty string (no header printed).
-        trace_iterations (bool, optional): Whether to enable iteration logging.
-            Defaults to True.
+        trace_iterations (bool | None, optional): Whether to enable iteration
+            logging. If None, falls back to :data:`TRACE_ITERATIONS`.
+        trace_throttle_iterations (bool | None, optional): Whether to throttle
+            printed iteration rows. If None, falls back to
+            :data:`TRACE_THROTTLE_ITERATIONS`.
 
     Returns:
         CubQMCLatticeG: Configured stopping criterion instance.
@@ -92,48 +106,15 @@ def make_oscillatory_solver(
         kind_func="oscillatory",
         kind_coeff=1,
     )
+    if trace_iterations is None:
+        trace_iterations = TRACE_ITERATIONS
+    if trace_throttle_iterations is None:
+        trace_throttle_iterations = TRACE_THROTTLE_ITERATIONS
     solver = CubQMCLatticeG(integrand, abs_tol=abs_tol, rel_tol=rel_tol)
     solver.trace_iterations = trace_iterations
     solver.trace_label = trace_label
+    solver.trace_throttle_iterations = trace_throttle_iterations
     return solver
-
-
-def make_solver(
-    abs_tol,
-    rel_tol=0,
-    seed=7,
-    dimension=3,
-    trace_label="",
-    trace_iterations=None,
-):
-    """Build the standard oscillatory demo solver with shared defaults.
-
-    Thin wrapper around :func:`make_oscillatory_solver` that defaults
-    ``trace_iterations`` to the module-level :data:`TRACE_ITERATIONS` flag.
-
-    Args:
-        abs_tol (float): Absolute error tolerance.
-        rel_tol (float, optional): Relative error tolerance. Defaults to 0.
-        seed (int, optional): Random seed for the lattice. Defaults to 7.
-        dimension (int, optional): Integrand dimension. Defaults to 3.
-        trace_label (str, optional): Label for the iteration log. Defaults to
-            an empty string.
-        trace_iterations (bool | None, optional): Whether to enable iteration
-            logging.  If None, falls back to :data:`TRACE_ITERATIONS`.
-
-    Returns:
-        CubQMCLatticeG: Configured stopping criterion instance.
-    """
-    if trace_iterations is None:
-        trace_iterations = TRACE_ITERATIONS
-    return make_oscillatory_solver(
-        abs_tol=abs_tol,
-        rel_tol=rel_tol,
-        seed=seed,
-        dimension=dimension,
-        trace_label=trace_label,
-        trace_iterations=trace_iterations,
-    )
 
 
 def half_width(data):
@@ -152,24 +133,138 @@ def half_width(data):
     return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
 
 
+def print_integration_result(
+    stage_name,
+    solution,
+    data,
+    *,
+    previous_n_total=None,
+    time_value=None,
+    time_label="Time",
+    additional_time_pairs=(),
+):
+    """Print a consistent integration-result block for resume demos.
+
+    Args:
+        stage_name (str): Human-readable stage label, e.g. ``"Resumed"``.
+        solution: Scalar-like solution returned by ``integrate``.
+        data: QMCPy ``Data`` object with ``n_total`` and time/bound attributes.
+        previous_n_total (int | None, optional): Previous sample count used for
+            resume runs. When provided, previous/total/new sample lines are
+            printed. Defaults to None.
+        time_value (float | None, optional): Time value to print for the primary
+            time line. Defaults to ``data.time_integrate``.
+        time_label (str, optional): Label for the primary time line.
+            Defaults to ``"Time"``.
+        additional_time_pairs (iterable[tuple[str, float]], optional): Extra
+            ``(label, seconds)`` time lines to print after the primary one.
+            Defaults to an empty tuple.
+    """
+    total_n = int(getattr(data, "n_total", 0))
+
+    def _positive_float(value):
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(value) or value <= 0:
+            return None
+        return value
+
+    sc = getattr(data, "stopping_crit", None)
+    tolerance_candidates = []
+    for tol_value in (
+        getattr(data, "abs_tol", None),
+        getattr(data, "rmse_tol", None),
+        getattr(sc, "abs_tol", None) if sc is not None else None,
+        getattr(sc, "rmse_tol", None) if sc is not None else None,
+    ):
+        tol_float = _positive_float(tol_value)
+        if tol_float is not None:
+            tolerance_candidates.append(tol_float)
+
+    solution_decimals = 8
+    if tolerance_candidates:
+        solution_decimals = int(math.ceil(-math.log10(min(tolerance_candidates)))) + 1
+        solution_decimals = max(7, min(12, solution_decimals))
+
+    value_w = max(12, solution_decimals + 3)
+    primary_time = (
+        float(getattr(data, "time_integrate", float("nan")))
+        if time_value is None
+        else float(time_value)
+    )
+
+    labels = [
+        f"{stage_name} solution",
+        "Samples used" if previous_n_total is None else "Previous samples",
+        "Total samples" if previous_n_total is not None else None,
+        "New samples" if previous_n_total is not None else None,
+        time_label,
+        *[str(extra_label) for extra_label, _ in additional_time_pairs],
+        "Estimated interval half-width",
+    ]
+    labels = [label for label in labels if label is not None]
+    label_w = max(len(label) + 1 for label in labels)
+
+    def _print_value_line(label, value_text):
+        print(f"  {label + ':':<{label_w}} {value_text:>{value_w}}")
+
+    print()
+    _print_value_line(
+        f"{stage_name} solution", f"{solution.item():.{solution_decimals}f}"
+    )
+    if previous_n_total is None:
+        _print_value_line("Samples used", f"{total_n:,}")
+    else:
+        previous_n_total = int(previous_n_total)
+        _print_value_line("Previous samples", f"{previous_n_total:,}")
+        _print_value_line("Total samples", f"{total_n:,}")
+        _print_value_line("New samples", f"{total_n - previous_n_total:,}")
+
+    _print_value_line(time_label, f"{primary_time:.4f} s")
+    for extra_label, extra_time in additional_time_pairs:
+        _print_value_line(str(extra_label), f"{float(extra_time):.4f} s")
+    _print_value_line("Estimated interval half-width", f"{half_width(data):.2e}")
+
+
 def print_stage_summary(rows, title="Stage summary"):
     """Print a compact stage-by-stage sample and time summary table.
 
     Args:
         rows (list[tuple]): Rows of the form
-            ``(name, abs_tol, total_n, new_n, half_width, time_sec)``.
+            ``(name, abs_tol, total_n, new_n, iters, solution, half_width, time_sec)``.
+            ``iters`` may be ``None`` when iteration tracing is disabled.
         title (str, optional): Table title. Defaults to ``"Stage summary"``.
     """
-    sep = "-" * 55
+    tol_values = [
+        float(abs_tol)
+        for _, abs_tol, *_ in rows
+        if abs_tol is not None and float(abs_tol) > 0
+    ]
+    if tol_values:
+        solution_decimals = int(math.ceil(-math.log10(min(tol_values)))) + 1
+        solution_decimals = max(7, min(12, solution_decimals))
+    else:
+        solution_decimals = 8
+    sol_w = solution_decimals + 4  # sign + leading digit + dot + decimals
+
+    sep_len = 7 + 1 + 7 + 1 + 9 + 1 + 9 + 1 + 6 + 1 + sol_w + 1 + 10 + 1 + 8
+    sep = "-" * sep_len
     print(f"\n{title}")
     print(sep)
     print(
-        f"{'Stage':<7} {'abs_tol':>7} {'total n':>9} {'new n':>9} {'half-width':>10} {'time (s)':>8}"
+        f"{'Stage':<7} {'abs_tol':>7} {'total n':>9} {'new n':>9}"
+        f" {'iters':>6} {'solution':>{sol_w}} {'half-width':>10} {'time (s)':>8}"
     )
     print(sep)
-    for name, abs_tol, total_n, new_n, hw, tsec in rows:
+    for name, abs_tol, total_n, new_n, iters, solution, hw, tsec in rows:
+        iter_str = str(int(iters)) if iters is not None else "-"
+        sol_str = f"{float(solution):.{solution_decimals}f}"
+        abs_tol_str = f"{float(abs_tol):.0e}" if abs_tol is not None else "---"
         print(
-            f"{name:<7} {abs_tol:>7.0e} {int(total_n):>9,} {int(new_n):>9,} {hw:>10.2e} {tsec:>8.4f}"
+            f"{name:<7} {abs_tol_str:>7} {int(total_n):>9,} {int(new_n):>9,}"
+            f" {iter_str:>6} {sol_str:>{sol_w}} {hw:>10.2e} {tsec:>8.4f}"
         )
     print(sep)
 
@@ -324,6 +419,36 @@ def make_named_tol_builder(sc_class, integrand_factory, tol_name, **fixed_kwargs
     return build
 
 
+def _safe_half_width(data):
+    """Return half-width from data, or bias_estimate for MLQMC types,
+    or RMSE estimate for MLMC types, or NaN when nothing is available."""
+    try:
+        return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
+    except Exception:
+        pass
+    try:
+        return float(data.bias_estimate)
+    except Exception:
+        pass
+    try:
+        import numpy as np
+        return float(np.sqrt(np.sum(data.var_level / data.n_level)))
+    except Exception:
+        return float("nan")
+
+
+def _get_sc_tol(sc):
+    """Return the first positive tolerance found on a stopping criterion."""
+    for attr in ("abs_tol", "rmse_tol"):
+        try:
+            val = float(getattr(sc, attr, None))
+            if val > 0:
+                return val
+        except (TypeError, ValueError):
+            pass
+    return None
+
+
 def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwargs):
     """Build, enable diagnostics on, and integrate a stopping criterion.
 
@@ -335,15 +460,16 @@ def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwarg
         **integrate_kwargs: Extra keyword arguments forwarded to ``integrate``.
 
     Returns:
-        tuple: ``(solution, data, log_text, input_text)`` where *log_text* is
-        the captured stdout from the integration run and *input_text* is a
-        compact summary of the stopping criterion inputs.
+        tuple: ``(solution, data, log_text, input_text, sc)`` where *log_text* is
+        the captured stdout from the integration run, *input_text* is a
+        compact summary of the stopping criterion inputs, and *sc* is the
+        stopping criterion instance after integration.
     """
     sc = enable_diagnostics(
         factory(), label, throttle_iterations=throttle_iterations
     )
     (solution, data), log = capture_integrate(sc, **integrate_kwargs)
-    return solution, data, log.strip(), _format_problem_inputs(sc)
+    return solution, data, log.strip(), _format_problem_inputs(sc), sc
 
 
 def run_resume_case(case, throttle_iterations=True):
@@ -360,24 +486,30 @@ def run_resume_case(case, throttle_iterations=True):
     name = case["name"]
     row = {"name": name}
     try:
-        sol1, data1, loose_log, loose_inputs = _run_logged_case(
+        sol1, data1, loose_log, loose_inputs, sc1 = _run_logged_case(
             case["loose"], f"{name}-LOOSE", throttle_iterations=throttle_iterations
         )
         old_n = int(getattr(data1, "n_total", 0))
-        sol2, data2, resume_log, resume_inputs = _run_logged_case(
+        # Capture loose stats before passing data1 into resume (may mutate in-place)
+        loose_iters = getattr(data1, "_iter_count", None)
+        loose_hw = _safe_half_width(data1)
+        loose_time_f = float(getattr(data1, "time_integrate", 0.0))
+        loose_solution_f = float(sol1.item())
+        sol2, data2, resume_log, resume_inputs, sc2 = _run_logged_case(
             case["tight"],
             f"{name}-RESUME",
             throttle_iterations=throttle_iterations,
             resume=data1,
         )
-        new_n = int(getattr(data2, "n_total", 0)) - old_n
+        resume_n = int(getattr(data2, "n_total", 0))
+        new_n = resume_n - old_n
         row.update(
             {
                 "status": "ok",
                 "loose_solution": format_value(sol1, ndigits=7),
                 "resume_solution": format_value(sol2, ndigits=7),
                 "old_n_total": str(old_n),
-                "resume_n_total": str(int(getattr(data2, "n_total", 0))),
+                "resume_n_total": str(resume_n),
                 "resume_n_new": str(new_n),
                 "resume_time": format_value(
                     getattr(data2, "time_integrate", float("nan")), ndigits=4
@@ -386,6 +518,19 @@ def run_resume_case(case, throttle_iterations=True):
                 "resume_inputs": resume_inputs,
                 "loose_log": loose_log,
                 "resume_log": resume_log,
+                # Extra numeric fields for stage summary
+                "_loose_abs_tol": _get_sc_tol(sc1),
+                "_loose_n": old_n,
+                "_loose_hw": loose_hw,
+                "_loose_iters": loose_iters,
+                "_loose_solution_f": loose_solution_f,
+                "_loose_time_f": loose_time_f,
+                "_resume_abs_tol": _get_sc_tol(sc2),
+                "_resume_n": resume_n,
+                "_resume_hw": _safe_half_width(data2),
+                "_resume_iters": getattr(data2, "_iter_count", None),
+                "_resume_solution_f": float(sol2.item()),
+                "_resume_time_f": float(getattr(data2, "time_integrate", 0.0)),
             }
         )
     except Exception as exc:
@@ -407,19 +552,27 @@ def run_fresh_case(case, throttle_iterations=True):
     name = case["name"]
     row = {"name": name}
     try:
-        sol, data, fresh_log, fresh_inputs = _run_logged_case(
+        sol, data, fresh_log, fresh_inputs, sc = _run_logged_case(
             case["tight"], f"{name}-FRESH", throttle_iterations=throttle_iterations
         )
+        fresh_n = int(getattr(data, "n_total", 0))
         row.update(
             {
                 "status": "ok",
                 "fresh_solution": format_value(sol, ndigits=7),
-                "fresh_n_total": str(int(getattr(data, "n_total", 0))),
+                "fresh_n_total": str(fresh_n),
                 "fresh_time": format_value(
                     getattr(data, "time_integrate", float("nan")), ndigits=4
                 ),
                 "fresh_inputs": fresh_inputs,
                 "fresh_log": fresh_log,
+                # Extra numeric fields for stage summary
+                "_fresh_abs_tol": _get_sc_tol(sc),
+                "_fresh_n": fresh_n,
+                "_fresh_hw": _safe_half_width(data),
+                "_fresh_iters": getattr(data, "_iter_count", None),
+                "_fresh_solution_f": float(sol.item()),
+                "_fresh_time_f": float(getattr(data, "time_integrate", 0.0)),
             }
         )
     except Exception as exc:
@@ -450,8 +603,12 @@ def write_report(
             Pairs of display label and row key for embedded logs. Defaults to an
             empty tuple.
     """
+    separator = "~" * 60
     lines = [title, f"generated: {strftime('%Y-%m-%d %H:%M:%S')}", ""]
-    for row in rows:
+    for i, row in enumerate(rows):
+        if i > 0:
+            lines.append(separator)
+            lines.append("")
         lines.append(
             f"[{row.get('name', 'unknown')}] status={row.get('status', 'unknown')}"
         )
@@ -486,5 +643,105 @@ def write_report(
             if printed_log or printed_summary:
                 lines.append("")
             lines.append(f"  error: {row['error']}")
+        lines.append("")
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_combined_report(path, title, resume_rows, fresh_rows):
+    """Write a combined loose+resume and fresh report with per-example stage summaries.
+
+    Each example block contains: loose inputs, resume inputs, fresh inputs,
+    all three iteration logs, a stage summary table, and key numeric values.
+
+    Args:
+        path: Output path object.
+        title (str): Report title.
+        resume_rows (list[dict]): Rows returned by :func:`run_resume_case`.
+        fresh_rows (list[dict]): Rows returned by :func:`run_fresh_case`,
+            in the same order as *resume_rows*.
+    """
+    separator = "~" * 60
+    lines = [title, f"generated: {strftime('%Y-%m-%d %H:%M:%S')}", ""]
+    for i, (rrow, frow) in enumerate(zip(resume_rows, fresh_rows)):
+        if i > 0:
+            lines.append(separator)
+            lines.append("")
+        name = rrow.get("name", "unknown")
+        rstatus = rrow.get("status", "unknown")
+        fstatus = frow.get("status", "unknown")
+        lines.append(f"[{name}] status={rstatus}")
+
+        # Input sections
+        for section_label, row_obj, row_key in [
+            ("loose_inputs", rrow, "loose_inputs"),
+            ("resume_inputs", rrow, "resume_inputs"),
+            ("fresh_inputs", frow, "fresh_inputs"),
+        ]:
+            text = row_obj.get(row_key, "")
+            if not text:
+                continue
+            lines.append("")
+            lines.append(f"  {section_label}:")
+            lines.extend([f"    {line}" for line in text.splitlines()])
+
+        # Iteration log sections
+        for section_label, row_obj, row_key in [
+            ("loose_iteration_log", rrow, "loose_log"),
+            ("resume_iteration_log", rrow, "resume_log"),
+            ("fresh_iteration_log", frow, "fresh_log"),
+        ]:
+            text = row_obj.get(row_key, "")
+            if not text:
+                continue
+            lines.append("")
+            lines.append(f"  {section_label}:")
+            lines.extend([f"    {line}" for line in text.splitlines()])
+
+        # Stage summary table
+        if rstatus == "ok" and fstatus == "ok":
+            stage_rows = [
+                (
+                    "Loose",
+                    rrow.get("_loose_abs_tol"),
+                    rrow.get("_loose_n", 0),
+                    rrow.get("_loose_n", 0),
+                    rrow.get("_loose_iters"),
+                    rrow.get("_loose_solution_f", float("nan")),
+                    rrow.get("_loose_hw", float("nan")),
+                    rrow.get("_loose_time_f", 0.0),
+                ),
+                (
+                    "Resumed",
+                    rrow.get("_resume_abs_tol"),
+                    rrow.get("_resume_n", 0),
+                    rrow.get("_resume_n", 0) - rrow.get("_loose_n", 0),
+                    rrow.get("_resume_iters"),
+                    rrow.get("_resume_solution_f", float("nan")),
+                    rrow.get("_resume_hw", float("nan")),
+                    rrow.get("_resume_time_f", 0.0),
+                ),
+                (
+                    "Fresh",
+                    frow.get("_fresh_abs_tol"),
+                    frow.get("_fresh_n", 0),
+                    frow.get("_fresh_n", 0),
+                    frow.get("_fresh_iters"),
+                    frow.get("_fresh_solution_f", float("nan")),
+                    frow.get("_fresh_hw", float("nan")),
+                    frow.get("_fresh_time_f", 0.0),
+                ),
+            ]
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                print_stage_summary(stage_rows, title=f"Stage summary of {name}")
+            summary_text = stream.getvalue().strip()
+            lines.append("")
+            lines.extend([f"  {line}" for line in summary_text.splitlines()])
+
+        # Errors
+        for row_obj in (rrow, frow):
+            if "error" in row_obj:
+                lines.append(f"  error: {row_obj['error']}")
+
         lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")

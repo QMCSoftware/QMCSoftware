@@ -244,6 +244,37 @@ def print_diagnostic(
     n_total_display = int(n_total) if n_total is not None else None
     xfull_shape = getattr(xfull, "shape", None)
 
+    def _positive_float(value):
+        value = safe_get_first_element(value)
+        if value is None:
+            return None
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not np.isfinite(value) or value <= 0:
+            return None
+        return value
+
+    sc = getattr(data, "stopping_crit", None)
+    tolerance_candidates = []
+    for tol_value in (
+        getattr(data, "abs_tol", None),
+        rmse_tol,
+        getattr(sc, "abs_tol", None) if sc is not None else None,
+        getattr(sc, "rmse_tol", None) if sc is not None else None,
+    ):
+        tol_float = _positive_float(tol_value)
+        if tol_float is not None:
+            tolerance_candidates.append(tol_float)
+
+    solution_decimals = 7
+    if tolerance_candidates:
+        # Keep one extra digit beyond tolerance scale for readability.
+        solution_decimals = int(np.ceil(-np.log10(min(tolerance_candidates)))) + 1
+        solution_decimals = max(7, min(12, solution_decimals))
+    solution_width = max(10, solution_decimals + 4)
+
     def _format_bound(value):
         if value is None:
             return f"{'None':>15}"
@@ -261,9 +292,9 @@ def print_diagnostic(
     if solution_display is not None and not (
         isinstance(solution_display, float) and solution_display != solution_display
     ):
-        solution_formatted = f"{solution_display:>10.7f}"
+        solution_formatted = f"{solution_display:>{solution_width}.{solution_decimals}f}"
     else:
-        solution_formatted = f"{'nan':>10}"
+        solution_formatted = f"{'nan':>{solution_width}}"
     n_min_formatted = f"{int(n_min):>10}" if n_min is not None else f"{'None':>10}"
     bound_diff_formatted = _format_bound(bound_diff_display)
     comb_bound_diff_formatted = _format_bound(comb_bound_diff_display)
@@ -304,7 +335,7 @@ def print_diagnostic(
     header_values = {
         "stage": f"{'stage':<12}",
         "iter": f"{'iter':>4}",
-        "solution": f"{'solution':>10}",
+        "solution": f"{'solution':>{solution_width}}",
         "bound_diff": f"{'bound_diff':>15}",
         "comb_bound_diff": f"{'comb_bound_diff':>15}",
         "bound_half_width": f"{'bound_half_width':>15}",

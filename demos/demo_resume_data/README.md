@@ -29,11 +29,8 @@ Running
 python demos/demo_resume_data/check_resume.py
 ```
 
-writes the following files into `output/`:
-
-- `check_loose_plus_resume.txt`:  Summary of the loose-then-resume workflow for each stopping criterion, plus the captured loose and resume iteration logs.
-
-- `check_fresh.txt`:  Summary of a fresh tight-tolerance run for each stopping criterion, plus the captured fresh iteration logs.
+writes the following file into `output/`:
+- `check_resume_summary.txt`: Combined report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including captured iteration logs.
 
 The script currently runs with `main(throttle_iterations=False)` when executed directly, so every logged iteration is printed.
 

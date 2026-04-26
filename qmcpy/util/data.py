@@ -13,7 +13,7 @@ class Data(object):
     def __init__(self, parameters):
         self.parameters = parameters
 
-    def save(self, path, compress=False):
+    def save(self, path, compress=False, overwrite=False):
         """Save this Data object to disk using pickle.
 
         Warning:
@@ -27,10 +27,15 @@ class Data(object):
                 when not already present.
             compress (bool, optional): Gzip-compress the saved file. Defaults
                 to False.
+            overwrite (bool, optional): If False (default), skip saving when
+                the file already exists. If True, overwrite any existing file.
         """
+        import os
         path = str(path)
         if compress and not path.endswith(".gz"):
             path = path + ".gz"
+        if not overwrite and os.path.exists(path):
+            return
         open_fn = gzip.open if path.endswith(".gz") else open
         with open_fn(path, "wb") as f:
             _serializer.dump(self, f)

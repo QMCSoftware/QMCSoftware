@@ -1,0 +1,625 @@
+Stopping Criteria Check: Resume vs Fresh
+generated: 2026-04-26 16:00:44
+
+[CubMCCLTVec] status=ok
+
+  loose_inputs:
+    abs_tol: 0.200000
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  resume_inputs:
+    abs_tol: 0.050000
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  fresh_inputs:
+    abs_tol: 0.050000
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  loose_iteration_log:
+    === CubMCCLTVec-LOOSE iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      xfull.shape
+    ------------------------------------------------------------------------------------
+    ITER            1   1.8532938       3.458e-01          0        256         (256, 2)
+
+  resume_iteration_log:
+    === CubMCCLTVec-RESUME iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      xfull.shape
+    ------------------------------------------------------------------------------------
+    RESUME          1   1.8532938       3.458e-01          0        256         (256, 2)
+    ITER            2   1.8532938       2.443e-01        256        512         (512, 2)
+    ITER            3   1.8234874       1.810e-01        512       1024        (1024, 2)
+    ITER            4   1.8410841       1.272e-01       1024       2048        (2048, 2)
+    ITER            5   1.8144951       9.050e-02       2048       4096        (4096, 2)
+
+  fresh_iteration_log:
+    === CubMCCLTVec-FRESH iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      xfull.shape
+    ------------------------------------------------------------------------------------
+    ITER            1   1.8532938       3.458e-01          0        256         (256, 2)
+    ITER            2   1.8245067       2.627e-01        256        512         (512, 2)
+    ITER            3   1.8091047       1.856e-01        512       1024        (1024, 2)
+    ITER            4   1.8424322       1.270e-01       1024       2048        (2048, 2)
+    ITER            5   1.8051965       9.145e-02       2048       4096        (4096, 2)
+
+  Stage summary of CubMCCLTVec
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     2e-01       256       256      1   1.8532938   1.73e-01   0.0002
+  Resumed   5e-02     4,096     3,840      5   1.8144951   4.53e-02   0.0007
+  Fresh     5e-02     4,096     4,096      5   1.8051965   4.57e-02   0.0007
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubQMCLatticeG] status=ok
+
+  loose_inputs:
+    abs_tol: 0.001000
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  resume_inputs:
+    abs_tol: 0.000001
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  fresh_inputs:
+    abs_tol: 0.000001
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  loose_iteration_log:
+    === CubQMCLatticeG-LOOSE iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.8113722       4.919e-02          0        256      8         (256, 2)
+    ITER            2   1.8098549       1.997e-02        256        512      9         (512, 2)
+    ITER            3   1.8104223       9.348e-03        512       1024     10        (1024, 2)
+    ITER            4   1.8088036       4.994e-03       1024       2048     11        (2048, 2)
+    ITER            5   1.8083250       2.121e-03       2048       4096     12        (4096, 2)
+    ITER            6   1.8082011       1.187e-03       4096       8192     13        (8192, 2)
+
+  resume_iteration_log:
+    === CubQMCLatticeG-RESUME iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    RESUME          6   1.8082011       1.187e-03       8192       8192     13        (8192, 2)
+    ITER            7   1.8081977       5.053e-04       8192      16384     14       (16384, 2)
+    ITER            8   1.8081730       2.852e-04      16384      32768     15       (32768, 2)
+    ITER            9   1.8081805       1.275e-04      32768      65536     16       (65536, 2)
+
+  fresh_iteration_log:
+    === CubQMCLatticeG-FRESH iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.8113722       4.919e-02          0        256      8         (256, 2)
+    ITER            2   1.8098549       1.997e-02        256        512      9         (512, 2)
+    ITER            3   1.8104223       9.348e-03        512       1024     10        (1024, 2)
+    ITER            4   1.8088036       4.994e-03       1024       2048     11        (2048, 2)
+    ITER            5   1.8083250       2.121e-03       2048       4096     12        (4096, 2)
+    ITER            6   1.8082011       1.187e-03       4096       8192     13        (8192, 2)
+    ITER            7   1.8081977       5.053e-04       8192      16384     14       (16384, 2)
+    ITER            8   1.8081730       2.852e-04      16384      32768     15       (32768, 2)
+    ITER            9   1.8081805       1.275e-04      32768      65536     16       (65536, 2)
+
+  Stage summary of CubQMCLatticeG
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     1e-03     8,192     8,192      6   1.8082011   5.93e-04   0.0025
+  Resumed   1e-06    65,536    57,344      9   1.8081805   6.38e-05   0.0074
+  Fresh     1e-06    65,536    65,536      9   1.8081805   6.38e-05   0.0102
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubQMCNetG] status=ok
+
+  loose_inputs:
+    abs_tol: 0.001000
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  resume_inputs:
+    abs_tol: 0.000001
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  fresh_inputs:
+    abs_tol: 0.000001
+    rel_tol: 0.000000
+    n_init: 256
+    n_limit: 65536
+    dimension: 2
+
+  loose_iteration_log:
+    === CubQMCNetG-LOOSE iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.8046660       3.595e-02          0        256      8         (256, 2)
+    ITER            2   1.8047274       2.428e-02        256        512      9         (512, 2)
+    ITER            3   1.8080187       8.593e-03        512       1024     10        (1024, 2)
+    ITER            4   1.8077140       5.121e-03       1024       2048     11        (2048, 2)
+    ITER            5   1.8080545       2.293e-03       2048       4096     12        (4096, 2)
+    ITER            6   1.8082002       1.099e-03       4096       8192     13        (8192, 2)
+
+  resume_iteration_log:
+    === CubQMCNetG-RESUME iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    RESUME          6   1.8082002       1.099e-03       8192       8192     13        (8192, 2)
+    ITER            7   1.8081727       5.261e-04       8192      16384     14       (16384, 2)
+    ITER            8   1.8082044       2.658e-04      16384      32768     15       (32768, 2)
+    ITER            9   1.8081893       1.265e-04      32768      65536     16       (65536, 2)
+
+  fresh_iteration_log:
+    === CubQMCNetG-FRESH iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.8046660       3.595e-02          0        256      8         (256, 2)
+    ITER            2   1.8047274       2.428e-02        256        512      9         (512, 2)
+    ITER            3   1.8080187       8.593e-03        512       1024     10        (1024, 2)
+    ITER            4   1.8077140       5.121e-03       1024       2048     11        (2048, 2)
+    ITER            5   1.8080545       2.293e-03       2048       4096     12        (4096, 2)
+    ITER            6   1.8082002       1.099e-03       4096       8192     13        (8192, 2)
+    ITER            7   1.8081727       5.261e-04       8192      16384     14       (16384, 2)
+    ITER            8   1.8082044       2.658e-04      16384      32768     15       (32768, 2)
+    ITER            9   1.8081893       1.265e-04      32768      65536     16       (65536, 2)
+
+  Stage summary of CubQMCNetG
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     1e-03     8,192     8,192      6   1.8082002   5.49e-04   0.0026
+  Resumed   1e-06    65,536    57,344      9   1.8081893   6.33e-05   0.0077
+  Fresh     1e-06    65,536    65,536      9   1.8081893   6.33e-05   0.0114
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubBayesLatticeG] status=ok
+
+  loose_inputs:
+    abs_tol: 0.200000
+    rel_tol: 0.000000
+    n_init: 32
+    n_limit: 65536
+    dimension: 2
+
+  resume_inputs:
+    abs_tol: 0.050000
+    rel_tol: 0.000000
+    n_init: 32
+    n_limit: 65536
+    dimension: 2
+
+  fresh_inputs:
+    abs_tol: 0.050000
+    rel_tol: 0.000000
+    n_init: 32
+    n_limit: 65536
+    dimension: 2
+
+  loose_iteration_log:
+    === CubBayesLatticeG-LOOSE iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.8199065       1.124e-01          0         32      5          (32, 2)
+
+  resume_iteration_log:
+    === CubBayesLatticeG-RESUME iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    RESUME          1   1.8199065       1.124e-01         32         32      5          (32, 2)
+    ITER            2   1.8074038       8.209e-03         32         64      6          (64, 2)
+
+  fresh_iteration_log:
+    === CubBayesLatticeG-FRESH iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.8199065       1.124e-01          0         32      5          (32, 2)
+    ITER            2   1.8074038       8.209e-03         32         64      6          (64, 2)
+
+  Stage summary of CubBayesLatticeG
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     2e-01        32        32      1   1.8199065   5.62e-02   0.0006
+  Resumed   5e-02        64        32      2   1.8074038   4.10e-03   0.0010
+  Fresh     5e-02        64        64      2   1.8074038   4.10e-03   0.0014
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubBayesNetG] status=ok
+
+  loose_inputs:
+    abs_tol: 0.200000
+    rel_tol: 0.000000
+    n_init: 32
+    n_limit: 65536
+    dimension: 2
+
+  resume_inputs:
+    abs_tol: 0.050000
+    rel_tol: 0.000000
+    n_init: 32
+    n_limit: 65536
+    dimension: 2
+
+  fresh_inputs:
+    abs_tol: 0.050000
+    rel_tol: 0.000000
+    n_init: 32
+    n_limit: 65536
+    dimension: 2
+
+  loose_iteration_log:
+    === CubBayesNetG-LOOSE iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.7287794       1.985e-01          0         32      5          (32, 2)
+
+  resume_iteration_log:
+    === CubBayesNetG-RESUME iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    RESUME          1   1.7287794       1.985e-01         32         32      5          (32, 2)
+    ITER            2   1.7781467       1.898e-01         32         64      6          (64, 2)
+    ITER            3   1.8037482       5.065e-02         64        128      7         (128, 2)
+
+  fresh_iteration_log:
+    === CubBayesNetG-FRESH iteration log ===
+    stage        iter    solution comb_bound_diff      n_min    n_total      m      xfull.shape
+    -------------------------------------------------------------------------------------------
+    ITER            1   1.7287794       1.985e-01          0         32      5          (32, 2)
+    ITER            2   1.7781467       1.898e-01         32         64      6          (64, 2)
+    ITER            3   1.8037482       5.065e-02         64        128      7         (128, 2)
+
+  Stage summary of CubBayesNetG
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     2e-01        32        32      1   1.7287794   9.92e-02   0.0007
+  Resumed   5e-02       128        96      3   1.8037482   2.53e-02   0.0026
+  Fresh     5e-02       128       128      3   1.8037482   2.53e-02   0.0027
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubMCML] status=ok
+
+  loose_inputs:
+    rmse_tol: 0.050000
+    n_init: 256
+    n_limit: 262144
+    levels_min: 2
+    levels_max: 10
+    dimension: 2
+
+  resume_inputs:
+    rmse_tol: 0.040000
+    n_init: 256
+    n_limit: 262144
+    levels_min: 2
+    levels_max: 10
+    dimension: 2
+
+  fresh_inputs:
+    rmse_tol: 0.040000
+    n_init: 256
+    n_limit: 262144
+    levels_min: 2
+    levels_max: 10
+    dimension: 2
+
+  loose_iteration_log:
+    === CubMCML-LOOSE iteration log ===
+    stage        iter    solution   rmse_estimate    n_total      m
+    ---------------------------------------------------------------
+    ITER            1   3.6731355       3.683e-01        768      3
+    ITER            2   3.4931749       3.645e-02      57702      3
+    ITER            3   3.4881027       3.454e-02      64687      3
+
+  resume_iteration_log:
+    === CubMCML-RESUME iteration log ===
+    stage        iter    solution   rmse_estimate    n_total      m
+    ---------------------------------------------------------------
+    RESUME          3   3.4881027       3.454e-02      64687      3
+    ITER            4   3.4351224       2.819e-02      98714      3
+    ITER            5   3.4352727       2.817e-02      98820      3
+    ITER            6   3.4349672       2.816e-02      98851      3
+
+  fresh_iteration_log:
+    === CubMCML-FRESH iteration log ===
+    stage        iter    solution   rmse_estimate    n_total      m
+    ---------------------------------------------------------------
+    ITER            1   3.6731355       3.683e-01        768      3
+    ITER            2   3.4554151       2.904e-02      90159      3
+    ITER            3   3.4460427       2.767e-02     100040      3
+    ITER            4   3.4457602       2.766e-02     100050      3
+
+  Stage summary of CubMCML
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     5e-02    64,687    64,687      3   3.4881027   3.45e-02   0.0055
+  Resumed   4e-02    98,851    34,164      6   3.4349672   2.82e-02   0.0027
+  Fresh     4e-02   100,050   100,050      4   3.4457602   2.77e-02   0.0080
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubMCMLCont] status=ok
+
+  loose_inputs:
+    rmse_tol: 0.060000
+    n_init: 256
+    n_limit: 65536
+    levels_min: 2
+    levels_max: 10
+    dimension: 2
+
+  resume_inputs:
+    rmse_tol: 0.050000
+    n_init: 256
+    n_limit: 65536
+    levels_min: 2
+    levels_max: 10
+    dimension: 2
+
+  fresh_inputs:
+    rmse_tol: 0.050000
+    n_init: 256
+    n_limit: 65536
+    levels_min: 2
+    levels_max: 10
+    dimension: 2
+
+  loose_iteration_log:
+    === CubMCMLCont-LOOSE iteration log ===
+    stage        iter    solution        rmse_tol    n_total      m
+    ---------------------------------------------------------------
+    ITER            1   3.6731355       6.000e+00        768      3
+    ITER            2   3.6731355       6.000e+00        768      3
+    ITER            3   3.6731355       3.597e+00        768      3
+    ITER            4   3.6731355       2.156e+00        768      3
+    ITER            5   3.6731355       1.293e+00        768      3
+    ITER            6   3.6731355       7.749e-01        768      3
+    ITER            7   3.6731355       4.646e-01        768      3
+    ITER            8   3.6125273       2.785e-01       1205      3
+    ITER            9   3.5319523       1.670e-01       2700      3
+    ITER           10   3.5209290       1.001e-01       8372      3
+    ITER           11   3.5451230       6.000e-02      25613      3
+
+  resume_iteration_log:
+    === CubMCMLCont-RESUME iteration log ===
+    stage        iter    solution        rmse_tol    n_total      m
+    ---------------------------------------------------------------
+    RESUME         11   3.5451230       5.000e-02      25613      3
+    ITER           12   3.5250741       5.000e-02      32276      3
+
+  fresh_iteration_log:
+    === CubMCMLCont-FRESH iteration log ===
+    stage        iter    solution        rmse_tol    n_total      m
+    ---------------------------------------------------------------
+    ITER            1   3.6731355       5.000e+00        768      3
+    ITER            2   3.6731355       5.000e+00        768      3
+    ITER            3   3.6731355       2.997e+00        768      3
+    ITER            4   3.6731355       1.797e+00        768      3
+    ITER            5   3.6731355       1.077e+00        768      3
+    ITER            6   3.6731355       6.458e-01        768      3
+    ITER            7   3.2701444       3.871e-01        871      3
+    ITER            8   3.7269683       2.321e-01       1437      3
+    ITER            9   3.6262716       1.391e-01       3892      3
+    ITER           10   3.5198043       8.341e-02      12196      3
+    ITER           11   3.5104946       5.000e-02      37352      3
+
+  Stage summary of CubMCMLCont
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     6e-02    25,613    25,613     11   3.5451230   5.57e-02   0.0038
+  Resumed   5e-02    32,276     6,663     12   3.5250741   4.98e-02   0.0008
+  Fresh     5e-02    37,352    37,352     11   3.5104946   4.63e-02   0.0044
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubQMCML] status=ok
+
+  loose_inputs:
+    rmse_tol: 0.009706
+    n_init: 256
+    n_limit: 4194304
+    levels_min: 2
+    levels_max: 10
+    dimension: 1
+
+  resume_inputs:
+    rmse_tol: 0.007764
+    n_init: 256
+    n_limit: 4194304
+    levels_min: 2
+    levels_max: 10
+    dimension: 1
+
+  fresh_inputs:
+    rmse_tol: 0.007764
+    n_init: 256
+    n_limit: 4194304
+    levels_min: 2
+    levels_max: 10
+    dimension: 1
+
+  loose_iteration_log:
+    === CubQMCML-LOOSE iteration log ===
+    stage        iter    solution   bias_estimate   rmse_estimate    n_total      m
+    -------------------------------------------------------------------------------
+    ITER            1   3.4486173       9.336e-04       1.027e-01      24576      3
+    ITER            2   3.4455971       9.336e-04       6.730e-02      32768      3
+    ITER            3   3.4318601       9.336e-04       4.675e-02      49152      3
+    ITER            4   3.4327578       9.110e-04       3.888e-02      57344      3
+    ITER            5   3.4297331       9.110e-04       3.329e-02      90112      3
+    ITER            6   3.4257414       1.018e-03       2.921e-02     106496      3
+    ITER            7   3.4262727       1.003e-03       2.510e-02     139264      3
+    ITER            8   3.4240839       1.003e-03       2.343e-02     204800      3
+    ITER            9   3.4246875       1.123e-03       1.360e-02     212992      3
+    ITER           10   3.4249745       1.123e-03       1.258e-02     344064      3
+    ITER           11   3.4259695       1.345e-03       1.070e-02     360448      3
+    ITER           12   3.4267754       1.546e-03       8.100e-03     393216      3
+    ITER           13   3.4265638       1.546e-03       7.297e-03     655360      3
+    ITER           14   3.4268917       1.531e-03       6.057e-03     720896      3
+
+  resume_iteration_log:
+    === CubQMCML-RESUME iteration log ===
+    stage        iter    solution   bias_estimate   rmse_estimate    n_total      m
+    -------------------------------------------------------------------------------
+    RESUME         14   3.4268917       1.531e-03       6.057e-03     720896      3
+    ITER           15   3.4277018       1.496e-03       5.516e-03     851968      3
+
+  fresh_iteration_log:
+    === CubQMCML-FRESH iteration log ===
+    stage        iter    solution   bias_estimate   rmse_estimate    n_total      m
+    -------------------------------------------------------------------------------
+    ITER            1   3.4486173       9.336e-04       1.027e-01      24576      3
+    ITER            2   3.4455971       9.336e-04       6.730e-02      32768      3
+    ITER            3   3.4318601       9.336e-04       4.675e-02      49152      3
+    ITER            4   3.4327578       9.110e-04       3.888e-02      57344      3
+    ITER            5   3.4297331       9.110e-04       3.329e-02      90112      3
+    ITER            6   3.4257414       1.018e-03       2.921e-02     106496      3
+    ITER            7   3.4262727       1.003e-03       2.510e-02     139264      3
+    ITER            8   3.4240839       1.003e-03       2.343e-02     204800      3
+    ITER            9   3.4246875       1.123e-03       1.360e-02     212992      3
+    ITER           10   3.4249745       1.123e-03       1.258e-02     344064      3
+    ITER           11   3.4259695       1.345e-03       1.070e-02     360448      3
+    ITER           12   3.4267754       1.546e-03       8.100e-03     393216      3
+    ITER           13   3.4265638       1.546e-03       7.297e-03     655360      3
+    ITER           14   3.4268917       1.531e-03       6.057e-03     720896      3
+    ITER           15   3.4277018       1.496e-03       5.516e-03     851968      3
+
+  Stage summary of CubQMCML
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     1e-02   720,896   720,896     14   3.4268917   1.53e-03   0.0551
+  Resumed   8e-03   851,968   131,072     15   3.4277018   1.50e-03   0.0138
+  Fresh     8e-03   851,968   851,968     15   3.4277018   1.50e-03   0.0698
+  --------------------------------------------------------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[CubQMCMLCont] status=ok
+
+  loose_inputs:
+    rmse_tol: 0.009706
+    n_init: 256
+    n_limit: 4194304
+    levels_min: 2
+    levels_max: 10
+    dimension: 1
+
+  resume_inputs:
+    rmse_tol: 0.007764
+    n_init: 256
+    n_limit: 4194304
+    levels_min: 2
+    levels_max: 10
+    dimension: 1
+
+  fresh_inputs:
+    rmse_tol: 0.007764
+    n_init: 256
+    n_limit: 4194304
+    levels_min: 2
+    levels_max: 10
+    dimension: 1
+
+  loose_iteration_log:
+    === CubQMCMLCont-LOOSE iteration log ===
+    stage        iter    solution   bias_estimate        rmse_tol    n_total      m
+    -------------------------------------------------------------------------------
+    ITER            1   3.4486173       9.336e-04       9.706e-01      24576      3
+    ITER            2   3.4486173       9.336e-04       5.818e-01      24576      3
+    ITER            3   3.4486173       9.336e-04       3.488e-01      24576      3
+    ITER            4   3.4486173       9.336e-04       2.091e-01      24576      3
+    ITER            5   3.4486173       9.336e-04       1.254e-01      24576      3
+    ITER            6   3.4486173       9.336e-04       7.515e-02      24576      3
+    ITER            7   3.4455971       9.336e-04       7.515e-02      32768      3
+    ITER            8   3.4455971       9.336e-04       4.505e-02      32768      3
+    ITER            9   3.4318601       9.336e-04       4.505e-02      49152      3
+    ITER           10   3.4327578       9.110e-04       4.505e-02      57344      3
+    ITER           11   3.4327578       9.110e-04       2.701e-02      57344      3
+    ITER           12   3.4297331       9.110e-04       2.701e-02      90112      3
+    ITER           13   3.4257414       1.018e-03       2.701e-02     106496      3
+    ITER           14   3.4262727       1.003e-03       2.701e-02     139264      3
+    ITER           15   3.4262727       1.003e-03       1.619e-02     139264      3
+    ITER           16   3.4240839       1.003e-03       1.619e-02     204800      3
+    ITER           17   3.4246875       1.123e-03       1.619e-02     212992      3
+    ITER           18   3.4246875       1.123e-03       9.706e-03     212992      3
+    ITER           19   3.4249745       1.123e-03       9.706e-03     344064      3
+    ITER           20   3.4259695       1.345e-03       9.706e-03     360448      3
+    ITER           21   3.4267754       1.546e-03       9.706e-03     393216      3
+
+  resume_iteration_log:
+    === CubQMCMLCont-RESUME iteration log ===
+    stage        iter    solution   bias_estimate        rmse_tol    n_total      m
+    -------------------------------------------------------------------------------
+    RESUME         21   3.4267754       1.546e-03       7.764e-03     393216      3
+    ITER           22   3.4265638       1.546e-03       7.764e-03     655360      3
+
+  fresh_iteration_log:
+    === CubQMCMLCont-FRESH iteration log ===
+    stage        iter    solution   bias_estimate        rmse_tol    n_total      m
+    -------------------------------------------------------------------------------
+    ITER            1   3.4486173       9.336e-04       7.764e-01      24576      3
+    ITER            2   3.4486173       9.336e-04       4.655e-01      24576      3
+    ITER            3   3.4486173       9.336e-04       2.790e-01      24576      3
+    ITER            4   3.4486173       9.336e-04       1.673e-01      24576      3
+    ITER            5   3.4486173       9.336e-04       1.003e-01      24576      3
+    ITER            6   3.4455971       9.336e-04       1.003e-01      32768      3
+    ITER            7   3.4455971       9.336e-04       6.012e-02      32768      3
+    ITER            8   3.4318601       9.336e-04       6.012e-02      49152      3
+    ITER            9   3.4318601       9.336e-04       3.604e-02      49152      3
+    ITER           10   3.4327578       9.110e-04       3.604e-02      57344      3
+    ITER           11   3.4297331       9.110e-04       3.604e-02      90112      3
+    ITER           12   3.4297331       9.110e-04       2.161e-02      90112      3
+    ITER           13   3.4257414       1.018e-03       2.161e-02     106496      3
+    ITER           14   3.4262727       1.003e-03       2.161e-02     139264      3
+    ITER           15   3.4240839       1.003e-03       2.161e-02     204800      3
+    ITER           16   3.4246875       1.123e-03       2.161e-02     212992      3
+    ITER           17   3.4246875       1.123e-03       1.295e-02     212992      3
+    ITER           18   3.4249745       1.123e-03       1.295e-02     344064      3
+    ITER           19   3.4249745       1.123e-03       7.764e-03     344064      3
+    ITER           20   3.4259695       1.345e-03       7.764e-03     360448      3
+    ITER           21   3.4267754       1.546e-03       7.764e-03     393216      3
+    ITER           22   3.4265638       1.546e-03       7.764e-03     655360      3
+
+  Stage summary of CubQMCMLCont
+  --------------------------------------------------------------------------
+  Stage   abs_tol   total n     new n  iters    solution half-width time (s)
+  --------------------------------------------------------------------------
+  Loose     1e-02   393,216   393,216     21   3.4267754   1.55e-03   0.0378
+  Resumed   8e-03   655,360   262,144     22   3.4265638   1.55e-03   0.0134
+  Fresh     8e-03   655,360   655,360     22   3.4265638   1.55e-03   0.0502
+  --------------------------------------------------------------------------
