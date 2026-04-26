@@ -1,11 +1,9 @@
 import unittest
-from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import BaseNotebookTest
 
 class NotebookTests(BaseNotebookTest):
 
-    @testbook('../../demos/demo_resume_data/resume_examples.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_resume_examples_notebook(self, tb):
+    def test_resume_examples_notebook(self):
         notebook_path, notebook_dir = self.locate_notebook(
             "../../demos/demo_resume_data/resume_examples.ipynb"
         )
