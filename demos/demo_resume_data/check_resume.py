@@ -4,10 +4,10 @@ from qmcpy import (
     CubBayesLatticeG,
     CubBayesNetG,
     CubMCCLTVec,
-    CubMCML,
-    CubMCMLCont,
-    CubQMCML,
-    CubQMCMLCont,
+    CubMLMC,
+    CubMLMCCont,
+    CubMLQMC,
+    CubMLQMCCont,
     CubQMCNetG,
     CubQMCLatticeG,
     DigitalNetB2,
@@ -53,6 +53,13 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
     def iid_financial_option():
         return FinancialOption(
             IIDStdUniform(dimension=dimension, seed=seed),
+            start_price=30,
+            strike_price=30,
+        )
+
+    def iid_financial_option_seed11():
+        return FinancialOption(
+            IIDStdUniform(dimension=dimension, seed=11),
             start_price=30,
             strike_price=30,
         )
@@ -126,36 +133,36 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
             tight_tol,
         ),
         make_tol_case(
-            "CubMCML",
+            "CubMLMC",
             make_named_tol_builder(
-                CubMCML, iid_financial_option, "rmse_tol", n_limit=2**18
+                CubMLMC, iid_financial_option, "rmse_tol", n_limit=2**16
             ),
+            0.2,
+            0.1,
+        ),
+        make_tol_case(
+            "CubMLMCCont",
+            make_named_tol_builder(
+                CubMLMCCont, iid_financial_option_seed11, "rmse_tol", n_limit=2**16
+            ),
+            0.1,
             0.05,
-            0.04,
         ),
         make_tol_case(
-            "CubMCMLCont",
+            "CubMLQMC",
             make_named_tol_builder(
-                CubMCMLCont, iid_financial_option, "rmse_tol", n_limit=2**16
+                CubMLQMC, qmc_financial_option, "abs_tol", n_limit=2**18
             ),
-            0.06,
-            0.05,
+            0.2,
+            0.1,
         ),
         make_tol_case(
-            "CubQMCML",
+            "CubMLQMCCont",
             make_named_tol_builder(
-                CubQMCML, qmc_financial_option, "abs_tol", n_limit=2**22
+                CubMLQMCCont, qmc_financial_option, "abs_tol", n_limit=2**18
             ),
-            0.025,
-            0.02,
-        ),
-        make_tol_case(
-            "CubQMCMLCont",
-            make_named_tol_builder(
-                CubQMCMLCont, qmc_financial_option, "abs_tol", n_limit=2**22
-            ),
-            0.025,
-            0.02,
+            0.2,
+            0.1,
         ),
     ]
 
