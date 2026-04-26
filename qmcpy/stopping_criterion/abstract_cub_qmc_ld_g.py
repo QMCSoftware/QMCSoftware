@@ -183,6 +183,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
+        resume_provenance = self._capture_resume_provenance(resume)
         first_resume_iter = False
         trace = self._make_trace_logger()
 
@@ -429,11 +430,9 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
         return data.solution, data
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):

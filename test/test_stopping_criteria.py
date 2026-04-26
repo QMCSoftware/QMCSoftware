@@ -4,11 +4,13 @@ import builtins
 import importlib
 import io
 import os
+import pickle
 import tempfile
 import unittest
 import warnings
 import numpy as np
 from contextlib import ExitStack, redirect_stdout
+from pathlib import Path
 from unittest.mock import patch
 
 from qmcpy import *
@@ -867,7 +869,7 @@ class TestResumeCheckpointing(unittest.TestCase):
             tight_sc.integrate(resume=checkpoint)
 
     def test_resume_rejects_incompatible_dimension(self):
-        loose_sc = CubMCCLT(
+        loose_sc = CubMCCLTVec(
             self._make_integrand(),
             abs_tol=self.loose_abs_tol,
             n_init=self.n_init,
@@ -875,7 +877,7 @@ class TestResumeCheckpointing(unittest.TestCase):
         )
         _, checkpoint = loose_sc.integrate()
 
-        incompatible_sc = CubMCCLT(
+        incompatible_sc = CubMCCLTVec(
             self._make_integrand(dimension=3),
             abs_tol=self.tight_abs_tol,
             n_init=self.n_init,
@@ -889,8 +891,9 @@ class TestResumeCheckpointing(unittest.TestCase):
         data.value = np.array([1.0, 2.0, 3.0])
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            plain_path = os.path.join(tmpdir, "checkpoint.pkl")
-            gzip_path = os.path.join(tmpdir, "checkpoint.pkl.gz")
+            tmp_path = Path(tmpdir)
+            plain_path = tmp_path / "checkpoint.pkl"
+            gzip_path = tmp_path / "checkpoint.pkl.gz"
 
             data.save(plain_path)
             loaded_plain = Data.load(plain_path)
@@ -899,6 +902,121 @@ class TestResumeCheckpointing(unittest.TestCase):
             data.save(gzip_path, compress=True)
             loaded_gzip = Data.load(gzip_path)
             self.assertTrue(np.array_equal(loaded_gzip.value, data.value))
+
+    def test_data_load_rejects_non_data_checkpoint(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "not_data.pkl"
+            with open(path, "wb") as f:
+                pickle.dump({"not": "data"}, f)
+            with self.assertRaises(TypeError):
+                Data.load(path)
+
+    def test_resume_metadata_and_provenance_are_recorded(self):
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.loose_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        old_n_total = int(checkpoint.n_total)
+        old_total_time = float(checkpoint.time_integrate_total)
+
+        self.assertFalse(checkpoint.resumed)
+        self.assertEqual(checkpoint.n_resume_from, 0)
+        self.assertAlmostEqual(checkpoint.time_integrate_previous, 0.0)
+        self.assertAlmostEqual(checkpoint.time_integrate_total, checkpoint.time_integrate)
+        self.assertTrue(checkpoint._stopping_criterion_class.endswith(".CubQMCLatticeG"))
+        self.assertTrue(checkpoint._integrand_class.endswith(".Keister"))
+        self.assertTrue(checkpoint._true_measure_class.endswith(".Gaussian"))
+        self.assertTrue(
+            checkpoint._discrete_distribution_class.endswith(".Lattice")
+        )
+
+        tight_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.tight_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        _, resumed = tight_sc.integrate(resume=checkpoint)
+
+        self.assertTrue(resumed.resumed)
+        self.assertEqual(resumed.n_resume_from, old_n_total)
+        self.assertAlmostEqual(resumed.time_integrate_previous, old_total_time)
+        self.assertAlmostEqual(resumed.time_integrate_resume, resumed.time_integrate)
+        self.assertAlmostEqual(
+            resumed.time_integrate_total,
+            resumed.time_integrate_previous + resumed.time_integrate_resume,
+        )
+
+    def test_resume_rejects_incompatible_checkpoint_format_version(self):
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.loose_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        checkpoint._resume_format_version = 999
+
+        tight_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.tight_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
+
+    def test_resume_rejects_incompatible_sampler_seed(self):
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.loose_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+
+        tight_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed + 1)),
+            abs_tol=self.tight_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
+
+    def test_cub_mc_clt_vec_resume_reuses_the_fresh_rng_stream(self):
+        loose_sc = CubMCCLTVec(
+            self._make_integrand(),
+            abs_tol=self.loose_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        old_n_total = int(checkpoint.n_total)
+
+        resumed_sc = CubMCCLTVec(
+            self._make_integrand(),
+            abs_tol=self.tight_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        fresh_sc = CubMCCLTVec(
+            self._make_integrand(),
+            abs_tol=self.tight_abs_tol,
+            n_init=self.n_init,
+            n_limit=self.n_limit,
+        )
+        _, fresh = fresh_sc.integrate()
+
+        self.assertGreater(int(resumed.n_total), old_n_total)
+        self.assertEqual(int(resumed.n_total), int(fresh.n_total))
+        self.assertTrue(np.allclose(resumed.xfull, fresh.xfull))
+        self.assertTrue(np.allclose(resumed.yfull, fresh.yfull))
 
     def test_resume_after_save_load_continues_rng_stream(self):
         qmc_n_init = 2**8
@@ -911,11 +1029,12 @@ class TestResumeCheckpointing(unittest.TestCase):
         _, checkpoint = loose_sc.integrate()
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            path = os.path.join(tmpdir, "resume.pkl.gz")
+            path = Path(tmpdir) / "resume.pkl.gz"
             checkpoint.save(path, compress=True)
             loaded = Data.load(path)
 
         old_n_total = int(loaded.n_total)
+        old_xfull = np.array(loaded.xfull, copy=True)
         tight_sc = CubQMCLatticeG(
             Keister(Lattice(dimension=self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol,
@@ -923,9 +1042,14 @@ class TestResumeCheckpointing(unittest.TestCase):
             n_limit=self.n_limit,
         )
         _, resumed = tight_sc.integrate(resume=loaded)
+        self.assertTrue(np.array_equal(resumed.xfull[:old_n_total], old_xfull))
         n_new = int(resumed.n_total) - old_n_total
-        if n_new > 0: 
-            self.assertFalse(np.allclose(resumed.xfull[old_n_total:], resumed.xfull[:n_new]))
+        if n_new > 0:
+            new_samples = resumed.xfull[old_n_total:]
+            repeated_previous_sample = np.any(
+                np.all(new_samples[:, None, :] == old_xfull[None, :, :], axis=-1)
+            )
+            self.assertFalse(repeated_previous_sample)
 
 if __name__ == "__main__":
     unittest.main()

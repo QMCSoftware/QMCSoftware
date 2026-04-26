@@ -157,6 +157,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
 
     def integrate(self, resume=None):
         t_start = time()
+        resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()
         self._active_trace = trace
         try:
@@ -171,11 +172,9 @@ class CubMLQMCCont(AbstractCubMLQMC):
                 for t in range(self.n_tols):
                     self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
                     self._integrate(data)
-            data.stopping_crit = self
-            data.integrand = self.integrand
-            data.true_measure = self.integrand.true_measure
-            data.discrete_distrib = self.true_measure.discrete_distrib
-            data.time_integrate = time() - t_start
+            self._finalize_integration_data(
+                data, time() - t_start, resume_provenance=resume_provenance
+            )
             return data.solution, data
         finally:
             self._active_trace = None

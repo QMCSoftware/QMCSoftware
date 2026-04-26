@@ -135,6 +135,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             replications    1
             entropy         7
     """
+    _RESUME_REQUIRED_FIELDS = ("xfull", "yfull", "n", "n_max")
 
     def __init__(
         self,
@@ -224,11 +225,37 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         self.set_tolerance(abs_tol, rel_tol)
         self.z_star = -norm.ppf(self.alphas_indv / 2)
 
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if int(data.stopping_crit.n_init) != int(self.n_init):
+            raise ParameterError("resume data has incompatible n_init.")
+        if data.xfull.shape[0] != int(data.n_total):
+            raise ParameterError("resume data xfull length must match n_total.")
+        if data.yfull.shape[-1] != int(data.n_total):
+            raise ParameterError("resume data yfull length must match n_total.")
+        if np.shape(data.n) != self.integrand.d_indv:
+            raise ParameterError(
+                "resume data n shape must match integrand.d_indv."
+            )
+        if int(np.max(np.asarray(data.n))) != int(data.n_total):
+            raise ParameterError("resume data n must be consistent with n_total.")
+        if int(data.n_total) < int(self.n_init):
+            raise ParameterError("resume data must include at least n_init samples.")
+
+    def _restore_resume_state(self, data):
+        self._restore_resume_rng_state(data)
+        self.true_measure.discrete_distrib = self.discrete_distrib
+        self.integrand.discrete_distrib = self.discrete_distrib
+        self.integrand.true_measure.discrete_distrib = self.discrete_distrib
+
     def integrate(self, resume=None):
         t_start = time()
+        resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()
-        if resume is not None:
-            data = resume
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is not None:
             # Reset flags so the tighter tolerance is re-evaluated from existing samples.
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
@@ -308,11 +335,9 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
         return data.solution, data
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):

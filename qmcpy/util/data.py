@@ -17,9 +17,9 @@ class Data(object):
         """Save this Data object to disk using pickle.
 
         Warning:
-            Pickle and dill files are not secure against untrusted input. Only
-            save and later load checkpoint files that you created or fully
-            trust.
+            ``pickle`` and ``dill`` files are not secure against untrusted
+            input. Only save and later load checkpoint files that you created
+            yourself or that come from a trusted source.
 
         Args:
             path (str or pathlib.Path): File path to save to. If
@@ -45,8 +45,9 @@ class Data(object):
         """Load a Data object from disk.
 
         Warning:
-            Loading pickle or dill files can execute arbitrary code. Only load
-            checkpoint files that you created or fully trust.
+            ``pickle`` and ``dill`` deserialization can execute arbitrary
+            code. Only load checkpoint files that you created yourself or that
+            come from a trusted source.
 
         Args:
             path (str or pathlib.Path): Path to the saved file. Files ending
@@ -58,7 +59,13 @@ class Data(object):
         path = str(path)
         open_fn = gzip.open if path.endswith(".gz") else open
         with open_fn(path, "rb") as f:
-            return _serializer.load(f)
+            loaded = _serializer.load(f)
+        if not isinstance(loaded, cls):
+            raise TypeError(
+                "checkpoint did not contain a %s instance; got %s."
+                % (cls.__name__, type(loaded).__name__)
+            )
+        return loaded
 
     def __repr__(self):
         string = _univ_repr(self, "Data", self.parameters + ["time_integrate"])

@@ -1,4 +1,5 @@
 import copy
+import sys
 
 from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import (
@@ -370,6 +371,7 @@ def print_diagnostic(
 
 
 class AbstractStoppingCriterion(object):
+    _RESUME_FORMAT_VERSION = 1
 
     def __init__(self, allowed_distribs, allow_vectorized_integrals):
         """Initialize a stopping criterion base class.
@@ -418,7 +420,10 @@ class AbstractStoppingCriterion(object):
 
         Args:
             resume (Data, optional): Existing integration state to resume from,
-                if supported. Defaults to None.
+                if supported. A valid resume checkpoint must continue the same
+                numerical experiment without duplicating samples, losing
+                accumulated statistics, or weakening the requested tolerance
+                guarantee. Defaults to None.
 
         Returns:
             tuple[Union[float, np.ndarray], Data]: Approximation to the integral
@@ -455,6 +460,75 @@ class AbstractStoppingCriterion(object):
         validate_resume(resume)
         restore_resume(resume)
         return resume
+
+    def _capture_resume_provenance(self, resume):
+        """Capture resume bookkeeping before the live ``Data`` object is mutated.
+
+        Args:
+            resume (Data or None): Resume checkpoint passed to ``integrate``.
+
+        Returns:
+            dict or None: Previous sample/time totals, or None for fresh runs.
+        """
+        if resume is None:
+            return None
+        previous_total_time = getattr(
+            resume, "time_integrate_total", getattr(resume, "time_integrate", 0.0)
+        )
+        return {
+            "n_total": int(getattr(resume, "n_total", 0)),
+            "time_integrate_total": float(previous_total_time),
+        }
+
+    @staticmethod
+    def _qualified_class_name(obj):
+        """Return a stable fully-qualified class name for audit metadata."""
+        cls = type(obj)
+        return "%s.%s" % (cls.__module__, cls.__name__)
+
+    @staticmethod
+    def _qmcpy_version():
+        """Best-effort lookup of the loaded QMCPy version string."""
+        qmcpy_module = sys.modules.get("qmcpy")
+        return getattr(qmcpy_module, "__version__", None)
+
+    def _annotate_checkpoint_metadata(self, data):
+        """Attach lightweight checkpoint metadata used for auditing/resume."""
+        data._qmcpy_version = self._qmcpy_version()
+        data._resume_format_version = int(self._RESUME_FORMAT_VERSION)
+        data._stopping_criterion_class = self._qualified_class_name(self)
+        data._integrand_class = self._qualified_class_name(self.integrand)
+        data._true_measure_class = self._qualified_class_name(self.true_measure)
+        data._discrete_distribution_class = self._qualified_class_name(
+            self.discrete_distrib
+        )
+
+    def _finalize_integration_data(self, data, elapsed, resume_provenance=None):
+        """Attach shared integration metadata before returning ``Data``.
+
+        Args:
+            data (Data): Integration state to finalize.
+            elapsed (float): Wall-clock time spent in the current ``integrate``
+                call.
+            resume_provenance (dict or None, optional): Output of
+                :meth:`_capture_resume_provenance`. Defaults to None.
+        """
+        data.stopping_crit = self
+        data.integrand = self.integrand
+        data.true_measure = self.integrand.true_measure
+        data.discrete_distrib = self.true_measure.discrete_distrib
+        data.time_integrate = float(elapsed)
+        previous_time = 0.0
+        previous_n_total = 0
+        if resume_provenance is not None:
+            previous_time = float(resume_provenance.get("time_integrate_total", 0.0))
+            previous_n_total = int(resume_provenance.get("n_total", 0))
+        data.resumed = resume_provenance is not None
+        data.n_resume_from = previous_n_total
+        data.time_integrate_previous = previous_time
+        data.time_integrate_resume = float(elapsed)
+        data.time_integrate_total = previous_time + float(elapsed)
+        self._annotate_checkpoint_metadata(data)
 
     def _resume_value_equal(self, current, saved):
         """Deep equality check tolerant of arrays, lists, dicts, and QMCPy objects.
@@ -553,7 +627,8 @@ class AbstractStoppingCriterion(object):
         """Run standard cross-cutting resume compatibility checks.
 
         Validates stopping criterion type, integrand, true measure, discrete
-        distribution, and ``n_total`` against ``n_limit``.
+        distribution, checkpoint format version, and ``n_total`` against
+        ``n_limit``.
 
         Args:
             data (Data): Resume checkpoint to validate.
@@ -564,6 +639,18 @@ class AbstractStoppingCriterion(object):
             ParameterError: If any compatibility check fails.
         """
         self._require_resume_attrs(data, ("stopping_crit", "integrand", "true_measure", "discrete_distrib", "n_total") + tuple(required_fields))
+        resume_format_version = getattr(
+            data, "_resume_format_version", self._RESUME_FORMAT_VERSION
+        )
+        try:
+            resume_format_version = int(resume_format_version)
+        except (TypeError, ValueError):
+            raise ParameterError("resume data has invalid _resume_format_version.")
+        if resume_format_version != self._RESUME_FORMAT_VERSION:
+            raise ParameterError(
+                "resume data uses checkpoint format version %d; expected %d."
+                % (resume_format_version, self._RESUME_FORMAT_VERSION)
+            )
         if type(data.stopping_crit) is not type(self):
             raise ParameterError("resume data was generated by %s, not %s." % (type(data.stopping_crit).__name__, type(self).__name__))
         self._validate_resume_object("integrand", self.integrand, data.integrand, ("d", "d_indv", "d_comb") + tuple(getattr(self.integrand, "parameters", [])))
