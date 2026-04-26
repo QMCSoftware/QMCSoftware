@@ -17,6 +17,14 @@ IS_PRINT_DIAGNOSTIC = False
 class _IterationTraceLogger(object):
 
     def __init__(self, stopping_criterion):
+        """Create a trace logger bound to the given stopping criterion.
+
+        Args:
+            stopping_criterion: Stopping criterion instance.  The logger reads
+                the optional attributes ``trace_iterations`` (bool),
+                ``trace_label`` (str), and ``trace_throttle_iterations`` (bool)
+                to configure itself.
+        """
         self.enabled = bool(getattr(stopping_criterion, "trace_iterations", False))
         self.label = str(getattr(stopping_criterion, "trace_label", ""))
         self.throttle_iterations = bool(
@@ -30,6 +38,14 @@ class _IterationTraceLogger(object):
 
     @staticmethod
     def _state_signature(data):
+        """Return a hashable snapshot of the data fields used to detect duplicate rows.
+
+        Args:
+            data (object): Integration state object.
+
+        Returns:
+            tuple: ``(n_min, n_total, m, xfull.shape)``.
+        """
         xfull = getattr(data, "xfull", None)
         return (
             getattr(data, "n_min", None),
@@ -39,14 +55,38 @@ class _IterationTraceLogger(object):
         )
 
     def _print_header_once(self):
+        """Print the section header line exactly once per logger instance."""
         if self.enabled and (not self.header_printed) and self.label:
             print(f"=== {self.label} iteration log ===")
             self.header_printed = True
 
     def _get_visible_columns(self, data):
+        """Return the ordered list of column names to display, inferred from data.
+
+        The result is cached after the first call so all rows share the same
+        columns.
+
+        Args:
+            data (object): Integration state object used to determine which
+                optional columns are present.
+
+        Returns:
+            tuple[str, ...]: Column names from the set ``{'stage', 'iter',
+                'solution', 'bound_diff', 'comb_bound_diff',
+                'bound_half_width', 'bias_estimate', 'n_min', 'n_total',
+                'm', 'xfull.shape'}``.
+        """
         if self.visible_columns is not None:
             return self.visible_columns
         visible_columns = ["stage", "iter", "solution"]
+        if getattr(data, "bound_diff", None) is not None:
+            visible_columns.append("bound_diff")
+        if getattr(data, "comb_bound_diff", None) is not None:
+            visible_columns.append("comb_bound_diff")
+        if getattr(data, "bound_half_width", None) is not None:
+            visible_columns.append("bound_half_width")
+        if getattr(data, "bias_estimate", None) is not None:
+            visible_columns.append("bias_estimate")
         if getattr(data, "n_min", None) is not None:
             visible_columns.append("n_min")
         visible_columns.append("n_total")
@@ -59,6 +99,19 @@ class _IterationTraceLogger(object):
         return self.visible_columns
 
     def emit(self, stage, data, step_value=None, increment=False, iter_value=None):
+        """Print one diagnostic row for the given stage label.
+
+        Args:
+            stage (str): Row label, e.g. ``"ITER"`` or ``"RESUME"``.
+            data (object): Integration state object.
+            step_value (int | None, optional): Value to assign to ``data.m``
+                before printing. Defaults to None.
+            increment (bool, optional): If True, advance the internal iteration
+                counter and assign the new value to ``data._iter_count``.
+                Defaults to False.
+            iter_value (int | None, optional): Explicit iteration count to
+                display (overrides ``increment``). Defaults to None.
+        """
         if not self.enabled:
             return
         self._print_header_once()
@@ -82,6 +135,18 @@ class _IterationTraceLogger(object):
         self.table_header_printed = True
 
     def resume(self, data, step_value=None):
+        """Emit a RESUME row and snapshot the current state for duplicate suppression.
+
+        Reads ``data._iter_count`` to restore the iteration counter so that the
+        next :meth:`iteration` call continues counting from the right number.
+        If the state does not change between the RESUME and the first ITER call
+        (e.g. no new samples were needed), that first ITER row is suppressed.
+
+        Args:
+            data (object): Integration state object from the resume checkpoint.
+            step_value (int | None, optional): Value to assign to ``data.m``
+                before printing. Defaults to None.
+        """
         previous_iter_count = getattr(data, "_iter_count", None)
         if previous_iter_count is not None:
             try:
@@ -98,6 +163,17 @@ class _IterationTraceLogger(object):
         self.pending_resume_signature = self._state_signature(data)
 
     def iteration(self, data, step_value=None):
+        """Emit an ITER row, unless state is unchanged since the last resume.
+
+        If :meth:`resume` was just called and the data state has not changed
+        (same ``n_total``, ``n_min``, ``m``, and ``xfull.shape``), the row is
+        suppressed to avoid a duplicate log entry.
+
+        Args:
+            data (object): Current integration state object.
+            step_value (int | None, optional): Value to assign to ``data.m``
+                before printing. Defaults to None.
+        """
         current_signature = self._state_signature(data)
         if (
             self.pending_resume_signature is not None
@@ -131,6 +207,10 @@ def print_diagnostic(
             columns to print. Defaults to all supported columns.
     """
     solution = getattr(data, "solution", None)
+    bound_diff = getattr(data, "bound_diff", None)
+    comb_bound_diff = getattr(data, "comb_bound_diff", None)
+    bound_half_width = getattr(data, "bound_half_width", None)
+    bias_estimate = getattr(data, "bias_estimate", None)
     m = getattr(data, "m", None)
     n_total = getattr(data, "n_total", None)
     n_min = getattr(data, "n_min", None)
@@ -148,11 +228,26 @@ def print_diagnostic(
             return obj
 
     solution_display = safe_get_first_element(solution)
+    bound_diff_display = safe_get_first_element(bound_diff)
+    comb_bound_diff_display = safe_get_first_element(comb_bound_diff)
+    bound_half_width_display = safe_get_first_element(bound_half_width)
+    bias_estimate_display = safe_get_first_element(bias_estimate)
     iter_count = getattr(data, "_iter_count", None)
     m_display = int(safe_get_first_element(m)) if m is not None else None
     iter_display = int(iter_count) if iter_count is not None else None
     n_total_display = int(n_total) if n_total is not None else None
     xfull_shape = getattr(xfull, "shape", None)
+
+    def _format_bound(value):
+        if value is None:
+            return f"{'None':>13}"
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            return f"{str(value):>13}"
+        if np.isnan(value):
+            return f"{'nan':>13}"
+        return f"{value:>13.3e}"
 
     n_total_formatted = (
         f"{n_total_display:>10}" if n_total_display is not None else f"{'None':>10}"
@@ -164,6 +259,10 @@ def print_diagnostic(
     else:
         solution_formatted = f"{'nan':>10}"
     n_min_formatted = f"{int(n_min):>10}" if n_min is not None else f"{'None':>10}"
+    bound_diff_formatted = _format_bound(bound_diff_display)
+    comb_bound_diff_formatted = _format_bound(comb_bound_diff_display)
+    bound_half_width_formatted = _format_bound(bound_half_width_display)
+    bias_estimate_formatted = _format_bound(bias_estimate_display)
     iter_formatted = f"{iter_display:>4}" if iter_display is not None else " " * 4
     m_formatted = f"{m_display:>4}" if m_display is not None else f"{'None':>4}"
 
@@ -178,6 +277,10 @@ def print_diagnostic(
             "stage",
             "iter",
             "solution",
+            "bound_diff",
+            "comb_bound_diff",
+            "bound_half_width",
+            "bias_estimate",
             "n_min",
             "n_total",
             "m",
@@ -187,6 +290,10 @@ def print_diagnostic(
         "stage": f"{'stage':<12}",
         "iter": f"{'iter':>4}",
         "solution": f"{'solution':>10}",
+        "bound_diff": f"{'bound_diff':>13}",
+        "comb_bound_diff": f"{'comb_bound_diff':>13}",
+        "bound_half_width": f"{'bound_half_width':>13}",
+        "bias_estimate": f"{'bias_estimate':>13}",
         "n_min": f"{'n_min':>10}",
         "n_total": f"{'n_total':>10}",
         "m": f"{'m':>4}",
@@ -196,6 +303,10 @@ def print_diagnostic(
         "stage": f"{label:<12}",
         "iter": iter_formatted,
         "solution": solution_formatted,
+        "bound_diff": bound_diff_formatted,
+        "comb_bound_diff": comb_bound_diff_formatted,
+        "bound_half_width": bound_half_width_formatted,
+        "bias_estimate": bias_estimate_formatted,
         "n_min": n_min_formatted,
         "n_total": n_total_formatted,
         "m": m_formatted,
@@ -296,6 +407,15 @@ class AbstractStoppingCriterion(object):
         return resume
 
     def _resume_value_equal(self, current, saved):
+        """Deep equality check tolerant of arrays, lists, dicts, and QMCPy objects.
+
+        Args:
+            current: Value from the live stopping criterion.
+            saved: Value from the resume checkpoint.
+
+        Returns:
+            bool: True when the two values are considered equal.
+        """
         if isinstance(current, np.ndarray) or isinstance(saved, np.ndarray):
             try:
                 return np.array_equal(
@@ -327,6 +447,15 @@ class AbstractStoppingCriterion(object):
         return bool(is_equal)
 
     def _require_resume_attrs(self, data, attrs):
+        """Raise ParameterError if any attribute in *attrs* is absent from *data*.
+
+        Args:
+            data (Data): Resume checkpoint.
+            attrs (tuple[str, ...]): Required attribute names.
+
+        Raises:
+            ParameterError: If one or more attributes are missing.
+        """
         missing = [attr for attr in attrs if not hasattr(data, attr)]
         if missing:
             raise ParameterError(
@@ -335,6 +464,20 @@ class AbstractStoppingCriterion(object):
             )
 
     def _validate_resume_object(self, label, current, saved, attrs):
+        """Validate that a saved sub-object is compatible with the current one.
+
+        Checks type equality and then compares each attribute listed in *attrs*
+        using :meth:`_resume_value_equal`.
+
+        Args:
+            label (str): Human-readable name used in error messages.
+            current: Live object (integrand, true measure, etc.).
+            saved: Saved object from the resume checkpoint.
+            attrs (tuple[str, ...]): Attribute names to compare.
+
+        Raises:
+            ParameterError: If the objects are incompatible.
+        """
         if saved is None:
             raise ParameterError("resume data missing %s state." % label)
         if type(saved) is not type(current):
@@ -357,6 +500,19 @@ class AbstractStoppingCriterion(object):
                 )
 
     def _validate_resume_data(self, data, required_fields=()):
+        """Run standard cross-cutting resume compatibility checks.
+
+        Validates stopping criterion type, integrand, true measure, discrete
+        distribution, and ``n_total`` against ``n_limit``.
+
+        Args:
+            data (Data): Resume checkpoint to validate.
+            required_fields (tuple[str, ...], optional): Additional attribute
+                names that must be present on *data*. Defaults to ``()``.
+
+        Raises:
+            ParameterError: If any compatibility check fails.
+        """
         self._require_resume_attrs(data, ("stopping_crit", "integrand", "true_measure", "discrete_distrib", "n_total") + tuple(required_fields))
         if type(data.stopping_crit) is not type(self):
             raise ParameterError("resume data was generated by %s, not %s." % (type(data.stopping_crit).__name__, type(self).__name__))
@@ -373,12 +529,39 @@ class AbstractStoppingCriterion(object):
             raise ParameterError("resume data n_total=%d exceeds current n_limit=%d." % (int(data.n_total), int(self.n_limit)))
 
     def _validate_resume_with_state(self, data, required_fields=(), state_fields=()):
+        """Validate resume data including algorithm-specific state fields.
+
+        Calls :meth:`_validate_resume_data` and additionally checks that all
+        *state_fields* are present and that ``n_total >= n_init``.
+
+        Args:
+            data (Data): Resume checkpoint to validate.
+            required_fields (tuple[str, ...], optional): Extra data attributes
+                required beyond the standard set. Defaults to ``()``.
+            state_fields (tuple[str, ...], optional): Algorithm-state attributes
+                that must also be present. Defaults to ``()``.
+
+        Raises:
+            ParameterError: If any compatibility check fails.
+        """
         self._validate_resume_data(data, required_fields=required_fields)
         self._require_resume_attrs(data, state_fields)
         if hasattr(self, "n_init") and int(data.n_total) < int(self.n_init):
             raise ParameterError("resume data must include at least n_init samples.")
 
     def _restore_resume_rng_state(self, data):
+        """Deep-copy the saved RNG state into the live discrete distribution.
+
+        Ensures that samples drawn after resuming are independent of those
+        already stored in the checkpoint.
+
+        Args:
+            data (Data): Resume checkpoint carrying the saved distribution in
+                ``data.discrete_distrib``.
+
+        Raises:
+            ParameterError: If either distribution lacks an ``rng`` attribute.
+        """
         saved_distrib = data.discrete_distrib
         if not hasattr(saved_distrib, "rng") or not hasattr(self.discrete_distrib, "rng"):
             raise ParameterError("resume data is missing discrete distribution RNG state.")
@@ -387,6 +570,21 @@ class AbstractStoppingCriterion(object):
         )
 
     def _compute_indv_alphas(self, alphas_comb):
+        """Distribute combined confidence levels to individual integrand dimensions.
+
+        Uses the integrand dependency map to allocate the per-combined-output
+        alpha budget down to each individual output dimension.
+
+        Args:
+            alphas_comb (np.ndarray): Per-combined-output confidence levels with
+                shape ``integrand.d_comb``.
+
+        Returns:
+            tuple[np.ndarray, bool]: ``(alphas_indv, identity_dependency)``
+                where *alphas_indv* has shape ``integrand.d_indv`` and
+                *identity_dependency* is True when each combined output depends
+                on exactly its matching individual output.
+        """
         alphas_indv = np.tile(1, self.integrand.d_indv)
         identity_dependency = True
         for k in np.ndindex(self.integrand.d_comb):
