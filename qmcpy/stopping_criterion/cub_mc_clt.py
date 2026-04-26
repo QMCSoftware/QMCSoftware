@@ -211,57 +211,6 @@ class CubMCCLT(AbstractStoppingCriterion):
             self.parameters += ["cv", "cv_mu"]
         self.z_star = -norm.ppf(self.alpha / 2.0)
 
-    def _validate_resume(self, data):
-        self._validate_resume_data(
-            data,
-            required_fields=("xfull", "yfull", "solution0", "sighat0"),
-        )
-        if int(data.stopping_crit.n_init) != int(self.n_init):
-            raise ParameterError("resume data has incompatible n_init.")
-        if data.xfull.shape[0] != int(data.n_total):
-            raise ParameterError("resume data xfull length must match n_total.")
-        if data.yfull.shape[-1] != int(data.n_total):
-            raise ParameterError("resume data yfull length must match n_total.")
-        if int(data.n_total) < int(self.n_init):
-            raise ParameterError("resume data must include the pilot samples.")
-        if self.ncv != getattr(data.stopping_crit, "ncv", 0):
-            raise ParameterError("resume data has incompatible control variates.")
-        if self.ncv > 0:
-            self._require_resume_attrs(data, ("ycvfull",))
-            if not hasattr(data.stopping_crit, "beta"):
-                raise ParameterError("resume data missing control variate coefficients.")
-            if data.ycvfull.shape != (self.ncv, int(data.n_total)):
-                raise ParameterError(
-                    "resume data ycvfull shape must be (ncv, n_total)."
-                )
-            if not self._resume_value_equal(self.cv_mu, data.stopping_crit.cv_mu):
-                raise ParameterError(
-                    "resume data has incompatible control variate means."
-                )
-            if len(data.stopping_crit.cv) != self.ncv:
-                raise ParameterError(
-                    "resume data has incompatible control variate count."
-                )
-            for current_cv, saved_cv in zip(self.cv, data.stopping_crit.cv):
-                self._validate_resume_object(
-                    "control_variate",
-                    current_cv,
-                    saved_cv,
-                    ("d", "d_indv", "d_comb")
-                    + tuple(getattr(current_cv, "parameters", [])),
-                )
-
-    def _restore_resume_state(self, data):
-        self._restore_resume_rng_state(data)
-        self.true_measure.discrete_distrib = self.discrete_distrib
-        self.integrand.discrete_distrib = self.discrete_distrib
-        self.integrand.true_measure.discrete_distrib = self.discrete_distrib
-        if self.ncv > 0:
-            self.beta = np.array(data.stopping_crit.beta, copy=True)
-            for cv in self.cv:
-                cv.discrete_distrib = self.discrete_distrib
-                cv.true_measure.discrete_distrib = self.discrete_distrib
-
     def _get_main_stage_samples(self, data):
         y = np.array(data.yfull[self.n_init :], copy=False)
         if self.ncv == 0:

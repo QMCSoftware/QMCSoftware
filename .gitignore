@@ -14,7 +14,6 @@ coverage.json
 *hparams.yaml
 *.ipynb_checkpoints/
 *__pycache__/
-.pytest_cache/
 qmcpy.egg-info/
 *.blg
 *.idx
