@@ -1,6 +1,7 @@
 # General Python
 .pdm-python
-*raw.githubusercontent.com*
+.pytest_cache/
+raw.githubusercontent.com/*
 packages.svg
 .pypirc
 test_readme.py
@@ -13,6 +14,7 @@ coverage.json
 *hparams.yaml
 *.ipynb_checkpoints/
 *__pycache__/
+.pytest_cache/
 qmcpy.egg-info/
 *.blg
 *.idx
