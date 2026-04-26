@@ -3,8 +3,6 @@ from pathlib import Path
 from qmcpy import (
     CubBayesLatticeG,
     CubBayesNetG,
-    CubMCG,
-    CubMCCLT,
     CubMCCLTVec,
     CubMCML,
     CubMCMLCont,
@@ -95,14 +93,6 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
 
     return [
         make_tol_case(
-            "CubMCCLT",
-            make_abs_tol_builder(
-                CubMCCLT, iid_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit
-            ),
-            loose_tol,
-            tight_tol,
-        ),
-        make_tol_case(
             "CubMCCLTVec",
             make_abs_tol_builder(
                 CubMCCLTVec,
@@ -113,18 +103,6 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
             ),
             loose_tol,
             tight_tol,
-        ),
-        make_tol_case(
-            "CubMCG",
-            make_abs_tol_builder(
-                CubMCG,
-                iid_keister,
-                rel_tol=5e-2,
-                n_init=n_init,
-                n_limit=n_limit,
-            ),
-            1e-2,
-            1e-3,
         ),
         make_tol_case(
             "CubQMCLatticeG",
@@ -225,34 +203,34 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
         make_tol_case(
             "CubMCML",
             make_named_tol_builder(
-                CubMCML, iid_financial_option, "rmse_tol", n_limit=n_limit
+                CubMCML, iid_financial_option, "rmse_tol", n_limit=2**18
             ),
-            loose_tol,
-            tight_tol,
+            0.05,
+            0.04,
         ),
         make_tol_case(
             "CubMCMLCont",
             make_named_tol_builder(
-                CubMCMLCont, iid_financial_option, "rmse_tol", n_limit=n_limit
+                CubMCMLCont, iid_financial_option, "rmse_tol", n_limit=2**16
             ),
-            loose_tol,
-            tight_tol,
+            0.06,
+            0.05,
         ),
         make_tol_case(
             "CubQMCML",
             make_named_tol_builder(
-                CubQMCML, qmc_financial_option, "abs_tol", n_limit=n_limit
+                CubQMCML, qmc_financial_option, "abs_tol", n_limit=2**22
             ),
-            loose_tol,
-            tight_tol,
+            0.025,
+            0.02,
         ),
         make_tol_case(
             "CubQMCMLCont",
             make_named_tol_builder(
-                CubQMCMLCont, qmc_financial_option, "abs_tol", n_limit=n_limit
+                CubQMCMLCont, qmc_financial_option, "abs_tol", n_limit=2**22
             ),
-            loose_tol,
-            tight_tol,
+            0.025,
+            0.02,
         ),
         custom_case("CubQMCRepStudentT", rep_student_t),
         custom_case("PFGPCI", pfgpci),

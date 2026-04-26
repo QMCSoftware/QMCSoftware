@@ -163,6 +163,7 @@ class CubMLMCCont(AbstractCubMLMC):
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
             if data is not None:
+                data.rmse_tol = self.rmse_tol
                 trace.resume(data, step_value=int(data.levels + 1))
                 self._integrate(data, skip_level_reset=True)
             else:
@@ -199,13 +200,15 @@ class CubMLMCCont(AbstractCubMLMC):
         if not skip_level_reset:
             data.levels = int(self.levels_min)
         self._update_data(data)  # Take warm-up samples if none have been taken so far
+        warmup_drew = data.diff_n_level.sum() > 0
         valid = data.n_level[: data.levels + 1] > 0
         if np.any(valid):
             data.solution = (
                 data.sum_level[0, : data.levels + 1][valid]
                 / data.n_level[: data.levels + 1][valid]
             ).sum()
-        if trace is not None:
+        if trace is not None and warmup_drew:
+            data.rmse_tol = self.rmse_tol
             trace.iteration(data, step_value=int(data.levels + 1))
 
         converged = False
@@ -223,6 +226,7 @@ class CubMLMCCont(AbstractCubMLMC):
                         / data.n_level[: data.levels + 1][valid]
                     ).sum()
                 if trace is not None:
+                    data.rmse_tol = self.rmse_tol
                     trace.iteration(data, step_value=int(data.levels + 1))
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 # data.diff_n_level = self._get_next_samples(data)
@@ -254,7 +258,6 @@ class CubMLMCCont(AbstractCubMLMC):
 
             # Take additional samples
             self._update_data(data)
-            data.n_total += data.diff_n_level.sum()
             valid = data.n_level[: data.levels + 1] > 0
             if np.any(valid):
                 data.solution = (
@@ -262,6 +265,7 @@ class CubMLMCCont(AbstractCubMLMC):
                     / data.n_level[: data.levels + 1][valid]
                 ).sum()
             if trace is not None:
+                data.rmse_tol = self.rmse_tol
                 trace.iteration(data, step_value=int(data.levels + 1))
 
             # Check for convergence

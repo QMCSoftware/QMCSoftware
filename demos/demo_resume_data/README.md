@@ -12,7 +12,9 @@ This folder contains notebooks, scripts, and saved checkpoint files for the QMCP
   - a loose run followed by resume with a tighter tolerance
   - a fresh tight run from scratch
 
-  It also captures per-iteration diagnostic logs and writes text reports into `output/`.
+  It also captures per-iteration diagnostic logs, writes text reports into
+  `output/`, and includes focused multilevel examples for `CubMCML`,
+  `CubMCMLCont`, `CubQMCML`, and `CubQMCMLCont`.
 
 - `resume_util.py`: Shared helpers for the resume demo scripts, including
   diagnostic capture, case execution, and text-report generation.

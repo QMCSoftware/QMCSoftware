@@ -1,40 +1,5 @@
 Stopping Criteria Check: Loose + Resume
-generated: 2026-04-26 09:56:23
-
-[CubMCCLT] status=ok
-  loose_inputs:
-    abs_tol: 0.200000
-    rel_tol: 0.000000
-    n_init: 256
-    n_limit: 65536
-    dimension: 2
-
-  resume_inputs:
-    abs_tol: 0.050000
-    rel_tol: 0.000000
-    n_init: 256
-    n_limit: 65536
-    dimension: 2
-
-  loose_iteration_log:
-    === CubMCCLT-LOOSE iteration log ===
-    stage        iter   solution      bound_diff bound_half_width    n_total      xfull.shape
-    -----------------------------------------------------------------------------------------
-    ITER            1  1.7555549       4.659e-01       2.330e-01        532         (532, 2)
-
-  resume_iteration_log:
-    === CubMCCLT-RESUME iteration log ===
-    stage        iter   solution      bound_diff bound_half_width    n_total      xfull.shape
-    -----------------------------------------------------------------------------------------
-    RESUME          1  1.7555549       4.659e-01       2.330e-01        532         (532, 2)
-    ITER            2  1.7992462       1.062e-01       5.310e-02       4665        (4665, 2)
-
-  loose_solution: 1.7555549
-  resume_solution: 1.7992462
-  old_n_total: 532
-  resume_n_total: 4665
-  resume_n_new: 4133
-  resume_time: 0.0004
+generated: 2026-04-26 12:46:24
 
 [CubMCCLTVec] status=ok
   loose_inputs:
@@ -73,41 +38,6 @@ generated: 2026-04-26 09:56:23
   resume_n_total: 4096
   resume_n_new: 3840
   resume_time: 0.0006
-
-[CubMCG] status=ok
-  loose_inputs:
-    abs_tol: 0.010000
-    rel_tol: 0.050000
-    n_init: 256
-    n_limit: 65536
-    dimension: 2
-
-  resume_inputs:
-    abs_tol: 0.001000
-    rel_tol: 0.050000
-    n_init: 256
-    n_limit: 65536
-    dimension: 2
-
-  loose_iteration_log:
-    === CubMCG-LOOSE iteration log ===
-    stage        iter   solution bound_half_width    n_total      xfull.shape
-    -------------------------------------------------------------------------
-    ITER            1  1.7957197       1.137e+00        512         (512, 2)
-    ITER            2  1.8291085       8.530e-02       3122        (3122, 2)
-
-  resume_iteration_log:
-    === CubMCG-RESUME iteration log ===
-    stage        iter   solution      bound_diff bound_half_width    n_total      xfull.shape
-    -----------------------------------------------------------------------------------------
-    RESUME          2  1.8291085       1.706e-01       8.530e-02       3122        (3122, 2)
-
-  loose_solution: 1.8291085
-  resume_solution: 1.8300100
-  old_n_total: 3122
-  resume_n_total: 3122
-  resume_n_new: 0
-  resume_time: 0.0056
 
 [CubQMCLatticeG] status=ok
   loose_inputs:
@@ -229,7 +159,7 @@ generated: 2026-04-26 09:56:23
   old_n_total: 8192
   resume_n_total: 1048576
   resume_n_new: 1040384
-  resume_time: 0.1315
+  resume_time: 0.1331
 
 [CubQMCLatticeG_hard_d4] status=ok
   loose_inputs:
@@ -275,7 +205,7 @@ generated: 2026-04-26 09:56:23
   old_n_total: 65536
   resume_n_total: 1048576
   resume_n_new: 983040
-  resume_time: 0.1784
+  resume_time: 0.1619
 
 [CubQMCNetG_hard_d2] status=ok
   loose_inputs:
@@ -319,7 +249,7 @@ generated: 2026-04-26 09:56:23
   old_n_total: 8192
   resume_n_total: 262144
   resume_n_new: 253952
-  resume_time: 0.0375
+  resume_time: 0.0362
 
 [CubQMCNetG_hard_d4] status=ok
   loose_inputs:
@@ -363,7 +293,7 @@ generated: 2026-04-26 09:56:23
   old_n_total: 65536
   resume_n_total: 262144
   resume_n_new: 196608
-  resume_time: 0.0386
+  resume_time: 0.0336
 
 [CubBayesLatticeG] status=ok
   loose_inputs:
@@ -398,7 +328,7 @@ generated: 2026-04-26 09:56:23
   old_n_total: 32
   resume_n_total: 64
   resume_n_new: 32
-  resume_time: 0.0011
+  resume_time: 0.0010
 
 [CubBayesNetG] status=ok
   loose_inputs:
@@ -434,50 +364,52 @@ generated: 2026-04-26 09:56:23
   old_n_total: 32
   resume_n_total: 128
   resume_n_new: 96
-  resume_time: 0.0027
+  resume_time: 0.0026
 
 [CubMCML] status=ok
   loose_inputs:
-    rmse_tol: 0.200000
+    rmse_tol: 0.050000
     n_init: 256
-    n_limit: 65536
+    n_limit: 262144
     levels_min: 2
     levels_max: 10
     dimension: 2
 
   resume_inputs:
-    rmse_tol: 0.050000
+    rmse_tol: 0.040000
     n_init: 256
-    n_limit: 65536
+    n_limit: 262144
     levels_min: 2
     levels_max: 10
     dimension: 2
 
   loose_iteration_log:
     === CubMCML-LOOSE iteration log ===
-    stage        iter   solution    n_total      m
-    ----------------------------------------------
-    ITER            1  3.6731355       1536      3
-    ITER            2  3.6380735       6448      3
-    ITER            3  3.6531340       4136      3
+    stage        iter   solution   rmse_estimate    n_total      m
+    --------------------------------------------------------------
+    ITER            1  3.6731355       3.683e-01        768      3
+    ITER            2  3.4931749       3.645e-02      57702      3
+    ITER            3  3.4881027       3.454e-02      64687      3
 
   resume_iteration_log:
     === CubMCML-RESUME iteration log ===
-    stage        iter   solution    n_total      m
-    ----------------------------------------------
-    RESUME          3  3.6531340       4136      3
-    ITER            4  3.4958255     118176      3
+    stage        iter   solution   rmse_estimate    n_total      m
+    --------------------------------------------------------------
+    RESUME          3  3.4881027       3.454e-02      64687      3
+    ITER            4  3.4351224       2.819e-02      98714      3
+    ITER            5  3.4352727       2.817e-02      98820      3
+    ITER            6  3.4349672       2.816e-02      98851      3
 
-  loose_solution: 3.6531340
-  resume_solution: 3.4958255
-  old_n_total: 4136
-  resume_n_total: 118176
-  resume_n_new: 114040
-  resume_time: 0.0048
+  loose_solution: 3.4881027
+  resume_solution: 3.4349672
+  old_n_total: 64687
+  resume_n_total: 98851
+  resume_n_new: 34164
+  resume_time: 0.0031
 
 [CubMCMLCont] status=ok
   loose_inputs:
-    rmse_tol: 0.200000
+    rmse_tol: 0.060000
     n_init: 256
     n_limit: 65536
     levels_min: 2
@@ -494,120 +426,140 @@ generated: 2026-04-26 09:56:23
 
   loose_iteration_log:
     === CubMCMLCont-LOOSE iteration log ===
-    stage        iter   solution    n_total      m
-    ----------------------------------------------
-    ITER            1  3.6731355        768      3
-    ITER            2  3.6731355        768      3
-    ITER            3  3.6731355        768      3
-    ITER            4  3.6731355        768      3
-    ITER            5  3.6731355        768      3
-    ITER            6  3.6731355        768      3
-    ITER            7  3.6731355        768      3
-    ITER            8  3.6731355        768      3
-    ITER            9  3.6731355        768      3
-    ITER           10  3.6123161        995      3
-    ITER           11  3.6338298       1915      3
+    stage        iter   solution        rmse_tol    n_total      m
+    --------------------------------------------------------------
+    ITER            1  3.6731355       6.000e+00        768      3
+    ITER            2  3.6731355       6.000e+00        768      3
+    ITER            3  3.6731355       3.597e+00        768      3
+    ITER            4  3.6731355       2.156e+00        768      3
+    ITER            5  3.6731355       1.293e+00        768      3
+    ITER            6  3.6731355       7.749e-01        768      3
+    ITER            7  3.6731355       4.646e-01        768      3
+    ITER            8  3.6125273       2.785e-01       1205      3
+    ITER            9  3.5319523       1.670e-01       2700      3
+    ITER           10  3.5209290       1.001e-01       8372      3
+    ITER           11  3.5451230       6.000e-02      25613      3
 
   resume_iteration_log:
     === CubMCMLCont-RESUME iteration log ===
-    stage        iter   solution    n_total      m
-    ----------------------------------------------
-    RESUME         11  3.6338298       1915      3
-    ITER           12  3.5201719      32425      3
+    stage        iter   solution        rmse_tol    n_total      m
+    --------------------------------------------------------------
+    RESUME         11  3.5451230       5.000e-02      25613      3
+    ITER           12  3.5250741       5.000e-02      32276      3
 
-  loose_solution: 3.6338298
-  resume_solution: 3.5201719
-  old_n_total: 1915
-  resume_n_total: 32425
-  resume_n_new: 30510
-  resume_time: 0.0024
+  loose_solution: 3.5451230
+  resume_solution: 3.5250741
+  old_n_total: 25613
+  resume_n_total: 32276
+  resume_n_new: 6663
+  resume_time: 0.0007
 
 [CubQMCML] status=ok
   loose_inputs:
-    rmse_tol: 0.077645
+    rmse_tol: 0.009706
     n_init: 256
-    n_limit: 65536
+    n_limit: 4194304
     levels_min: 2
     levels_max: 10
     dimension: 1
 
   resume_inputs:
-    rmse_tol: 0.019411
+    rmse_tol: 0.007764
     n_init: 256
-    n_limit: 65536
+    n_limit: 4194304
     levels_min: 2
     levels_max: 10
     dimension: 1
 
   loose_iteration_log:
     === CubQMCML-LOOSE iteration log ===
-    stage        iter   solution   bias_estimate    n_total      m
-    --------------------------------------------------------------
-    ITER            1  3.4486173       9.336e-04      24576      3
-    ITER            2  3.4455971       9.336e-04      32768      3
-    ITER            3  3.4318601       9.336e-04      49152      3
+    stage        iter   solution   bias_estimate   rmse_estimate    n_total      m
+    ------------------------------------------------------------------------------
+    ITER            1  3.4486173       9.336e-04       1.027e-01      24576      3
+    ITER            2  3.4455971       9.336e-04       6.730e-02      32768      3
+    ITER            3  3.4318601       9.336e-04       4.675e-02      49152      3
+    ITER            4  3.4327578       9.110e-04       3.888e-02      57344      3
+    ITER            5  3.4297331       9.110e-04       3.329e-02      90112      3
+    ITER            6  3.4257414       1.018e-03       2.921e-02     106496      3
+    ITER            7  3.4262727       1.003e-03       2.510e-02     139264      3
+    ITER            8  3.4240839       1.003e-03       2.343e-02     204800      3
+    ITER            9  3.4246875       1.123e-03       1.360e-02     212992      3
+    ITER           10  3.4249745       1.123e-03       1.258e-02     344064      3
+    ITER           11  3.4259695       1.345e-03       1.070e-02     360448      3
+    ITER           12  3.4267754       1.546e-03       8.100e-03     393216      3
+    ITER           13  3.4265638       1.546e-03       7.297e-03     655360      3
+    ITER           14  3.4268917       1.531e-03       6.057e-03     720896      3
 
   resume_iteration_log:
     === CubQMCML-RESUME iteration log ===
-    stage        iter   solution   bias_estimate    n_total      m
-    --------------------------------------------------------------
-    RESUME          3  3.4318601       9.336e-04      49152      3
-    ITER            4  3.4327578       9.110e-04      57344      3
+    stage        iter   solution   bias_estimate   rmse_estimate    n_total      m
+    ------------------------------------------------------------------------------
+    RESUME         14  3.4268917       1.531e-03       6.057e-03     720896      3
+    ITER           15  3.4277018       1.496e-03       5.516e-03     851968      3
 
-  loose_solution: 3.4318601
-  resume_solution: 3.4327578
-  old_n_total: 49152
-  resume_n_total: 57344
-  resume_n_new: 8192
-  resume_time: 0.0011
+  loose_solution: 3.4268917
+  resume_solution: 3.4277018
+  old_n_total: 720896
+  resume_n_total: 851968
+  resume_n_new: 131072
+  resume_time: 0.0139
 
 [CubQMCMLCont] status=ok
   loose_inputs:
-    rmse_tol: 0.077645
+    rmse_tol: 0.009706
     n_init: 256
-    n_limit: 65536
+    n_limit: 4194304
     levels_min: 2
     levels_max: 10
     dimension: 1
 
   resume_inputs:
-    rmse_tol: 0.019411
+    rmse_tol: 0.007764
     n_init: 256
-    n_limit: 65536
+    n_limit: 4194304
     levels_min: 2
     levels_max: 10
     dimension: 1
 
   loose_iteration_log:
     === CubQMCMLCont-LOOSE iteration log ===
-    stage        iter   solution   bias_estimate    n_total      m
-    --------------------------------------------------------------
-    ITER            1  3.4486173       9.336e-04      24576      3
-    ITER            2  3.4486173       9.336e-04      24576      3
-    ITER            3  3.4486173       9.336e-04      24576      3
-    ITER            4  3.4486173       9.336e-04      24576      3
-    ITER            5  3.4486173       9.336e-04      24576      3
-    ITER            6  3.4486173       9.336e-04      24576      3
-    ITER            7  3.4486173       9.336e-04      24576      3
-    ITER            8  3.4486173       9.336e-04      24576      3
-    ITER            9  3.4486173       9.336e-04      24576      3
-    ITER           10  3.4486173       9.336e-04      24576      3
-    ITER           11  3.4455971       9.336e-04      32768      3
+    stage        iter   solution   bias_estimate        rmse_tol    n_total      m
+    ------------------------------------------------------------------------------
+    ITER            1  3.4486173       9.336e-04       9.706e-01      24576      3
+    ITER            2  3.4486173       9.336e-04       5.818e-01      24576      3
+    ITER            3  3.4486173       9.336e-04       3.488e-01      24576      3
+    ITER            4  3.4486173       9.336e-04       2.091e-01      24576      3
+    ITER            5  3.4486173       9.336e-04       1.254e-01      24576      3
+    ITER            6  3.4486173       9.336e-04       7.515e-02      24576      3
+    ITER            7  3.4455971       9.336e-04       7.515e-02      32768      3
+    ITER            8  3.4455971       9.336e-04       4.505e-02      32768      3
+    ITER            9  3.4318601       9.336e-04       4.505e-02      49152      3
+    ITER           10  3.4327578       9.110e-04       4.505e-02      57344      3
+    ITER           11  3.4327578       9.110e-04       2.701e-02      57344      3
+    ITER           12  3.4297331       9.110e-04       2.701e-02      90112      3
+    ITER           13  3.4257414       1.018e-03       2.701e-02     106496      3
+    ITER           14  3.4262727       1.003e-03       2.701e-02     139264      3
+    ITER           15  3.4262727       1.003e-03       1.619e-02     139264      3
+    ITER           16  3.4240839       1.003e-03       1.619e-02     204800      3
+    ITER           17  3.4246875       1.123e-03       1.619e-02     212992      3
+    ITER           18  3.4246875       1.123e-03       9.706e-03     212992      3
+    ITER           19  3.4249745       1.123e-03       9.706e-03     344064      3
+    ITER           20  3.4259695       1.345e-03       9.706e-03     360448      3
+    ITER           21  3.4267754       1.546e-03       9.706e-03     393216      3
 
   resume_iteration_log:
     === CubQMCMLCont-RESUME iteration log ===
-    stage        iter   solution   bias_estimate    n_total      m
-    --------------------------------------------------------------
-    RESUME         11  3.4455971       9.336e-04      32768      3
-    ITER           12  3.4318601       9.336e-04      49152      3
-    ITER           13  3.4327578       9.110e-04      57344      3
+    stage        iter   solution   bias_estimate        rmse_tol    n_total      m
+    ------------------------------------------------------------------------------
+    RESUME         21  3.4267754       1.546e-03       7.764e-03     393216      3
+    ITER           22  3.4265638       1.546e-03       7.764e-03     655360      3
 
-  loose_solution: 3.4455971
-  resume_solution: 3.4327578
-  old_n_total: 32768
-  resume_n_total: 57344
-  resume_n_new: 24576
-  resume_time: 0.0021
+  loose_solution: 3.4267754
+  resume_solution: 3.4265638
+  old_n_total: 393216
+  resume_n_total: 655360
+  resume_n_new: 262144
+  resume_time: 0.0135
 
 [CubQMCRepStudentT] status=error
   error: ParameterError: CubQMCRepStudentT does not support resume.

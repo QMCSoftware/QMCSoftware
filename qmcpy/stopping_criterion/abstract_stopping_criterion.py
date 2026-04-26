@@ -87,6 +87,10 @@ class _IterationTraceLogger(object):
             visible_columns.append("bound_half_width")
         if getattr(data, "bias_estimate", None) is not None:
             visible_columns.append("bias_estimate")
+        if getattr(data, "rmse_estimate", None) is not None:
+            visible_columns.append("rmse_estimate")
+        if getattr(data, "rmse_tol", None) is not None:
+            visible_columns.append("rmse_tol")
         if getattr(data, "n_min", None) is not None:
             visible_columns.append("n_min")
         visible_columns.append("n_total")
@@ -211,6 +215,8 @@ def print_diagnostic(
     comb_bound_diff = getattr(data, "comb_bound_diff", None)
     bound_half_width = getattr(data, "bound_half_width", None)
     bias_estimate = getattr(data, "bias_estimate", None)
+    rmse_estimate = getattr(data, "rmse_estimate", None)
+    rmse_tol = getattr(data, "rmse_tol", None)
     m = getattr(data, "m", None)
     n_total = getattr(data, "n_total", None)
     n_min = getattr(data, "n_min", None)
@@ -263,6 +269,8 @@ def print_diagnostic(
     comb_bound_diff_formatted = _format_bound(comb_bound_diff_display)
     bound_half_width_formatted = _format_bound(bound_half_width_display)
     bias_estimate_formatted = _format_bound(bias_estimate_display)
+    rmse_estimate_formatted = _format_bound(rmse_estimate)
+    rmse_tol_formatted = _format_bound(rmse_tol)
     iter_formatted = f"{iter_display:>4}" if iter_display is not None else " " * 4
     m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
@@ -282,6 +290,10 @@ def print_diagnostic(
             visible_columns.append("bound_half_width")
         if bias_estimate is not None:
             visible_columns.append("bias_estimate")
+        if rmse_estimate is not None:
+            visible_columns.append("rmse_estimate")
+        if rmse_tol is not None:
+            visible_columns.append("rmse_tol")
         visible_columns.append("n_min")
         visible_columns.append("n_total")
         if m is not None:
@@ -297,6 +309,8 @@ def print_diagnostic(
         "comb_bound_diff": f"{'comb_bound_diff':>15}",
         "bound_half_width": f"{'bound_half_width':>15}",
         "bias_estimate": f"{'bias_estimate':>15}",
+        "rmse_estimate": f"{'rmse_estimate':>15}",
+        "rmse_tol": f"{'rmse_tol':>15}",
         "n_min": f"{'n_min':>10}",
         "n_total": f"{'n_total':>10}",
         "m": f"{'m':>6}",
@@ -310,6 +324,8 @@ def print_diagnostic(
         "comb_bound_diff": comb_bound_diff_formatted,
         "bound_half_width": bound_half_width_formatted,
         "bias_estimate": bias_estimate_formatted,
+        "rmse_estimate": rmse_estimate_formatted,
+        "rmse_tol": rmse_tol_formatted,
         "n_min": n_min_formatted,
         "n_total": n_total_formatted,
         "m": m_formatted,

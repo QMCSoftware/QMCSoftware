@@ -162,6 +162,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
             if data is not None:
+                data.rmse_tol = self.rmse_tol
                 trace.resume(data, step_value=int(data.levels))
                 self._integrate(data, skip_level_reset=True)
             else:
@@ -204,6 +205,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
             # Ensure that we have samples on the finest level
             self.update_data(data)
             if trace is not None:
+                data.rmse_tol = self.rmse_tol
                 trace.iteration(data, step_value=int(data.levels))
             self._update_theta(data)
 
@@ -230,6 +232,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
 
                 self.update_data(data)
                 if trace is not None:
+                    data.rmse_tol = self.rmse_tol
                     trace.iteration(data, step_value=int(data.levels))
                 self._update_theta(data)
 

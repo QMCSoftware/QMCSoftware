@@ -150,6 +150,7 @@ class CubMLMC(AbstractCubMLMC):
         trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is not None:
+            data.rmse_estimate = np.sqrt((data.var_level / data.n_level[:len(data.var_level)]).sum())
             trace.resume(data, step_value=int(data.levels + 1))
         if data is None:
             data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "cost_per_sample", "alpha", "beta", "gamma"])
@@ -167,10 +168,10 @@ class CubMLMC(AbstractCubMLMC):
             valid = data.n_level > 0
             if np.any(valid):
                 data.solution = (data.sum_level[0, valid] / data.n_level[valid]).sum()
+            data.rmse_estimate = np.sqrt((data.var_level / np.maximum(1, data.n_level[:len(data.var_level)])).sum())
 
         while data.diff_n_level.sum() > 0:
             self._update_data(data)
-            data.n_total += data.diff_n_level.sum()
             _update_trace_solution()
             trace.iteration(data, step_value=int(data.levels + 1))
             # set optimal number of additional samples

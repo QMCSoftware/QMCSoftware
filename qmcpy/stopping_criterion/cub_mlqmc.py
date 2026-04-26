@@ -135,6 +135,7 @@ class CubMLQMC(AbstractCubMLQMC):
         trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
         if data is not None:
+            data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
             trace.resume(data, step_value=int(data.levels))
         if data is None:
             data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
@@ -150,6 +151,7 @@ class CubMLQMC(AbstractCubMLQMC):
             data.level_integrands = []
         while True:
             self.update_data(data)
+            data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
             trace.iteration(data, step_value=int(data.levels))
             if data.var_level.sum() > (self.rmse_tol**2 / 2.0):
                 # double N_l on level with largest V_l/(2^l*N_l)
