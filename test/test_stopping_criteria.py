@@ -703,9 +703,7 @@ class TestResumeFeature(unittest.TestCase):
     def test_resume_matches_fresh_tight_solution(self):
         """Resume solutions should match a fresh run at tighter tolerance."""
         cases = [
-            ("CubMCCLT", CubMCCLT, self._iid_distribution, ()),
             ("CubMCCLTVec", CubMCCLTVec, self._iid_distribution, (ImportError, NotImplementedError)),
-            ("CubMCG", CubMCG, self._iid_distribution, ()),
             ("CubQMCLatticeG", CubQMCLatticeG, self._lattice_distribution, ()),
             ("CubQMCNetG", CubQMCNetG, self._net_distribution, ()),
             ("CubBayesLatticeG", CubBayesLatticeG, self._lattice_distribution, ()),
@@ -798,6 +796,14 @@ class TestResumeFeature(unittest.TestCase):
     def test_unsupported_resume_raises_parameter_error(self):
         """Stopping criteria without resume support must raise ParameterError."""
         cases = [
+            (
+                "CubMCCLT",
+                lambda: CubMCCLT(Keister(self._iid_distribution()), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol, n_init=self.n_init, n_limit=self.n_limit),
+            ),
+            (
+                "CubMCG",
+                lambda: CubMCG(Keister(self._iid_distribution()), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol, n_init=self.n_init, n_limit=self.n_limit),
+            ),
             ("CubQMCRepStudentT", self._qmc_rep_student_t),
             ("PFGPCI", self._pfgpci),
         ]
@@ -824,7 +830,7 @@ class TestResumeCheckpointing(unittest.TestCase):
     def _make_integrand(self, dimension=None, seed=None):
         return Keister(IIDStdUniform(dimension=self.dimension if dimension is None else dimension, seed=self.seed if seed is None else seed))
 
-    def test_cub_mc_clt_resume_reuses_existing_main_stage_samples(self):
+    def test_cub_mc_clt_resume_raises_parameter_error(self):
         loose_sc = CubMCCLT(
             self._make_integrand(),
             abs_tol=self.loose_abs_tol,
@@ -839,15 +845,10 @@ class TestResumeCheckpointing(unittest.TestCase):
             n_init=self.n_init,
             n_limit=self.n_limit,
         )
-        _, resumed = tight_sc.integrate(resume=checkpoint)
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
 
-        y_main = resumed.yfull[self.n_init :]
-        self.assertEqual(int(resumed.n_total), resumed.yfull.shape[-1])
-        self.assertEqual(int(resumed.n_mu), y_main.shape[-1])
-        self.assertTrue(np.allclose(resumed.solution, y_main.mean()))
-        self.assertTrue(np.allclose(resumed.sighat, y_main.std(ddof=1)))
-
-    def test_cub_mc_g_resume_reuses_existing_main_stage_samples(self):
+    def test_cub_mc_g_resume_raises_parameter_error(self):
         loose_sc = CubMCG(
             self._make_integrand(),
             abs_tol=self.loose_abs_tol,
@@ -862,12 +863,8 @@ class TestResumeCheckpointing(unittest.TestCase):
             n_init=self.n_init,
             n_limit=self.n_limit,
         )
-        _, resumed = tight_sc.integrate(resume=checkpoint)
-
-        y_main = resumed.yfull[self.n_init :]
-        self.assertEqual(int(resumed.n_total), resumed.yfull.shape[-1])
-        self.assertEqual(int(resumed.n_mu), y_main.shape[-1])
-        self.assertTrue(np.allclose(resumed.solution, y_main.mean()))
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
 
     def test_resume_rejects_incompatible_dimension(self):
         loose_sc = CubMCCLT(
@@ -904,8 +901,8 @@ class TestResumeCheckpointing(unittest.TestCase):
             self.assertTrue(np.array_equal(loaded_gzip.value, data.value))
 
     def test_resume_after_save_load_continues_rng_stream(self):
-        loose_sc = CubMCCLT(
-            self._make_integrand(),
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
             abs_tol=self.loose_abs_tol,
             n_init=self.n_init,
             n_limit=self.n_limit,
@@ -918,8 +915,8 @@ class TestResumeCheckpointing(unittest.TestCase):
             loaded = Data.load(path)
 
         old_n_total = int(loaded.n_total)
-        tight_sc = CubMCCLT(
-            self._make_integrand(),
+        tight_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
             abs_tol=self.tight_abs_tol,
             n_init=self.n_init,
             n_limit=self.n_limit,

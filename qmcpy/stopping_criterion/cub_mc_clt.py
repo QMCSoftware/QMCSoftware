@@ -272,58 +272,8 @@ class CubMCCLT(AbstractStoppingCriterion):
     def integrate(self, resume=None):
         t_start = time()
         trace = self._make_trace_logger()
-        data = self._prepare_resume_data(
-            resume, self._validate_resume, self._restore_resume_state
-        )
-        if data is not None:
-            trace.resume(data)
-            prev_n_total = int(data.n_total)
-            prev_n_mu = prev_n_total - int(self.n_init)
-            # Reuse previous pilot variance; skip fresh pilot step.
-            tol_up = np.maximum(self.abs_tol, abs(data.solution0) * self.rel_tol)
-            n_mu_temp = np.ceil(
-                data.sighat0 ** 2 * (self.z_star * self.inflate / tol_up) ** 2
-            )
-            target_n_mu = int(np.maximum(self.n_init, n_mu_temp))
-            n_new = max(0, target_n_mu - prev_n_mu)
-            if (prev_n_total + n_new) > self.n_limit:
-                warnings.warn(
-                    "Trying to generate %d new samples would exceed n_limit = %d. "
-                    "Will instead generate %d new samples." % (
-                        int(n_new), int(self.n_limit),
-                        int(max(0, self.n_limit - prev_n_total)),
-                    ), MaxSamplesWarning
-                )
-                n_new = max(0, self.n_limit - prev_n_total)
-            if n_new > 0:
-                x = self.discrete_distrib(n=n_new)
-                data.xfull = np.concatenate([data.xfull, x], 0)
-                y = self.integrand.f(x)
-                data.yfull = np.concatenate([data.yfull, y], -1)
-                if self.ncv > 0:
-                    ycv = [None] * self.ncv
-                    for k in range(self.ncv):
-                        ycv[k] = self.cv[k].f(x)
-                    ycv = np.stack(ycv, 0)
-                    data.ycvfull = np.concatenate([data.ycvfull, ycv], 1)
-            data.n_mu = prev_n_mu + n_new
-            y_main = self._get_main_stage_samples(data)
-            data.sighat = y_main.std(ddof=1)
-            data.solution = y_main.mean()
-            data.bound_half_width = (
-                self.z_star * self.inflate * data.sighat / np.sqrt(data.n_mu)
-            )
-            data.bound_low = data.solution - data.bound_half_width
-            data.bound_high = data.solution + data.bound_half_width
-            data.bound_diff = data.bound_high - data.bound_low
-            data.n_total = prev_n_total + n_new
-            data.stopping_crit = self
-            data.integrand = self.integrand
-            data.true_measure = self.integrand.true_measure
-            data.discrete_distrib = self.true_measure.discrete_distrib
-            trace.iteration(data)
-            data.time_integrate = time() - t_start
-            return data.solution, data
+        if resume is not None:
+            raise ParameterError("CubMCCLT does not support resume.")
         data = Data(parameters=["solution", "bound_low", "bound_high", "bound_diff", "n_total", "time_integrate"])
         data.xfull = np.empty((0, self.integrand.d))
         data.yfull = np.empty(0)
