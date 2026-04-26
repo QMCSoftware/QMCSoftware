@@ -373,7 +373,7 @@ def run_fresh_case(case, throttle_iterations=True):
         row.update(
             {
                 "status": "ok",
-                "fresh_solution": format_value(sol),
+                "fresh_solution": format_value(sol, ndigits=7),
                 "fresh_n_total": str(int(getattr(data, "n_total", 0))),
                 "fresh_time": format_value(
                     getattr(data, "time_integrate", float("nan")), ndigits=4
