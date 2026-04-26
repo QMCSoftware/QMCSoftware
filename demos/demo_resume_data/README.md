@@ -3,6 +3,12 @@
 This folder contains notebooks and helper scripts for demonstrating QMCPy's
 resume workflow.
 
+Current scope: the resume workflow in this demo covers `CubMCCLTVec`,
+`CubQMCLatticeG`, `CubQMCNetG`, `CubBayesLatticeG`, `CubBayesNetG`,
+`CubMLMC`, `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`. It does not cover
+`CubMCCLT`, `CubMCG`, `CubQMCRepStudentT`, or `PFGPCI`, which currently raise `ParameterError` when
+`resume=...` is supplied.
+
 ## Contents
 
 - `accuracy_and_resume.ipynb`:   Long-form walkthrough of the feature.
