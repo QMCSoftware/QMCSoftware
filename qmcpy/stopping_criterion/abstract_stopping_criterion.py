@@ -273,19 +273,22 @@ def print_diagnostic(
         if 10 < throttle <= 1000 and throttle % 10 != 0:
             return
     if visible_columns is None:
-        visible_columns = (
-            "stage",
-            "iter",
-            "solution",
-            "bound_diff",
-            "comb_bound_diff",
-            "bound_half_width",
-            "bias_estimate",
-            "n_min",
-            "n_total",
-            "m",
-            "xfull.shape",
-        )
+        visible_columns = ["stage", "iter", "solution"]
+        if bound_diff is not None:
+            visible_columns.append("bound_diff")
+        if comb_bound_diff is not None:
+            visible_columns.append("comb_bound_diff")
+        if bound_half_width is not None:
+            visible_columns.append("bound_half_width")
+        if bias_estimate is not None:
+            visible_columns.append("bias_estimate")
+        visible_columns.append("n_min")
+        visible_columns.append("n_total")
+        if m is not None:
+            visible_columns.append("m")
+        if xfull_shape is not None:
+            visible_columns.append("xfull.shape")
+        visible_columns = tuple(visible_columns)
     header_values = {
         "stage": f"{'stage':<12}",
         "iter": f"{'iter':>4}",
