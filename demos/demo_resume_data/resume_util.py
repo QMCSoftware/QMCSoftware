@@ -35,7 +35,21 @@ def make_oscillatory_solver(
     trace_label="",
     trace_iterations=True,
 ):
-    """Build a CubQMCLatticeG solver for the standard oscillatory demo case."""
+    """Build a CubQMCLatticeG solver for the standard oscillatory demo case.
+
+    Args:
+        abs_tol (float): Absolute error tolerance.
+        rel_tol (float, optional): Relative error tolerance. Defaults to 0.
+        seed (int, optional): Random seed for the lattice. Defaults to 7.
+        dimension (int, optional): Integrand dimension. Defaults to 3.
+        trace_label (str, optional): Label for the iteration log. Defaults to
+            an empty string (no header printed).
+        trace_iterations (bool, optional): Whether to enable iteration logging.
+            Defaults to True.
+
+    Returns:
+        CubQMCLatticeG: Configured stopping criterion instance.
+    """
     integrand = Genz(
         Lattice(dimension=dimension, seed=seed),
         kind_func="oscillatory",
@@ -55,7 +69,24 @@ def make_solver(
     trace_label="",
     trace_iterations=None,
 ):
-    """Build the standard oscillatory demo solver with shared defaults."""
+    """Build the standard oscillatory demo solver with shared defaults.
+
+    Thin wrapper around :func:`make_oscillatory_solver` that defaults
+    ``trace_iterations`` to the module-level :data:`TRACE_ITERATIONS` flag.
+
+    Args:
+        abs_tol (float): Absolute error tolerance.
+        rel_tol (float, optional): Relative error tolerance. Defaults to 0.
+        seed (int, optional): Random seed for the lattice. Defaults to 7.
+        dimension (int, optional): Integrand dimension. Defaults to 3.
+        trace_label (str, optional): Label for the iteration log. Defaults to
+            an empty string.
+        trace_iterations (bool | None, optional): Whether to enable iteration
+            logging.  If None, falls back to :data:`TRACE_ITERATIONS`.
+
+    Returns:
+        CubQMCLatticeG: Configured stopping criterion instance.
+    """
     if trace_iterations is None:
         trace_iterations = TRACE_ITERATIONS
     return make_oscillatory_solver(
@@ -69,12 +100,29 @@ def make_solver(
 
 
 def half_width(data):
-    """Return the interval half-width from a QMCPy data object."""
+    """Return the confidence-interval half-width from a QMCPy data object.
+
+    Computed as ``(comb_bound_high - comb_bound_low) / 2``, which equals
+    ``z* * inflate * sigma_hat / sqrt(n)`` for CLT-based criteria.
+
+    Args:
+        data (Data): Completed integration data object with ``comb_bound_high``
+            and ``comb_bound_low`` attributes.
+
+    Returns:
+        float: Half-width of the confidence interval.
+    """
     return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
 
 
 def print_stage_summary(rows, title="Stage summary"):
-    """Print compact stage-by-stage sample/time summary rows."""
+    """Print a compact stage-by-stage sample and time summary table.
+
+    Args:
+        rows (list[tuple]): Rows of the form
+            ``(name, abs_tol, total_n, new_n, half_width, time_sec)``.
+        title (str, optional): Table title. Defaults to ``"Stage summary"``.
+    """
     sep = "-" * 55
     print(f"\n{title}")
     print(sep)
@@ -99,7 +147,19 @@ def print_comparison_metrics(
     label_w=36,
     val_w=14,
 ):
-    """Print a compact block of resume-vs-fresh comparison metrics."""
+    """Print a compact block of resume-vs-fresh comparison metrics.
+
+    Args:
+        incremental_speedup (float): Ratio of fresh new-sample count to resume
+            new-sample count (higher is better for resume).
+        new_samples_resume (int): New samples drawn during the resume stage.
+        new_samples_fresh (int): New samples drawn during a fresh tight run.
+        samples_saved (int): Difference ``new_samples_fresh - new_samples_resume``.
+        two_step_time (float): Wall time of the loose + resume two-stage run.
+        fresh_wall_time (float): Wall time of the fresh tight run.
+        label_w (int, optional): Width of the label column. Defaults to 36.
+        val_w (int, optional): Width of the value column. Defaults to 14.
+    """
     print("\nComparison metrics")
     print(
         f"{'Incremental speedup (fresh/resume):':<{label_w}} {incremental_speedup:>{val_w}.2f}x"
@@ -130,7 +190,7 @@ def enable_diagnostics(stopping_criterion, label, throttle_iterations=True):
 
 
 def capture_integrate(stopping_criterion, *args, **kwargs):
-    """Run ``integrate`` while capturing printed diagnostic output.
+    """Run ``integrate`` while capturing all printed diagnostic output.
 
     Args:
         stopping_criterion: Stopping criterion instance.
@@ -138,7 +198,8 @@ def capture_integrate(stopping_criterion, *args, **kwargs):
         **kwargs: Keyword arguments forwarded to ``integrate``.
 
     Returns:
-        tuple[object, str]: ``integrate`` return value and captured stdout.
+        tuple[tuple, str]: ``((solution, data), captured_stdout)`` where
+        *captured_stdout* contains the full text printed during integration.
     """
     stream = io.StringIO()
     with redirect_stdout(stream):
@@ -227,6 +288,19 @@ def make_named_tol_builder(sc_class, integrand_factory, tol_name, **fixed_kwargs
 
 
 def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwargs):
+    """Build, enable diagnostics on, and integrate a stopping criterion.
+
+    Args:
+        factory (callable): Zero-argument factory returning a stopping criterion.
+        label (str): Iteration-log label forwarded to :func:`enable_diagnostics`.
+        throttle_iterations (bool, optional): Whether to throttle printed rows.
+            Defaults to True.
+        **integrate_kwargs: Extra keyword arguments forwarded to ``integrate``.
+
+    Returns:
+        tuple[tuple, str]: ``((solution, data), log_text)`` where *log_text* is
+        the captured stdout from the integration run.
+    """
     sc = enable_diagnostics(
         factory(), label, throttle_iterations=throttle_iterations
     )
@@ -262,8 +336,8 @@ def run_resume_case(case, throttle_iterations=True):
         row.update(
             {
                 "status": "ok",
-                "loose_solution": format_value(sol1),
-                "resume_solution": format_value(sol2),
+                "loose_solution": format_value(sol1, ndigits=7),
+                "resume_solution": format_value(sol2, ndigits=7),
                 "old_n_total": str(old_n),
                 "resume_n_total": str(int(getattr(data2, "n_total", 0))),
                 "resume_n_new": str(new_n),
@@ -320,7 +394,7 @@ def write_report(path, title, rows, summary_keys=(), log_sections=()):
         title (str): Report title.
         rows (list[dict]): Case result rows.
         summary_keys (tuple[str, ...] | list[str], optional): Summary fields to
-            print before the logs. Defaults to an empty tuple.
+            print after the logs. Defaults to an empty tuple.
         log_sections (tuple[tuple[str, str], ...] | list[tuple[str, str]], optional):
             Pairs of display label and row key for embedded logs. Defaults to an
             empty tuple.
@@ -330,11 +404,6 @@ def write_report(path, title, rows, summary_keys=(), log_sections=()):
         lines.append(
             f"[{row.get('name', 'unknown')}] status={row.get('status', 'unknown')}"
         )
-        for key in summary_keys:
-            if key in row:
-                lines.append(f"  {key}: {row[key]}")
-        if summary_keys:
-            lines.append("")
         printed_log = False
         for section_label, row_key in log_sections:
             log_text = row.get(row_key, "")
@@ -345,8 +414,15 @@ def write_report(path, title, rows, summary_keys=(), log_sections=()):
             lines.append(f"  {section_label}:")
             lines.extend([f"    {line}" for line in log_text.splitlines()])
             printed_log = True
+        if printed_log and summary_keys:
+            lines.append("")
+        printed_summary = False
+        for key in summary_keys:
+            if key in row:
+                lines.append(f"  {key}: {row[key]}")
+                printed_summary = True
         if "error" in row:
-            if printed_log or summary_keys:
+            if printed_log or printed_summary:
                 lines.append("")
             lines.append(f"  error: {row['error']}")
         lines.append("")
