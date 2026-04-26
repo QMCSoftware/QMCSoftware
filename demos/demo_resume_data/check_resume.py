@@ -117,10 +117,14 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
         make_tol_case(
             "CubMCG",
             make_abs_tol_builder(
-                CubMCG, iid_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit
+                CubMCG,
+                iid_keister,
+                rel_tol=5e-2,
+                n_init=n_init,
+                n_limit=n_limit,
             ),
-            loose_tol,
-            tight_tol,
+            1e-2,
+            1e-3,
         ),
         make_tol_case(
             "CubQMCLatticeG",
@@ -143,8 +147,8 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
                 n_init=n_init,
                 n_limit=n_limit,
             ),
-            loose_tol,
-            tight_tol,
+            1e-3,
+            1e-6,
         ),
         make_tol_case(
             "CubQMCLatticeG_hard_d2",
