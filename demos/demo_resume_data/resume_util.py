@@ -27,6 +27,43 @@ def format_value(value, ndigits=8):
         return str(value)
 
 
+def _format_problem_inputs(stopping_criterion):
+    """Build a compact problem-input summary for a stopping criterion.
+
+    Args:
+        stopping_criterion: Stopping criterion instance.
+
+    Returns:
+        str: Multi-line text block describing key solver inputs.
+    """
+    integrand = getattr(stopping_criterion, "integrand", None)
+    lines = []
+
+    def add_scalar(label, value, *, ndigits=6):
+        if value is None:
+            return
+        lines.append(f"{label}: {format_value(value, ndigits=ndigits)}")
+
+    def add_int(label, value):
+        if value is None:
+            return
+        try:
+            lines.append(f"{label}: {int(value)}")
+        except Exception:
+            lines.append(f"{label}: {value}")
+
+    add_scalar("abs_tol", getattr(stopping_criterion, "abs_tol", None))
+    add_scalar("rel_tol", getattr(stopping_criterion, "rel_tol", None))
+    add_scalar("rmse_tol", getattr(stopping_criterion, "rmse_tol", None))
+    add_int("n_init", getattr(stopping_criterion, "n_init", None))
+    add_int("n_limit", getattr(stopping_criterion, "n_limit", None))
+    add_int("levels_min", getattr(stopping_criterion, "levels_min", None))
+    add_int("levels_max", getattr(stopping_criterion, "levels_max", None))
+    if integrand is not None:
+        add_int("dimension", getattr(integrand, "d", None))
+    return "\n".join(lines)
+
+
 def make_oscillatory_solver(
     abs_tol,
     rel_tol=0,
@@ -298,14 +335,15 @@ def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwarg
         **integrate_kwargs: Extra keyword arguments forwarded to ``integrate``.
 
     Returns:
-        tuple[tuple, str]: ``((solution, data), log_text)`` where *log_text* is
-        the captured stdout from the integration run.
+        tuple: ``(solution, data, log_text, input_text)`` where *log_text* is
+        the captured stdout from the integration run and *input_text* is a
+        compact summary of the stopping criterion inputs.
     """
     sc = enable_diagnostics(
         factory(), label, throttle_iterations=throttle_iterations
     )
     (solution, data), log = capture_integrate(sc, **integrate_kwargs)
-    return solution, data, log.strip()
+    return solution, data, log.strip(), _format_problem_inputs(sc)
 
 
 def run_resume_case(case, throttle_iterations=True):
@@ -322,11 +360,11 @@ def run_resume_case(case, throttle_iterations=True):
     name = case["name"]
     row = {"name": name}
     try:
-        sol1, data1, loose_log = _run_logged_case(
+        sol1, data1, loose_log, loose_inputs = _run_logged_case(
             case["loose"], f"{name}-LOOSE", throttle_iterations=throttle_iterations
         )
         old_n = int(getattr(data1, "n_total", 0))
-        sol2, data2, resume_log = _run_logged_case(
+        sol2, data2, resume_log, resume_inputs = _run_logged_case(
             case["tight"],
             f"{name}-RESUME",
             throttle_iterations=throttle_iterations,
@@ -344,6 +382,8 @@ def run_resume_case(case, throttle_iterations=True):
                 "resume_time": format_value(
                     getattr(data2, "time_integrate", float("nan")), ndigits=4
                 ),
+                "loose_inputs": loose_inputs,
+                "resume_inputs": resume_inputs,
                 "loose_log": loose_log,
                 "resume_log": resume_log,
             }
@@ -367,7 +407,7 @@ def run_fresh_case(case, throttle_iterations=True):
     name = case["name"]
     row = {"name": name}
     try:
-        sol, data, fresh_log = _run_logged_case(
+        sol, data, fresh_log, fresh_inputs = _run_logged_case(
             case["tight"], f"{name}-FRESH", throttle_iterations=throttle_iterations
         )
         row.update(
@@ -378,6 +418,7 @@ def run_fresh_case(case, throttle_iterations=True):
                 "fresh_time": format_value(
                     getattr(data, "time_integrate", float("nan")), ndigits=4
                 ),
+                "fresh_inputs": fresh_inputs,
                 "fresh_log": fresh_log,
             }
         )
@@ -386,7 +427,14 @@ def run_fresh_case(case, throttle_iterations=True):
     return row
 
 
-def write_report(path, title, rows, summary_keys=(), log_sections=()):
+def write_report(
+    path,
+    title,
+    rows,
+    summary_keys=(),
+    input_sections=(),
+    log_sections=(),
+):
     """Write a text report for resume-demo rows.
 
     Args:
@@ -395,6 +443,9 @@ def write_report(path, title, rows, summary_keys=(), log_sections=()):
         rows (list[dict]): Case result rows.
         summary_keys (tuple[str, ...] | list[str], optional): Summary fields to
             print after the logs. Defaults to an empty tuple.
+        input_sections (tuple[tuple[str, str], ...] | list[tuple[str, str]], optional):
+            Pairs of display label and row key for compact problem-input blocks.
+            Defaults to an empty tuple.
         log_sections (tuple[tuple[str, str], ...] | list[tuple[str, str]], optional):
             Pairs of display label and row key for embedded logs. Defaults to an
             empty tuple.
@@ -404,12 +455,22 @@ def write_report(path, title, rows, summary_keys=(), log_sections=()):
         lines.append(
             f"[{row.get('name', 'unknown')}] status={row.get('status', 'unknown')}"
         )
+        printed_inputs = False
+        for section_label, row_key in input_sections:
+            input_text = row.get(row_key, "")
+            if not input_text:
+                continue
+            if printed_inputs:
+                lines.append("")
+            lines.append(f"  {section_label}:")
+            lines.extend([f"    {line}" for line in input_text.splitlines()])
+            printed_inputs = True
         printed_log = False
         for section_label, row_key in log_sections:
             log_text = row.get(row_key, "")
             if not log_text:
                 continue
-            if printed_log:
+            if printed_inputs or printed_log:
                 lines.append("")
             lines.append(f"  {section_label}:")
             lines.extend([f"    {line}" for line in log_text.splitlines()])

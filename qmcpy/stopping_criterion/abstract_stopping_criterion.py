@@ -240,14 +240,14 @@ def print_diagnostic(
 
     def _format_bound(value):
         if value is None:
-            return f"{'None':>13}"
+            return f"{'None':>15}"
         try:
             value = float(value)
         except (TypeError, ValueError):
-            return f"{str(value):>13}"
+            return f"{str(value):>15}"
         if np.isnan(value):
-            return f"{'nan':>13}"
-        return f"{value:>13.3e}"
+            return f"{'nan':>15}"
+        return f"{value:>15.3e}"
 
     n_total_formatted = (
         f"{n_total_display:>10}" if n_total_display is not None else f"{'None':>10}"
@@ -264,7 +264,7 @@ def print_diagnostic(
     bound_half_width_formatted = _format_bound(bound_half_width_display)
     bias_estimate_formatted = _format_bound(bias_estimate_display)
     iter_formatted = f"{iter_display:>4}" if iter_display is not None else " " * 4
-    m_formatted = f"{m_display:>4}" if m_display is not None else f"{'None':>4}"
+    m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
     throttle = iter_display
     if throttle_iterations and label == "ITER" and throttle is not None:
@@ -290,13 +290,13 @@ def print_diagnostic(
         "stage": f"{'stage':<12}",
         "iter": f"{'iter':>4}",
         "solution": f"{'solution':>10}",
-        "bound_diff": f"{'bound_diff':>13}",
-        "comb_bound_diff": f"{'comb_bound_diff':>13}",
-        "bound_half_width": f"{'bound_half_width':>13}",
-        "bias_estimate": f"{'bias_estimate':>13}",
+        "bound_diff": f"{'bound_diff':>15}",
+        "comb_bound_diff": f"{'comb_bound_diff':>15}",
+        "bound_half_width": f"{'bound_half_width':>15}",
+        "bias_estimate": f"{'bias_estimate':>15}",
         "n_min": f"{'n_min':>10}",
         "n_total": f"{'n_total':>10}",
-        "m": f"{'m':>4}",
+        "m": f"{'m':>6}",
         "xfull.shape": f"{'xfull.shape':>16}",
     }
     row_values = {

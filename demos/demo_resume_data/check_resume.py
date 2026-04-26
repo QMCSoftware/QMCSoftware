@@ -288,6 +288,10 @@ def main(throttle_iterations=True):
             "resume_n_new",
             "resume_time",
         ],
+        input_sections=(
+            ("loose_inputs", "loose_inputs"),
+            ("resume_inputs", "resume_inputs"),
+        ),
         log_sections=(
             ("loose_iteration_log", "loose_log"),
             ("resume_iteration_log", "resume_log"),
@@ -298,6 +302,7 @@ def main(throttle_iterations=True):
         "Stopping Criteria Check: Fresh Tight Run",
         fresh_rows,
         summary_keys=["fresh_solution", "fresh_n_total", "fresh_time"],
+        input_sections=(("fresh_inputs", "fresh_inputs"),),
         log_sections=(("fresh_iteration_log", "fresh_log"),),
     )
 
