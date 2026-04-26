@@ -17,6 +17,10 @@ from qmcpy import (
     Lattice,
 )
 
+DEFAULT_SEED = 7
+DEFAULT_CONT_SEED = 11
+DEFAULT_DIMENSION = 2
+
 
 try:
     from .resume_util import (
@@ -40,7 +44,16 @@ except ImportError:
     )
 
 
-def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, n_init=2**8, n_limit=2**16):
+def _build_cases(
+    seed=7,
+    cont_seed=11,
+    dimension=2,
+    loose_tol=0.2,
+    tight_tol=0.05,
+    rel_tol=0,
+    n_init=2**8,
+    n_limit=2**16,
+):
     iid_keister = lambda dim=dimension: Keister(
         IIDStdUniform(dimension=dim, seed=seed)
     )
@@ -57,9 +70,9 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
             strike_price=30,
         )
 
-    def iid_financial_option_seed11():
+    def iid_financial_option_cont():
         return FinancialOption(
-            IIDStdUniform(dimension=dimension, seed=11),
+            IIDStdUniform(dimension=dimension, seed=cont_seed),
             start_price=30,
             strike_price=30,
         )
@@ -143,7 +156,7 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
         make_tol_case(
             "CubMLMCCont",
             make_named_tol_builder(
-                CubMLMCCont, iid_financial_option_seed11, "rmse_tol", n_limit=2**16
+                CubMLMCCont, iid_financial_option_cont, "rmse_tol", n_limit=2**16
             ),
             0.1,
             0.05,
@@ -167,8 +180,9 @@ def _build_cases(seed=7, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, 
     ]
 
 
-def main(throttle_iterations=True):
-    cases = _build_cases()
+def main(throttle_iterations=True, seed=7, cont_seed=11, dimension=2):
+    # Fix all demo sampler seeds here so the reported solution estimates are reproducible.
+    cases = _build_cases(seed=seed, cont_seed=cont_seed, dimension=dimension)
     output_dir = Path(__file__).resolve().parent / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -192,4 +206,9 @@ def main(throttle_iterations=True):
 
 
 if __name__ == "__main__":
-    main(throttle_iterations=False)
+    main(
+        throttle_iterations=False,
+        seed=DEFAULT_SEED,
+        cont_seed=DEFAULT_CONT_SEED,
+        dimension=DEFAULT_DIMENSION,
+    )
