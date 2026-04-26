@@ -1,4 +1,4 @@
-# Demo Resume Data
+# Resume Demo  
 
 This folder contains notebooks, scripts, and saved checkpoint files for the QMCPy resume's demo workflow.
 
@@ -37,6 +37,3 @@ writes the following files into `output/`:
 
 The script currently runs with `main(throttle_iterations=False)` when executed directly, so every logged iteration is printed.
 
-## Saved Checkpoints
-
-The `.pkl` and `.pkl.gz` files in `output/` are serialized `Data` objects used by the resume demos.
