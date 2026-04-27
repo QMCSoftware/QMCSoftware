@@ -232,7 +232,7 @@ def print_integration_result(
     _print_value_line("Estimated interval half-width", f"{half_width(data):.2e}")
 
 
-def print_stage_summary(rows, title="Stage summary"):
+def print_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     """Print a compact stage-by-stage sample and time summary table.
 
     Args:
@@ -240,6 +240,8 @@ def print_stage_summary(rows, title="Stage summary"):
             ``(name, abs_tol, total_n, new_n, iters, solution, half_width, time_sec)``.
             ``iters`` may be ``None`` when iteration tracing is disabled.
         title (str, optional): Table title. Defaults to ``"Stage summary"``.
+        tol_header (str, optional): Column header for the tolerance column.
+            Defaults to ``"abs_tol"``.
     """
     tol_values = [
         float(abs_tol)
@@ -258,7 +260,7 @@ def print_stage_summary(rows, title="Stage summary"):
     print(f"\n{title}")
     print(sep)
     print(
-        f"{'Stage':<7} {'abs_tol':>7} {'total n':>9} {'new n':>9}"
+        f"{'Stage':<7} {tol_header:>7} {'total n':>9} {'new n':>9}"
         f" {'iters':>6} {'solution':>{sol_w}} {'half-width':>10} {'time (s)':>8}"
     )
     print(sep)
@@ -436,21 +438,31 @@ def _safe_half_width(data):
         pass
     try:
         import numpy as np
-        return float(np.sqrt(np.sum(data.var_level / data.n_level)))
+        n = data.n_level
+        v = data.var_level
+        # Align lengths: var_level may be shorter than n_level by one (last level index)
+        min_len = min(len(n), len(v))
+        n, v = n[:min_len], v[:min_len]
+        valid = n > 0
+        return float(np.sqrt(np.sum(v[valid] / n[valid])))
     except Exception:
         return float("nan")
 
 
 def _get_sc_tol(sc):
-    """Return the first positive tolerance found on a stopping criterion."""
-    for attr in ("abs_tol", "rmse_tol"):
+    """Return (value, name) for the primary tolerance of a stopping criterion.
+
+    Prefers ``target_rmse_tol`` (Cont solvers), then ``abs_tol``, then ``rmse_tol``.
+    Returns ``(None, None)`` when nothing is found.
+    """
+    for attr in ("target_rmse_tol", "abs_tol", "rmse_tol"):
         try:
             val = float(getattr(sc, attr, None))
             if val > 0:
-                return val
+                return val, attr
         except (TypeError, ValueError):
             pass
-    return None
+    return None, None
 
 
 def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwargs):
@@ -523,13 +535,15 @@ def run_resume_case(case, throttle_iterations=True):
                 "loose_log": loose_log,
                 "resume_log": resume_log,
                 # Extra numeric fields for stage summary
-                "_loose_abs_tol": _get_sc_tol(sc1),
+                "_loose_abs_tol": _get_sc_tol(sc1)[0],
+                "_loose_tol_name": _get_sc_tol(sc1)[1],
                 "_loose_n": old_n,
                 "_loose_hw": loose_hw,
                 "_loose_iters": loose_iters,
                 "_loose_solution_f": loose_solution_f,
                 "_loose_time_f": loose_time_f,
-                "_resume_abs_tol": _get_sc_tol(sc2),
+                "_resume_abs_tol": _get_sc_tol(sc2)[0],
+                "_resume_tol_name": _get_sc_tol(sc2)[1],
                 "_resume_n": resume_n,
                 "_resume_hw": _safe_half_width(data2),
                 "_resume_iters": getattr(data2, "_iter_count", None),
@@ -571,7 +585,8 @@ def run_fresh_case(case, throttle_iterations=True):
                 "fresh_inputs": fresh_inputs,
                 "fresh_log": fresh_log,
                 # Extra numeric fields for stage summary
-                "_fresh_abs_tol": _get_sc_tol(sc),
+                "_fresh_abs_tol": _get_sc_tol(sc)[0],
+                "_fresh_tol_name": _get_sc_tol(sc)[1],
                 "_fresh_n": fresh_n,
                 "_fresh_hw": _safe_half_width(data),
                 "_fresh_iters": getattr(data, "_iter_count", None),
@@ -735,9 +750,16 @@ def write_combined_report(path, title, resume_rows, fresh_rows):
                     frow.get("_fresh_time_f", 0.0),
                 ),
             ]
+            # Use target_rmse_tol as the column header when all rows report that name
+            tol_names = {
+                rrow.get("_loose_tol_name"),
+                rrow.get("_resume_tol_name"),
+                frow.get("_fresh_tol_name"),
+            } - {None}
+            tol_header = "rmse_tol" if tol_names == {"target_rmse_tol"} else "abs_tol"
             stream = io.StringIO()
             with redirect_stdout(stream):
-                print_stage_summary(stage_rows, title=f"Stage summary of {name}")
+                print_stage_summary(stage_rows, title=f"Stage summary of {name}", tol_header=tol_header)
             summary_text = stream.getvalue().strip()
             lines.append("")
             lines.extend([f"  {line}" for line in summary_text.splitlines()])
