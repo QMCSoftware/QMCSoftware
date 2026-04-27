@@ -3,23 +3,8 @@ from parsl import bash_app
 import glob
 import os
 import re
-import time
 import platform
 from pathlib import Path
-import time
-import parsl as pl
-
-# Use ThreadPoolExecutor on macOS (avoids interchange.py spawn issue)
-# Use HighThroughputExecutor on Linux for better performance
-if platform.system() == "Darwin":
-    from parsl.config import Config
-    from parsl.executors import ThreadPoolExecutor
-
-    config = Config(
-        executors=[ThreadPoolExecutor(max_threads=8, label="local_threads")]
-    )
-else:
-    from parsl.configs.htex_local import config
 
 
 @bash_app

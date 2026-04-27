@@ -1,3 +1,11 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+---
+
 # True Measures
 
 ## UML Overview
@@ -47,6 +55,14 @@
 ## `Kumaraswamy`
 
 ::: qmcpy.true_measure.kumaraswamy.Kumaraswamy
+
+## `AcceptanceRejection`
+
+::: qmcpy.true_measure.acceptance_rejection.AcceptanceRejection
+
+## `AcceptanceRejectionReal`
+
+::: qmcpy.true_measure.acceptance_rejection.AcceptanceRejectionReal
 
 ## UML Specific
 

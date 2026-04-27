@@ -1,7 +1,6 @@
 import unittest
 import subprocess
 import os
-import sys
 import shutil
 from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest

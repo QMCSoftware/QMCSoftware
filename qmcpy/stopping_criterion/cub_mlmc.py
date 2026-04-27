@@ -5,9 +5,8 @@ from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
-from ..true_measure import Gaussian
 from ..integrand import FinancialOption
-from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning, ParameterWarning
+from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
 import numpy as np
 from scipy.stats import norm
 from time import time

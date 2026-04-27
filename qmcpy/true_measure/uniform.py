@@ -2,8 +2,6 @@ from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
-from scipy.stats import norm
-from typing import Union
 
 
 class Uniform(AbstractTrueMeasure):

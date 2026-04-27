@@ -1,15 +1,37 @@
 """Unit tests for subclasses of StoppingCriterion in QMCPy"""
 
+import builtins
+import importlib
 from qmcpy import *
 from qmcpy.util import *
 import numpy as np
 import unittest
+from unittest.mock import patch
 
 keister_2d_exact = 1.808186429263620
 tol = 0.005
 rel_tol = 0
 
+class TestStoppingCriterionImportFallbacks(unittest.TestCase):
+    def test_import_fallback_classes(self):
+        original_import = builtins.__import__
 
+        def _fake_import(name, *args, **kwargs):
+            if name in ("torch", "gpytorch"):
+                raise ImportError("forced import failure")
+            return original_import(name, *args, **kwargs)
+
+        with patch("builtins.__import__", side_effect=_fake_import):
+            sc_mod = importlib.import_module("qmcpy.stopping_criterion")
+            sc_mod = importlib.reload(sc_mod)
+            with self.assertRaises(ModuleNotFoundError):
+                sc_mod.PFGPCI()
+            with self.assertRaises(ModuleNotFoundError):
+                sc_mod.PFSampleErrorDensityAR()
+            with self.assertRaises(ModuleNotFoundError):
+                sc_mod.SuggesterSimple()
+        importlib.reload(importlib.import_module("qmcpy.stopping_criterion"))
+        
 class TestCubMCCLT(unittest.TestCase):
     """Unit tests for CubMCCLT StoppingCriterion."""
 
@@ -384,7 +406,6 @@ class TestCubQMCML(unittest.TestCase):
         )
         algorithm = CubQMCML(integrand, abs_tol=tol, n_limit=2**10)
         self.assertWarns(MaxSamplesWarning, algorithm.integrate)
-
 
 if __name__ == "__main__":
     unittest.main()
