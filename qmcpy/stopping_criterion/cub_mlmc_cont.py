@@ -156,6 +156,21 @@ class CubMLMCCont(AbstractCubMLMC):
         data.levels -= 1
 
     def integrate(self, resume=None):
+        """Run (or continue) the continuation-MLMC integration.
+
+        Args:
+            resume (Data, optional): Checkpoint returned by a previous
+                ``integrate()`` call.  The new tolerance may be tighter *or*
+                looser than the one used when the checkpoint was created.
+                With a tighter tolerance the algorithm picks up the tolerance
+                ladder from ``max(checkpoint_rmse_tol, target_rmse_tol)`` and
+                continues down to ``target_rmse_tol``.  With a looser tolerance
+                the first step immediately converges on the existing samples
+                and no additional ladder steps are needed.
+
+        Returns:
+            tuple: ``(solution, data)``.
+        """
         t_start = time()
         resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()

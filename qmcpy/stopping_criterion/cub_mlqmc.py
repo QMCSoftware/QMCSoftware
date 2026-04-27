@@ -5,7 +5,7 @@ from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
 from ..integrand import FinancialOption
-from ..util import MaxSamplesWarning, MaxLevelsWarning
+from ..util import MaxSamplesWarning, MaxLevelsWarning, ParameterError
 import numpy as np
 from scipy.stats import norm
 from time import time
@@ -123,14 +123,35 @@ class CubMLQMC(AbstractCubMLQMC):
 
     def _validate_resume(self, data):
         self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if np.shape(data.mean_level_reps) != (data.levels, int(self.replications)):
+            raise ParameterError(
+                "resume data mean_level_reps shape %s is incompatible with levels=%d, replications=%d."
+                % (np.shape(data.mean_level_reps), data.levels, int(self.replications))
+            )
 
     def _restore_resume_state(self, data):
         # eval_level is all-False at end of a converged run; the loop's first
         # update_data call is a no-op, then the algorithm re-evaluates variance
-        # and bias against the new (tighter) rmse_tol and samples accordingly.
+        # and bias against the new rmse_tol (tighter or looser) and samples
+        # accordingly.  With a looser tolerance the variance/bias conditions are
+        # already met and the loop exits immediately.
         pass
 
     def integrate(self, resume=None):
+        """Run (or continue) the MLQMC integration.
+
+        Args:
+            resume (Data, optional): Checkpoint returned by a previous
+                ``integrate()`` call.  The new tolerance may be tighter *or*
+                looser than the one used when the checkpoint was created.
+                With a tighter tolerance the algorithm draws additional samples
+                from where it left off.  With a looser tolerance the existing
+                samples already satisfy the requirement and the method returns
+                immediately with no new sampling.
+
+        Returns:
+            tuple: ``(solution, data)``.
+        """
         t_start = time()
         resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()

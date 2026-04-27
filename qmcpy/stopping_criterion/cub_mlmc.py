@@ -141,11 +141,27 @@ class CubMLMC(AbstractCubMLMC):
         # Undo the final data.levels += 1 stored in the returned data so the
         # internal loop convention (0-indexed last level) is restored.
         data.levels -= 1
-        # Recompute the optimal allocation for the new (tighter) rmse_tol.
+        # Recompute the optimal allocation for the new rmse_tol (may be tighter
+        # or looser than the checkpoint tolerance).  With a looser tolerance
+        # diff_n_level will be all-zero and the main loop exits immediately.
         n_samples = self._get_next_samples(data)
         data.diff_n_level = np.maximum(0, n_samples - data.n_level[: data.levels + 1])
 
     def integrate(self, resume=None):
+        """Run (or continue) the MLMC integration.
+
+        Args:
+            resume (Data, optional): Checkpoint returned by a previous
+                ``integrate()`` call.  The new tolerance may be tighter *or*
+                looser than the one used when the checkpoint was created.
+                With a tighter tolerance the algorithm draws additional samples
+                from where it left off.  With a looser tolerance the existing
+                samples already satisfy the requirement and the method returns
+                immediately with no new sampling.
+
+        Returns:
+            tuple: ``(solution, data)``.
+        """
         t_start = time()
         resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()
