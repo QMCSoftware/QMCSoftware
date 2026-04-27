@@ -115,10 +115,8 @@ class BaseNotebookTest(unittest.TestCase):
         notebook_path = self._notebook_test_path(notebook_path)
         # If stop_at_pattern or skip_patterns is provided, use testbook for selective execution
         if stop_at_pattern or skip_patterns:
-            with open(notebook_path) as f:
+            with open(notebook_path, encoding="utf-8") as f:
                 nb = nbformat.read(f, as_version=4)
-
-            # add skip_patterns to replacements and change each skip pattern to ""
             if skip_patterns:
                 if not replacements:
                     replacements = {}
@@ -172,7 +170,7 @@ class BaseNotebookTest(unittest.TestCase):
         # Otherwise use the original ExecutePreprocessor method
         from nbconvert.preprocessors import ExecutePreprocessor
 
-        with open(notebook_path) as f:
+        with open(notebook_path, encoding="utf-8") as f:
             nb = nbformat.read(f, as_version=4)
 
         # Apply replacements in memory if provided
