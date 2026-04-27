@@ -303,9 +303,10 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         resume_provenance = self._capture_resume_provenance(resume)
         first_resume_iter = False
         trace = self._make_trace_logger()
-        if resume is not None:
-            data = resume
-            self._validate_resume(data)
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is not None:
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
             data.n_min = int(data.n_total)
@@ -418,7 +419,23 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         return data.solution, data
 
     def _validate_resume(self, data):
-        self._validate_resume_with_state(data, required_fields=self._RESUME_REQUIRED_FIELDS, state_fields=self._RESUME_STATE_FIELDS)
+        self._validate_resume_with_state(
+            data,
+            required_fields=self._RESUME_REQUIRED_FIELDS,
+            state_fields=self._RESUME_STATE_FIELDS,
+        )
+        n_total = int(data.n_total)
+        output_shape = self.integrand.d_indv + (n_total,)
+        self._validate_resume_shape("xfull", data.xfull, (n_total, self.integrand.d))
+        self._validate_resume_shape("yfull", data.yfull, output_shape)
+        self._validate_resume_shape("_ytildefull", data._ytildefull, output_shape)
+        self._validate_resume_shape("n", data.n, self.integrand.d_indv)
+        if int(np.max(np.asarray(data.n))) != n_total:
+            raise ParameterError("resume data n must be consistent with n_total.")
+        if int(data.n_max) != n_total:
+            raise ParameterError("resume data n_total must match n_max.")
+        if not self._is_power_of_two(n_total):
+            raise ParameterError("resume data n_total must be a power of 2.")
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
         assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."

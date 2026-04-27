@@ -1,6 +1,7 @@
 """Unit tests for subclasses of StoppingCriterion in QMCPy"""
 
 import builtins
+import copy
 import importlib
 import io
 import os
@@ -19,10 +20,9 @@ from qmcpy.util.data import Data
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from qmcpy.integrand.abstract_integrand import AbstractIntegrand
 from qmcpy.stopping_criterion.abstract_stopping_criterion import (
-    _IterationTraceLogger,
     AbstractStoppingCriterion,
-    print_diagnostic,
 )
+from qmcpy.stopping_criterion.diagnostics import _IterationTraceLogger, print_diagnostic
 
 
 # Test functions and parameters
@@ -664,27 +664,66 @@ class TestResumeFeature(unittest.TestCase):
     def _multilevel_builder(self, stopping_criterion, integrand_factory, tol_kwarg, tol):
         return lambda: stopping_criterion(integrand_factory(), **{tol_kwarg: tol}, n_limit=self.n_limit)
 
-    def _assert_resume_behavior(self, label, loose_builder, tight_builder, compare_to_fresh=False, rtol=0.5, skip_exceptions=()):
+    def _assert_resume_behavior(
+        self,
+        label,
+        loose_builder,
+        tight_builder,
+        compare_to_fresh=False,
+        rtol=1e-12,
+        atol=1e-12,
+        skip_exceptions=(),
+    ):
         def _run_assertions():
             sc1 = loose_builder()
             _, data1 = sc1.integrate()
-            old_n_total = int(data1.n_total)  # save before resume mutates data1 in-place
+            old_n_total = int(data1.n_total)
+            old_xfull = (
+                np.array(data1.xfull, copy=True) if hasattr(data1, "xfull") else None
+            )
 
             sc2 = tight_builder()
             sol2, data2 = sc2.integrate(resume=data1)
 
+            self.assertIsNot(
+                data2, data1, msg=f"{label} resume should not mutate the input checkpoint"
+            )
             self.assertTrue(hasattr(data2, "n_total"), msg=f"{label} missing n_total")
             self.assertTrue(
                 data2.n_total >= old_n_total,
                 msg=f"{label} resume did not preserve/increase n_total",
             )
+            self.assertEqual(
+                int(data1.n_total),
+                old_n_total,
+                msg=f"{label} mutated the input checkpoint sample count",
+            )
+            if old_xfull is not None:
+                self.assertTrue(
+                    np.array_equal(data1.xfull, old_xfull),
+                    msg=f"{label} mutated the input checkpoint samples",
+                )
+                self.assertTrue(
+                    np.array_equal(data2.xfull[:old_n_total], old_xfull),
+                    msg=f"{label} did not reuse the checkpoint sample prefix exactly",
+                )
 
             if compare_to_fresh:
                 sc3 = tight_builder()
-                sol3, _ = sc3.integrate()
+                sol3, data3 = sc3.integrate()
                 self.assertTrue(
-                    np.allclose(sol2, sol3, rtol=rtol),
+                    np.allclose(sol2, sol3, rtol=rtol, atol=atol),
                     msg=f"{label} resume solution diverged from fresh run",
+                )
+                self.assertTrue(
+                    np.array_equal(data2.xfull, data3.xfull),
+                    msg=f"{label} resume samples diverged from fresh run",
+                )
+                self.assertTrue(
+                    np.allclose(
+                        data2.yfull, data3.yfull, rtol=rtol, atol=atol, equal_nan=True
+                    ),
+                    msg=f"{label} resume integrand evaluations diverged from fresh run",
                 )
 
         if skip_exceptions:
@@ -719,7 +758,6 @@ class TestResumeFeature(unittest.TestCase):
                     self._keister_builder(stopping_criterion, distribution_factory, self.loose_abs_tol),
                     self._keister_builder(stopping_criterion, distribution_factory, self.tight_abs_tol),
                     compare_to_fresh=True,
-                    rtol=0.5,
                     skip_exceptions=skip_exceptions,
                 )
 
@@ -832,6 +870,32 @@ class TestResumeCheckpointing(unittest.TestCase):
     def _make_integrand(self, dimension=None, seed=None):
         return Keister(IIDStdUniform(dimension=self.dimension if dimension is None else dimension, seed=self.seed if seed is None else seed))
 
+    def _make_qmc_checkpoint(self):
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.loose_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        return checkpoint
+
+    def _make_bayes_checkpoint(self):
+        loose_sc = CubBayesLatticeG(
+            Keister(
+                Lattice(
+                    dimension=self.dimension,
+                    seed=self.seed,
+                    order="RADICAL INVERSE",
+                )
+            ),
+            abs_tol=self.loose_abs_tol,
+            n_init=2**5,
+            n_limit=self.n_limit,
+        )
+        _, checkpoint = loose_sc.integrate()
+        return checkpoint
+
     def test_cub_mc_clt_resume_raises_parameter_error(self):
         loose_sc = CubMCCLT(
             self._make_integrand(),
@@ -912,15 +976,10 @@ class TestResumeCheckpointing(unittest.TestCase):
                 Data.load(path)
 
     def test_resume_metadata_and_provenance_are_recorded(self):
-        loose_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.loose_abs_tol,
-            n_init=2**8,
-            n_limit=self.n_limit,
-        )
-        _, checkpoint = loose_sc.integrate()
+        checkpoint = self._make_qmc_checkpoint()
         old_n_total = int(checkpoint.n_total)
         old_total_time = float(checkpoint.time_integrate_total)
+        old_xfull = np.array(checkpoint.xfull, copy=True)
 
         self.assertFalse(checkpoint.resumed)
         self.assertEqual(checkpoint.n_resume_from, 0)
@@ -941,6 +1000,7 @@ class TestResumeCheckpointing(unittest.TestCase):
         )
         _, resumed = tight_sc.integrate(resume=checkpoint)
 
+        self.assertIsNot(resumed, checkpoint)
         self.assertTrue(resumed.resumed)
         self.assertEqual(resumed.n_resume_from, old_n_total)
         self.assertAlmostEqual(resumed.time_integrate_previous, old_total_time)
@@ -949,6 +1009,79 @@ class TestResumeCheckpointing(unittest.TestCase):
             resumed.time_integrate_total,
             resumed.time_integrate_previous + resumed.time_integrate_resume,
         )
+        self.assertFalse(checkpoint.resumed)
+        self.assertEqual(checkpoint.n_resume_from, 0)
+        self.assertEqual(int(checkpoint.n_total), old_n_total)
+        self.assertTrue(np.array_equal(checkpoint.xfull, old_xfull))
+
+    def test_qmc_resume_rejects_inconsistent_checkpoint_state(self):
+        checkpoint = self._make_qmc_checkpoint()
+        cases = []
+
+        bad = copy.deepcopy(checkpoint)
+        bad.xfull = bad.xfull[:-1]
+        cases.append(("xfull_length", bad))
+
+        bad = copy.deepcopy(checkpoint)
+        bad.n_max = int(bad.n_total) * 2
+        cases.append(("n_max", bad))
+
+        bad = copy.deepcopy(checkpoint)
+        bad.n_total = 192
+        bad.n_max = 192
+        bad.xfull = bad.xfull[:192]
+        bad.yfull = bad.yfull[..., :192]
+        bad._ytildefull = bad._ytildefull[..., :192]
+        bad._kappanumap = bad._kappanumap[..., :192]
+        bad.n = np.minimum(np.asarray(bad.n), 192)
+        cases.append(("non_power_of_two_n_total", bad))
+
+        tight_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
+            abs_tol=self.tight_abs_tol,
+            n_init=2**8,
+            n_limit=self.n_limit,
+        )
+        for label, bad_checkpoint in cases:
+            with self.subTest(case=label):
+                with self.assertRaises(ParameterError):
+                    tight_sc.integrate(resume=bad_checkpoint)
+
+    def test_bayes_resume_rejects_inconsistent_checkpoint_state(self):
+        checkpoint = self._make_bayes_checkpoint()
+        cases = []
+
+        bad = copy.deepcopy(checkpoint)
+        bad._ytildefull = bad._ytildefull[..., :-1]
+        cases.append(("transform_length", bad))
+
+        bad = copy.deepcopy(checkpoint)
+        bad.n_total = 48
+        bad.n_max = 48
+        bad.xfull = np.concatenate([bad.xfull, bad.xfull[:16]], axis=0)
+        bad.yfull = np.concatenate([bad.yfull, bad.yfull[..., :16]], axis=-1)
+        bad._ytildefull = np.concatenate(
+            [bad._ytildefull, bad._ytildefull[..., :16]], axis=-1
+        )
+        bad.n = np.full_like(np.asarray(bad.n), 48)
+        cases.append(("non_power_of_two_n_total", bad))
+
+        tight_sc = CubBayesLatticeG(
+            Keister(
+                Lattice(
+                    dimension=self.dimension,
+                    seed=self.seed,
+                    order="RADICAL INVERSE",
+                )
+            ),
+            abs_tol=self.tight_abs_tol,
+            n_init=2**5,
+            n_limit=self.n_limit,
+        )
+        for label, bad_checkpoint in cases:
+            with self.subTest(case=label):
+                with self.assertRaises(ParameterError):
+                    tight_sc.integrate(resume=bad_checkpoint)
 
     def test_resume_rejects_incompatible_checkpoint_format_version(self):
         loose_sc = CubQMCLatticeG(
@@ -1042,6 +1175,9 @@ class TestResumeCheckpointing(unittest.TestCase):
             n_limit=self.n_limit,
         )
         _, resumed = tight_sc.integrate(resume=loaded)
+        self.assertIsNot(resumed, loaded)
+        self.assertEqual(int(loaded.n_total), old_n_total)
+        self.assertTrue(np.array_equal(loaded.xfull, old_xfull))
         self.assertTrue(np.array_equal(resumed.xfull[:old_n_total], old_xfull))
         n_new = int(resumed.n_total) - old_n_total
         if n_new > 0:

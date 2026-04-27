@@ -176,10 +176,36 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         return beta
 
     def _validate_resume(self, data):
+        required_fields = self._RESUME_REQUIRED_FIELDS
         state_fields = self._RESUME_STATE_FIELDS
         if self.ncv > 0:
+            required_fields = required_fields + ("ycvfull", "beta")
             state_fields = state_fields + ("_ycvtildefull",)
-        self._validate_resume_with_state(data, required_fields=self._RESUME_REQUIRED_FIELDS, state_fields=state_fields)
+        self._validate_resume_with_state(
+            data, required_fields=required_fields, state_fields=state_fields
+        )
+        n_total = int(data.n_total)
+        output_shape = self.integrand.d_indv + (n_total,)
+        self._validate_resume_shape("xfull", data.xfull, (n_total, self.integrand.d))
+        self._validate_resume_shape("yfull", data.yfull, output_shape)
+        self._validate_resume_shape("_ytildefull", data._ytildefull, output_shape)
+        self._validate_resume_shape("_kappanumap", data._kappanumap, output_shape)
+        self._validate_resume_shape("n", data.n, self.integrand.d_indv)
+        if int(np.max(np.asarray(data.n))) != n_total:
+            raise ParameterError("resume data n must be consistent with n_total.")
+        if int(data.n_max) != n_total:
+            raise ParameterError("resume data n_total must match n_max.")
+        if not self._is_power_of_two(n_total):
+            raise ParameterError("resume data n_total must be a power of 2.")
+        if self.ncv > 0:
+            cv_shape = self.integrand.d_indv + (self.ncv, n_total)
+            self._validate_resume_shape("ycvfull", data.ycvfull, cv_shape)
+            self._validate_resume_shape(
+                "_ycvtildefull", data._ycvtildefull, cv_shape
+            )
+            self._validate_resume_shape(
+                "beta", data.beta, self.integrand.d_indv + (self.ncv,)
+            )
 
     def integrate(self, resume=None):
         t_start = time()
@@ -187,9 +213,10 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         first_resume_iter = False
         trace = self._make_trace_logger()
 
-        if resume is not None:
-            data = resume
-            self._validate_resume(data)
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is not None:
             # Reset flags so all components are re-evaluated against the new tolerance.
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
