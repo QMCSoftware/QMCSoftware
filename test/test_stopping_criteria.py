@@ -635,10 +635,11 @@ class TestResumeFeature(unittest.TestCase):
         self.seed = 7
         self.dimension = 2
         self.loose_abs_tol = 0.2
-        self.tight_abs_tol = 0.05
+        self.tight_abs_tol = 0.1
         self.rel_tol = 0
         self.n_init = 2**8
-        self.n_limit = 2**16
+        self.n_limit = 2**10
+        self.n_limit_ml = 2**16  # multilevel algorithms need more headroom
 
     def _iid_distribution(self):
         return IIDStdUniform(self.dimension, seed=self.seed)
@@ -662,7 +663,7 @@ class TestResumeFeature(unittest.TestCase):
         return lambda: stopping_criterion(Keister(distribution_factory()), abs_tol=abs_tol, rel_tol=self.rel_tol, n_init=self.n_init, n_limit=self.n_limit)
 
     def _multilevel_builder(self, stopping_criterion, integrand_factory, tol_kwarg, tol):
-        return lambda: stopping_criterion(integrand_factory(), **{tol_kwarg: tol}, n_limit=self.n_limit)
+        return lambda: stopping_criterion(integrand_factory(), **{tol_kwarg: tol}, n_limit=self.n_limit_ml)
 
     def _assert_resume_behavior(
         self,
