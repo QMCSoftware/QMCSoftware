@@ -572,9 +572,9 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
     def test_multilevel_rmse_tol_overrides_abs_tol(self):
         cases = [
             ("CubMLMC", CubMLMC, self._iid_financial_option, "rmse_tol"),
-            ("CubMLMCCont", CubMLMCCont, self._iid_financial_option, "target_tol"),
+            ("CubMLMCCont", CubMLMCCont, self._iid_financial_option, "target_rmse_tol"),
             ("CubMLQMC", CubMLQMC, self._qmc_financial_option, "rmse_tol"),
-            ("CubMLQMCCont", CubMLQMCCont, self._qmc_financial_option, "target_tol"),
+            ("CubMLQMCCont", CubMLQMCCont, self._qmc_financial_option, "target_rmse_tol"),
         ]
         for label, cls, integrand_factory, attr in cases:
             with self.subTest(stopping_criterion=label):
@@ -595,7 +595,7 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
                 sc = cls(
                     integrand_factory(), rmse_tol=0.1, levels_min=2, levels_max=levels_max
                 )
-                sc.rmse_tol = sc.target_tol
+                sc.rmse_tol = sc.target_rmse_tol
                 data = sc._construct_data()
                 data.n_total = 0
                 data.levels = sc.levels_max
@@ -790,7 +790,7 @@ class TestResumeFeature(unittest.TestCase):
                 data = type("ResumeData", (), {"solution": 0.0, "levels": 5})()
                 captured = {}
 
-                def fake_integrate(resume_data, skip_level_reset=False):
+                def fake_integrate(resume_data, skip_level_reset=False, step_tol=None):
                     captured["levels"] = resume_data.levels
                     captured["skip_level_reset"] = skip_level_reset
 
@@ -800,7 +800,7 @@ class TestResumeFeature(unittest.TestCase):
 
                 self.assertEqual(captured["levels"], expected_levels)
                 self.assertTrue(captured["skip_level_reset"])
-                self.assertEqual(sc.rmse_tol, sc.target_tol)
+                self.assertEqual(sc.rmse_tol, sc.target_rmse_tol)
 
     def test_qmc_resume_rejects_missing_transform_state(self):
         loose_sc = CubQMCLatticeG(
@@ -967,6 +967,37 @@ class TestResumeCheckpointing(unittest.TestCase):
             data.save(gzip_path, compress=True)
             loaded_gzip = Data.load(gzip_path)
             self.assertTrue(np.array_equal(loaded_gzip.value, data.value))
+
+    def test_data_save_returns_final_path_and_gz_suffix(self):
+        data = Data(parameters=["value"])
+        data.value = np.array([1.0])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir) / "chk.pkl"
+            plain_path = data.save(base)
+            self.assertEqual(plain_path, str(base))
+            gz_path = data.save(Path(tmpdir) / "chk2.pkl", compress=True)
+            self.assertTrue(gz_path.endswith(".gz"))
+
+    def test_data_save_raises_file_exists_error_without_overwrite(self):
+        data = Data(parameters=["value"])
+        data.value = np.array([1.0])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "chk.pkl"
+            data.save(path)
+            with self.assertRaises(FileExistsError):
+                data.save(path)
+
+    def test_data_save_overwrite_replaces_existing_file(self):
+        data1 = Data(parameters=["value"])
+        data1.value = np.array([1.0])
+        data2 = Data(parameters=["value"])
+        data2.value = np.array([99.0])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "chk.pkl"
+            data1.save(path)
+            data2.save(path, overwrite=True)
+            loaded = Data.load(path)
+            self.assertTrue(np.array_equal(loaded.value, data2.value))
 
     def test_data_load_rejects_non_data_checkpoint(self):
         with tempfile.TemporaryDirectory() as tmpdir:

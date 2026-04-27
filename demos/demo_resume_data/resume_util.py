@@ -64,7 +64,11 @@ def _format_problem_inputs(stopping_criterion):
 
     add_scalar("abs_tol", getattr(stopping_criterion, "abs_tol", None))
     add_scalar("rel_tol", getattr(stopping_criterion, "rel_tol", None))
-    add_scalar("rmse_tol", getattr(stopping_criterion, "rmse_tol", None))
+    _target_rmse_tol = getattr(stopping_criterion, "target_rmse_tol", None)
+    if _target_rmse_tol is not None:
+        add_scalar("target_rmse_tol", _target_rmse_tol)
+    else:
+        add_scalar("rmse_tol", getattr(stopping_criterion, "rmse_tol", None))
     add_int("n_init", getattr(stopping_criterion, "n_init", None))
     add_int("n_limit", getattr(stopping_criterion, "n_limit", None))
     add_int("levels_min", getattr(stopping_criterion, "levels_min", None))

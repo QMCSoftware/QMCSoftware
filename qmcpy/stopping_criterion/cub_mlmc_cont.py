@@ -120,9 +120,10 @@ class CubMLMCCont(AbstractCubMLMC):
             raise ParameterError("needs n_init > 0")
         # initialization
         if rmse_tol:
-            self.target_tol = float(rmse_tol)
+            self.target_rmse_tol = float(rmse_tol)
         else:  # use absolute tolerance
-            self.target_tol = float(abs_tol) / norm.ppf(1 - alpha / 2)
+            self.target_rmse_tol = float(abs_tol) / norm.ppf(1 - alpha / 2)
+        self.rmse_tol = self.target_rmse_tol  # user-facing attribute; never mutated after __init__
         self.n_init = n_init
         self.n_limit = n_limit
         self.levels_min = levels_min
@@ -153,8 +154,6 @@ class CubMLMCCont(AbstractCubMLMC):
     def _restore_resume_state(self, data):
         # Undo the final data.levels += 1 stored in the returned data.
         data.levels -= 1
-        # Jump straight to the target tolerance in a single _integrate call.
-        self.rmse_tol = self.target_tol
 
     def integrate(self, resume=None):
         t_start = time()
@@ -164,15 +163,21 @@ class CubMLMCCont(AbstractCubMLMC):
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
             if data is not None:
-                data.rmse_tol = self.rmse_tol
+                step_tol = max(getattr(data, 'rmse_tol', self.target_rmse_tol), self.target_rmse_tol)
+                data.rmse_tol = step_tol
                 trace.resume(data, step_value=int(data.levels + 1))
-                self._integrate(data, skip_level_reset=True)
+                self._integrate(data, skip_level_reset=True, step_tol=step_tol)
+                # Continue down the tolerance ladder for any steps tighter than the resume step_tol
+                for t in range(self.n_tols):
+                    next_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
+                    if next_tol < step_tol:
+                        self._integrate(data, step_tol=next_tol)
             else:
                 data = self._construct_data()
                 # Loop over coarser tolerances
                 for t in range(self.n_tols):
-                    self.rmse_tol = self.inflate ** (self.n_tols - t - 1) * self.target_tol  # Set new target tolerance
-                    self._integrate(data)
+                    step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
+                    self._integrate(data, step_tol=step_tol)
             self._finalize_integration_data(
                 data, time() - t_start, resume_provenance=resume_provenance
             )
@@ -193,7 +198,9 @@ class CubMLMCCont(AbstractCubMLMC):
         data.level_integrands = []
         return data
 
-    def _integrate(self, data, skip_level_reset=False, trace=None):
+    def _integrate(self, data, skip_level_reset=False, trace=None, step_tol=None):
+        if step_tol is None:
+            step_tol = self.rmse_tol
         trace = getattr(self, "_active_trace", None) if trace is None else trace
         self.theta = self.theta_init
         if not skip_level_reset:
@@ -207,7 +214,7 @@ class CubMLMCCont(AbstractCubMLMC):
                 / data.n_level[: data.levels + 1][valid]
             ).sum()
         if trace is not None and warmup_drew:
-            data.rmse_tol = self.rmse_tol
+            data.rmse_tol = step_tol
             trace.iteration(data, step_value=int(data.levels + 1))
 
         converged = False
@@ -225,7 +232,7 @@ class CubMLMCCont(AbstractCubMLMC):
                         / data.n_level[: data.levels + 1][valid]
                     ).sum()
                 if trace is not None:
-                    data.rmse_tol = self.rmse_tol
+                    data.rmse_tol = step_tol
                     trace.iteration(data, step_value=int(data.levels + 1))
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 # data.diff_n_level = self._get_next_samples(data)
@@ -233,7 +240,7 @@ class CubMLMCCont(AbstractCubMLMC):
                 # data.diff_n_level[data.levels] = max(3, min(self.n_init, data.diff_n_level[data.levels]))
 
             # Update splitting parameter
-            self._update_theta(data)
+            self._update_theta(data, step_tol)
 
             # Set optimal number of additional samples
             n_samples = self._get_next_samples(data)
@@ -264,11 +271,11 @@ class CubMLMCCont(AbstractCubMLMC):
                     / data.n_level[: data.levels + 1][valid]
                 ).sum()
             if trace is not None:
-                data.rmse_tol = self.rmse_tol
+                data.rmse_tol = step_tol
                 trace.iteration(data, step_value=int(data.levels + 1))
 
             # Check for convergence
-            converged = self._rmse(data) < self.rmse_tol
+            converged = self._rmse(data) < step_tol
             if not converged:
                 if data.levels == self.levels_max:
                     warnings.warn(
@@ -285,11 +292,11 @@ class CubMLMCCont(AbstractCubMLMC):
         ).sum()
         data.levels += 1
 
-    def _update_theta(self, data):
+    def _update_theta(self, data, step_tol):
         # Update error splitting parameter
         self.theta = max(
             0.01,
-            min(0.5, (self._bias(data, len(data.n_level) - 1) / self.rmse_tol) ** 2),
+            min(0.5, (self._bias(data, len(data.n_level) - 1) / step_tol) ** 2),
         )
 
     def _rmse(self, data):

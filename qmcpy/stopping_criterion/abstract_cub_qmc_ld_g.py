@@ -8,6 +8,16 @@ from time import time
 import warnings
 
 
+def _default_fudge(m):
+    """Default fudge factor: 5 * 2**(-m)."""
+    return 5.0 * 2.0 ** (-m)
+
+
+def _lstsq_pyfunc(x, y):
+    """Least-squares solve used by the vectorized vlstsq attribute."""
+    return np.linalg.lstsq(x.T, y, rcond=None)[0]
+
+
 class AbstractCubQMCLDG(AbstractStoppingCriterion):
     _RESUME_REQUIRED_FIELDS = (
         "solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n", "n_max", "xfull", "yfull"
@@ -66,18 +76,21 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             )
             self.n_limit = dd_n_limit
         assert isinstance(error_fun, str) or callable(error_fun)
+        _error_fun_key = None
         if isinstance(error_fun, str):
-            if error_fun.upper() == "EITHER":
+            _error_fun_key = error_fun.upper()
+            if _error_fun_key == "EITHER":
                 error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
                     abs_tol, abs(sv) * rel_tol
                 )
-            elif error_fun.upper() == "BOTH":
+            elif _error_fun_key == "BOTH":
                 error_fun = lambda sv, abs_tol, rel_tol: np.minimum(
                     abs_tol, abs(sv) * rel_tol
                 )
             else:
                 raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
         self.error_fun = error_fun
+        self._error_fun_key = _error_fun_key  # used by __getstate__ for pickling
         self.fudge = fudge
         self.check_cone = check_cone
         self.ft = ft
@@ -135,7 +148,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         else:
             self.update_beta = False
         self.vlstsq = np.vectorize(
-            lambda x, y: np.linalg.lstsq(x.T, y, rcond=None)[0],
+            _lstsq_pyfunc,
             signature="(k,m),(m)->(k)",
         )
 
@@ -174,6 +187,40 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         x4beta = np.take_along_axis(ycvtildefull, kappa_approx[..., None, :], axis=-1)
         beta = self.vlstsq(x4beta, y4beta)
         return beta
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # omg_circ and omg_hat are local lambdas that pickle cannot serialize.
+        # Replace them with sentinels; __setstate__ rebuilds them.
+        state['omg_circ'] = '__default__'
+        state['omg_hat'] = '__default__'
+        # error_fun is also a local lambda when constructed from a string keyword.
+        # Replace with the canonical string form so it can be reconstructed.
+        if self._error_fun_key is not None:
+            state['error_fun'] = self._error_fun_key
+        # fudge may be a local lambda (e.g. default arg in subclass __init__).
+        # If it's the default, replace with a sentinel; otherwise leave for pickle.
+        if getattr(self.fudge, '__name__', None) == '<lambda>':
+            state['fudge'] = '__default_fudge__'
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Rebuild omg_circ and omg_hat from their sentinels.
+        self.omg_circ = lambda m: 2 ** (-m)
+        self.omg_hat = lambda m: self.fudge(m) / (
+            (1 + self.fudge(self.r_lag)) * self.omg_circ(self.r_lag)
+        )
+        # Rebuild error_fun from its string key if present.
+        if isinstance(self.error_fun, str):
+            key = self.error_fun.upper()
+            if key == 'EITHER':
+                self.error_fun = lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)
+            elif key == 'BOTH':
+                self.error_fun = lambda sv, abs_tol, rel_tol: np.minimum(abs_tol, abs(sv) * rel_tol)
+        # Rebuild fudge from its sentinel.
+        if self.fudge == '__default_fudge__':
+            self.fudge = _default_fudge
 
     def _validate_resume(self, data):
         required_fields = self._RESUME_REQUIRED_FIELDS

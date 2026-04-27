@@ -1,4 +1,4 @@
-from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
+from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG, _default_fudge
 from ..fast_transform import fwht, omega_fwht
 from ..util import ParameterError
 from ..discrete_distribution import DigitalNetB2
@@ -203,7 +203,7 @@ class CubQMCNetG(AbstractCubQMCLDG):
         n_init=2**10,
         n_limit=2**35,
         error_fun="EITHER",
-        fudge=lambda m: 5.0 * 2.0 ** (-m),
+        fudge=_default_fudge,
         check_cone=False,
         control_variates=None,
         control_variate_means=None,

@@ -49,18 +49,21 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         self.n_init = int(n_init)
         self.n_limit = int(n_limit)
         assert isinstance(error_fun, str) or callable(error_fun)
+        _error_fun_key = None
         if isinstance(error_fun, str):
-            if error_fun.upper() == "EITHER":
+            _error_fun_key = error_fun.upper()
+            if _error_fun_key == "EITHER":
                 error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
                     abs_tol, abs(sv) * rel_tol
                 )
-            elif error_fun.upper() == "BOTH":
+            elif _error_fun_key == "BOTH":
                 error_fun = lambda sv, abs_tol, rel_tol: np.minimum(
                     abs_tol, abs(sv) * rel_tol
                 )
             else:
                 raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
         self.error_fun = error_fun
+        self._error_fun_key = _error_fun_key  # used by __getstate__ for pickling
         self.alpha = alpha
         # QMCPy Objs
         self.integrand = integrand
@@ -179,6 +182,24 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         self.error_bound = err_bd
         muhat = np.abs(muhat)
         return muhat, err_bd
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # error_fun is a local lambda when constructed from a string keyword.
+        # Replace with the canonical string form so it can be reconstructed.
+        if self._error_fun_key is not None:
+            state['error_fun'] = self._error_fun_key
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Rebuild error_fun from its string key if present.
+        if isinstance(self.error_fun, str):
+            key = self.error_fun.upper()
+            if key == 'EITHER':
+                self.error_fun = lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)
+            elif key == 'BOTH':
+                self.error_fun = lambda sv, abs_tol, rel_tol: np.minimum(abs_tol, abs(sv) * rel_tol)
 
     # objective function to estimate parameter theta
     # MLE : Maximum likelihood estimation

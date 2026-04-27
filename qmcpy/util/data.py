@@ -1,9 +1,5 @@
 import gzip
 import pickle
-try:
-    import dill as _serializer
-except ImportError:
-    _serializer = pickle
 
 from ..util import _univ_repr
 
@@ -17,9 +13,9 @@ class Data(object):
         """Save this Data object to disk using pickle.
 
         Warning:
-            ``pickle`` and ``dill`` files are not secure against untrusted
-            input. Only save and later load checkpoint files that you created
-            yourself or that come from a trusted source.
+            ``pickle`` files are not secure against untrusted input. Only save
+            and later load checkpoint files that you created yourself or that
+            come from a trusted source.
 
         Args:
             path (str or pathlib.Path): File path to save to. If
@@ -27,27 +23,39 @@ class Data(object):
                 when not already present.
             compress (bool, optional): Gzip-compress the saved file. Defaults
                 to False.
-            overwrite (bool, optional): If False (default), skip saving when
-                the file already exists. If True, overwrite any existing file.
+            overwrite (bool, optional): If False (default), raise
+                ``FileExistsError`` when the file already exists. If True,
+                overwrite any existing file.
+
+        Returns:
+            str: The final path the file was written to (may differ from
+            *path* when ``compress=True`` appends ``.gz``).
+
+        Raises:
+            FileExistsError: If the target path already exists and
+                ``overwrite=False``.
         """
         import os
         path = str(path)
         if compress and not path.endswith(".gz"):
             path = path + ".gz"
         if not overwrite and os.path.exists(path):
-            return
+            raise FileExistsError(
+                f"{path} already exists; pass overwrite=True to replace it."
+            )
         open_fn = gzip.open if path.endswith(".gz") else open
         with open_fn(path, "wb") as f:
-            _serializer.dump(self, f)
+            pickle.dump(self, f)
+        return path
 
     @classmethod
     def load(cls, path):
         """Load a Data object from disk.
 
         Warning:
-            ``pickle`` and ``dill`` deserialization can execute arbitrary
-            code. Only load checkpoint files that you created yourself or that
-            come from a trusted source.
+            ``pickle`` deserialization can execute arbitrary code. Only load
+            checkpoint files that you created yourself or that come from a
+            trusted source.
 
         Args:
             path (str or pathlib.Path): Path to the saved file. Files ending
@@ -59,7 +67,7 @@ class Data(object):
         path = str(path)
         open_fn = gzip.open if path.endswith(".gz") else open
         with open_fn(path, "rb") as f:
-            loaded = _serializer.load(f)
+            loaded = pickle.load(f)
         if not isinstance(loaded, cls):
             raise TypeError(
                 "checkpoint did not contain a %s instance; got %s."
