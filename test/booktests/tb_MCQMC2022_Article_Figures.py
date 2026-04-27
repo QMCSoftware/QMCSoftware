@@ -1,9 +1,8 @@
 import unittest
-import subprocess
 import os
 import shutil
 from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import TB_TIMEOUT, BaseNotebookTest, pip_install
 
 
 @unittest.skip("Skipping NotebookTests class")
@@ -12,7 +11,7 @@ class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()
         # Install required packages
-        subprocess.run(["pip", "install", "-q", "matplotlib", "umbridge"], check=False)
+        pip_install("matplotlib", "umbridge")
         # Create outputs directory if needed
         os.makedirs("outputs", exist_ok=True)
         demos_path = "../../demos/talk_paper_demos/MCQMC2022_Article_Figures/"

@@ -10,6 +10,7 @@ import gc
 import time
 import os
 import subprocess
+import sys
 from testbook import testbook
 import nbformat
 import matplotlib
@@ -18,8 +19,6 @@ import uuid
 matplotlib.rcParams["text.usetex"] = False  # Disable LaTeX
 
 TB_TIMEOUT = 3600
-subprocess.run(["pip", "install", "-q", "psutil", "testbook", "parsl"], check=False)
-
 
 def notebook_test_path(notebook_path):
     """Return a testbook-safe absolute notebook path string."""
@@ -27,6 +26,23 @@ def notebook_test_path(notebook_path):
     if not path.is_absolute():
         path = Path(__file__).resolve().parent / path
     return path.resolve(strict=False).as_posix()
+
+
+def pip_install(*packages):
+    """Attempt to install packages with the active Python's pip without failing."""
+    if not packages:
+        return
+    # check if a package in input exists, take it out of the later installation
+    packages_to_install = []
+    for package in packages:
+        try:
+            __import__(package)
+        except ImportError:
+            packages_to_install.append(package)
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-q", *packages_to_install],
+        check=False,
+    )
 
 
 class BaseNotebookTest(unittest.TestCase):
