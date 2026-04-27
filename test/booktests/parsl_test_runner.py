@@ -4,7 +4,6 @@ import glob
 import os
 import re
 import platform
-import shlex
 import sys
 from pathlib import Path
 
@@ -16,10 +15,20 @@ def run_single_test(
     stdout="test_output.txt",
     stderr="test_error.txt",
 ):
-    """Run a single test file using the same Python as the parent runner."""
+    """Run a single test file using the same Python as the parent runner.
+
+    The `bash_app` body returns a shell command string, so quote dynamic
+    arguments here without relying on additional module imports in the worker
+    context.
+    """
+    def shell_quote(value):
+        """Return a POSIX-safe single-quoted shell argument."""
+        value = str(value)
+        return "'" + value.replace("'", "'\"'\"'") + "'"
+
     python_executable = python_executable or sys.executable
-    python_executable = shlex.quote(str(python_executable))
-    test_file = shlex.quote(str(test_file))
+    python_executable = shell_quote(python_executable)
+    test_file = shell_quote(test_file)
     return f"""
     PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" {python_executable} -m coverage run --append --source=../../qmcpy/ -m unittest {test_file} 2>&1
     """

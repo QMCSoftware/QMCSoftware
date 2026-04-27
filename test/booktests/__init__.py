@@ -20,13 +20,6 @@ matplotlib.rcParams["text.usetex"] = False  # Disable LaTeX
 
 TB_TIMEOUT = 3600
 
-def notebook_test_path(notebook_path):
-    """Return a testbook-safe absolute notebook path string."""
-    path = Path(notebook_path)
-    if not path.is_absolute():
-        path = Path(__file__).resolve().parent / path
-    return path.resolve(strict=False).as_posix()
-
 
 def pip_install(*packages):
     """Attempt to install packages with the active Python's pip without failing."""
@@ -47,6 +40,13 @@ def pip_install(*packages):
 
 class BaseNotebookTest(unittest.TestCase):
     """Base class for notebook tests with automatic memory cleanup"""
+
+    def _notebook_test_path(self, notebook_path):
+        """Return a testbook-safe absolute notebook path string."""
+        path = Path(notebook_path)
+        if not path.is_absolute():
+            path = Path(__file__).resolve().parent / path
+        return path.resolve(strict=False).as_posix()
 
     def get_memory_usage(self):
         """Get current memory usage in GB"""
@@ -71,7 +71,7 @@ class BaseNotebookTest(unittest.TestCase):
     # -- Shared helpers for notebook tests -------------------------------------------------
     def locate_notebook(self, rel_path):
         """Return absolute notebook path and its directory. Skip test if missing."""
-        notebook_path = notebook_test_path(rel_path)
+        notebook_path = self._notebook_test_path(rel_path)
         if not os.path.exists(notebook_path):
             self.skipTest(f"Notebook not found at {notebook_path}")
         return notebook_path, os.path.dirname(notebook_path)
@@ -112,7 +112,7 @@ class BaseNotebookTest(unittest.TestCase):
                 at the first cell containing this pattern
             skip_patterns: Optional list of string patterns - cells containing any of these patterns will be skipped
         """
-        notebook_path = notebook_test_path(notebook_path)
+        notebook_path = self._notebook_test_path(notebook_path)
         # If stop_at_pattern or skip_patterns is provided, use testbook for selective execution
         if stop_at_pattern or skip_patterns:
             with open(notebook_path) as f:
