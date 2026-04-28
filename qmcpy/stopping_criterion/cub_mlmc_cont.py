@@ -181,12 +181,16 @@ class CubMLMCCont(AbstractCubMLMC):
                 step_tol = max(getattr(data, 'rmse_tol', self.target_rmse_tol), self.target_rmse_tol)
                 data.rmse_tol = step_tol
                 trace.resume(data, step_value=int(data.levels + 1))
-                self._integrate(data, skip_level_reset=True, step_tol=step_tol)
-                # Continue down the tolerance ladder for any steps tighter than the resume step_tol
+                # Run any ladder steps that are tighter than the checkpoint tolerance
+                ran_any = False
                 for t in range(self.n_tols):
                     next_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
                     if next_tol < step_tol:
                         self._integrate(data, step_tol=next_tol)
+                        ran_any = True
+                if not ran_any:
+                    # Resuming at same or looser tolerance: data already converged; no new work needed.
+                    pass
             else:
                 data = self._construct_data()
                 # Loop over coarser tolerances
