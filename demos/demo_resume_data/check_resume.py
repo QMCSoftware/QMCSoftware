@@ -90,6 +90,5 @@ def main(throttle_iterations=True, seed=7, cont_seed=11, dimension=2):
     print(f"wrote: {combined_path}")
 
 
-
 if __name__ == "__main__":
-    main(throttle_iterations=False, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAULT_DIMENSION)
+    main(throttle_iterations=True, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAULT_DIMENSION)

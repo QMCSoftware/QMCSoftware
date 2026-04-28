@@ -254,23 +254,27 @@ def print_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     else:
         solution_decimals = 8
     sol_w = solution_decimals + 4  # sign + leading digit + dot + decimals
-
-    sep_len = 7 + 1 + 7 + 1 + 9 + 1 + 9 + 1 + 6 + 1 + sol_w + 1 + 10 + 1 + 8
+    stage_w = 7
+    # Keep rmse_tol values visually separated by one extra leading space.
+    tol_w = max(7, len(tol_header) + (1 if tol_header == "rmse_tol" else 0))
+    total_n_w = 9
+    new_n_w = 9
+    iters_w = 6
+    hw_w = 10
+    time_w = 8
+    sep_len = stage_w + tol_w + total_n_w + new_n_w + iters_w + sol_w + hw_w + time_w + 7
     sep = "-" * sep_len
     print(f"\n{title}")
     print(sep)
-    print(
-        f"{'Stage':<7} {tol_header:>7} {'total n':>9} {'new n':>9}"
-        f" {'iters':>6} {'solution':>{sol_w}} {'half-width':>10} {'time (s)':>8}"
-    )
+    print(f"{'Stage':<{stage_w}} {tol_header:>{tol_w}} {'total n':>{total_n_w}} {'new n':>{new_n_w}}"
+          f" {'iters':>{iters_w}} {'solution':>{sol_w}} {'half-width':>{hw_w}} {'time (s)':>{time_w}}")
     print(sep)
     for name, abs_tol, total_n, new_n, iters, solution, hw, tsec in rows:
         iter_str = str(int(iters)) if iters is not None else "-"
         sol_str = f"{float(solution):.{solution_decimals}f}"
         abs_tol_str = f"{float(abs_tol):.0e}" if abs_tol is not None else "---"
-        print(
-            f"{name:<7} {abs_tol_str:>7} {int(total_n):>9,} {int(new_n):>9,}"
-            f" {iter_str:>6} {sol_str:>{sol_w}} {hw:>10.2e} {tsec:>8.4f}"
+        print(f"{name:<{stage_w}} {abs_tol_str:>{tol_w}} {int(total_n):>{total_n_w},} {int(new_n):>{new_n_w},}"
+              f" {iter_str:>{iters_w}} {sol_str:>{sol_w}} {hw:>{hw_w}.2e} {tsec:>{time_w}.4f}"
         )
     print(sep)
 

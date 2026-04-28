@@ -338,6 +338,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         self._finalize_integration_data(
             data, time() - t_start, resume_provenance=resume_provenance
         )
+        trace.finalize()
         return data.solution, data
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):

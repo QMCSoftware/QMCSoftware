@@ -1,7 +1,7 @@
 """Diagnostics helpers for stopping-criterion iteration tracing."""
 
 import numpy as np
-
+from math import log10
 
 class _IterationTraceLogger(object):
     def __init__(self, stopping_criterion):
@@ -15,14 +15,25 @@ class _IterationTraceLogger(object):
         """
         self.enabled = bool(getattr(stopping_criterion, "trace_iterations", False))
         self.label = str(getattr(stopping_criterion, "trace_label", ""))
-        self.throttle_iterations = bool(
-            getattr(stopping_criterion, "trace_throttle_iterations", True)
-        )
+        self.throttle_iterations = bool(getattr(stopping_criterion, "trace_throttle_iterations", True))
+        self.store_throttled_iterations = bool(getattr(stopping_criterion, "trace_store_throttled_iterations", False))
         self.header_printed = False
         self.table_header_printed = False
         self.iter_count = 0
         self.visible_columns = None
         self.pending_resume_signature = None
+        self._last_iter_snapshot = None
+        self._last_iter_count = 0
+        self._last_printed_iter_count = 0
+
+    def _would_be_throttled(self, iter_count):
+        """Return True if an ITER row with this count would be suppressed by throttling."""
+        if not self.throttle_iterations:
+            return False
+        if iter_count is None or iter_count <= 10:
+            return False
+        step = 10 ** int(log10(iter_count))
+        return iter_count % step != 0
 
     @staticmethod
     def _state_signature(data):
@@ -117,6 +128,11 @@ class _IterationTraceLogger(object):
         if step_value is not None:
             data.m = int(step_value)
         visible_columns = self._get_visible_columns(data)
+        if stage == "ITER":
+            self._last_iter_snapshot = data
+            self._last_iter_count = data._iter_count if data._iter_count is not None else 0
+            if not self._would_be_throttled(data._iter_count):
+                self._last_printed_iter_count = self._last_iter_count
         print_diagnostic(
             stage,
             data,
@@ -175,6 +191,28 @@ class _IterationTraceLogger(object):
             return
         self.pending_resume_signature = None
         self.emit("ITER", data, step_value=step_value, increment=True)
+
+    def _flush_last_if_suppressed(self):
+        """Force-print the last ITER row if it was suppressed by throttling."""
+        if not self.enabled:
+            return
+        if self._last_iter_snapshot is None:
+            return
+        if self._last_iter_count == self._last_printed_iter_count:
+            return
+        print_diagnostic(
+            "ITER",
+            self._last_iter_snapshot,
+            table_header=False,
+            throttle_iterations=False,
+            visible_columns=self.visible_columns,
+        )
+        self._last_printed_iter_count = self._last_iter_count
+
+    def finalize(self):
+        """Force-print the last ITER row if throttling suppressed it, then clear snapshot."""
+        self._flush_last_if_suppressed()
+        self._last_iter_snapshot = None
 
 
 def print_diagnostic(
@@ -293,10 +331,9 @@ def print_diagnostic(
     m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
     throttle = iter_display
-    if throttle_iterations and label == "ITER" and throttle is not None:
-        if throttle > 1000 and throttle % 100 != 0:
-            return
-        if 10 < throttle <= 1000 and throttle % 10 != 0:
+    if throttle_iterations and label == "ITER" and throttle is not None and throttle > 10:
+        step = 10 ** int(log10(throttle))
+        if throttle % step != 0:
             return
     if visible_columns is None:
         visible_columns = ["stage", "iter", "solution"]
