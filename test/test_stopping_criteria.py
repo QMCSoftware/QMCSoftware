@@ -138,7 +138,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             (),
             {
                 "solution": [1.25],
-                "_iter_count": 11,
+                "_iter_count": 55,
                 "m": 13,
                 "n_total": 16,
                 "n_min": None,
@@ -156,7 +156,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         output = unthrottled.getvalue()
         self.assertIn("ITER", output)
         self.assertIn("1.2500000", output)
-        self.assertRegex(output, r"ITER\s+11\s+1\.2500000\s+None\s+16\s+13")
+        self.assertRegex(output, r"ITER\s+55\s+1\.2500000\s+None\s+16\s+13")
 
     def test_print_diagnostic_can_hide_optional_columns(self):
         data = type(
