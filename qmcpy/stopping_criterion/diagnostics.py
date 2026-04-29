@@ -3,6 +3,9 @@
 import numpy as np
 from math import log10
 
+# ITER rows up to this count are always printed; above it the log-scale throttle applies.
+_THROTTLE_FREE_ITER_THRESHOLD = 50
+
 class _IterationTraceLogger(object):
     def __init__(self, stopping_criterion):
         """Create a trace logger bound to the given stopping criterion.
@@ -30,7 +33,7 @@ class _IterationTraceLogger(object):
         """Return True if an ITER row with this count would be suppressed by throttling."""
         if not self.throttle_iterations:
             return False
-        if iter_count is None or iter_count <= 10:
+        if iter_count is None or iter_count <= _THROTTLE_FREE_ITER_THRESHOLD:
             return False
         step = 10 ** int(log10(iter_count))
         return iter_count % step != 0
@@ -331,7 +334,7 @@ def print_diagnostic(
     m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
     throttle = iter_display
-    if throttle_iterations and label == "ITER" and throttle is not None and throttle > 10:
+    if throttle_iterations and label == "ITER" and throttle is not None and throttle > _THROTTLE_FREE_ITER_THRESHOLD:
         step = 10 ** int(log10(throttle))
         if throttle % step != 0:
             return

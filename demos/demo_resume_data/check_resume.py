@@ -1,19 +1,11 @@
 from pathlib import Path
-
 from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC,
     CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
+from resume_util import (make_abs_tol_builder, make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report)
 
 DEFAULT_SEED = 7
 DEFAULT_CONT_SEED = 11
 DEFAULT_DIMENSION = 2
-
-
-try:
-    from .resume_util import (capture_integrate, enable_diagnostics, make_abs_tol_builder,
-        make_case, make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report)
-except ImportError:
-    from resume_util import (capture_integrate, enable_diagnostics, make_abs_tol_builder,
-        make_case, make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report)
 
 
 def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, n_init=2**8, n_limit=2**16):
@@ -39,11 +31,13 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
         make_tol_case("CubMCCLTVec",
             make_abs_tol_builder(CubMCCLTVec, iid_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
             loose_tol, tight_tol),
+        # LatticeG: Lattice rule file has m_max=20 (n <= 2^20); tight_tol=1e-5 fits within that cap.
         make_tol_case("CubQMCLatticeG",
-            make_abs_tol_builder(CubQMCLatticeG, lattice_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
-            1e-3, 1e-6),
+            make_abs_tol_builder(CubQMCLatticeG, lattice_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**20),
+            1e-3, 1e-5),
+        # NetG: no lattice cap; needs ~2^22 samples for tight_tol=1e-6.
         make_tol_case("CubQMCNetG",
-            make_abs_tol_builder(CubQMCNetG, net_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
+            make_abs_tol_builder(CubQMCNetG, net_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**22),
             1e-3, 1e-6),
         make_tol_case("CubQMCBayesLatticeG",
             make_abs_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
@@ -73,7 +67,6 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
                 n_tols=1200, inflate=1.001, n_limit=2**24),
             1.0, 0.5),
     ]
-
 
 
 def main(throttle_iterations=True, seed=7, cont_seed=11, dimension=2):
