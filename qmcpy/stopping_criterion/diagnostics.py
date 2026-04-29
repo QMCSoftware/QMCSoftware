@@ -4,7 +4,7 @@ import numpy as np
 from math import log10
 
 # ITER rows up to this count are always printed; above it the log-scale throttle applies.
-_THROTTLE_FREE_ITER_THRESHOLD = 50
+_THROTTLE_FREE_ITER_THRESHOLD = 30
 
 class _IterationTraceLogger(object):
     def __init__(self, stopping_criterion):
