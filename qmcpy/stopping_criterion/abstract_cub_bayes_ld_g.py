@@ -49,6 +49,8 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         self.n_init = int(n_init)
         self.n_limit = int(n_limit)
         assert isinstance(error_fun, str) or callable(error_fun)
+        # _error_fun_key stores a simple, serializable string and ensures correct state saving
+        # in __getstate__(), bypassing serialization of complex lambda functions, which often fails.
         _error_fun_key = None
         if isinstance(error_fun, str):
             _error_fun_key = error_fun.upper()

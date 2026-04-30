@@ -17,7 +17,7 @@ IS_PRINT_DIAGNOSTIC = False
 
 
 class AbstractStoppingCriterion(object):
-    _RESUME_FORMAT_VERSION = 1
+    _RESUME_FORMAT_VERSION = 1  # Increment when checkpoint format changes in a non-backwards-compatible way
 
     def __init__(self, allowed_distribs, allow_vectorized_integrals):
         """Initialize a stopping criterion base class.
@@ -114,7 +114,7 @@ class AbstractStoppingCriterion(object):
         """Optional hook for subclasses to align state before resuming.
 
         Subclasses that need to restore RNG state or rewrite checkpoint fields
-        may override this method. The default implementation is a no-op.
+        may override this method. The default implementation contains no operation.
 
         Args:
             data (Data): Deep-copied resume checkpoint that will be mutated by
