@@ -6,23 +6,14 @@ import math
 from time import strftime
 
 from qmcpy import CubQMCLatticeG, Genz, Lattice
-from qmcpy.stopping_criterion import abstract_stopping_criterion as _asc
-
 
 TRACE_ITERATIONS = True
 TRACE_THROTTLE_ITERATIONS = True
 
 
+# region Formatting and reporting helpers
 def format_value(value, ndigits=8):
-    """Format a scalar-like value for report output.
-
-    Args:
-        value: Value to format.
-        ndigits (int, optional): Digits after the decimal point. Defaults to 8.
-
-    Returns:
-        str: Formatted value string.
-    """
+    """Format a scalar-like value for report output."""
     try:
         return f"{float(value):.{ndigits}f}"
     except Exception:
@@ -30,14 +21,7 @@ def format_value(value, ndigits=8):
 
 
 def _format_problem_inputs(stopping_criterion):
-    """Build a compact problem-input summary for a stopping criterion.
-
-    Args:
-        stopping_criterion: Stopping criterion instance.
-
-    Returns:
-        str: Multi-line text block describing key solver inputs.
-    """
+    """Build a compact problem-input summary for a stopping criterion."""
     integrand = getattr(stopping_criterion, "integrand", None)
     lines = []
 
@@ -78,6 +62,10 @@ def _format_problem_inputs(stopping_criterion):
     return "\n".join(lines)
 
 
+# endregion
+
+
+# region Solver builder
 def make_CubQMCLatticeG_solver(
     abs_tol,
     rel_tol=0,
@@ -87,24 +75,7 @@ def make_CubQMCLatticeG_solver(
     trace_iterations=None,
     trace_throttle_iterations=None,
 ):
-    """Build a CubQMCLatticeG solver for the demo case.
-
-    Args:
-        abs_tol (float): Absolute error tolerance.
-        rel_tol (float, optional): Relative error tolerance. Defaults to 0.
-        seed (int, optional): Random seed for the lattice. Defaults to 7.
-        dimension (int, optional): Integrand dimension. Defaults to 3.
-        trace_label (str, optional): Label for the iteration log. Defaults to
-            an empty string (no header printed).
-        trace_iterations (bool | None, optional): Whether to enable iteration
-            logging. If None, falls back to :data:`TRACE_ITERATIONS`.
-        trace_throttle_iterations (bool | None, optional): Whether to throttle
-            printed iteration rows. If None, falls back to
-            :data:`TRACE_THROTTLE_ITERATIONS`.
-
-    Returns:
-        CubQMCLatticeG: Configured stopping criterion instance.
-    """
+    """Build a CubQMCLatticeG solver for the demo case."""
     integrand = Genz(
         Lattice(dimension=dimension, seed=seed),
         kind_func="oscillatory",
@@ -121,19 +92,12 @@ def make_CubQMCLatticeG_solver(
     return solver
 
 
+# endregion
+
+
+# region Result summaries and diagnostics
 def half_width(data):
-    """Return the confidence-interval half-width from a QMCPy data object.
-
-    Computed as ``(comb_bound_high - comb_bound_low) / 2``, which equals
-    ``z* * inflate * sigma_hat / sqrt(n)`` for CLT-based criteria.
-
-    Args:
-        data (Data): Completed integration data object with ``comb_bound_high``
-            and ``comb_bound_low`` attributes.
-
-    Returns:
-        float: Half-width of the confidence interval.
-    """
+    """Return the confidence-interval half-width from a QMCPy data object."""
     return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
 
 
@@ -147,23 +111,7 @@ def print_integration_result(
     time_label="Time",
     additional_time_pairs=(),
 ):
-    """Print a consistent integration-result block for resume demos.
-
-    Args:
-        stage_name (str): Human-readable stage label, e.g. ``"Resumed"``.
-        solution: Scalar-like solution returned by ``integrate``.
-        data: QMCPy ``Data`` object with ``n_total`` and time/bound attributes.
-        previous_n_total (int | None, optional): Previous sample count used for
-            resume runs. When provided, previous/total/new sample lines are
-            printed. Defaults to None.
-        time_value (float | None, optional): Time value to print for the primary
-            time line. Defaults to ``data.time_integrate``.
-        time_label (str, optional): Label for the primary time line.
-            Defaults to ``"Time"``.
-        additional_time_pairs (iterable[tuple[str, float]], optional): Extra
-            ``(label, seconds)`` time lines to print after the primary one.
-            Defaults to an empty tuple.
-    """
+    """Print a consistent integration-result block for resume demos."""
     total_n = int(getattr(data, "n_total", 0))
 
     def _positive_float(value):
@@ -233,16 +181,7 @@ def print_integration_result(
 
 
 def print_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
-    """Print a compact stage-by-stage sample and time summary table.
-
-    Args:
-        rows (list[tuple]): Rows of the form
-            ``(name, abs_tol, total_n, new_n, iters, solution, half_width, time_sec)``.
-            ``iters`` may be ``None`` when iteration tracing is disabled.
-        title (str, optional): Table title. Defaults to ``"Stage summary"``.
-        tol_header (str, optional): Column header for the tolerance column.
-            Defaults to ``"abs_tol"``.
-    """
+    """Print a compact stage-by-stage sample and time summary table."""
     tol_values = [
         float(abs_tol)
         for _, abs_tol, *_ in rows
@@ -289,19 +228,7 @@ def print_comparison_metrics(
     label_w=36,
     val_w=14,
 ):
-    """Print a compact block of resume-vs-fresh comparison metrics.
-
-    Args:
-        incremental_speedup (float): Ratio of fresh new-sample count to resume
-            new-sample count (higher is better for resume).
-        new_samples_resume (int): New samples drawn during the resume stage.
-        new_samples_fresh (int): New samples drawn during a fresh tight run.
-        samples_saved (int): Difference ``new_samples_fresh - new_samples_resume``.
-        two_step_time (float): Wall time of the loose + resume two-stage run.
-        fresh_wall_time (float): Wall time of the fresh tight run.
-        label_w (int, optional): Width of the label column. Defaults to 36.
-        val_w (int, optional): Width of the value column. Defaults to 14.
-    """
+    """Print a compact block of resume-vs-fresh comparison metrics."""
     print("\nComparison metrics")
     print(
         f"{'Incremental speedup (fresh/resume):':<{label_w}} {incremental_speedup:>{val_w}.2f}x"
@@ -314,17 +241,7 @@ def print_comparison_metrics(
 
 
 def enable_diagnostics(stopping_criterion, label, throttle_iterations=True):
-    """Enable iteration diagnostics on a stopping criterion instance.
-
-    Args:
-        stopping_criterion: Stopping criterion instance to modify.
-        label (str): Label shown in the iteration log.
-        throttle_iterations (bool, optional): Whether to throttle printed
-            iteration rows. Defaults to True.
-
-    Returns:
-        object: The same stopping criterion instance.
-    """
+    """Enable iteration diagnostics on a stopping criterion instance."""
     setattr(stopping_criterion, "trace_iterations", True)
     setattr(stopping_criterion, "trace_label", label)
     setattr(stopping_criterion, "trace_throttle_iterations", throttle_iterations)
@@ -332,72 +249,29 @@ def enable_diagnostics(stopping_criterion, label, throttle_iterations=True):
 
 
 def capture_integrate(stopping_criterion, *args, **kwargs):
-    """Run ``integrate`` while capturing all printed diagnostic output.
-
-    Args:
-        stopping_criterion: Stopping criterion instance.
-        *args: Positional arguments forwarded to ``integrate``.
-        **kwargs: Keyword arguments forwarded to ``integrate``.
-
-    Returns:
-        tuple[tuple, str]: ``((solution, data), captured_stdout)`` where
-        *captured_stdout* contains the full text printed during integration.
-    """
+    """Run ``integrate`` while capturing all printed diagnostic output."""
     stream = io.StringIO()
     with redirect_stdout(stream):
         out = stopping_criterion.integrate(*args, **kwargs)
     return out, stream.getvalue()
 
 
+# endregion
+
+
+# region Case factories and runners
 def make_case(name, loose_factory, tight_factory):
-    """Create a standard loose/tight demo case record.
-
-    Args:
-        name (str): Human-readable stopping criterion name.
-        loose_factory (callable): Zero-argument factory for the loose run.
-        tight_factory (callable): Zero-argument factory for the tight run.
-
-    Returns:
-        dict: Case metadata consumed by the demo runner.
-    """
+    """Create a standard loose/tight demo case record."""
     return {"name": name, "loose": loose_factory, "tight": tight_factory}
 
 
 def make_tol_case(name, builder, loose_tol, tight_tol):
-    """Create a case from a scalar-tolerance builder.
-
-    Args:
-        name (str): Human-readable stopping criterion name.
-        builder (callable): Single-argument factory taking a tolerance value.
-        loose_tol (float): Tolerance for the loose run.
-        tight_tol (float): Tolerance for the tight run.
-
-    Returns:
-        dict: Case metadata consumed by the demo runner.
-    """
+    """Create a case from a scalar-tolerance builder."""
     return make_case(name, lambda: builder(loose_tol), lambda: builder(tight_tol))
 
 
-def make_abs_tol_builder(
-    sc_class,
-    integrand_factory,
-    *,
-    rel_tol=0,
-    n_init=None,
-    n_limit=None,
-):
-    """Build a factory for stopping criteria driven by ``abs_tol``.
-
-    Args:
-        sc_class: Stopping criterion class.
-        integrand_factory (callable): Zero-argument integrand factory.
-        rel_tol (float, optional): Relative tolerance. Defaults to 0.
-        n_init (int | None, optional): Initial sample count. Defaults to None.
-        n_limit (int | None, optional): Sample budget. Defaults to None.
-
-    Returns:
-        callable: Builder taking ``abs_tol`` and returning a stopping criterion.
-    """
+def make_abs_tol_builder(sc_class, integrand_factory, *, rel_tol=0, n_init=None, n_limit=None):
+    """Build a factory for stopping criteria driven by ``abs_tol``."""
     def build(abs_tol):
         kwargs = {"abs_tol": abs_tol, "rel_tol": rel_tol}
         if n_init is not None:
@@ -410,19 +284,7 @@ def make_abs_tol_builder(
 
 
 def make_named_tol_builder(sc_class, integrand_factory, tol_name, **fixed_kwargs):
-    """Build a factory for stopping criteria with a named tolerance argument.
-
-    Args:
-        sc_class: Stopping criterion class.
-        integrand_factory (callable): Zero-argument integrand factory.
-        tol_name (str): Tolerance keyword to set, such as ``abs_tol`` or
-            ``rmse_tol``.
-        **fixed_kwargs: Additional keyword arguments passed to the class.
-
-    Returns:
-        callable: Builder taking the tolerance value and returning a stopping
-        criterion.
-    """
+    """Build a factory for stopping criteria with a named tolerance argument."""
     def build(tol):
         return sc_class(integrand_factory(), **{tol_name: tol, **fixed_kwargs})
 
@@ -430,8 +292,7 @@ def make_named_tol_builder(sc_class, integrand_factory, tol_name, **fixed_kwargs
 
 
 def _safe_half_width(data):
-    """Return half-width from data, or bias_estimate for MLQMC types,
-    or RMSE estimate for MLMC types, or NaN when nothing is available."""
+    """Return the best available half-width or RMSE estimate; otherwise NaN."""
     try:
         return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
     except Exception:
@@ -454,11 +315,7 @@ def _safe_half_width(data):
 
 
 def _get_sc_tol(sc):
-    """Return (value, name) for the primary tolerance of a stopping criterion.
-
-    Prefers ``target_rmse_tol`` (Cont solvers), then ``abs_tol``, then ``rmse_tol``.
-    Returns ``(None, None)`` when nothing is found.
-    """
+    """Return the primary positive tolerance value and its attribute name."""
     for attr in ("target_rmse_tol", "abs_tol", "rmse_tol"):
         try:
             val = float(getattr(sc, attr, None))
@@ -470,21 +327,7 @@ def _get_sc_tol(sc):
 
 
 def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwargs):
-    """Build, enable diagnostics on, and integrate a stopping criterion.
-
-    Args:
-        factory (callable): Zero-argument factory returning a stopping criterion.
-        label (str): Iteration-log label forwarded to :func:`enable_diagnostics`.
-        throttle_iterations (bool, optional): Whether to throttle printed rows.
-            Defaults to True.
-        **integrate_kwargs: Extra keyword arguments forwarded to ``integrate``.
-
-    Returns:
-        tuple: ``(solution, data, log_text, input_text, sc)`` where *log_text* is
-        the captured stdout from the integration run, *input_text* is a
-        compact summary of the stopping criterion inputs, and *sc* is the
-        stopping criterion instance after integration.
-    """
+    """Build, trace, integrate, and return logs plus compact inputs."""
     sc = enable_diagnostics(
         factory(), label, throttle_iterations=throttle_iterations
     )
@@ -493,16 +336,7 @@ def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwarg
 
 
 def run_resume_case(case, throttle_iterations=True):
-    """Run a loose solve followed by a resumed tighter solve.
-
-    Args:
-        case (dict): Case definition with ``name``, ``loose``, and ``tight``.
-        throttle_iterations (bool, optional): Whether to throttle printed
-            iteration rows. Defaults to True.
-
-    Returns:
-        dict: Result record used by the report writers.
-    """
+    """Run a loose solve followed by a resumed tighter solve."""
     name = case["name"]
     row = {"name": name}
     try:
@@ -561,16 +395,7 @@ def run_resume_case(case, throttle_iterations=True):
 
 
 def run_fresh_case(case, throttle_iterations=True):
-    """Run a fresh tight solve from scratch.
-
-    Args:
-        case (dict): Case definition with ``name`` and ``tight``.
-        throttle_iterations (bool, optional): Whether to throttle printed
-            iteration rows. Defaults to True.
-
-    Returns:
-        dict: Result record used by the report writers.
-    """
+    """Run a fresh tight solve from scratch."""
     name = case["name"]
     row = {"name": name}
     try:
@@ -603,29 +428,12 @@ def run_fresh_case(case, throttle_iterations=True):
     return row
 
 
-def write_report(
-    path,
-    title,
-    rows,
-    summary_keys=(),
-    input_sections=(),
-    log_sections=(),
-):
-    """Write a text report for resume-demo rows.
+# endregion
 
-    Args:
-        path: Output path object.
-        title (str): Report title.
-        rows (list[dict]): Case result rows.
-        summary_keys (tuple[str, ...] | list[str], optional): Summary fields to
-            print after the logs. Defaults to an empty tuple.
-        input_sections (tuple[tuple[str, str], ...] | list[tuple[str, str]], optional):
-            Pairs of display label and row key for compact problem-input blocks.
-            Defaults to an empty tuple.
-        log_sections (tuple[tuple[str, str], ...] | list[tuple[str, str]], optional):
-            Pairs of display label and row key for embedded logs. Defaults to an
-            empty tuple.
-    """
+
+# region Report writers
+def write_report(path, title, rows, summary_keys=(), input_sections=(), log_sections=()):
+    """Write a text report for resume-demo rows."""
     separator = "~" * 60
     lines = [title, f"generated: {strftime('%Y-%m-%d %H:%M:%S')}", ""]
     for i, row in enumerate(rows):
@@ -671,18 +479,7 @@ def write_report(
 
 
 def write_combined_report(path, title, resume_rows, fresh_rows):
-    """Write a combined loose+resume and fresh report with per-example stage summaries.
-
-    Each example block contains: loose inputs, resume inputs, fresh inputs,
-    all three iteration logs, a stage summary table, and key numeric values.
-
-    Args:
-        path: Output path object.
-        title (str): Report title.
-        resume_rows (list[dict]): Rows returned by :func:`run_resume_case`.
-        fresh_rows (list[dict]): Rows returned by :func:`run_fresh_case`,
-            in the same order as *resume_rows*.
-    """
+    """Write combined loose/resume/fresh reports with stage summaries."""
     separator = "~" * 60
     lines = [title, f"generated: {strftime('%Y-%m-%d %H:%M:%S')}", ""]
     for i, (rrow, frow) in enumerate(zip(resume_rows, fresh_rows)):
