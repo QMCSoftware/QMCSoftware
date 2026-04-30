@@ -76,7 +76,7 @@ class BaseNotebookTest(unittest.TestCase):
             self.skipTest(f"Notebook not found at {notebook_path}")
         return notebook_path, os.path.dirname(notebook_path)
 
-    def fix_gbm_symlinks(self, notebook_dir, symlinks_to_fix=None):
+    def fix_symlinks(self, notebook_dir, symlinks_to_fix=None):
         """Fix or create symlinks inside a demo notebook directory."""
         code_dir = os.path.join(notebook_dir, "gbm_code")
         if not symlinks_to_fix:

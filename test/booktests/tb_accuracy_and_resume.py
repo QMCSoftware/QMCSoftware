@@ -10,7 +10,7 @@ class NotebookTests(BaseNotebookTest):
         symlinks_to_fix = [
             "resume_util.py",
         ]
-        self.fix_gbm_symlinks(notebook_dir, symlinks_to_fix)
+        self.fix_symlinks(notebook_dir, symlinks_to_fix)
         self.run_notebook(notebook_path)
 
 
