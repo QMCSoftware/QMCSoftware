@@ -64,7 +64,8 @@ nav:
         - Some True Measures: demos/some_true_measures.ipynb
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
   - Blogs: 
-    - SciPyWrapper: demos/scipywrapper_dependence_custom/blog.md
+    - SciPyWrapper: blogs/scipywrapper/index.md
+    - GBM with QMCPy: blogs/gbm-qmcpy/index.md
   # - Papers: 
   #   - JOSS: paper/paper.md
   - For Developers:

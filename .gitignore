@@ -64,6 +64,7 @@ coverage-data/*
 *.Rhistory
 
 # Website
+.cache/
 docs/_site
 docs/Gemfile.lock
 site/
@@ -112,4 +113,3 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
-
