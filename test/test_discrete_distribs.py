@@ -330,6 +330,20 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertEqual(x.shape, (4, 2))
         self.assertTrue(np.isfinite(x).all())
         self.assertTrue(((x >= 0) & (x < 1)).all())
+    
+    def test_repeated_sampling(self):
+        for order in ["GRAY","NATURAL"]:
+            for randomize in ["FALSE","LMS DS","LMS","DS","OWEN"]:
+                for alpha in [1,2]:
+                    replications = 3 if randomize!="FALSE" else 1
+                    dnb2 = DigitalNetB2(dimension=5,replications=replications,randomize=randomize,order=order,alpha=alpha)
+                    x_full = dnb2(16) 
+                    self.assertEqual(x_full.shape,(replications, 16, 5))
+                    self.assertTrue((x_full[:,:4,:]==dnb2(0,4)).all())
+                    self.assertTrue((x_full[:,4:8,:]==dnb2(4,8)).all())
+                    self.assertTrue((x_full[:,8:16,:]==dnb2(8,16)).all())
+                    self.assertTrue((x_full[:,4:16,:]==dnb2(4,16)).all())
+
 
 
 class TestHalton(unittest.TestCase):
