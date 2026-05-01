@@ -4,6 +4,7 @@ Each tb_*.py file tests a single demo notebook.
 """
 
 import unittest, gc
+from pathlib import Path
 import psutil
 import gc
 import time
@@ -18,6 +19,14 @@ matplotlib.rcParams["text.usetex"] = False  # Disable LaTeX
 
 TB_TIMEOUT = 3600
 subprocess.run(["pip", "install", "-q", "psutil", "testbook", "parsl"], check=False)
+
+
+def notebook_test_path(notebook_path):
+    """Return a testbook-safe absolute notebook path string."""
+    path = Path(notebook_path)
+    if not path.is_absolute():
+        path = Path(__file__).resolve().parent / path
+    return path.resolve(strict=False).as_posix()
 
 
 class BaseNotebookTest(unittest.TestCase):
@@ -46,10 +55,9 @@ class BaseNotebookTest(unittest.TestCase):
     # -- Shared helpers for notebook tests -------------------------------------------------
     def locate_notebook(self, rel_path):
         """Return absolute notebook path and its directory. Skip test if missing."""
-        notebook_path = os.path.join(os.path.dirname(__file__), rel_path)
+        notebook_path = notebook_test_path(rel_path)
         if not os.path.exists(notebook_path):
             self.skipTest(f"Notebook not found at {notebook_path}")
-        notebook_path = os.path.abspath(notebook_path)
         return notebook_path, os.path.dirname(notebook_path)
 
     def fix_gbm_symlinks(self, notebook_dir, symlinks_to_fix=None):
@@ -85,13 +93,21 @@ class BaseNotebookTest(unittest.TestCase):
             replacements: Optional dict of {old_str: new_str} to apply to code cells in memory
             is_overwrite: If True, overwrite the notebook file with modified cells
             stop_at_pattern: Optional string pattern - if provided, uses `testbook` to stop execution
-                           at the first cell containing this pattern
+                at the first cell containing this pattern
             skip_patterns: Optional list of string patterns - cells containing any of these patterns will be skipped
         """
+        notebook_path = notebook_test_path(notebook_path)
         # If stop_at_pattern or skip_patterns is provided, use testbook for selective execution
         if stop_at_pattern or skip_patterns:
             with open(notebook_path) as f:
                 nb = nbformat.read(f, as_version=4)
+
+            # add skip_patterns to replacements and change each skip pattern to ""
+            if skip_patterns:
+                if not replacements:
+                    replacements = {}
+                for pattern in skip_patterns:
+                    replacements[pattern] = ""
 
             # Apply replacements if provided
             if replacements:
@@ -109,59 +125,30 @@ class BaseNotebookTest(unittest.TestCase):
 
             # Write modified notebook to a temp file so testbook uses the replacements
             # Use a hidden file name to avoid polluting the directory
-
             notebook_dir = os.path.dirname(notebook_path)
-            temp_path = os.path.join(
-                notebook_dir, f".tmp_test_{uuid.uuid4().hex[:8]}.ipynb"
-            )
+            temp_path = os.path.join(notebook_dir, f".tmp_test_{uuid.uuid4().hex[:8]}.ipynb")
             try:
                 nbformat.write(nb, temp_path)
-
-                # Use testbook to execute cells until we hit the stop pattern
-                # Execute from the notebook's directory to ensure imports work
+                # Run the cells until the specified stop pattern is reached. 
+                # Execute from the notebook's directory to guarantee import functionality.
                 original_cwd = os.getcwd()
-                skip_patterns = skip_patterns or []
                 try:
                     os.chdir(notebook_dir)
                     with testbook(temp_path, timeout=timeout, execute=False) as tb:
-                            for i, cell in enumerate(tb.cells):
-                                if cell.cell_type == "code":
-                                    # Normalize cell source to a single string. Some nbformat/testbook
-                                    # variants represent the source as a list of lines rather than
-                                    # a single string, which makes `pattern in cell.source` fail.
-                                    raw_source = None
-                                    if hasattr(cell, "source"):
-                                        raw_source = cell.source
-                                    elif isinstance(cell, dict):
-                                        raw_source = cell.get("source", "")
-                                    else:
-                                        raw_source = ""
+                        for i, cell in enumerate(tb.cells):
+                            if cell.cell_type == "code":
+                                # Normalize cell source to a single string after handling a list or tuple if needed
+                                raw_source = cell.source if hasattr(cell, "source") else (cell.get("source", "") if isinstance(cell, dict) else "")
+                                src = "".join(raw_source) if isinstance(raw_source, (list, tuple)) else str(raw_source)
+                                if stop_at_pattern and stop_at_pattern in src:  # stop execution
+                                    print(f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'")
+                                    break
 
-                                    if isinstance(raw_source, (list, tuple)):
-                                        src = "".join(raw_source)
-                                    else:
-                                        src = str(raw_source)
-
-                                    if stop_at_pattern and stop_at_pattern in src:
-                                        print(
-                                            f"Stopping execution at cell {i}: found pattern '{stop_at_pattern}'"
-                                        )
-                                        break
-                                    # Check if this cell should be skipped
-                                    should_skip = any(pattern in src for pattern in skip_patterns)
-                                    if should_skip:
-                                        print(f"Skipping cell {i}: matched skip pattern")
-                                        continue
-                                    try:
-                                        tb.execute_cell(i)
-                                    except Exception as e:
-                                        raise RuntimeError(
-                                            f"Error executing cell {i} in {notebook_path}: {e}"
-                                        )
+                                # Execute the current cell
+                                tb.execute_cell(i)
                 finally:
                     os.chdir(original_cwd)
-            finally:
-                # Clean up temp file
+            finally:  # Clean up temp file
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
             return

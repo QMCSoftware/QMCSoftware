@@ -49,18 +49,18 @@ requires-python = ">= 3.5"
 dependencies = [
     "numpy >= 1.17.0",
     "scipy >= 1.1.0",
-    "qmctoolscl >= 1.1.6",
+    "qmctoolscl >= 1.2.1",
     ]
 
 [project.optional-dependencies]
 torch = [
-    "torch >= 2.7.0",
+    "torch >= 2.2.0",
     ]
 gpytorch = [
-    "gpytorch >= 1.7.0",
+    "gpytorch >= 1.7.0, <= 1.15.1", # some issue with gpytorch == 1.15.2, see qmcpy/util/exact_gpytorch_regression_model.py, see # https://github.com/cornellius-gp/gpytorch/issues/2736
     ]
 botorch = [
-    "botorch >= 0.10.0",
+    "botorch >= 0.10.0, <= 1.17.0", # some issue with gpytorch == 1.15.2, see qmcpy/util/exact_gpytorch_regression_model.py, see # https://github.com/cornellius-gp/gpytorch/issues/2736
     ]
 umbridge = [
     "umbridge >= 1.2.1",
@@ -89,10 +89,10 @@ test_torch = [
     "torch >= 2.7.0",
     ]
 test_gpytorch = [
-    "gpytorch >= 1.11",
+    "gpytorch >= 1.11, <= 1.15.1", # some issue with gpytorch == 1.15.2, see qmcpy/util/exact_gpytorch_regression_model.py, see # https://github.com/cornellius-gp/gpytorch/issues/2736
     ]
 test_botorch = [
-    "botorch >= 0.10.0",
+    "botorch >= 0.10.0, <= 1.17.0", # some issue with gpytorch == 1.15.2, see qmcpy/util/exact_gpytorch_regression_model.py, see # https://github.com/cornellius-gp/gpytorch/issues/2736
     ]
 test_umbridge = [
     "umbridge >= 1.2.4",
@@ -111,13 +111,14 @@ docs = [
     "mkpdfs-mkdocs >= 1.0.1",
     "mkdocs-print-site-plugin >= 2.7.2",
     "mkdocs-exclude >= 1.0.2",
-    "pylint >= 2.14.4",
+    "pylint >= 4.0.5",
 ]
 dev = [ # brew install weasyprint
     "qmcpy[docs,test,torch,gpytorch,botorch,umbridge]",
     "jupyterlab >= 4.0.0",
     "jupyterlab_execute_time >= 3.2.0",
     "ipynbname >= 2025.8.0.0",
+    "pypistats >= 1.0.0",
     "sympy >= 1.14.0",
     "matplotlib >= 3.9.0",
     "tueplots >= 0.2.0",
@@ -149,8 +150,6 @@ class = [
 run-setuptools = true
 includes = [
     "qmcpy",
-    "qmcpy/discrete_distribution/_c_lib/*.h",
-    "qmcpy/discrete_distribution/_c_lib/*.c",
     "qmcpy/discrete_distribution/digital_net_b2/generating_matrices/*.npy",
     "qmcpy/discrete_distribution/lattice/generating_vectors/*.npy",
     "qmcpy/util/qmcpy.mplstyle",

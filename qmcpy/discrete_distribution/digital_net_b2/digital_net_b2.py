@@ -1,7 +1,7 @@
 from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ...util import ParameterError, ParameterWarning
 import qmctoolscl
-from os.path import dirname, abspath, isfile
+from os.path import dirname, abspath
 import numpy as np
 from numpy.lib.npyio import DataSource
 import warnings
@@ -652,7 +652,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             elif self.order == "RADICAL INVERSE":
                 raise ParameterError("DigitalNetB2 in radical inverse order requires n_min and n_max be 0 or powers of 2")
             else:
-                raise Exception("invalid digital net order")
+                raise ValueError("invalid digital net order")
         if self.order == "GRAY":
             qmctoolscl.dnb2_gen_gray(
                 r_x, n, d, n_start, mmax, self.gen_mats, xb, backend="c"
@@ -662,7 +662,7 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 r_x, n, d, n_start, mmax, self.gen_mats, xb, backend="c"
             )
         else:
-            raise Exception("invalid digital net order")
+            raise ValueError("invalid digital net order")
         r = np.uint64(self.replications)
         if "NUS" in self.randomize:
             if self.alpha == 1:

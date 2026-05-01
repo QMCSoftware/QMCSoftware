@@ -1,6 +1,5 @@
 import numpy as np
 import os
-from typing import Union
 import qmcpy as qp
 
 
@@ -41,7 +40,7 @@ def plot_proj(
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         plt.style.use(os.path.join(dir_path, "qmcpy.mplstyle"))
-    except:
+    except Exception:
         raise ImportError(
             "Missing matplotlib.pyplot as plt, Matplotlib must be installed to run plot_proj function"
         )

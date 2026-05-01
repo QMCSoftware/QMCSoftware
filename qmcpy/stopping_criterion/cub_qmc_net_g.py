@@ -205,8 +205,8 @@ class CubQMCNetG(AbstractCubQMCLDG):
         error_fun="EITHER",
         fudge=lambda m: 5.0 * 2.0 ** (-m),
         check_cone=False,
-        control_variates=[],
-        control_variate_means=[],
+        control_variates=None,
+        control_variate_means=None,
         update_cv_coeffs=False,
     ):
         r"""
@@ -235,6 +235,10 @@ class CubQMCNetG(AbstractCubQMCLDG):
             update_cv_coeffs (bool): If set to true, the control variate coefficients are recomputed at each iteration.
                 Otherwise they are estimated once after the initial sampling and then fixed.
         """
+        if control_variates is None:
+            control_variates = []
+        if control_variate_means is None:
+            control_variate_means = []
         super(CubQMCNetG, self).__init__(
             integrand,
             abs_tol,

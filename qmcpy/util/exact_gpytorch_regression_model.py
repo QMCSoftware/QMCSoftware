@@ -69,6 +69,8 @@ class ExactGPyTorchRegressionModel(gpytorch.models.ExactGP):
         if self.use_gpu:
             x, noise = x.cuda(), noise.cuda()
         with torch.no_grad():
+            # some issue with gpytorch == 1.15.2 making this call very slow by not obeying torch.no_grad() in some way
+            # https://github.com/cornellius-gp/gpytorch/issues/2736
             observed_pred = self.likelihood(self.__call__(x), noise=noise)
         mean_post = observed_pred.mean
         std_post = observed_pred.stddev

@@ -13,6 +13,7 @@ from .student_t import StudentT
 from .uniform_triangle import UniformTriangle
 from .zero_inflated_exp_uniform import ZeroInflatedExpUniform
 from .triangular import Triangular
+from .acceptance_rejection import AcceptanceRejection, AcceptanceRejectionReal
 
 TrueMeasure = AbstractTrueMeasure
 _TrueMeasure = AbstractTrueMeasure

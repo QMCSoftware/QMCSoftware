@@ -3,23 +3,8 @@ from parsl import bash_app
 import glob
 import os
 import re
-import time
 import platform
 from pathlib import Path
-import time
-import parsl as pl
-
-# Use ThreadPoolExecutor on macOS (avoids interchange.py spawn issue)
-# Use HighThroughputExecutor on Linux for better performance
-if platform.system() == "Darwin":
-    from parsl.config import Config
-    from parsl.executors import ThreadPoolExecutor
-
-    config = Config(
-        executors=[ThreadPoolExecutor(max_threads=8, label="local_threads")]
-    )
-else:
-    from parsl.configs.htex_local import config
 
 
 @bash_app
@@ -248,7 +233,7 @@ def generate_summary_report(results, execution_time=0.0, total_test_time=0.0):
     print(f"Ran {total_modules} test modules in {execution_time:.3f}s")
     if total_test_time > 0:
         print(
-            f"Total test time: {total_test_time:.3f}s (overhead: {execution_time - total_test_time:.3f}s)"
+            f"Total test time: {total_test_time:.3f}s (time saved by parallelization: {total_test_time - execution_time:.3f}s)"
         )
     print()
 

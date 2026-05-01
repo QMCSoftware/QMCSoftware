@@ -1,12 +1,11 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
-from ..discrete_distribution import IIDStdUniform
+from ..discrete_distribution import IIDStdUniform  #pylint: disable=unused-import
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
-from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, BoxIntegral, CustomFun, Genz, SensitivityIndices
+from ..integrand import Keister, BoxIntegral, CustomFun, Genz, SensitivityIndices  #pylint: disable=unused-import
 from ..util import MaxSamplesWarning, ParameterWarning, ParameterError
 import numpy as np
 from time import time

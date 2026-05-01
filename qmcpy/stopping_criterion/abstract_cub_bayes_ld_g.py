@@ -1,12 +1,12 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 import numpy as np
 from time import time
 import warnings
 from scipy.optimize import fminbound as fminbnd
-from scipy.optimize import fmin, fmin_bfgs
+from scipy.optimize import fmin
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 

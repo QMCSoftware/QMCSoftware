@@ -4,9 +4,8 @@ from ..discrete_distribution import DigitalNetB2, Lattice, Halton
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
-from ..true_measure import Gaussian
 from ..integrand import FinancialOption
-from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
+from ..util import MaxSamplesWarning, MaxLevelsWarning
 import numpy as np
 from scipy.stats import norm
 from time import time

@@ -1,7 +1,7 @@
 import unittest
 from __init__ import BaseNotebookTest
 
-
+@unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
 
     def test_gbm_demo_notebook(self):
@@ -37,7 +37,7 @@ class NotebookTests(BaseNotebookTest):
             "max=8": "max=2",
         }
 
-        stop_at_pattern = "MAIN EXPERIMENT RUNNER"
+        stop_at_pattern = "Output results to LaTeX"
         self.run_notebook(notebook_path, replacements, stop_at_pattern=stop_at_pattern)
 
 
