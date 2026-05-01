@@ -4,7 +4,7 @@ import numpy as np
 from math import log10
 
 # ITER rows up to this count are always printed; above it the log-scale throttle applies.
-_THROTTLE_FREE_ITER_THRESHOLD = 30
+_THROTTLE_ITER_THRESHOLD = 30
 
 class _IterationTraceLogger(object):
     def __init__(self, stopping_criterion):
@@ -13,13 +13,12 @@ class _IterationTraceLogger(object):
         Args:
             stopping_criterion: Stopping criterion instance. The logger reads
                 the optional attributes ``trace_iterations`` (bool),
-                ``trace_label`` (str), and ``trace_throttle_iterations`` (bool)
+                ``trace_label`` (str), and ``verbose`` (bool)
                 to configure itself.
         """
         self.enabled = bool(getattr(stopping_criterion, "trace_iterations", False))
         self.label = str(getattr(stopping_criterion, "trace_label", ""))
-        self.verbose = bool(getattr(stopping_criterion, "trace_throttle_iterations", True))
-        self.store_throttled_iterations = bool(getattr(stopping_criterion, "trace_store_throttled_iterations", False))
+        self.verbose = bool(getattr(stopping_criterion, "verbose", True))
         self.header_printed = False
         self.table_header_printed = False
         self.iter_count = 0
@@ -31,9 +30,9 @@ class _IterationTraceLogger(object):
 
     def _would_be_throttled(self, iter_count):
         """Return True if an ITER row with this count would be suppressed by throttling."""
-        if not self.verbose:
+        if self.verbose:
             return False
-        if iter_count is None or iter_count <= _THROTTLE_FREE_ITER_THRESHOLD:
+        if iter_count is None or iter_count <= _THROTTLE_ITER_THRESHOLD:
             return False
         step = 10 ** int(log10(iter_count))
         return iter_count % step != 0
@@ -233,9 +232,9 @@ def print_diagnostic(
             ``n_total``, ``n_min``, ``m``, and ``xfull``.
         table_header (bool, optional): Whether to print the compact table
             header before the row. Defaults to False.
-        verbose (bool, optional): Whether to apply the current
-            iteration-log throttling rules for ``ITER`` rows. Defaults to True.
-            If False, every iteration row is printed.
+        verbose (bool, optional): Whether to print every ``ITER`` row.
+            Defaults to True. If False, the current iteration-log throttling
+            rules are applied.
         visible_columns (tuple[str, ...] | list[str] | None, optional): Ordered
             columns to print. Defaults to all supported columns.
     """
@@ -334,7 +333,7 @@ def print_diagnostic(
     m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
     throttle = iter_display
-    if verbose and label == "ITER" and throttle is not None and throttle > _THROTTLE_FREE_ITER_THRESHOLD:
+    if (not verbose) and label == "ITER" and throttle is not None and throttle > _THROTTLE_ITER_THRESHOLD:
         step = 10 ** int(log10(throttle))
         if throttle % step != 0:
             return

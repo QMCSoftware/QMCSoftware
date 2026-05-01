@@ -147,12 +147,12 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         )()
         throttled = io.StringIO()
         with redirect_stdout(throttled):
-            print_diagnostic("ITER", data)
+            print_diagnostic("ITER", data, verbose=False)
         self.assertEqual(throttled.getvalue(), "")
 
         unthrottled = io.StringIO()
         with redirect_stdout(unthrottled):
-            print_diagnostic("ITER", data, verbose=False)
+            print_diagnostic("ITER", data, verbose=True)
         output = unthrottled.getvalue()
         self.assertIn("ITER", output)
         self.assertIn("1.2500000", output)
@@ -191,7 +191,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
                 {
                     "trace_iterations": True,
                     "trace_label": "resume-test",
-                    "trace_throttle_iterations": False,
+                    "verbose": True,
                 },
             )()
         )
@@ -1345,17 +1345,32 @@ class TestResumeValidationHelpers(unittest.TestCase):
 class TestDiagnosticsOptionalColumns(unittest.TestCase):
     """Tests for optional columns and edge-case paths in diagnostics helpers."""
 
-    def _make_logger(self, throttle=False):
+    def _make_logger(self, verbose=False):
         sc = type(
             "SC",
             (),
             {
                 "trace_iterations": True,
                 "trace_label": "",
-                "trace_throttle_iterations": throttle,
+                "verbose": verbose,
             },
         )()
         return _IterationTraceLogger(sc)
+
+    @staticmethod
+    def _load_resume_util():
+        resume_util_path = (
+            Path(__file__).resolve().parents[1]
+            / "demos"
+            / "demo_resume_data"
+            / "resume_util.py"
+        )
+        spec = importlib.util.spec_from_file_location(
+            "demo_resume_util", resume_util_path
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
 
     def _make_rich_data(self):
         """Data object with all optional diagnostic fields set to non-None values."""
@@ -1384,6 +1399,24 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         cols = logger._get_visible_columns(data)
         for col in ("comb_bound_diff", "bound_half_width", "bias_estimate", "rmse_estimate", "rmse_tol", "n_min"):
             self.assertIn(col, cols, msg=f"Expected column '{col}' in visible columns")
+
+    def test_enable_diagnostics_verbose_true_sets_verbose(self):
+        resume_util = self._load_resume_util()
+        sc = type("SC", (), {})()
+        out = resume_util.enable_diagnostics(sc, "demo", verbose=True)
+        self.assertIs(out, sc)
+        self.assertTrue(sc.trace_iterations)
+        self.assertEqual(sc.trace_label, "demo")
+        self.assertTrue(sc.verbose)
+
+    def test_enable_diagnostics_verbose_false_sets_verbose_false(self):
+        resume_util = self._load_resume_util()
+        sc = type("SC", (), {})()
+        out = resume_util.enable_diagnostics(sc, "demo", verbose=False)
+        self.assertIs(out, sc)
+        self.assertTrue(sc.trace_iterations)
+        self.assertEqual(sc.trace_label, "demo")
+        self.assertFalse(sc.verbose)
 
     def test_print_diagnostic_visible_columns_none_with_all_optional_fields(self):
         """visible_columns=None auto-detects and displays all optional columns."""

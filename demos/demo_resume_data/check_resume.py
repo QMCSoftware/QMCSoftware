@@ -59,7 +59,7 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
     ]
 
 
-def main(verbose=True, seed=7, cont_seed=11, dimension=2):
+def main(verbose=False, seed=7, cont_seed=11, dimension=2):
     # Fix all demo sampler seeds here so the reported solution estimates are reproducible.
     cases = _build_cases(seed=seed, cont_seed=cont_seed, dimension=dimension)
     output_dir = Path(__file__).resolve().parent / "output"
@@ -74,4 +74,4 @@ def main(verbose=True, seed=7, cont_seed=11, dimension=2):
 
 
 if __name__ == "__main__":
-    main(verbose=True, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAULT_DIMENSION)
+    main(verbose=False, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAULT_DIMENSION)

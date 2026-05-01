@@ -201,11 +201,11 @@ def print_comparison_metrics(
     print(f"{'Fresh tight time:':<{label_w}} {fresh_wall_time:>{val_w}.4f} s")
 
 
-def enable_diagnostics(stopping_criterion, label, verbose=True):
+def enable_diagnostics(stopping_criterion, label, verbose=False):
     """Enable iteration diagnostics on a stopping criterion instance."""
     setattr(stopping_criterion, "trace_iterations", True)
     setattr(stopping_criterion, "trace_label", label)
-    setattr(stopping_criterion, "trace_throttle_iterations", verbose)
+    setattr(stopping_criterion, "verbose", verbose)
     return stopping_criterion
 
 
@@ -285,14 +285,14 @@ def _get_sc_tol(sc):
     return None, None
 
 
-def _run_logged_case(factory, label, verbose=True, **integrate_kwargs):
+def _run_logged_case(factory, label, verbose=False, **integrate_kwargs):
     """Build, trace, integrate, and return logs plus compact inputs."""
     sc = enable_diagnostics(factory(), label, verbose=verbose)
     (solution, data), log = capture_integrate(sc, **integrate_kwargs)
     return solution, data, log.strip(), _format_problem_inputs(sc), sc
 
 
-def run_resume_case(case, verbose=True):
+def run_resume_case(case, verbose=False):
     """Run a loose solve followed by a resumed tighter solve."""
     name = case["name"]
     row = {"name": name}
@@ -318,7 +318,7 @@ def run_resume_case(case, verbose=True):
                              getattr(tight_sc, "rmse_tol", None) if not hasattr(tight_sc, "abs_tol") else None,),
         )
         setattr(sc1, "trace_label", f"{name}-RESUME")
-        setattr(sc1, "trace_throttle_iterations", verbose)
+        setattr(sc1, "verbose", verbose)
         (sol2, data2), resume_log = capture_integrate(sc1, resume=data1)
         resume_log = resume_log.strip()
         resume_inputs = _format_problem_inputs(sc1)
@@ -360,7 +360,7 @@ def run_resume_case(case, verbose=True):
     return row
 
 
-def run_fresh_case(case, verbose=True):
+def run_fresh_case(case, verbose=False):
     """Run a fresh tight solve from scratch."""
     name = case["name"]
     row = {"name": name}

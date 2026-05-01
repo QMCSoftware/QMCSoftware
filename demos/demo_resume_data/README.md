@@ -42,4 +42,4 @@ python demos/demo_resume_data/check_resume.py
 creates the following file in `output/`:
 - `check_resume_summary.txt`: Combined report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including captured iteration logs.
 
-The script currently runs with `main(verbose=False)` when executed directly, so every logged iteration is printed.
+The script currently runs with `main(verbose=True)` when executed directly, so every logged iteration is printed.
