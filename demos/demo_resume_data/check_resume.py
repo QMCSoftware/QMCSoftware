@@ -31,11 +31,9 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
         make_tol_case("CubMCCLTVec",
             make_abs_tol_builder(CubMCCLTVec, iid_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
             loose_tol, tight_tol),
-        # LatticeG: Lattice rule file has m_max=20 (n <= 2^20); tight_tol=1e-5 fits within that cap.
         make_tol_case("CubQMCLatticeG",
             make_abs_tol_builder(CubQMCLatticeG, lattice_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**20),
             1e-3, 1e-5),
-        # NetG: no lattice cap; needs ~2^22 samples for tight_tol=1e-6.
         make_tol_case("CubQMCNetG",
             make_abs_tol_builder(CubQMCNetG, net_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**22),
             1e-3, 1e-6),
@@ -43,29 +41,21 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
             make_abs_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
             loose_tol, tight_tol),
         make_tol_case("CubBayesNetG",
-            make_abs_tol_builder(CubBayesNetG, net_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
-            loose_tol, tight_tol),
+            make_abs_tol_builder(CubBayesNetG, net_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit), loose_tol, tight_tol),
         make_tol_case("CubMLMC",
-            make_named_tol_builder(CubMLMC, iid_financial_option, "rmse_tol", n_limit=2**16),
-            0.2, 0.1),
+            make_named_tol_builder(CubMLMC, iid_financial_option, "rmse_tol", n_limit=2**16), 0.2, 0.1),
         make_tol_case("CubMLMCCont",
-            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "rmse_tol", n_limit=2**16),
-            0.1, 0.05),
+            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "rmse_tol", n_limit=2**16), 0.1, 0.05),
         make_tol_case("CubMLQMC",
-            make_named_tol_builder(CubMLQMC, qmc_financial_option, "abs_tol", n_limit=2**18),
-            0.2, 0.1),
+            make_named_tol_builder(CubMLQMC, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
         make_tol_case("CubMLQMCCont",
-            make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol", n_limit=2**18),
-            0.2, 0.1),
-        # n_tols=20 produces >30 trace rows (20 outer tolerance loops × 2–3 inner MLMC iterations each)
+            make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
+        make_tol_case("CubMLQMCContLong",
+            make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol",
+                n_tols=1200, inflate=1.001, n_limit=2**24), 0.2, 0.1),
         make_tol_case("CubMLMCContLong",
-            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "rmse_tol", n_tols=20, n_limit=2**18),
-            0.1, 0.05),
-        # n_tols=1200, inflate=1.001 produces >1600 trace rows; integral ≈ 200 (> 100)
-        make_tol_case("CubMLMCContVeryLong",
             make_named_tol_builder(CubMLMCCont, iid_financial_option_cont_large, "rmse_tol",
-                n_tols=1200, inflate=1.001, n_limit=2**24),
-            1.0, 0.5),
+                n_tols=1200, inflate=1.001, n_limit=2**24), 1.0, 0.5),
     ]
 
 
@@ -76,7 +66,7 @@ def main(verbose=True, seed=7, cont_seed=11, dimension=2):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     resume_rows = [run_resume_case(case, verbose=case.get("verbose", verbose)) for case in cases]
-    fresh_rows  = [run_fresh_case( case, verbose=case.get("verbose", verbose)) for case in cases]
+    fresh_rows  = [run_fresh_case(case, verbose=case.get("verbose", verbose)) for case in cases]
 
     combined_path = output_dir / "check_resume_summary.txt"
     write_combined_report(combined_path, "Stopping Criteria Check: Resume vs Fresh", resume_rows, fresh_rows)

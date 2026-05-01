@@ -5,13 +5,9 @@ import io
 import math
 from time import strftime
 
-from qmcpy import CubQMCLatticeG, Genz, Lattice
-
-TRACE_ITERATIONS = True
-TRACE_THROTTLE_ITERATIONS = True
-
-
-# region Formatting and reporting helpers
+#################################################################
+# Formatting and reporting helpers
+#################################################################
 def format_value(value, ndigits=8):
     """Format a scalar-like value for report output."""
     try:
@@ -61,10 +57,9 @@ def _format_problem_inputs(stopping_criterion):
         add_int("dimension", getattr(integrand, "d", None))
     return "\n".join(lines)
 
-
-# endregion
-
-# region Result summaries and diagnostics
+#################################################################
+# Result summaries and diagnostics
+#################################################################
 def half_width(data):
     """Return the confidence-interval half-width from a QMCPy data object."""
     return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
@@ -198,9 +193,7 @@ def print_comparison_metrics(
 ):
     """Print a compact block of resume-vs-fresh comparison metrics."""
     print("\nComparison metrics")
-    print(
-        f"{'Incremental speedup (fresh/resume):':<{label_w}} {incremental_speedup:>{val_w}.2f}x"
-    )
+    print(f"{'Incremental speedup (fresh/resume):':<{label_w}} {incremental_speedup:>{val_w}.2f}x")
     print(f"{'Resume new samples:':<{label_w}} {new_samples_resume:>{val_w},}")
     print(f"{'Fresh new samples:':<{label_w}} {new_samples_fresh:>{val_w},}")
     print(f"{'Samples saved by resume:':<{label_w}} {samples_saved:>{val_w},}")
@@ -223,11 +216,9 @@ def capture_integrate(stopping_criterion, *args, **kwargs):
         out = stopping_criterion.integrate(*args, **kwargs)
     return out, stream.getvalue()
 
-
-# endregion
-
-
-# region Case factories and runners
+#################################################################
+#  Case factories and runners
+#################################################################
 def make_case(name, loose_factory, tight_factory):
     """Create a standard loose/tight demo case record."""
     return {"name": name, "loose": loose_factory, "tight": tight_factory}
@@ -296,9 +287,7 @@ def _get_sc_tol(sc):
 
 def _run_logged_case(factory, label, verbose=True, **integrate_kwargs):
     """Build, trace, integrate, and return logs plus compact inputs."""
-    sc = enable_diagnostics(
-        factory(), label, verbose=verbose
-    )
+    sc = enable_diagnostics(factory(), label, verbose=verbose)
     (solution, data), log = capture_integrate(sc, **integrate_kwargs)
     return solution, data, log.strip(), _format_problem_inputs(sc), sc
 
@@ -309,20 +298,31 @@ def run_resume_case(case, verbose=True):
     row = {"name": name}
     try:
         sol1, data1, loose_log, loose_inputs, sc1 = _run_logged_case(
-            case["loose"], f"{name}-LOOSE", verbose=verbose
-        )
+            case["loose"], f"{name}-LOOSE", verbose=verbose)
         old_n = int(getattr(data1, "n_total", 0))
         # Capture loose stats before passing data1 into resume (may mutate in-place)
         loose_iters = getattr(data1, "_iter_count", None)
         loose_hw = _safe_half_width(data1)
         loose_time_f = float(getattr(data1, "time_integrate", 0.0))
         loose_solution_f = float(sol1.item())
-        sol2, data2, resume_log, resume_inputs, sc2 = _run_logged_case(
-            case["tight"],
-            f"{name}-RESUME",
-            verbose=verbose,
-            resume=data1,
+        loose_tol, loose_tol_name = _get_sc_tol(sc1)
+
+        # Start RESUMED stage with the same solver, retuned to the tight tolerance.
+        tight_sc = case["tight"]()
+        if hasattr(tight_sc, "target_rmse_tol"):
+            sc1.target_rmse_tol = float(tight_sc.target_rmse_tol)
+        sc1.set_tolerance(
+            abs_tol=getattr(tight_sc, "abs_tol", None),
+            rel_tol=getattr(tight_sc, "rel_tol", None),
+            rmse_tol=getattr(tight_sc, "target_rmse_tol", 
+                             getattr(tight_sc, "rmse_tol", None) if not hasattr(tight_sc, "abs_tol") else None,),
         )
+        setattr(sc1, "trace_label", f"{name}-RESUME")
+        setattr(sc1, "trace_throttle_iterations", verbose)
+        (sol2, data2), resume_log = capture_integrate(sc1, resume=data1)
+        resume_log = resume_log.strip()
+        resume_inputs = _format_problem_inputs(sc1)
+
         resume_n = int(getattr(data2, "n_total", 0))
         new_n = resume_n - old_n
         row.update(
@@ -333,23 +333,21 @@ def run_resume_case(case, verbose=True):
                 "old_n_total": str(old_n),
                 "resume_n_total": str(resume_n),
                 "resume_n_new": str(new_n),
-                "resume_time": format_value(
-                    getattr(data2, "time_integrate", float("nan")), ndigits=4
-                ),
+                "resume_time": format_value(getattr(data2, "time_integrate", float("nan")), ndigits=4),
                 "loose_inputs": loose_inputs,
                 "resume_inputs": resume_inputs,
                 "loose_log": loose_log,
                 "resume_log": resume_log,
                 # Extra numeric fields for stage summary
-                "_loose_abs_tol": _get_sc_tol(sc1)[0],
-                "_loose_tol_name": _get_sc_tol(sc1)[1],
+                "_loose_abs_tol": loose_tol,
+                "_loose_tol_name": loose_tol_name,
                 "_loose_n": old_n,
                 "_loose_hw": loose_hw,
                 "_loose_iters": loose_iters,
                 "_loose_solution_f": loose_solution_f,
                 "_loose_time_f": loose_time_f,
-                "_resume_abs_tol": _get_sc_tol(sc2)[0],
-                "_resume_tol_name": _get_sc_tol(sc2)[1],
+                "_resume_abs_tol": _get_sc_tol(sc1)[0],
+                "_resume_tol_name": _get_sc_tol(sc1)[1],
                 "_resume_n": resume_n,
                 "_resume_hw": _safe_half_width(data2),
                 "_resume_iters": getattr(data2, "_iter_count", None),
@@ -396,10 +394,9 @@ def run_fresh_case(case, verbose=True):
     return row
 
 
-# endregion
-
-
-# region Report writers
+#################################################################
+#  Report writers
+#################################################################
 def write_report(path, title, rows, summary_keys=(), input_sections=(), log_sections=()):
     """Write a text report for resume-demo rows."""
     separator = "~" * 60
