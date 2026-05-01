@@ -64,42 +64,10 @@ def _format_problem_inputs(stopping_criterion):
 
 # endregion
 
-
-# region Solver builder
-def make_CubQMCLatticeG_solver(
-    abs_tol,
-    rel_tol=0,
-    seed=7,
-    dimension=3,
-    trace_label="",
-    trace_iterations=None,
-    trace_throttle_iterations=None,
-):
-    """Build a CubQMCLatticeG solver for the demo case."""
-    integrand = Genz(
-        Lattice(dimension=dimension, seed=seed),
-        kind_func="oscillatory",
-        kind_coeff=1,
-    )
-    if trace_iterations is None:
-        trace_iterations = TRACE_ITERATIONS
-    if trace_throttle_iterations is None:
-        trace_throttle_iterations = TRACE_THROTTLE_ITERATIONS
-    solver = CubQMCLatticeG(integrand, abs_tol=abs_tol, rel_tol=rel_tol)
-    solver.trace_iterations = trace_iterations
-    solver.trace_label = trace_label
-    solver.trace_throttle_iterations = trace_throttle_iterations
-    return solver
-
-
-# endregion
-
-
 # region Result summaries and diagnostics
 def half_width(data):
     """Return the confidence-interval half-width from a QMCPy data object."""
     return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
-
 
 def print_integration_result(
     stage_name,
@@ -240,11 +208,11 @@ def print_comparison_metrics(
     print(f"{'Fresh tight time:':<{label_w}} {fresh_wall_time:>{val_w}.4f} s")
 
 
-def enable_diagnostics(stopping_criterion, label, throttle_iterations=True):
+def enable_diagnostics(stopping_criterion, label, verbose=True):
     """Enable iteration diagnostics on a stopping criterion instance."""
     setattr(stopping_criterion, "trace_iterations", True)
     setattr(stopping_criterion, "trace_label", label)
-    setattr(stopping_criterion, "trace_throttle_iterations", throttle_iterations)
+    setattr(stopping_criterion, "trace_throttle_iterations", verbose)
     return stopping_criterion
 
 
@@ -326,22 +294,22 @@ def _get_sc_tol(sc):
     return None, None
 
 
-def _run_logged_case(factory, label, throttle_iterations=True, **integrate_kwargs):
+def _run_logged_case(factory, label, verbose=True, **integrate_kwargs):
     """Build, trace, integrate, and return logs plus compact inputs."""
     sc = enable_diagnostics(
-        factory(), label, throttle_iterations=throttle_iterations
+        factory(), label, verbose=verbose
     )
     (solution, data), log = capture_integrate(sc, **integrate_kwargs)
     return solution, data, log.strip(), _format_problem_inputs(sc), sc
 
 
-def run_resume_case(case, throttle_iterations=True):
+def run_resume_case(case, verbose=True):
     """Run a loose solve followed by a resumed tighter solve."""
     name = case["name"]
     row = {"name": name}
     try:
         sol1, data1, loose_log, loose_inputs, sc1 = _run_logged_case(
-            case["loose"], f"{name}-LOOSE", throttle_iterations=throttle_iterations
+            case["loose"], f"{name}-LOOSE", verbose=verbose
         )
         old_n = int(getattr(data1, "n_total", 0))
         # Capture loose stats before passing data1 into resume (may mutate in-place)
@@ -352,7 +320,7 @@ def run_resume_case(case, throttle_iterations=True):
         sol2, data2, resume_log, resume_inputs, sc2 = _run_logged_case(
             case["tight"],
             f"{name}-RESUME",
-            throttle_iterations=throttle_iterations,
+            verbose=verbose,
             resume=data1,
         )
         resume_n = int(getattr(data2, "n_total", 0))
@@ -394,13 +362,13 @@ def run_resume_case(case, throttle_iterations=True):
     return row
 
 
-def run_fresh_case(case, throttle_iterations=True):
+def run_fresh_case(case, verbose=True):
     """Run a fresh tight solve from scratch."""
     name = case["name"]
     row = {"name": name}
     try:
         sol, data, fresh_log, fresh_inputs, sc = _run_logged_case(
-            case["tight"], f"{name}-FRESH", throttle_iterations=throttle_iterations
+            case["tight"], f"{name}-FRESH", verbose=verbose
         )
         fresh_n = int(getattr(data, "n_total", 0))
         row.update(

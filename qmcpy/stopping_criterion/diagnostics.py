@@ -18,7 +18,7 @@ class _IterationTraceLogger(object):
         """
         self.enabled = bool(getattr(stopping_criterion, "trace_iterations", False))
         self.label = str(getattr(stopping_criterion, "trace_label", ""))
-        self.throttle_iterations = bool(getattr(stopping_criterion, "trace_throttle_iterations", True))
+        self.verbose = bool(getattr(stopping_criterion, "trace_throttle_iterations", True))
         self.store_throttled_iterations = bool(getattr(stopping_criterion, "trace_store_throttled_iterations", False))
         self.header_printed = False
         self.table_header_printed = False
@@ -31,7 +31,7 @@ class _IterationTraceLogger(object):
 
     def _would_be_throttled(self, iter_count):
         """Return True if an ITER row with this count would be suppressed by throttling."""
-        if not self.throttle_iterations:
+        if not self.verbose:
             return False
         if iter_count is None or iter_count <= _THROTTLE_FREE_ITER_THRESHOLD:
             return False
@@ -140,7 +140,7 @@ class _IterationTraceLogger(object):
             stage,
             data,
             table_header=not self.table_header_printed,
-            throttle_iterations=self.throttle_iterations,
+            verbose=self.verbose,
             visible_columns=visible_columns,
         )
         self.table_header_printed = True
@@ -207,7 +207,7 @@ class _IterationTraceLogger(object):
             "ITER",
             self._last_iter_snapshot,
             table_header=False,
-            throttle_iterations=False,
+            verbose=False,
             visible_columns=self.visible_columns,
         )
         self._last_printed_iter_count = self._last_iter_count
@@ -222,7 +222,7 @@ def print_diagnostic(
     label,
     data,
     table_header=False,
-    throttle_iterations=True,
+    verbose=True,
     visible_columns=None,
 ):
     """Print diagnostic information for an integration state.
@@ -233,7 +233,7 @@ def print_diagnostic(
             ``n_total``, ``n_min``, ``m``, and ``xfull``.
         table_header (bool, optional): Whether to print the compact table
             header before the row. Defaults to False.
-        throttle_iterations (bool, optional): Whether to apply the current
+        verbose (bool, optional): Whether to apply the current
             iteration-log throttling rules for ``ITER`` rows. Defaults to True.
             If False, every iteration row is printed.
         visible_columns (tuple[str, ...] | list[str] | None, optional): Ordered
@@ -334,7 +334,7 @@ def print_diagnostic(
     m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
     throttle = iter_display
-    if throttle_iterations and label == "ITER" and throttle is not None and throttle > _THROTTLE_FREE_ITER_THRESHOLD:
+    if verbose and label == "ITER" and throttle is not None and throttle > _THROTTLE_FREE_ITER_THRESHOLD:
         step = 10 ** int(log10(throttle))
         if throttle % step != 0:
             return

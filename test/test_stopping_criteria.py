@@ -152,7 +152,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
 
         unthrottled = io.StringIO()
         with redirect_stdout(unthrottled):
-            print_diagnostic("ITER", data, throttle_iterations=False)
+            print_diagnostic("ITER", data, verbose=False)
         output = unthrottled.getvalue()
         self.assertIn("ITER", output)
         self.assertIn("1.2500000", output)

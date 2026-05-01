@@ -69,14 +69,14 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
     ]
 
 
-def main(throttle_iterations=True, seed=7, cont_seed=11, dimension=2):
+def main(verbose=True, seed=7, cont_seed=11, dimension=2):
     # Fix all demo sampler seeds here so the reported solution estimates are reproducible.
     cases = _build_cases(seed=seed, cont_seed=cont_seed, dimension=dimension)
     output_dir = Path(__file__).resolve().parent / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    resume_rows = [run_resume_case(case, throttle_iterations=case.get("throttle_iterations", throttle_iterations)) for case in cases]
-    fresh_rows  = [run_fresh_case( case, throttle_iterations=case.get("throttle_iterations", throttle_iterations)) for case in cases]
+    resume_rows = [run_resume_case(case, verbose=case.get("verbose", verbose)) for case in cases]
+    fresh_rows  = [run_fresh_case( case, verbose=case.get("verbose", verbose)) for case in cases]
 
     combined_path = output_dir / "check_resume_summary.txt"
     write_combined_report(combined_path, "Stopping Criteria Check: Resume vs Fresh", resume_rows, fresh_rows)
@@ -84,4 +84,4 @@ def main(throttle_iterations=True, seed=7, cont_seed=11, dimension=2):
 
 
 if __name__ == "__main__":
-    main(throttle_iterations=True, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAULT_DIMENSION)
+    main(verbose=True, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAULT_DIMENSION)
