@@ -1,4 +1,4 @@
-# Example Implementation of GBM Using QMCPy
+# Highly Efficient Geometric Brownian Motion Modeling with QMCPy
 
 !!! example "Example implementation of GBM using QMCPy"
     Install the required Python packages:
