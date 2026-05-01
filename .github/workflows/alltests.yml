@@ -40,31 +40,10 @@ jobs:
       - name: Add 12GB swap (Linux)
         if: runner.os == 'Linux'
         run: |
-          set +e
-          swap_enabled=0
-          sudo swapoff /swapfile 2>/dev/null || true
-          sudo rm -f /swapfile
-          for size in 12G 8G 4G; do
-            echo "Trying to add ${size} swap at /swapfile"
-            sudo fallocate -l "$size" /swapfile
-            if [ $? -ne 0 ]; then
-              echo "::warning::Could not allocate ${size} swapfile"
-              sudo rm -f /swapfile
-              continue
-            fi
-            sudo chmod 600 /swapfile
-            sudo mkswap /swapfile
-            sudo swapon /swapfile
-            if [ $? -eq 0 ]; then
-              swap_enabled=1
-              break
-            fi
-            echo "::warning::Could not enable ${size} swapfile"
-            sudo rm -f /swapfile
-          done
-          if [ "$swap_enabled" -ne 1 ]; then
-            echo "::warning::Continuing without extra Linux swap"
-          fi
+          sudo fallocate -l 12G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
           free -h
       - name: Add 12GB swap (macOS)
         if: runner.os == 'macOS'
