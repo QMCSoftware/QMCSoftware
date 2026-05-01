@@ -64,7 +64,6 @@ coverage-data/*
 *.Rhistory
 
 # Website
-.cache/
 docs/_site
 docs/Gemfile.lock
 site/
