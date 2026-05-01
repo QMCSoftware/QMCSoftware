@@ -640,6 +640,8 @@ class TestResumeFeature(unittest.TestCase):
         self.n_init = 2**8
         self.n_limit = 2**10
         self.n_limit_ml = 2**16  # multilevel algorithms need more headroom
+        self.n_init_rep = 2**5
+        self.n_limit_rep = 2**18
 
     def _iid_distribution(self):
         return IIDStdUniform(self.dimension, seed=self.seed)
@@ -664,6 +666,15 @@ class TestResumeFeature(unittest.TestCase):
 
     def _multilevel_builder(self, stopping_criterion, integrand_factory, tol_kwarg, tol):
         return lambda: stopping_criterion(integrand_factory(), **{tol_kwarg: tol}, n_limit=self.n_limit_ml)
+
+    def _qmc_rep_student_t_builder(self, abs_tol):
+        return lambda: CubQMCRepStudentT(
+            Keister(self._net_rep_distribution()),
+            abs_tol=abs_tol,
+            rel_tol=self.rel_tol,
+            n_init=self.n_init_rep,
+            n_limit=self.n_limit_rep,
+        )
 
     def _assert_resume_behavior(
         self,
@@ -704,8 +715,9 @@ class TestResumeFeature(unittest.TestCase):
                     np.array_equal(data1.xfull, old_xfull),
                     msg=f"{label} mutated the input checkpoint samples",
                 )
+                resumed_prefix = data2.xfull[..., : old_xfull.shape[-2], :]
                 self.assertTrue(
-                    np.array_equal(data2.xfull[:old_n_total], old_xfull),
+                    np.array_equal(resumed_prefix, old_xfull),
                     msg=f"{label} did not reuse the checkpoint sample prefix exactly",
                 )
 
@@ -761,6 +773,14 @@ class TestResumeFeature(unittest.TestCase):
                     compare_to_fresh=True,
                     skip_exceptions=skip_exceptions,
                 )
+
+        with self.subTest(stopping_criterion="CubQMCRepStudentT"):
+            self._assert_resume_behavior(
+                "CubQMCRepStudentT",
+                self._qmc_rep_student_t_builder(self.loose_abs_tol),
+                self._qmc_rep_student_t_builder(self.tight_abs_tol),
+                compare_to_fresh=True,
+            )
 
     def test_resume_increases_samples_for_multilevel_algorithms(self):
         """Multilevel resume runs should retain or increase sample work."""
@@ -829,7 +849,8 @@ class TestResumeFeature(unittest.TestCase):
             tight_sc.integrate(resume=checkpoint)
 
     def _qmc_rep_student_t(self):
-        return CubQMCRepStudentT(Keister(self._net_rep_distribution()), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol)
+        return CubQMCRepStudentT(Keister(self._net_rep_distribution()), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol,
+            n_init=self.n_init_rep, n_limit=self.n_limit_rep,)
 
     def _pfgpci(self):
         return PFGPCI(Ishigami(DigitalNetB2(3, seed=self.seed)), failure_threshold=0, failure_above_threshold=False, abs_tol=self.tight_abs_tol, n_init=8, n_limit=16, n_batch=4, n_approx=2**8, gpytorch_train_iter=1, verbose=False, n_ref_approx=0)
@@ -845,7 +866,6 @@ class TestResumeFeature(unittest.TestCase):
                 "CubMCG",
                 lambda: CubMCG(Keister(self._iid_distribution()), abs_tol=self.tight_abs_tol, rel_tol=self.rel_tol, n_init=self.n_init, n_limit=self.n_limit),
             ),
-            ("CubQMCRepStudentT", self._qmc_rep_student_t),
             ("PFGPCI", self._pfgpci),
         ]
 
@@ -857,6 +877,22 @@ class TestResumeFeature(unittest.TestCase):
                     self.skipTest(f"{label} unavailable: {exc}")
                 with self.assertRaises(ParameterError):
                     sc.integrate(resume=object())
+
+    def test_qmc_rep_student_t_resume_rejects_missing_running_sums(self):
+        loose_sc = CubQMCRepStudentT(
+            Keister(self._net_rep_distribution()),
+            abs_tol=self.loose_abs_tol,
+            rel_tol=self.rel_tol,
+            n_init=self.n_init_rep,
+            n_limit=self.n_limit_rep,
+        )
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "_ysums"))
+        del checkpoint._ysums
+
+        tight_sc = self._qmc_rep_student_t()
+        with self.assertRaises(ParameterError):
+            tight_sc.integrate(resume=checkpoint)
 
 class TestResumeCheckpointing(unittest.TestCase):
     def setUp(self):

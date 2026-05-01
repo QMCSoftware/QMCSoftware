@@ -1,6 +1,8 @@
 from pathlib import Path
+import warnings
 from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC,
-    CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
+    CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
+
 from resume_util import (make_abs_tol_builder, make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report)
 
 DEFAULT_SEED = 7
@@ -12,6 +14,10 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
     iid_keister = lambda dim=dimension: Keister(IIDStdUniform(dimension=dim, seed=seed))
     lattice_keister = lambda dim=dimension: Keister(Lattice(dimension=dim, seed=seed))
     net_keister = lambda dim=dimension: Keister(DigitalNetB2(dimension=dim, seed=seed))
+    rep_student_dimension = max(5, dimension)
+    net_rep_keister = lambda dim=rep_student_dimension: Keister(
+        DigitalNetB2(dimension=dim, replications=16, seed=seed)
+    )
     bayes_lattice_keister = lambda dim=dimension: Keister(Lattice(dimension=dim, seed=seed, order="RADICAL INVERSE"))
 
     def iid_financial_option():
@@ -21,7 +27,6 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
         return FinancialOption(IIDStdUniform(dimension=dimension, seed=cont_seed), start_price=30, strike_price=30)
 
     def iid_financial_option_cont_large():
-        # start_price=300, strike_price=100 gives integral ≈ 200 (> 100)
         return FinancialOption(IIDStdUniform(dimension=4, seed=cont_seed), start_price=300, strike_price=100)
 
     def qmc_financial_option():
@@ -37,6 +42,9 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
         make_tol_case("CubQMCNetG",
             make_abs_tol_builder(CubQMCNetG, net_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**22),
             1e-3, 1e-6),
+        make_tol_case("CubQMCRepStudentT",
+            make_abs_tol_builder(CubQMCRepStudentT, net_rep_keister, rel_tol=rel_tol, n_init=2**5, n_limit=2**18),
+            loose_tol, tight_tol),
         make_tol_case("CubQMCBayesLatticeG",
             make_abs_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
             loose_tol, tight_tol),
@@ -60,7 +68,6 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
 
 
 def main(verbose=False, seed=7, cont_seed=11, dimension=2):
-    # Fix all demo sampler seeds here so the reported solution estimates are reproducible.
     cases = _build_cases(seed=seed, cont_seed=cont_seed, dimension=dimension)
     output_dir = Path(__file__).resolve().parent / "output"
     output_dir.mkdir(parents=True, exist_ok=True)

@@ -25,6 +25,8 @@ import warnings
 
 
 class CubQMCRepStudentT(AbstractStoppingCriterion):
+    _RESUME_REQUIRED_FIELDS = ("xfull", "yfull", "n", "n_rep", "_ysums", "n_max")
+
     r"""
     Quasi-Monte Carlo stopping criterion based on Student's $t$-distribution for multiple replications.
 
@@ -274,26 +276,37 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
 
     def integrate(self, resume=None):
         t_start = time()
-        if resume is not None:
-            raise ParameterError("CubQMCRepStudentT does not support resume.")
-        data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "n_rep", "time_integrate"])
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n_rep = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((self.discrete_distrib.replications, 0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (self.discrete_distrib.replications, 0))
-        data._ysums = np.zeros(self.integrand.d_indv + (self.discrete_distrib.replications,), dtype=float)
+        resume_provenance = self._capture_resume_provenance(resume)
+        trace = self._make_trace_logger()
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is not None:
+            # Reset flags so the tighter tolerance is re-evaluated from existing samples.
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            trace.resume(data)
+        else:
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "n_rep", "time_integrate"])
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n_rep = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((self.discrete_distrib.replications, 0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (self.discrete_distrib.replications, 0))
+            data._ysums = np.zeros(self.integrand.d_indv + (self.discrete_distrib.replications,), dtype=float)
+        first_resume_iter = resume is not None
         while True:
-            xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull, xnext], 1)
-            ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            data.n_rep[data.compute_flags] = data.n_max
-            data._ysums[data.compute_flags] += ynext[data.compute_flags].sum(-1)
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
+                data.xfull = np.concatenate([data.xfull, xnext], 1)
+                ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+                data.n_rep[data.compute_flags] = data.n_max
+                data._ysums[data.compute_flags] += ynext[data.compute_flags].sum(-1)
             data.muhats = data._ysums / data.n_rep[..., None]
             data.solution_indv = data.muhats.mean(-1)
             data.sigmahat = data.muhats.std(-1, ddof=1)
@@ -322,6 +335,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            trace.iteration(data)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
@@ -332,14 +346,67 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                 Note that error tolerances may not be satisfied. """ % (int(data.n_total), int(data.n_total), int(self.n_limit))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
+        trace.finalize()
         return data.solution, data
+
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if int(data.stopping_crit.n_init) != int(self.n_init):
+            raise ParameterError("resume data has incompatible n_init.")
+        replications = int(self.discrete_distrib.replications)
+        n_rep_max = int(np.max(np.asarray(data.n_rep)))
+        if not self._is_power_of_two(n_rep_max):
+            raise ParameterError("resume data n_rep must be a power of 2.")
+        if int(data.n_max) != n_rep_max:
+            raise ParameterError("resume data n_max must match max(n_rep).")
+        if n_rep_max < int(self.n_init):
+            raise ParameterError(
+                "resume data must include at least n_init samples per replication."
+            )
+        if data.xfull.shape != (replications, n_rep_max, self.integrand.d):
+            raise ParameterError(
+                "resume data xfull shape must be (%d, %d, %d); got %s."
+                % (replications, n_rep_max, self.integrand.d, data.xfull.shape)
+            )
+        expected_y_shape = self.integrand.d_indv + (replications, n_rep_max)
+        if np.shape(data.yfull) != expected_y_shape:
+            raise ParameterError(
+                "resume data yfull shape must be %s; got %s."
+                % (expected_y_shape, np.shape(data.yfull))
+            )
+        if np.shape(data._ysums) != self.integrand.d_indv + (replications,):
+            raise ParameterError(
+                "resume data _ysums shape must be %s; got %s."
+                % (self.integrand.d_indv + (replications,), np.shape(data._ysums))
+            )
+        if np.shape(data.n) != self.integrand.d_indv:
+            raise ParameterError("resume data n shape must match integrand.d_indv.")
+        if np.shape(data.n_rep) != self.integrand.d_indv:
+            raise ParameterError(
+                "resume data n_rep shape must match integrand.d_indv."
+            )
+        if not np.array_equal(
+            np.asarray(data.n), replications * np.asarray(data.n_rep)
+        ):
+            raise ParameterError(
+                "resume data n must equal replications * n_rep componentwise."
+            )
+        if int(data.n_total) != replications * n_rep_max:
+            raise ParameterError(
+                "resume data n_total must equal replications * max(n_rep)."
+            )
+
+    def _restore_resume_state(self, data):
+        self._restore_resume_rng_state(data)
+        self.true_measure.discrete_distrib = self.discrete_distrib
+        self.integrand.discrete_distrib = self.discrete_distrib
+        self.integrand.true_measure.discrete_distrib = self.discrete_distrib
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
         assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
