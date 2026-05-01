@@ -530,6 +530,18 @@ def write_combined_report(path, title, resume_rows, fresh_rows):
             lines.append("")
             lines.extend([f"  {line}" for line in summary_text.splitlines()])
 
+        # Compare total n in last rows. If different, print warning
+        resume_n = rrow.get("_resume_n", 0)
+        fresh_n = frow.get("_fresh_n", 0)
+        if resume_n != fresh_n:
+            print(f"  WARNING: {name}: Inconsistent total samples across stages (resume_n={resume_n}, fresh_n={fresh_n})")
+        # Compare solutions in last rows. If > 2 tol, print warning
+        resume_sol = rrow.get("_resume_solution_f", float("nan"))
+        fresh_sol = frow.get("_fresh_solution_f", float("nan"))
+        resume_tol = rrow.get("_resume_abs_tol", float("nan"))
+        if abs(resume_sol - fresh_sol) > 2 * (resume_tol if resume_tol is not None else float("nan")):
+            print(f"  WARNING: {name}: Resume and fresh solutions differ by more than 2 * tol (resume_sol={resume_sol}, fresh_sol={fresh_sol}, tol={resume_tol})")
+
         # Errors
         for row_obj in (rrow, frow):
             if "error" in row_obj:
