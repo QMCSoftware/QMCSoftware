@@ -89,7 +89,7 @@ class PFGPCI(AbstractStoppingCriterion):
         ...     batch_sampler = PFSampleErrorDensityAR(verbose=False),
         ...     n_batch = 16,
         ...     n_limit = 128,
-        ...     n_approx = 2**12,
+        ...     n_approx = 2**18,
         ...     gpytorch_prior_mean = gpytorch.means.ZeroMean(),
         ...     gpytorch_prior_cov = gpytorch.kernels.ScaleKernel(
         ...         gpytorch.kernels.MaternKernel(nu=2.5,lengthscale_constraint = gpytorch.constraints.Interval(.5,1)),
@@ -97,19 +97,19 @@ class PFGPCI(AbstractStoppingCriterion):
         ...     gpytorch_likelihood = gpytorch.likelihoods.GaussianLikelihood(noise_constraint = gpytorch.constraints.Interval(1e-12,1e-8)),
         ...     gpytorch_marginal_log_likelihood_func = lambda likelihood,gpyt_model: gpytorch.mlls.ExactMarginalLogLikelihood(likelihood,gpyt_model),
         ...     torch_optimizer_func = lambda gpyt_model: torch.optim.Adam(gpyt_model.parameters(),lr=0.1),
-        ...     gpytorch_train_iter = 25,
+        ...     gpytorch_train_iter = 100,
         ...     gpytorch_use_gpu = False,
         ...     verbose = False,
-        ...     n_ref_approx = 0,
+        ...     n_ref_approx = 2**22,
         ...     seed_ref_approx = 11)
         >>> solution,data = pfgpci.integrate(seed=7,refit=True)
         >>> data
         PFGPCIData (Data)
-            solution        0.165
-            error_bound     0.024
-            bound_low       0.141
-            bound_high      0.188
-            n_total         2^(7)
+            solution        0.158
+            error_bound     0.022
+            bound_low       0.136
+            bound_high      0.180
+            n_total         112
             time_integrate  ...
         PFGPCI (AbstractStoppingCriterion)
             abs_tol         0.025
@@ -134,13 +134,16 @@ class PFGPCI(AbstractStoppingCriterion):
         >>> with np.printoptions(formatter={"float": lambda x: "%-10.2e"%x, "int": lambda x: "%-10d"%x, "bool": lambda x: "%-10s"%x}):
         ...     for k,v in df.items():
         ...         print("%15s: %s"%(k,str(v)))
-                   iter: [0          1          2          3          4         ]
-                  n_sum: [64         80         96         112        128       ]
-                n_batch: [64         16         16         16         16        ]
-           error_bounds: [4.39e-02   3.39e-02   3.85e-02   2.60e-02   2.37e-02  ]
-                 ci_low: [1.02e-01   1.25e-01   1.28e-01   1.39e-01   1.41e-01  ]
-                ci_high: [1.90e-01   1.92e-01   2.05e-01   1.91e-01   1.88e-01  ]
-              solutions: [1.46e-01   1.58e-01   1.66e-01   1.65e-01   1.65e-01  ]
+                   iter: [0          1          2          3         ]
+                  n_sum: [64         80         96         112       ]
+                n_batch: [64         16         16         16        ]
+           error_bounds: [5.58e-02   3.92e-02   3.05e-02   2.16e-02  ]
+                 ci_low: [8.66e-02   1.16e-01   1.19e-01   1.36e-01  ]
+                ci_high: [1.98e-01   1.95e-01   1.80e-01   1.80e-01  ]
+              solutions: [1.42e-01   1.55e-01   1.50e-01   1.58e-01  ]
+          solutions_ref: [1.62e-01   1.62e-01   1.62e-01   1.62e-01  ]
+              error_ref: [2.01e-02   7.02e-03   1.28e-02   4.52e-03  ]
+                  in_ci: [True       True       True       True      ]
 
     **References:**
 
