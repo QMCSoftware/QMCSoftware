@@ -4,6 +4,7 @@ import sys
 from .diagnostics import (  # noqa: F401
     _IterationTraceLogger,
     format_iteration_log as _format_iteration_log,
+    get_iteration_log_frame as _get_iteration_log_frame,
     print_diagnostic,
     print_iteration_log as _print_iteration_log,
 )
@@ -92,7 +93,50 @@ class AbstractStoppingCriterion(object):
             _IterationTraceLogger: Trace logger configured from the stopping
                 criterion's optional trace attributes.
         """
-        return _IterationTraceLogger(self)
+        requested_trace_iterations = bool(getattr(self, "trace_iterations", False))
+        trace_verbose = bool(getattr(self, "verbose", False))
+        had_store = hasattr(self, "_trace_store_iterations")
+        previous_store = getattr(self, "_trace_store_iterations", None)
+        had_store_all = hasattr(self, "_trace_store_all_iterations")
+        previous_store_all = getattr(self, "_trace_store_all_iterations", None)
+        had_print = hasattr(self, "_trace_print_iterations")
+        previous_print = getattr(self, "_trace_print_iterations", None)
+        self._trace_store_iterations = True
+        self._trace_store_all_iterations = requested_trace_iterations and trace_verbose
+        self._trace_print_iterations = requested_trace_iterations
+        try:
+            return _IterationTraceLogger(self)
+        finally:
+            if had_store:
+                self._trace_store_iterations = previous_store
+            else:
+                delattr(self, "_trace_store_iterations")
+            if had_store_all:
+                self._trace_store_all_iterations = previous_store_all
+            else:
+                delattr(self, "_trace_store_all_iterations")
+            if had_print:
+                self._trace_print_iterations = previous_print
+            else:
+                delattr(self, "_trace_print_iterations")
+
+    def get_iteration_log(
+        self, history=None, printed_only=True, drop_empty_columns=True, formatted=True
+    ):
+        """Return the latest iteration log as a pandas DataFrame."""
+        if history is None:
+            if printed_only and drop_empty_columns and formatted:
+                cached_history_df = getattr(self, "history_df", None)
+                if cached_history_df is not None:
+                    return cached_history_df
+            history = getattr(self, "iteration_history", None)
+        return _get_iteration_log_frame(
+            history,
+            stopping_criterion=self,
+            printed_only=printed_only,
+            drop_empty_columns=drop_empty_columns,
+            formatted=formatted,
+        )
 
     def format_iteration_log(self, history=None, printed_only=True, include_header=True):
         """Return the stored iteration log for the latest run or supplied history."""
@@ -135,18 +179,20 @@ class AbstractStoppingCriterion(object):
             return None
         validate_resume(resume)
         data = copy.deepcopy(resume)
-        self._clear_iteration_history(data)
+        self._detach_resume_stopping_criterion_history(data)
         restore_resume(data)
         return data
 
     @staticmethod
-    def _clear_iteration_history(data):
-        """Drop copied trace history from a live resume state."""
-        if hasattr(data, "iteration_history"):
-            data.iteration_history = None
+    def _detach_resume_stopping_criterion_history(data):
+        """Detach copied solver-owned history caches while preserving checkpoint history."""
         stopping_crit = getattr(data, "stopping_crit", None)
-        if stopping_crit is not None and hasattr(stopping_crit, "iteration_history"):
+        if stopping_crit is None:
+            return
+        if hasattr(stopping_crit, "iteration_history"):
             stopping_crit.iteration_history = None
+        if hasattr(stopping_crit, "history_df"):
+            stopping_crit.history_df = None
 
     def _restore_resume_state(self, data):
         """Optional hook for subclasses to align state before resuming.
@@ -228,6 +274,7 @@ class AbstractStoppingCriterion(object):
         data.time_integrate_resume = float(elapsed)
         data.time_integrate_total = previous_time + float(elapsed)
         data.iteration_history = getattr(self, "iteration_history", None)
+        data.history_df = getattr(self, "history_df", None)
         self._annotate_checkpoint_metadata(data)
 
     def _resume_value_equal(self, current, saved):

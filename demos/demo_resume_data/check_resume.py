@@ -1,8 +1,8 @@
 from pathlib import Path
 from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC, CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, 
     CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
-
-from resume_util import (make_abs_tol_builder, make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report)
+from resume_util import (make_named_tol_builder, make_tol_case, print_stage_summary, run_fresh_case, run_resume_case,
+                         stage_summary_rows_from_stage_records, stage_summary_tol_header, write_combined_report)
 
 DEFAULT_SEED = 7
 DEFAULT_CONT_SEED = 11

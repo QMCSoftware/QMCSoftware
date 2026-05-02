@@ -62,88 +62,148 @@ def half_width(data):
     """Return the confidence-interval half-width from a QMCPy data object."""
     return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
 
-def print_integration_result(
-    stage_name,
-    solution,
-    data,
-    *,
-    previous_n_total=None,
-    time_value=None,
-    time_label="Time",
-    additional_time_pairs=(),
-):
-    """Print a consistent integration-result block for resume demos."""
-    total_n = int(getattr(data, "n_total", 0))
 
-    def _positive_float(value):
+def _history_tol_value(row):
+    """Return the most relevant tolerance stored on a history row."""
+    for key in ("abs_tol", "rmse_tol"):
         try:
-            value = float(value)
+            value = float(row.get(key, None))
         except (TypeError, ValueError):
-            return None
-        if not math.isfinite(value) or value <= 0:
-            return None
-        return value
+            continue
+        if math.isfinite(value) and value > 0:
+            return value, key
+    return None, None
 
-    sc = getattr(data, "stopping_crit", None)
-    tolerance_candidates = []
-    for tol_value in (
-        getattr(data, "abs_tol", None),
-        getattr(data, "rmse_tol", None),
-        getattr(sc, "abs_tol", None) if sc is not None else None,
-        getattr(sc, "rmse_tol", None) if sc is not None else None,
-    ):
-        tol_float = _positive_float(tol_value)
-        if tol_float is not None:
-            tolerance_candidates.append(tol_float)
 
-    solution_decimals = 8
-    if tolerance_candidates:
-        solution_decimals = int(math.ceil(-math.log10(min(tolerance_candidates)))) + 1
-        solution_decimals = max(7, min(12, solution_decimals))
+def _history_half_width(row):
+    """Infer a half-width style summary from a stored history row."""
+    for key in ("bound_half_width", "bias_estimate", "rmse_estimate"):
+        try:
+            value = float(row.get(key, None))
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            return value
+    for key in ("comb_bound_diff", "bound_diff"):
+        try:
+            value = float(row.get(key, None))
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            return value / 2
+    return float("nan")
 
-    value_w = max(12, solution_decimals + 3)
-    primary_time = (
-        float(getattr(data, "time_integrate", float("nan")))
-        if time_value is None
-        else float(time_value)
+
+def _history_time_value(data):
+    """Return a stage runtime from a QMCPy data object, or NaN if unavailable."""
+    try:
+        return float(getattr(data, "time_integrate", float("nan")))
+    except (TypeError, ValueError):
+        return float("nan")
+
+
+def _stage_row_from_history(name, row, previous_n_total=0, time_value=float("nan")):
+    """Convert a stored history row into a stage-summary tuple."""
+    total_n = int(row.get("n_total", 0) or 0)
+    tol, tol_name = _history_tol_value(row)
+    return (
+        name,
+        tol,
+        total_n,
+        total_n - int(previous_n_total),
+        row.get("iter", None),
+        float(row.get("solution", float("nan"))),
+        _history_half_width(row),
+        float(time_value),
+        tol_name,
     )
 
-    labels = [
-        f"{stage_name} solution",
-        "Samples used" if previous_n_total is None else "Previous samples",
-        "Total samples" if previous_n_total is not None else None,
-        "New samples" if previous_n_total is not None else None,
-        time_label,
-        *[str(extra_label) for extra_label, _ in additional_time_pairs],
-        "Estimated interval half-width",
-    ]
-    labels = [label for label in labels if label is not None]
-    label_w = max(len(label) + 1 for label in labels)
 
-    def _print_value_line(label, value_text):
-        print(f"  {label + ':':<{label_w}} {value_text:>{value_w}}")
-
-    print()
-    _print_value_line(
-        f"{stage_name} solution", f"{solution.item():.{solution_decimals}f}"
-    )
-    if previous_n_total is None:
-        _print_value_line("Samples used", f"{total_n:,}")
+def stage_summary_rows_from_histories(
+    resume_solver,
+    *,
+    loose_data=None,
+    resume_data=None,
+    fresh_solver=None,
+    fresh_data=None,
+):
+    """Build stage-summary rows from solver iteration histories."""
+    history = getattr(resume_solver, "iteration_history", None)
+    if history is None or len(history) == 0:
+        raise ValueError("resume_solver has no stored iteration history")
+    rows = []
+    resume_indices = [index for index, stage in enumerate(history["stage"]) if stage == "RESUME"]
+    if resume_indices:
+        resume_index = resume_indices[0]
+        loose_index = max(
+            (index for index in range(resume_index) if history["stage"][index] != "RESUME"),
+            default=resume_index,
+        )
+        rows.append(
+            _stage_row_from_history(
+                "Loose",
+                history.row(loose_index),
+                previous_n_total=0,
+                time_value=_history_time_value(loose_data),
+            )
+        )
+        rows.append(
+            _stage_row_from_history(
+                "Resumed",
+                history.row(len(history) - 1),
+                previous_n_total=int(history["n_total"][resume_index] or 0),
+                time_value=_history_time_value(resume_data),
+            )
+        )
     else:
-        previous_n_total = int(previous_n_total)
-        _print_value_line("Previous samples", f"{previous_n_total:,}")
-        _print_value_line("Total samples", f"{total_n:,}")
-        _print_value_line("New samples", f"{total_n - previous_n_total:,}")
+        rows.append(
+            _stage_row_from_history(
+                "Loose" if fresh_solver is not None else "Run",
+                history.row(len(history) - 1),
+                previous_n_total=0,
+                time_value=_history_time_value(loose_data if fresh_solver is not None else resume_data),
+            )
+        )
+    if fresh_solver is not None:
+        fresh_history = getattr(fresh_solver, "iteration_history", None)
+        if fresh_history is None or len(fresh_history) == 0:
+            raise ValueError("fresh_solver has no stored iteration history")
+        rows.append(
+            _stage_row_from_history(
+                "Fresh",
+                fresh_history.row(len(fresh_history) - 1),
+                previous_n_total=0,
+                time_value=_history_time_value(fresh_data),
+            )
+        )
+    return rows
 
-    _print_value_line(time_label, f"{primary_time:.4f} s")
-    for extra_label, extra_time in additional_time_pairs:
-        _print_value_line(str(extra_label), f"{float(extra_time):.4f} s")
-    _print_value_line("Estimated interval half-width", f"{half_width(data):.2e}")
+
+def stage_summary_rows_from_stage_records(loose_stage, resume_stage=None, fresh_stage=None):
+    """Build stage-summary rows from stored stage-record dictionaries."""
+    rows = []
+    for name, stage in (("Loose", loose_stage), ("Resumed", resume_stage), ("Fresh", fresh_stage)):
+        if not stage:
+            continue
+        rows.append(
+            (
+                name,
+                stage.get("tol"),
+                stage.get("total_n", 0),
+                stage.get("new_n", 0),
+                stage.get("iters"),
+                stage.get("solution", float("nan")),
+                stage.get("half_width", float("nan")),
+                stage.get("time", 0.0),
+            )
+        )
+    return rows
 
 
-def print_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
-    """Print a compact stage-by-stage sample and time summary table."""
-    print(format_stage_summary(rows, title=title, tol_header=tol_header))
+def stage_summary_tol_header(*stages):
+    """Infer the preferred tolerance-column header from stage records."""
+    tol_names = {stage.get("tol_name") for stage in stages if stage} - {None}
+    return "rmse_tol" if tol_names == {"target_rmse_tol"} else "abs_tol"
 
 
 def format_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
@@ -188,25 +248,33 @@ def format_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     return "\n".join(lines)
 
 
-def print_comparison_metrics(
-    incremental_speedup,
-    new_samples_resume,
-    new_samples_fresh,
-    samples_saved,
-    two_step_time,
-    fresh_wall_time,
-    label_w=36,
-    val_w=14,
+def print_stage_summary(
+    rows=None,
+    *,
+    title="Stage summary",
+    tol_header=None,
+    resume_solver=None,
+    loose_data=None,
+    resume_data=None,
+    fresh_solver=None,
+    fresh_data=None,
 ):
-    """Print a compact block of resume-vs-fresh comparison metrics."""
-    print("\nComparison metrics")
-    print(f"{'Incremental speedup (fresh/resume):':<{label_w}} {incremental_speedup:>{val_w}.2f}x")
-    print(f"{'Resume new samples:':<{label_w}} {new_samples_resume:>{val_w},}")
-    print(f"{'Fresh new samples:':<{label_w}} {new_samples_fresh:>{val_w},}")
-    print(f"{'Samples saved by resume:':<{label_w}} {samples_saved:>{val_w},}")
-    print(f"{'End-to-end loose+resume time:':<{label_w}} {two_step_time:>{val_w}.4f} s")
-    print(f"{'Fresh tight time:':<{label_w}} {fresh_wall_time:>{val_w}.4f} s")
-
+    """Print a compact stage-by-stage sample and time summary table."""
+    if rows is None:
+        rows = stage_summary_rows_from_histories(
+            resume_solver,
+            loose_data=loose_data,
+            resume_data=resume_data,
+            fresh_solver=fresh_solver,
+            fresh_data=fresh_data,
+        )
+        if tol_header is None:
+            tol_names = {row[-1] for row in rows} - {None}
+            tol_header = "rmse_tol" if tol_names == {"rmse_tol"} else "abs_tol"
+        rows = [row[:-1] for row in rows]
+    elif tol_header is None:
+        tol_header = "abs_tol"
+    print(format_stage_summary(rows, title=title, tol_header=tol_header))
 
 def collect_resume_fresh_warnings(name, resume_stage, fresh_stage):
     """Return warning strings for mismatched resume-vs-fresh outcomes."""
@@ -409,52 +477,6 @@ def run_fresh_case(case, verbose=False):
 #################################################################
 #  Report writers
 #################################################################
-def write_report(path, title, rows, summary_keys=(), input_sections=(), log_sections=()):
-    """Write a text report for resume-demo rows."""
-    separator = "~" * 60
-    lines = [title, f"generated: {strftime('%Y-%m-%d %H:%M:%S')}", ""]
-    for i, row in enumerate(rows):
-        if i > 0:
-            lines.append(separator)
-            lines.append("")
-        lines.append(
-            f"[{row.get('name', 'unknown')}] status={row.get('status', 'unknown')}"
-        )
-        printed_inputs = False
-        for section_label, row_key in input_sections:
-            input_text = row.get(row_key, "")
-            if not input_text:
-                continue
-            if printed_inputs:
-                lines.append("")
-            lines.append(f"  {section_label}:")
-            lines.extend([f"    {line}" for line in input_text.splitlines()])
-            printed_inputs = True
-        printed_log = False
-        for section_label, row_key in log_sections:
-            log_text = row.get(row_key, "")
-            if not log_text:
-                continue
-            if printed_inputs or printed_log:
-                lines.append("")
-            lines.append(f"  {section_label}:")
-            lines.extend([f"    {line}" for line in log_text.splitlines()])
-            printed_log = True
-        if printed_log and summary_keys:
-            lines.append("")
-        printed_summary = False
-        for key in summary_keys:
-            if key in row:
-                lines.append(f"  {key}: {row[key]}")
-                printed_summary = True
-        if "error" in row:
-            if printed_log or printed_summary:
-                lines.append("")
-            lines.append(f"  error: {row['error']}")
-        lines.append("")
-    path.write_text("\n".join(lines), encoding="utf-8")
-
-
 def write_combined_report(path, title, resume_rows, fresh_rows):
     """Write combined loose/resume/fresh reports with stage summaries."""
     separator = "~" * 60
@@ -499,45 +521,12 @@ def write_combined_report(path, title, resume_rows, fresh_rows):
 
         # Stage summary table
         if rstatus == "ok" and fstatus == "ok":
-            stage_rows = [
-                (
-                    "Loose",
-                    loose_stage.get("tol"),
-                    loose_stage.get("total_n", 0),
-                    loose_stage.get("new_n", 0),
-                    loose_stage.get("iters"),
-                    loose_stage.get("solution", float("nan")),
-                    loose_stage.get("half_width", float("nan")),
-                    loose_stage.get("time", 0.0),
-                ),
-                (
-                    "Resumed",
-                    resume_stage.get("tol"),
-                    resume_stage.get("total_n", 0),
-                    resume_stage.get("new_n", 0),
-                    resume_stage.get("iters"),
-                    resume_stage.get("solution", float("nan")),
-                    resume_stage.get("half_width", float("nan")),
-                    resume_stage.get("time", 0.0),
-                ),
-                (
-                    "Fresh",
-                    fresh_stage.get("tol"),
-                    fresh_stage.get("total_n", 0),
-                    fresh_stage.get("new_n", 0),
-                    fresh_stage.get("iters"),
-                    fresh_stage.get("solution", float("nan")),
-                    fresh_stage.get("half_width", float("nan")),
-                    fresh_stage.get("time", 0.0),
-                ),
-            ]
-            # Use target_rmse_tol as the column header when all rows report that name
-            tol_names = {
-                loose_stage.get("tol_name"),
-                resume_stage.get("tol_name"),
-                fresh_stage.get("tol_name"),
-            } - {None}
-            tol_header = "rmse_tol" if tol_names == {"target_rmse_tol"} else "abs_tol"
+            stage_rows = stage_summary_rows_from_stage_records(
+                loose_stage, resume_stage, fresh_stage
+            )
+            tol_header = stage_summary_tol_header(
+                loose_stage, resume_stage, fresh_stage
+            )
             summary_text = format_stage_summary(
                 stage_rows, title=f"Stage summary of {name}", tol_header=tol_header
             ).strip()

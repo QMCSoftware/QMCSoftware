@@ -42,4 +42,4 @@ python demos/demo_resume_data/check_resume.py
 creates the following file in `output/`:
 - `check_resume_summary.txt`: Combined report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including stored iteration logs.
 
-Each solver now exposes `format_iteration_log()` and `print_iteration_log()` for replaying the stored trace after `integrate()`.
+Each solver now stores an in-memory iteration log after `integrate()`. Use `history_df` or `get_iteration_log()` for a formatted table, or `format_iteration_log()` / `print_iteration_log()` for text replay. By default that stored history is throttled; enabling `trace_iterations` lets you opt into live printing, and `verbose=True` stores every iteration. On resumed runs, the new `RESUME` stage is appended to the saved loose-stage history. The demo helper `print_stage_summary(...)` can now rebuild the Loose/Resumed/Fresh summary directly from those stored histories.

@@ -4,12 +4,12 @@ import builtins
 import copy
 import importlib
 import io
-import os
 import pickle
 import tempfile
 import unittest
 import warnings
 import numpy as np
+import pandas as pd
 from contextlib import ExitStack, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
@@ -254,7 +254,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             ("stage", "iter", "solution", "n_total", "m", "xfull.shape"),
         )
 
-    def test_prepare_resume_data_clears_history(self):
+    def test_prepare_resume_data_preserves_history(self):
         distrib = _DummyDiscreteDistribution()
         integrand = _DummyIntegrand(object(), distrib)
         sc = _DummyStoppingCriterion(
@@ -268,6 +268,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             {
                 "iter": 1,
                 "solution": 1.0,
+                "abs_tol": 0.1,
                 "bound_diff": None,
                 "comb_bound_diff": None,
                 "bound_half_width": None,
@@ -286,12 +287,19 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         resume.solution = 1.0
         resume.n_total = 16
         resume.iteration_history = history
-        resume.stopping_crit = type("SavedSC", (), {"iteration_history": history})()
+        resume.history_df = pd.DataFrame({"stage": ["ITER"], "iter": ["1"]})
+        resume.stopping_crit = type(
+            "SavedSC", (), {"iteration_history": history, "history_df": resume.history_df}
+        )()
         copied = sc._prepare_resume_data(resume, lambda data: None, lambda data: None)
-        self.assertIsNone(copied.iteration_history)
+        self.assertIsNotNone(copied.iteration_history)
+        self.assertIsNot(copied.iteration_history, history)
+        self.assertEqual(copied.iteration_history["stage"], history["stage"])
         self.assertIsNone(copied.stopping_crit.iteration_history)
+        self.assertIsNone(copied.stopping_crit.history_df)
         self.assertIs(resume.iteration_history, history)
         self.assertIs(resume.stopping_crit.iteration_history, history)
+        self.assertIs(resume.stopping_crit.history_df, resume.history_df)
 
     def test_init_requires_integrand(self):
         with self.assertRaises(ParameterError):
@@ -437,7 +445,7 @@ class TestCubMCCLT(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(IIDStdUniform(dimension=2, seed=7))
-        solution, data = CubMCCLT(integrand, abs_tol=tol).integrate()
+        solution, _ = CubMCCLT(integrand, abs_tol=tol).integrate()
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_trace_history(self):
@@ -468,6 +476,31 @@ class TestCubMCCLT(unittest.TestCase):
         sc.print_iteration_log(file=replay_stream)
         self.assertEqual(replay_stream.getvalue().strip(), log_text)
 
+    def test_iteration_log_available_without_live_trace(self):
+        sc = CubMCCLT(
+            Keister(IIDStdUniform(dimension=2, seed=7)),
+            abs_tol=0.5,
+            n_init=64,
+            n_limit=4096,
+        )
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            _, data = sc.integrate()
+        self.assertEqual(stream.getvalue(), "")
+        self.assertIs(data.iteration_history, sc.iteration_history)
+        self.assertIsInstance(data.iteration_history, IterationHistoryTable)
+        log_df = sc.get_iteration_log()
+        self.assertIsInstance(sc.history_df, pd.DataFrame)
+        self.assertIs(data.history_df, sc.history_df)
+        self.assertTrue(log_df.equals(sc.history_df))
+        self.assertFalse(log_df.empty)
+        self.assertNotIn("printed", log_df.columns)
+        self.assertIn("stage", log_df.columns)
+        self.assertIn("n_total", log_df.columns)
+        self.assertRegex(log_df.iloc[-1]["solution"], r"^-?\d+\.\d{7}$")
+        self.assertRegex(log_df.iloc[-1]["bound_diff"], r"^-?\d\.\d{3}e[+-]\d{2}$")
+        self.assertEqual(len(log_df), len(sc.get_iteration_log(printed_only=False)))
+
 
 class TestCubMCG(unittest.TestCase):
     """Unit tests for CubMCG StoppingCriterion."""
@@ -483,7 +516,7 @@ class TestCubMCG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(IIDStdUniform(dimension=2, seed=7))
-        solution, data = CubMCG(integrand, abs_tol=tol).integrate()
+        solution, _ = CubMCG(integrand, abs_tol=tol).integrate()
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
 
@@ -501,7 +534,7 @@ class TestCubQMCCLT(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(Halton(dimension=2, seed=7, replications=32))
-        solution, data = CubQMCCLT(integrand, abs_tol=tol).integrate()
+        solution, _ = CubQMCCLT(integrand, abs_tol=tol).integrate()
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices_dnb2(self):
@@ -534,7 +567,7 @@ class TestCubQMCLatticeG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(Lattice(dimension=2, seed=7))
-        solution, data = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
+        solution, _ = CubQMCLatticeG(integrand, abs_tol=tol).integrate()
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices(self):
@@ -557,7 +590,7 @@ class TestCubQMCNetG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(DigitalNetB2(dimension=2, seed=7))
-        solution, data = CubQMCNetG(integrand, abs_tol=tol).integrate()
+        solution, _ = CubQMCNetG(integrand, abs_tol=tol).integrate()
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
     def test_sobol_indices(self):
@@ -580,19 +613,19 @@ class TestCubBayesLatticeG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(Lattice(dimension=2, seed=7, order="RADICAL INVERSE"))
-        solution, data = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2**5).integrate()
+        solution, _ = CubBayesLatticeG(integrand, abs_tol=tol, n_init=2**5).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices_bayes_lattice(self, dims=3, abs_tol=1e-2):
         keister_d_ = Keister(Lattice(dimension=dims, seed=7))
         keister_indices_ = SobolIndices(keister_d_, indices="singletons")
         sc_ = CubQMCLatticeG(keister_indices_, abs_tol=abs_tol, ptransform="Baker")
-        solution_, data_ = sc_.integrate()
+        solution_, _ = sc_.integrate()
 
         keister_d = Keister(Lattice(dimension=dims, order="RADICAL INVERSE", seed=7))
         keister_indices = SobolIndices(keister_d, indices="singletons")
         sc = CubBayesLatticeG(keister_indices, order=1, abs_tol=abs_tol, ptransform="Baker")
-        solution, data = sc.integrate()
+        solution, _ = sc.integrate()
 
         self.assertTrue(solution.shape, (dims, dims, 1))
         self.assertTrue(abs(solution - solution_).max() < abs_tol)
@@ -618,7 +651,7 @@ class TestCubBayesNetG(unittest.TestCase):
 
     def test_keister_2d(self):
         integrand = Keister(DigitalNetB2(dimension=2, seed=7))
-        solution, data = CubBayesNetG(integrand, n_init=2**5, abs_tol=tol).integrate()
+        solution, _ = CubBayesNetG(integrand, n_init=2**5, abs_tol=tol).integrate()
         self.assertTrue(abs(solution - keister_2d_exact) < tol)
 
     def test_sobol_indices(self):
@@ -884,6 +917,23 @@ class TestResumeFeature(unittest.TestCase):
                 compare_to_fresh=True,
             )
 
+    def test_resume_appends_iteration_history(self):
+        loose_sc = self._qmc_rep_student_t_builder(self.loose_abs_tol)()
+        _, checkpoint = loose_sc.integrate()
+        loose_df = checkpoint.history_df.copy()
+
+        resumed_sc = self._qmc_rep_student_t_builder(self.tight_abs_tol)()
+        _, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        self.assertIsInstance(resumed_sc.history_df, pd.DataFrame)
+        self.assertIs(resumed.history_df, resumed_sc.history_df)
+        self.assertGreater(len(resumed.history_df), len(loose_df))
+        self.assertEqual(
+            list(resumed.history_df["stage"].iloc[: len(loose_df)]),
+            list(loose_df["stage"]),
+        )
+        self.assertEqual(resumed.history_df["stage"].iloc[len(loose_df)], "RESUME")
+
     def test_resume_increases_multilevel_samples(self):
         """Multilevel resume runs should retain or increase sample work."""
         cases = [
@@ -947,6 +997,7 @@ class TestResumeFeature(unittest.TestCase):
                 def fake_integrate(resume_data, skip_level_reset=False, step_tol=None):
                     captured["levels"] = resume_data.levels
                     captured["skip_level_reset"] = skip_level_reset
+                    captured["step_tol"] = step_tol
 
                 with patch.object(sc, "_validate_resume"), \
                      patch.object(sc, "_integrate", side_effect=fake_integrate):
@@ -954,6 +1005,7 @@ class TestResumeFeature(unittest.TestCase):
 
                 self.assertEqual(captured["levels"], expected_levels)
                 self.assertTrue(captured["skip_level_reset"])
+                self.assertIsNotNone(captured["step_tol"])
                 self.assertEqual(sc.rmse_tol, sc.target_rmse_tol)
 
     def test_qmc_resume_requires_transform_state(self):
@@ -1411,7 +1463,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
         sc = self._make_sc()
 
         class BadEq:
-            def __eq__(self, other):
+            def __eq__(self, _other):
                 raise ValueError("comparison not supported")
 
         result = sc._resume_value_equal(BadEq(), BadEq())
@@ -1616,6 +1668,67 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         self.assertIn("WARNING: DemoSolver: Inconsistent total samples across stages", stdout_text)
         self.assertIn("WARNING: DemoSolver: Resume and fresh solutions differ by more than 2 * tol", stdout_text)
 
+    def test_print_stage_summary_from_histories(self):
+        resume_util = self._load_resume_util()
+        resume_history = IterationHistoryTable()
+        for stage, row in [
+            ("ITER", {"iter": 1, "solution": 1.0, "abs_tol": 1e-2, "comb_bound_diff": 4e-2, "n_min": 0, "n_total": 16, "m": 4, "xfull.shape": (16, 2)}),
+            ("ITER", {"iter": 2, "solution": 1.1, "abs_tol": 1e-2, "comb_bound_diff": 2e-2, "n_min": 16, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
+            ("RESUME", {"iter": 2, "solution": 1.1, "abs_tol": 1e-3, "comb_bound_diff": 2e-2, "n_min": 32, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
+            ("ITER", {"iter": 3, "solution": 1.125, "abs_tol": 1e-3, "comb_bound_diff": 6e-3, "n_min": 32, "n_total": 64, "m": 6, "xfull.shape": (64, 2)}),
+        ]:
+            resume_history.append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
+        fresh_history = IterationHistoryTable()
+        for stage, row in [
+            ("ITER", {"iter": 1, "solution": 1.0, "abs_tol": 1e-3, "comb_bound_diff": 4e-2, "n_min": 0, "n_total": 16, "m": 4, "xfull.shape": (16, 2)}),
+            ("ITER", {"iter": 2, "solution": 1.1, "abs_tol": 1e-3, "comb_bound_diff": 2e-2, "n_min": 16, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
+            ("ITER", {"iter": 3, "solution": 1.125, "abs_tol": 1e-3, "comb_bound_diff": 6e-3, "n_min": 32, "n_total": 64, "m": 6, "xfull.shape": (64, 2)}),
+        ]:
+            fresh_history.append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
+        resume_solver = type("ResumeSolver", (), {"iteration_history": resume_history})()
+        fresh_solver = type("FreshSolver", (), {"iteration_history": fresh_history})()
+        rows = resume_util.stage_summary_rows_from_histories(
+            resume_solver,
+            loose_data=type("LooseData", (), {"time_integrate": 0.1})(),
+            resume_data=type("ResumeData", (), {"time_integrate": 0.2})(),
+            fresh_solver=fresh_solver,
+            fresh_data=type("FreshData", (), {"time_integrate": 0.3})(),
+        )
+        self.assertEqual(rows[0][:5], ("Loose", 1e-2, 32, 32, 2))
+        self.assertEqual(rows[1][:5], ("Resumed", 1e-3, 64, 32, 3))
+        self.assertEqual(rows[2][:5], ("Fresh", 1e-3, 64, 64, 3))
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            resume_util.print_stage_summary(
+                resume_solver=resume_solver,
+                loose_data=type("LooseData", (), {"time_integrate": 0.1})(),
+                resume_data=type("ResumeData", (), {"time_integrate": 0.2})(),
+                fresh_solver=fresh_solver,
+                fresh_data=type("FreshData", (), {"time_integrate": 0.3})(),
+            )
+        output = stream.getvalue()
+        self.assertIn("Loose", output)
+        self.assertIn("Resumed", output)
+        self.assertIn("Fresh", output)
+        self.assertIn("32", output)
+        self.assertIn("64", output)
+
+    def test_stage_summary_rows_from_stage_records(self):
+        resume_util = self._load_resume_util()
+        loose_stage = {"tol": 1e-2, "tol_name": "abs_tol", "total_n": 32, "new_n": 32, "iters": 2, "solution": 1.1, "half_width": 1e-2, "time": 0.1}
+        resume_stage = {"tol": 1e-3, "tol_name": "abs_tol", "total_n": 64, "new_n": 32, "iters": 3, "solution": 1.125, "half_width": 3e-3, "time": 0.2}
+        fresh_stage = {"tol": 1e-3, "tol_name": "abs_tol", "total_n": 64, "new_n": 64, "iters": 3, "solution": 1.125, "half_width": 3e-3, "time": 0.3}
+        rows = resume_util.stage_summary_rows_from_stage_records(
+            loose_stage, resume_stage, fresh_stage
+        )
+        self.assertEqual(rows[0][:5], ("Loose", 1e-2, 32, 32, 2))
+        self.assertEqual(rows[1][:5], ("Resumed", 1e-3, 64, 32, 3))
+        self.assertEqual(rows[2][:5], ("Fresh", 1e-3, 64, 64, 3))
+        self.assertEqual(
+            resume_util.stage_summary_tol_header(loose_stage, resume_stage, fresh_stage),
+            "abs_tol",
+        )
+
     def test_print_diagnostic_auto_optional_columns(self):
         """visible_columns=None auto-detects and displays all optional columns."""
         data = self._make_rich_data()
@@ -1704,6 +1817,23 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         self.assertEqual(stream.getvalue(), "")
         self.assertEqual(len(logger.history), 1)
         self.assertTrue(logger.history["printed"][0])
+
+    def test_trace_history_stores_solver_tolerance(self):
+        sc = type(
+            "SC",
+            (),
+            {
+                "trace_iterations": True,
+                "trace_label": "",
+                "verbose": False,
+                "abs_tol": 1e-3,
+            },
+        )()
+        logger = _IterationTraceLogger(sc)
+        data = type("Data", (), {"solution": 1.0, "n_total": 10})()
+        with redirect_stdout(io.StringIO()):
+            logger.iteration(data)
+        self.assertEqual(logger.history["abs_tol"][0], 1e-3)
 
     def test_resume_non_int_iter_count(self):
         """resume() silently ignores a non-int _iter_count on the data."""
@@ -1810,7 +1940,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         """CubMLMC adds levels through the bias convergence path."""
         fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
         sc = CubMLMC(fo, rmse_tol=0.5, n_limit=int(1e10))
-        sol, data = sc.integrate()
+        _, data = sc.integrate()
         # A successful run must have added at least one level beyond levels_min=2
         self.assertGreater(data.levels, 2)
 
@@ -1818,7 +1948,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         """CubMLQMC exercises the elif bias > rmse_tol/sqrt(2) → _add_level path."""
         fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
         sc = CubMLQMC(fo, abs_tol=0.5, n_limit=int(1e10))
-        sol, data = sc.integrate()
+        _, data = sc.integrate()
         # A successful run should have exercised at least one level addition
         self.assertGreater(data.levels, 1)
 
@@ -1839,7 +1969,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
             return sc.target_rmse_tol * 0.3
 
         with patch.object(sc, "_rmse", side_effect=patched_rmse):
-            sol, data = sc.integrate()
+            _, data = sc.integrate()
 
         # levels > levels_min+1 = 3 confirms _add_level fired inside _integrate
         self.assertGreater(data.levels, 3)
