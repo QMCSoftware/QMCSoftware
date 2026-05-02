@@ -1,10 +1,271 @@
 """Diagnostics helpers for stopping-criterion iteration tracing."""
 
+import io
 import numpy as np
+import sys
+from contextlib import redirect_stdout
 from math import log10
 
 # ITER rows up to this count are always printed; above it the log-scale throttle applies.
 _THROTTLE_ITER_THRESHOLD = 30
+
+_ITERATION_HISTORY_COLUMNS = (
+    "stage",
+    "iter",
+    "solution",
+    "bound_diff",
+    "comb_bound_diff",
+    "bound_half_width",
+    "bias_estimate",
+    "rmse_estimate",
+    "rmse_tol",
+    "n_min",
+    "n_total",
+    "m",
+    "xfull.shape",
+    "printed",
+)
+
+
+class IterationHistoryTable(object):
+    """Column-oriented storage for iteration trace rows."""
+
+    __slots__ = ("_columns", "visible_columns", "context")
+
+    def __init__(self):
+        self._columns = {column: [] for column in _ITERATION_HISTORY_COLUMNS}
+        self.visible_columns = None
+        self.context = None
+
+    @property
+    def columns(self):
+        return _ITERATION_HISTORY_COLUMNS
+
+    @property
+    def shape(self):
+        return (len(self), len(self.columns))
+
+    def __len__(self):
+        return len(self._columns["stage"])
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            return self._columns[key]
+        return self.row(key)
+
+    def __repr__(self):
+        return "IterationHistoryTable(rows=%d, columns=%s)" % (
+            len(self),
+            self.columns,
+        )
+
+    def append(self, stage, row, visible_columns=None, printed=True):
+        if self.visible_columns is None and visible_columns is not None:
+            self.visible_columns = tuple(visible_columns)
+        self._columns["stage"].append(stage)
+        self._columns["iter"].append(row["iter"])
+        self._columns["solution"].append(row["solution"])
+        self._columns["bound_diff"].append(row["bound_diff"])
+        self._columns["comb_bound_diff"].append(row["comb_bound_diff"])
+        self._columns["bound_half_width"].append(row["bound_half_width"])
+        self._columns["bias_estimate"].append(row["bias_estimate"])
+        self._columns["rmse_estimate"].append(row["rmse_estimate"])
+        self._columns["rmse_tol"].append(row["rmse_tol"])
+        self._columns["n_min"].append(row["n_min"])
+        self._columns["n_total"].append(row["n_total"])
+        self._columns["m"].append(row["m"])
+        self._columns["xfull.shape"].append(row["xfull.shape"])
+        self._columns["printed"].append(bool(printed))
+        return len(self) - 1
+
+    def mark_printed(self, index, printed=True):
+        self._columns["printed"][index] = bool(printed)
+
+    def row(self, index):
+        return {column: self._columns[column][index] for column in self.columns}
+
+    def rows(self):
+        return [self.row(index) for index in range(len(self))]
+
+    def to_dict(self):
+        return {column: list(values) for column, values in self._columns.items()}
+
+
+def _safe_get_first_element(obj):
+    try:
+        if isinstance(obj, (list, tuple, np.ndarray)) and obj is not None:
+            if hasattr(obj, "shape") and obj.shape == ():
+                return obj
+            if len(obj) > 0:
+                return obj[0]
+        return obj
+    except (TypeError, AttributeError):
+        return obj
+
+
+def _positive_float(value):
+    value = _safe_get_first_element(value)
+    if value is None:
+        return None
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not np.isfinite(value) or value <= 0:
+        return None
+    return value
+
+
+def _extract_diagnostic_row(data):
+    xfull = getattr(data, "xfull", None)
+    m = getattr(data, "m", None)
+    iter_count = getattr(data, "_iter_count", None)
+    n_min = getattr(data, "n_min", None)
+    n_total = getattr(data, "n_total", None)
+    return {
+        "iter": int(iter_count) if iter_count is not None else None,
+        "solution": _safe_get_first_element(getattr(data, "solution", None)),
+        "bound_diff": _safe_get_first_element(getattr(data, "bound_diff", None)),
+        "comb_bound_diff": _safe_get_first_element(
+            getattr(data, "comb_bound_diff", None)
+        ),
+        "bound_half_width": _safe_get_first_element(
+            getattr(data, "bound_half_width", None)
+        ),
+        "bias_estimate": _safe_get_first_element(
+            getattr(data, "bias_estimate", None)
+        ),
+        "rmse_estimate": _safe_get_first_element(
+            getattr(data, "rmse_estimate", None)
+        ),
+        "rmse_tol": _safe_get_first_element(getattr(data, "rmse_tol", None)),
+        "n_min": int(n_min) if n_min is not None else None,
+        "n_total": int(n_total) if n_total is not None else None,
+        "m": int(_safe_get_first_element(m)) if m is not None else None,
+        "xfull.shape": getattr(xfull, "shape", None),
+    }
+
+
+def _visible_columns_from_row(row, include_n_min=False):
+    visible_columns = ["stage", "iter", "solution"]
+    if row["bound_diff"] is not None:
+        visible_columns.append("bound_diff")
+    if row["comb_bound_diff"] is not None:
+        visible_columns.append("comb_bound_diff")
+    if row["bound_half_width"] is not None:
+        visible_columns.append("bound_half_width")
+    if row["bias_estimate"] is not None:
+        visible_columns.append("bias_estimate")
+    if row["rmse_estimate"] is not None:
+        visible_columns.append("rmse_estimate")
+    if row["rmse_tol"] is not None:
+        visible_columns.append("rmse_tol")
+    if include_n_min or row["n_min"] is not None:
+        visible_columns.append("n_min")
+    visible_columns.append("n_total")
+    if row["m"] is not None:
+        visible_columns.append("m")
+    if row["xfull.shape"] is not None:
+        visible_columns.append("xfull.shape")
+    return tuple(visible_columns)
+
+
+def _history_context_from_stopping_criterion(stopping_criterion):
+    return {
+        "trace_label": str(getattr(stopping_criterion, "trace_label", "")),
+        "abs_tol": getattr(stopping_criterion, "abs_tol", None),
+        "rel_tol": getattr(stopping_criterion, "rel_tol", None),
+        "rmse_tol": getattr(stopping_criterion, "rmse_tol", None),
+        "target_rmse_tol": getattr(stopping_criterion, "target_rmse_tol", None),
+    }
+
+
+def _build_history_stopping_criterion(history, stopping_criterion=None):
+    context = dict(getattr(history, "context", None) or {})
+    if not context and stopping_criterion is not None:
+        context = _history_context_from_stopping_criterion(stopping_criterion)
+    return type("HistoryStoppingCriterion", (), context)()
+
+
+def _build_history_data(history, index, stopping_criterion=None):
+    row = history.row(index)
+    context = dict(getattr(history, "context", None) or {})
+    data = type("HistoryRowData", (), {})()
+    data._iter_count = row["iter"]
+    data.solution = row["solution"]
+    data.bound_diff = row["bound_diff"]
+    data.comb_bound_diff = row["comb_bound_diff"]
+    data.bound_half_width = row["bound_half_width"]
+    data.bias_estimate = row["bias_estimate"]
+    data.rmse_estimate = row["rmse_estimate"]
+    data.rmse_tol = (
+        row["rmse_tol"]
+        if row["rmse_tol"] is not None
+        else context.get("rmse_tol", context.get("target_rmse_tol"))
+    )
+    data.n_min = row["n_min"]
+    data.n_total = row["n_total"]
+    data.m = row["m"]
+    data.abs_tol = context.get("abs_tol", None)
+    data.rel_tol = context.get("rel_tol", None)
+    if row["xfull.shape"] is not None:
+        data.xfull = type("HistoryShape", (), {"shape": row["xfull.shape"]})()
+    else:
+        data.xfull = None
+    data.stopping_crit = _build_history_stopping_criterion(history, stopping_criterion)
+    return row["stage"], data
+
+
+def print_iteration_log(
+    history,
+    stopping_criterion=None,
+    printed_only=True,
+    include_header=True,
+    file=None,
+):
+    """Print a stored iteration log from an IterationHistoryTable."""
+    if history is None or len(history) == 0:
+        return
+    if file is None:
+        file = sys.stdout
+    context = dict(getattr(history, "context", None) or {})
+    label = context.get("trace_label", "")
+    if (not label) and stopping_criterion is not None:
+        label = str(getattr(stopping_criterion, "trace_label", ""))
+    indices = range(len(history))
+    if printed_only:
+        indices = [index for index in indices if history["printed"][index]]
+    indices = list(indices)
+    if not indices:
+        return
+    with redirect_stdout(file):
+        if include_header and label:
+            print(f"=== {label} iteration log ===")
+        for offset, index in enumerate(indices):
+            stage, data = _build_history_data(history, index, stopping_criterion)
+            print_diagnostic(
+                stage,
+                data,
+                table_header=offset == 0,
+                verbose=True,
+                visible_columns=history.visible_columns,
+            )
+
+
+def format_iteration_log(
+    history, stopping_criterion=None, printed_only=True, include_header=True
+):
+    """Return a stored iteration log as text."""
+    stream = io.StringIO()
+    print_iteration_log(
+        history,
+        stopping_criterion=stopping_criterion,
+        printed_only=printed_only,
+        include_header=include_header,
+        file=stream,
+    )
+    return stream.getvalue().strip()
+
 
 class _IterationTraceLogger(object):
     def __init__(self, stopping_criterion):
@@ -19,14 +280,24 @@ class _IterationTraceLogger(object):
         self.enabled = bool(getattr(stopping_criterion, "trace_iterations", False))
         self.label = str(getattr(stopping_criterion, "trace_label", ""))
         self.verbose = bool(getattr(stopping_criterion, "verbose", True))
+        self.print_enabled = bool(getattr(stopping_criterion, "trace_print", True))
+        self.stopping_criterion = stopping_criterion
         self.header_printed = False
         self.table_header_printed = False
         self.iter_count = 0
         self.visible_columns = None
         self.pending_resume_signature = None
         self._last_iter_snapshot = None
+        self._last_data = None
         self._last_iter_count = 0
+        self._last_iter_history_index = None
         self._last_printed_iter_count = 0
+        self.history = IterationHistoryTable() if self.enabled else None
+        self.stopping_criterion.iteration_history = self.history
+        if self.history is not None:
+            self.history.context = _history_context_from_stopping_criterion(
+                stopping_criterion
+            )
 
     def _would_be_throttled(self, iter_count):
         """Return True if an ITER row with this count would be suppressed by throttling."""
@@ -57,11 +328,11 @@ class _IterationTraceLogger(object):
 
     def _print_header_once(self):
         """Print the section header line exactly once per logger instance."""
-        if self.enabled and (not self.header_printed) and self.label:
+        if self.enabled and self.print_enabled and (not self.header_printed) and self.label:
             print(f"=== {self.label} iteration log ===")
             self.header_printed = True
 
-    def _get_visible_columns(self, data):
+    def _get_visible_columns(self, data, row=None):
         """Return the ordered list of column names to display, inferred from data.
 
         The result is cached after the first call so all rows share the same
@@ -79,28 +350,8 @@ class _IterationTraceLogger(object):
         """
         if self.visible_columns is not None:
             return self.visible_columns
-        visible_columns = ["stage", "iter", "solution"]
-        if getattr(data, "bound_diff", None) is not None:
-            visible_columns.append("bound_diff")
-        if getattr(data, "comb_bound_diff", None) is not None:
-            visible_columns.append("comb_bound_diff")
-        if getattr(data, "bound_half_width", None) is not None:
-            visible_columns.append("bound_half_width")
-        if getattr(data, "bias_estimate", None) is not None:
-            visible_columns.append("bias_estimate")
-        if getattr(data, "rmse_estimate", None) is not None:
-            visible_columns.append("rmse_estimate")
-        if getattr(data, "rmse_tol", None) is not None:
-            visible_columns.append("rmse_tol")
-        if getattr(data, "n_min", None) is not None:
-            visible_columns.append("n_min")
-        visible_columns.append("n_total")
-        if getattr(data, "m", None) is not None:
-            visible_columns.append("m")
-        xfull = getattr(data, "xfull", None)
-        if getattr(xfull, "shape", None) is not None:
-            visible_columns.append("xfull.shape")
-        self.visible_columns = tuple(visible_columns)
+        row = _extract_diagnostic_row(data) if row is None else row
+        self.visible_columns = _visible_columns_from_row(row)
         return self.visible_columns
 
     def emit(self, stage, data, step_value=None, increment=False, iter_value=None):
@@ -129,20 +380,33 @@ class _IterationTraceLogger(object):
             data._iter_count = None
         if step_value is not None:
             data.m = int(step_value)
-        visible_columns = self._get_visible_columns(data)
+        row = _extract_diagnostic_row(data)
+        visible_columns = self._get_visible_columns(data, row=row)
+        printed = stage != "ITER" or not self._would_be_throttled(row["iter"])
+        history_index = None
+        if self.history is not None:
+            history_index = self.history.append(
+                stage,
+                row,
+                visible_columns=visible_columns,
+                printed=printed,
+            )
+        self._last_data = data
         if stage == "ITER":
             self._last_iter_snapshot = data
-            self._last_iter_count = data._iter_count if data._iter_count is not None else 0
-            if not self._would_be_throttled(data._iter_count):
+            self._last_iter_count = row["iter"] if row["iter"] is not None else 0
+            self._last_iter_history_index = history_index
+            if printed:
                 self._last_printed_iter_count = self._last_iter_count
-        print_diagnostic(
-            stage,
-            data,
-            table_header=not self.table_header_printed,
-            verbose=self.verbose,
-            visible_columns=visible_columns,
-        )
-        self.table_header_printed = True
+        if self.print_enabled:
+            print_diagnostic(
+                stage,
+                data,
+                table_header=not self.table_header_printed,
+                verbose=self.verbose,
+                visible_columns=visible_columns,
+            )
+            self.table_header_printed = True
 
     def resume(self, data, step_value=None):
         """Emit a RESUME row and snapshot the current state for duplicate suppression.
@@ -202,18 +466,23 @@ class _IterationTraceLogger(object):
             return
         if self._last_iter_count == self._last_printed_iter_count:
             return
-        print_diagnostic(
-            "ITER",
-            self._last_iter_snapshot,
-            table_header=False,
-            verbose=False,
-            visible_columns=self.visible_columns,
-        )
+        if self.print_enabled:
+            print_diagnostic(
+                "ITER",
+                self._last_iter_snapshot,
+                table_header=False,
+                verbose=True,
+                visible_columns=self.visible_columns,
+            )
+        if self.history is not None and self._last_iter_history_index is not None:
+            self.history.mark_printed(self._last_iter_history_index, True)
         self._last_printed_iter_count = self._last_iter_count
 
     def finalize(self):
         """Force-print the last ITER row if throttling suppressed it, then clear snapshot."""
         self._flush_last_if_suppressed()
+        if self.enabled and self._last_data is not None:
+            self._last_data.iteration_history = self.history
         self._last_iter_snapshot = None
 
 
@@ -238,57 +507,25 @@ def print_diagnostic(
         visible_columns (tuple[str, ...] | list[str] | None, optional): Ordered
             columns to print. Defaults to all supported columns.
     """
-    solution = getattr(data, "solution", None)
-    bound_diff = getattr(data, "bound_diff", None)
-    comb_bound_diff = getattr(data, "comb_bound_diff", None)
-    bound_half_width = getattr(data, "bound_half_width", None)
-    bias_estimate = getattr(data, "bias_estimate", None)
-    rmse_estimate = getattr(data, "rmse_estimate", None)
-    rmse_tol = getattr(data, "rmse_tol", None)
-    m = getattr(data, "m", None)
-    n_total = getattr(data, "n_total", None)
-    n_min = getattr(data, "n_min", None)
-    xfull = getattr(data, "xfull", None)
-
-    def safe_get_first_element(obj):
-        try:
-            if isinstance(obj, (list, tuple, np.ndarray)) and obj is not None:
-                if hasattr(obj, "shape") and obj.shape == ():
-                    return obj
-                if len(obj) > 0:
-                    return obj[0]
-            return obj
-        except (TypeError, AttributeError):
-            return obj
-
-    solution_display = safe_get_first_element(solution)
-    bound_diff_display = safe_get_first_element(bound_diff)
-    comb_bound_diff_display = safe_get_first_element(comb_bound_diff)
-    bound_half_width_display = safe_get_first_element(bound_half_width)
-    bias_estimate_display = safe_get_first_element(bias_estimate)
-    iter_count = getattr(data, "_iter_count", None)
-    m_display = int(safe_get_first_element(m)) if m is not None else None
-    iter_display = int(iter_count) if iter_count is not None else None
-    n_total_display = int(n_total) if n_total is not None else None
-    xfull_shape = getattr(xfull, "shape", None)
-
-    def _positive_float(value):
-        value = safe_get_first_element(value)
-        if value is None:
-            return None
-        try:
-            value = float(value)
-        except (TypeError, ValueError):
-            return None
-        if not np.isfinite(value) or value <= 0:
-            return None
-        return value
+    row = _extract_diagnostic_row(data)
+    solution_display = row["solution"]
+    bound_diff_display = row["bound_diff"]
+    comb_bound_diff_display = row["comb_bound_diff"]
+    bound_half_width_display = row["bound_half_width"]
+    bias_estimate_display = row["bias_estimate"]
+    rmse_estimate_display = row["rmse_estimate"]
+    rmse_tol_display = row["rmse_tol"]
+    iter_display = row["iter"]
+    n_min_display = row["n_min"]
+    n_total_display = row["n_total"]
+    m_display = row["m"]
+    xfull_shape = row["xfull.shape"]
 
     sc = getattr(data, "stopping_crit", None)
     tolerance_candidates = []
     for tol_value in (
         getattr(data, "abs_tol", None),
-        rmse_tol,
+        rmse_tol_display,
         getattr(sc, "abs_tol", None) if sc is not None else None,
         getattr(sc, "rmse_tol", None) if sc is not None else None,
     ):
@@ -322,13 +559,15 @@ def print_diagnostic(
         solution_formatted = f"{solution_display:>{solution_width}.{solution_decimals}f}"
     else:
         solution_formatted = f"{'nan':>{solution_width}}"
-    n_min_formatted = f"{int(n_min):>10}" if n_min is not None else f"{'None':>10}"
+    n_min_formatted = (
+        f"{n_min_display:>10}" if n_min_display is not None else f"{'None':>10}"
+    )
     bound_diff_formatted = _format_bound(bound_diff_display)
     comb_bound_diff_formatted = _format_bound(comb_bound_diff_display)
     bound_half_width_formatted = _format_bound(bound_half_width_display)
     bias_estimate_formatted = _format_bound(bias_estimate_display)
-    rmse_estimate_formatted = _format_bound(rmse_estimate)
-    rmse_tol_formatted = _format_bound(rmse_tol)
+    rmse_estimate_formatted = _format_bound(rmse_estimate_display)
+    rmse_tol_formatted = _format_bound(rmse_tol_display)
     iter_formatted = f"{iter_display:>4}" if iter_display is not None else " " * 4
     m_formatted = f"{m_display:>6}" if m_display is not None else f"{'None':>6}"
 
@@ -338,26 +577,7 @@ def print_diagnostic(
         if throttle % step != 0:
             return
     if visible_columns is None:
-        visible_columns = ["stage", "iter", "solution"]
-        if bound_diff is not None:
-            visible_columns.append("bound_diff")
-        if comb_bound_diff is not None:
-            visible_columns.append("comb_bound_diff")
-        if bound_half_width is not None:
-            visible_columns.append("bound_half_width")
-        if bias_estimate is not None:
-            visible_columns.append("bias_estimate")
-        if rmse_estimate is not None:
-            visible_columns.append("rmse_estimate")
-        if rmse_tol is not None:
-            visible_columns.append("rmse_tol")
-        visible_columns.append("n_min")
-        visible_columns.append("n_total")
-        if m is not None:
-            visible_columns.append("m")
-        if xfull_shape is not None:
-            visible_columns.append("xfull.shape")
-        visible_columns = tuple(visible_columns)
+        visible_columns = _visible_columns_from_row(row, include_n_min=True)
     header_values = {
         "stage": f"{'stage':<12}",
         "iter": f"{'iter':>4}",

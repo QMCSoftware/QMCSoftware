@@ -19,10 +19,8 @@ from qmcpy.util import *
 from qmcpy.util.data import Data
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from qmcpy.integrand.abstract_integrand import AbstractIntegrand
-from qmcpy.stopping_criterion.abstract_stopping_criterion import (
-    AbstractStoppingCriterion,
-)
-from qmcpy.stopping_criterion.diagnostics import _IterationTraceLogger, print_diagnostic
+from qmcpy.stopping_criterion.abstract_stopping_criterion import AbstractStoppingCriterion
+from qmcpy.stopping_criterion.diagnostics import IterationHistoryTable, _IterationTraceLogger, print_diagnostic
 
 
 # Test functions and parameters
@@ -98,7 +96,7 @@ class _DummyStoppingCriterion(AbstractStoppingCriterion):
 
 
 class TestAbstractStoppingCriterion(unittest.TestCase):
-    def test_print_diagnostic_formats_header_and_values(self):
+    def test_print_diagnostic_header_and_values(self):
         data = type(
             "Data",
             (),
@@ -122,7 +120,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertIn("(2, 3)", output)
         self.assertRegex(output, r"resume\s+2\s+1\.2500000\s+None\s+16\s+4")
 
-    def test_print_diagnostic_formats_missing_values_as_nan_and_none(self):
+    def test_print_diagnostic_missing_values(self):
         data = type("Data", (), {"solution": float("nan"), "xfull": None})()
         stream = io.StringIO()
         with redirect_stdout(stream):
@@ -132,7 +130,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertIn("nan", output)
         self.assertIn("None", output)
 
-    def test_print_diagnostic_can_disable_iteration_throttling(self):
+    def test_print_diagnostic_unthrottled(self):
         data = type(
             "Data",
             (),
@@ -158,7 +156,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertIn("1.2500000", output)
         self.assertRegex(output, r"ITER\s+55\s+1\.2500000\s+None\s+16\s+13")
 
-    def test_print_diagnostic_can_hide_optional_columns(self):
+    def test_print_diagnostic_hide_optional_columns(self):
         data = type(
             "Data",
             (),
@@ -183,7 +181,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertNotIn("n_min", output)
         self.assertNotIn("xfull.shape", output)
 
-    def test_resume_trace_blanks_resume_iter_and_continues_count(self):
+    def test_resume_trace_iter_count(self):
         logger = _IterationTraceLogger(
             type(
                 "SC",
@@ -219,6 +217,82 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertNotIn("RESUME       None", output)
         self.assertRegex(output, r"ITER\s+7\s+1\.2500000\s+8\s+20\s+14")
 
+    def test_trace_history_marks_flushed_rows(self):
+        logger = _IterationTraceLogger(
+            type(
+                "SC",
+                (),
+                {
+                    "trace_iterations": True,
+                    "trace_label": "",
+                    "verbose": False,
+                },
+            )()
+        )
+        logger.iter_count = 54
+        data = type(
+            "Data",
+            (),
+            {
+                "solution": [1.25],
+                "n_total": 64,
+                "m": 7,
+                "xfull": np.zeros((64, 2)),
+            },
+        )()
+        with redirect_stdout(io.StringIO()):
+            logger.iteration(data, step_value=7)
+            self.assertIsInstance(logger.history, IterationHistoryTable)
+            self.assertEqual(len(logger.history), 1)
+            self.assertEqual(logger.history["stage"][0], "ITER")
+            self.assertEqual(logger.history["iter"][0], 55)
+            self.assertFalse(logger.history["printed"][0])
+            logger.finalize()
+        self.assertTrue(logger.history["printed"][0])
+        self.assertEqual(
+            logger.history.visible_columns,
+            ("stage", "iter", "solution", "n_total", "m", "xfull.shape"),
+        )
+
+    def test_prepare_resume_data_clears_history(self):
+        distrib = _DummyDiscreteDistribution()
+        integrand = _DummyIntegrand(object(), distrib)
+        sc = _DummyStoppingCriterion(
+            integrand=integrand,
+            true_measure=integrand.true_measure,
+            discrete_distrib=distrib,
+        )
+        history = IterationHistoryTable()
+        history.append(
+            "ITER",
+            {
+                "iter": 1,
+                "solution": 1.0,
+                "bound_diff": None,
+                "comb_bound_diff": None,
+                "bound_half_width": None,
+                "bias_estimate": None,
+                "rmse_estimate": None,
+                "rmse_tol": None,
+                "n_min": None,
+                "n_total": 16,
+                "m": None,
+                "xfull.shape": None,
+            },
+            visible_columns=("stage", "iter", "solution", "n_total"),
+            printed=True,
+        )
+        resume = Data(parameters=["solution", "n_total"])
+        resume.solution = 1.0
+        resume.n_total = 16
+        resume.iteration_history = history
+        resume.stopping_crit = type("SavedSC", (), {"iteration_history": history})()
+        copied = sc._prepare_resume_data(resume, lambda data: None, lambda data: None)
+        self.assertIsNone(copied.iteration_history)
+        self.assertIsNone(copied.stopping_crit.iteration_history)
+        self.assertIs(resume.iteration_history, history)
+        self.assertIs(resume.stopping_crit.iteration_history, history)
+
     def test_init_requires_integrand(self):
         with self.assertRaises(ParameterError):
             _DummyStoppingCriterion()
@@ -233,7 +307,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
                 discrete_distrib=distrib,
             )
 
-    def test_init_requires_matching_discrete_distribution(self):
+    def test_init_requires_matching_distribution(self):
         distrib = _DummyDiscreteDistribution()
         integrand = _DummyIntegrand(object(), distrib)
         with self.assertRaises(ParameterError):
@@ -253,7 +327,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
                 discrete_distrib=distrib,
             )
 
-    def test_init_rejects_vectorized_integrals_when_not_supported(self):
+    def test_init_rejects_vectorized_integrals(self):
         distrib = _DummyDiscreteDistribution()
         integrand = _DummyIntegrand(object(), distrib, d_indv=(2,), d_comb=(2,))
         with self.assertRaises(ParameterError):
@@ -287,7 +361,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         with self.assertRaises(MethodImplementationError):
             sc.set_tolerance(abs_tol=0.1)
 
-    def test_compute_indv_alphas_with_identity_dependency(self):
+    def test_compute_indv_alphas_identity(self):
         distrib = _DummyDiscreteDistribution()
         integrand = _DummyIntegrand(
             object(),
@@ -306,7 +380,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertTrue(identity_dependency)
         self.assertTrue(np.allclose(alphas_indv, [0.2, 0.4]))
 
-    def test_compute_indv_alphas_with_non_identity_dependency(self):
+    def test_compute_indv_alphas_dependency(self):
         distrib = _DummyDiscreteDistribution()
 
         def dependency(flags):
@@ -365,6 +439,34 @@ class TestCubMCCLT(unittest.TestCase):
         integrand = Keister(IIDStdUniform(dimension=2, seed=7))
         solution, data = CubMCCLT(integrand, abs_tol=tol).integrate()
         self.assertLess(abs(solution - keister_2d_exact), tol)
+
+    def test_trace_history(self):
+        sc = CubMCCLT(
+            Keister(IIDStdUniform(dimension=2, seed=7)),
+            abs_tol=0.5,
+            n_init=64,
+            n_limit=4096,
+        )
+        sc.trace_iterations = True
+        sc.trace_label = "CubMCCLT"
+        sc.verbose = True
+        sc.trace_print = False
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            _, data = sc.integrate()
+        self.assertEqual(stream.getvalue(), "")
+        self.assertIs(data.iteration_history, sc.iteration_history)
+        self.assertIsInstance(data.iteration_history, IterationHistoryTable)
+        self.assertEqual(data.iteration_history["stage"][-1], "ITER")
+        self.assertTrue(all(data.iteration_history["printed"]))
+        self.assertIn("n_total", data.iteration_history.visible_columns)
+        self.assertGreater(len(data.iteration_history), 0)
+        log_text = sc.format_iteration_log()
+        self.assertIn("=== CubMCCLT iteration log ===", log_text)
+        self.assertIn("ITER", log_text)
+        replay_stream = io.StringIO()
+        sc.print_iteration_log(file=replay_stream)
+        self.assertEqual(replay_stream.getvalue().strip(), log_text)
 
 
 class TestCubMCG(unittest.TestCase):
@@ -585,7 +687,7 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
                     msg=f"{label} did not prioritize rmse_tol over abs_tol",
                 )
 
-    def test_continuation_warns_when_max_levels_reached(self):
+    def test_continuation_warns_at_max_levels(self):
         cases = [
             ("CubMLMCCont", CubMLMCCont, self._iid_financial_option, 2),
             ("CubMLQMCCont", CubMLQMCCont, self._qmc_financial_option, 3),
@@ -747,7 +849,7 @@ class TestResumeFeature(unittest.TestCase):
         else:
             _run_assertions()
 
-    def test_resume_none_is_equivalent_to_fresh_start(self):
+    def test_resume_none_matches_fresh_start(self):
         """resume=None must behave identically to a fresh start."""
         make_sc = self._keister_builder(CubQMCLatticeG, self._lattice_distribution, self.tight_abs_tol)
         sol1, _ = make_sc().integrate()
@@ -782,7 +884,7 @@ class TestResumeFeature(unittest.TestCase):
                 compare_to_fresh=True,
             )
 
-    def test_resume_increases_samples_for_multilevel_algorithms(self):
+    def test_resume_increases_multilevel_samples(self):
         """Multilevel resume runs should retain or increase sample work."""
         cases = [
             ("CubMCML", CubMCML, self._iid_financial_option, "rmse_tol"),
@@ -799,7 +901,7 @@ class TestResumeFeature(unittest.TestCase):
                     self._multilevel_builder(stopping_criterion, integrand_factory, tol_kwarg, self.tight_abs_tol),
                 )
 
-    def test_cub_mlmc_resume_matches_fresh_total_samples(self):
+    def test_cub_mlmc_resume_matches_fresh_n(self):
         loose_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
         _, checkpoint = loose_sc.integrate()
         self.assertTrue(hasattr(checkpoint, "level_diffs"))
@@ -815,7 +917,7 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
 
-    def test_cub_mlmc_cont_resume_matches_fresh_total_samples(self):
+    def test_cub_mlmc_cont_resume_matches_fresh_n(self):
         loose_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
         _, checkpoint = loose_sc.integrate()
         self.assertTrue(hasattr(checkpoint, "level_diffs"))
@@ -831,7 +933,7 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
 
-    def test_continuation_resume_uses_target_tol_without_level_reset(self):
+    def test_cont_resume_keeps_levels(self):
         cases = [
             ("CubMLMCCont", CubMLMCCont, self._iid_financial_option, 4),
             ("CubMLQMCCont", CubMLQMCCont, self._qmc_financial_option, 5),
@@ -854,7 +956,7 @@ class TestResumeFeature(unittest.TestCase):
                 self.assertTrue(captured["skip_level_reset"])
                 self.assertEqual(sc.rmse_tol, sc.target_rmse_tol)
 
-    def test_qmc_resume_rejects_missing_transform_state(self):
+    def test_qmc_resume_requires_transform_state(self):
         loose_sc = CubQMCLatticeG(
             Keister(Lattice(dimension=self.dimension, seed=self.seed)),
             abs_tol=self.loose_abs_tol,
@@ -870,7 +972,7 @@ class TestResumeFeature(unittest.TestCase):
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
-    def test_bayes_resume_rejects_missing_transform_state(self):
+    def test_bayes_resume_requires_transform_state(self):
         loose_sc = CubBayesLatticeG(Keister(Lattice(dimension=self.dimension, seed=self.seed, order="RADICAL INVERSE")), abs_tol=self.loose_abs_tol, rel_tol=self.rel_tol, n_init=2**5, n_limit=self.n_limit)
         _, checkpoint = loose_sc.integrate()
         self.assertTrue(hasattr(checkpoint, "_ytildefull"))
@@ -887,7 +989,30 @@ class TestResumeFeature(unittest.TestCase):
     def _pfgpci(self):
         return PFGPCI(Ishigami(DigitalNetB2(3, seed=self.seed)), failure_threshold=0, failure_above_threshold=False, abs_tol=self.tight_abs_tol, n_init=8, n_limit=16, n_batch=4, n_approx=2**8, gpytorch_train_iter=1, verbose=False, n_ref_approx=0)
 
-    def test_unsupported_resume_raises_parameter_error(self):
+    def _checkpoint_integrand(self, dimension=2, seed=13):
+        return Keister(IIDStdUniform(dimension=dimension, seed=seed))
+
+    def _make_qmc_checkpoint(self):
+        loose_sc = CubQMCLatticeG(
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.2,
+            n_init=2**8,
+            n_limit=2048,
+        )
+        _, checkpoint = loose_sc.integrate()
+        return checkpoint
+
+    def _make_bayes_checkpoint(self):
+        loose_sc = CubBayesLatticeG(
+            Keister(Lattice(dimension=2, seed=13, order="RADICAL INVERSE")),
+            abs_tol=0.2,
+            n_init=2**5,
+            n_limit=2048,
+        )
+        _, checkpoint = loose_sc.integrate()
+        return checkpoint
+
+    def test_unsupported_resume_raises(self):
         """Stopping criteria without resume support must raise ParameterError."""
         cases = [
             (
@@ -910,7 +1035,7 @@ class TestResumeFeature(unittest.TestCase):
                 with self.assertRaises(ParameterError):
                     sc.integrate(resume=object())
 
-    def test_qmc_rep_student_t_resume_rejects_missing_running_sums(self):
+    def test_rep_student_t_resume_requires_ysums(self):
         loose_sc = CubQMCRepStudentT(
             Keister(self._net_rep_distribution()),
             abs_tol=self.loose_abs_tol,
@@ -926,100 +1051,61 @@ class TestResumeFeature(unittest.TestCase):
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
-class TestResumeCheckpointing(unittest.TestCase):
-    def setUp(self):
-        warnings.filterwarnings("ignore", category=MaxSamplesWarning)
-        self.seed = 13
-        self.dimension = 2
-        self.n_init = 32
-        self.n_limit = 2048
-        self.loose_abs_tol = 0.2
-        self.tight_abs_tol = 0.05
-
-    def _make_integrand(self, dimension=None, seed=None):
-        return Keister(IIDStdUniform(dimension=self.dimension if dimension is None else dimension, seed=self.seed if seed is None else seed))
-
-    def _make_qmc_checkpoint(self):
-        loose_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.loose_abs_tol,
-            n_init=2**8,
-            n_limit=self.n_limit,
-        )
-        _, checkpoint = loose_sc.integrate()
-        return checkpoint
-
-    def _make_bayes_checkpoint(self):
-        loose_sc = CubBayesLatticeG(
-            Keister(
-                Lattice(
-                    dimension=self.dimension,
-                    seed=self.seed,
-                    order="RADICAL INVERSE",
-                )
-            ),
-            abs_tol=self.loose_abs_tol,
-            n_init=2**5,
-            n_limit=self.n_limit,
-        )
-        _, checkpoint = loose_sc.integrate()
-        return checkpoint
-
-    def test_cub_mc_clt_resume_raises_parameter_error(self):
+    def test_cub_mc_clt_resume_raises(self):
         loose_sc = CubMCCLT(
-            self._make_integrand(),
-            abs_tol=self.loose_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.2,
+            n_init=32,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
 
         tight_sc = CubMCCLT(
-            self._make_integrand(),
-            abs_tol=self.tight_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.05,
+            n_init=32,
+            n_limit=2048,
         )
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
     def test_cub_mc_g_resume_raises_parameter_error(self):
         loose_sc = CubMCG(
-            self._make_integrand(),
-            abs_tol=self.loose_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.2,
+            n_init=32,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
 
         tight_sc = CubMCG(
-            self._make_integrand(),
-            abs_tol=self.tight_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.05,
+            n_init=32,
+            n_limit=2048,
         )
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
     def test_resume_rejects_incompatible_dimension(self):
         loose_sc = CubMCCLTVec(
-            self._make_integrand(),
-            abs_tol=self.loose_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.2,
+            n_init=32,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
 
         incompatible_sc = CubMCCLTVec(
-            self._make_integrand(dimension=3),
-            abs_tol=self.tight_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(dimension=3),
+            abs_tol=0.05,
+            n_init=32,
+            n_limit=2048,
         )
         with self.assertRaises(ParameterError):
             incompatible_sc.integrate(resume=checkpoint)
 
-    def test_data_save_load_round_trip_plain_and_gzip(self):
+    def test_data_save_load_round_trip(self):
         data = Data(parameters=["value"])
         data.value = np.array([1.0, 2.0, 3.0])
 
@@ -1036,7 +1122,7 @@ class TestResumeCheckpointing(unittest.TestCase):
             loaded_gzip = Data.load(gzip_path)
             self.assertTrue(np.array_equal(loaded_gzip.value, data.value))
 
-    def test_data_save_returns_final_path_and_gz_suffix(self):
+    def test_data_save_returns_path_and_gz_suffix(self):
         data = Data(parameters=["value"])
         data.value = np.array([1.0])
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1046,7 +1132,7 @@ class TestResumeCheckpointing(unittest.TestCase):
             gz_path = data.save(Path(tmpdir) / "chk2.pkl", compress=True)
             self.assertTrue(gz_path.endswith(".gz"))
 
-    def test_data_save_raises_file_exists_error_without_overwrite(self):
+    def test_data_save_file_exists(self):
         data = Data(parameters=["value"])
         data.value = np.array([1.0])
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1055,7 +1141,7 @@ class TestResumeCheckpointing(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 data.save(path)
 
-    def test_data_save_overwrite_replaces_existing_file(self):
+    def test_data_save_overwrite_replaces_file(self):
         data1 = Data(parameters=["value"])
         data1.value = np.array([1.0])
         data2 = Data(parameters=["value"])
@@ -1075,7 +1161,7 @@ class TestResumeCheckpointing(unittest.TestCase):
             with self.assertRaises(TypeError):
                 Data.load(path)
 
-    def test_resume_metadata_and_provenance_are_recorded(self):
+    def test_resume_records_metadata(self):
         checkpoint = self._make_qmc_checkpoint()
         old_n_total = int(checkpoint.n_total)
         old_total_time = float(checkpoint.time_integrate_total)
@@ -1093,10 +1179,10 @@ class TestResumeCheckpointing(unittest.TestCase):
         )
 
         tight_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.tight_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.05,
             n_init=2**8,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         _, resumed = tight_sc.integrate(resume=checkpoint)
 
@@ -1114,7 +1200,7 @@ class TestResumeCheckpointing(unittest.TestCase):
         self.assertEqual(int(checkpoint.n_total), old_n_total)
         self.assertTrue(np.array_equal(checkpoint.xfull, old_xfull))
 
-    def test_qmc_resume_rejects_inconsistent_checkpoint_state(self):
+    def test_qmc_resume_rejects_bad_checkpoint(self):
         checkpoint = self._make_qmc_checkpoint()
         cases = []
 
@@ -1137,17 +1223,17 @@ class TestResumeCheckpointing(unittest.TestCase):
         cases.append(("non_power_of_two_n_total", bad))
 
         tight_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.tight_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.05,
             n_init=2**8,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         for label, bad_checkpoint in cases:
             with self.subTest(case=label):
                 with self.assertRaises(ParameterError):
                     tight_sc.integrate(resume=bad_checkpoint)
 
-    def test_bayes_resume_rejects_inconsistent_checkpoint_state(self):
+    def test_bayes_resume_rejects_bad_checkpoint(self):
         checkpoint = self._make_bayes_checkpoint()
         cases = []
 
@@ -1167,82 +1253,76 @@ class TestResumeCheckpointing(unittest.TestCase):
         cases.append(("non_power_of_two_n_total", bad))
 
         tight_sc = CubBayesLatticeG(
-            Keister(
-                Lattice(
-                    dimension=self.dimension,
-                    seed=self.seed,
-                    order="RADICAL INVERSE",
-                )
-            ),
-            abs_tol=self.tight_abs_tol,
+            Keister(Lattice(dimension=2, seed=13, order="RADICAL INVERSE")),
+            abs_tol=0.05,
             n_init=2**5,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         for label, bad_checkpoint in cases:
             with self.subTest(case=label):
                 with self.assertRaises(ParameterError):
                     tight_sc.integrate(resume=bad_checkpoint)
 
-    def test_resume_rejects_incompatible_checkpoint_format_version(self):
+    def test_resume_rejects_bad_format_version(self):
         loose_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.loose_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.2,
             n_init=2**8,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
         checkpoint._resume_format_version = 999
 
         tight_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.tight_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.05,
             n_init=2**8,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
-    def test_resume_rejects_incompatible_sampler_seed(self):
+    def test_resume_rejects_bad_sampler_seed(self):
         loose_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.loose_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.2,
             n_init=2**8,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
 
         tight_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed + 1)),
-            abs_tol=self.tight_abs_tol,
+            Keister(Lattice(dimension=2, seed=14)),
+            abs_tol=0.05,
             n_init=2**8,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         with self.assertRaises(ParameterError):
             tight_sc.integrate(resume=checkpoint)
 
-    def test_cub_mc_clt_vec_resume_reuses_the_fresh_rng_stream(self):
+    def test_cub_mc_clt_vec_resume_reuses_rng_stream(self):
         loose_sc = CubMCCLTVec(
-            self._make_integrand(),
-            abs_tol=self.loose_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.2,
+            n_init=32,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
         old_n_total = int(checkpoint.n_total)
 
         resumed_sc = CubMCCLTVec(
-            self._make_integrand(),
-            abs_tol=self.tight_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.05,
+            n_init=32,
+            n_limit=2048,
         )
         _, resumed = resumed_sc.integrate(resume=checkpoint)
 
         fresh_sc = CubMCCLTVec(
-            self._make_integrand(),
-            abs_tol=self.tight_abs_tol,
-            n_init=self.n_init,
-            n_limit=self.n_limit,
+            self._checkpoint_integrand(),
+            abs_tol=0.05,
+            n_init=32,
+            n_limit=2048,
         )
         _, fresh = fresh_sc.integrate()
 
@@ -1251,13 +1331,13 @@ class TestResumeCheckpointing(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.xfull, fresh.xfull))
         self.assertTrue(np.allclose(resumed.yfull, fresh.yfull))
 
-    def test_resume_after_save_load_continues_rng_stream(self):
+    def test_resume_after_load_continues_rng_stream(self):
         qmc_n_init = 2**8
         loose_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.loose_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.2,
             n_init=qmc_n_init,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         _, checkpoint = loose_sc.integrate()
 
@@ -1269,10 +1349,10 @@ class TestResumeCheckpointing(unittest.TestCase):
         old_n_total = int(loaded.n_total)
         old_xfull = np.array(loaded.xfull, copy=True)
         tight_sc = CubQMCLatticeG(
-            Keister(Lattice(dimension=self.dimension, seed=self.seed)),
-            abs_tol=self.tight_abs_tol,
+            Keister(Lattice(dimension=2, seed=13)),
+            abs_tol=0.05,
             n_init=qmc_n_init,
-            n_limit=self.n_limit,
+            n_limit=2048,
         )
         _, resumed = tight_sc.integrate(resume=loaded)
         self.assertIsNot(resumed, loaded)
@@ -1318,7 +1398,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
         self.assertTrue(sc._resume_value_equal({"a": 1, "b": 2}, {"a": 1, "b": 2}))
         self.assertFalse(sc._resume_value_equal({"a": 1}, {"a": 2}))
 
-    def test_resume_value_equal_qmcpy_objects_compared_by_str(self):
+    def test_resume_value_equal_qmcpy_objects(self):
         sc = self._make_sc()
         # objects with a .parameters attribute are compared via str()
         Obj = type("Obj", (), {"parameters": []})
@@ -1327,7 +1407,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
         result = sc._resume_value_equal(obj1, obj2)
         self.assertIsInstance(result, bool)
 
-    def test_resume_value_equal_exception_in_eq_falls_back_to_str(self):
+    def test_resume_value_equal_bad_eq(self):
         sc = self._make_sc()
 
         class BadEq:
@@ -1337,7 +1417,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
         result = sc._resume_value_equal(BadEq(), BadEq())
         self.assertIsInstance(result, bool)
 
-    def test_resume_value_equal_numpy_type_error_fallback(self):
+    def test_resume_value_equal_numpy_fallback(self):
         sc = self._make_sc()
         # Simulate older numpy where equal_nan kwarg raises TypeError
         original_array_equal = np.array_equal
@@ -1353,17 +1433,17 @@ class TestResumeValidationHelpers(unittest.TestCase):
             result = sc._resume_value_equal(np.array([1.0, 2.0]), np.array([1.0, 2.0]))
         self.assertTrue(result)
 
-    def test_validate_resume_object_saved_none_raises(self):
+    def test_validate_resume_object_saved_none(self):
         sc = self._make_sc()
         with self.assertRaisesRegex(ParameterError, "missing test_label state"):
             sc._validate_resume_object("test_label", object(), None, ())
 
-    def test_validate_resume_object_type_mismatch_raises(self):
+    def test_validate_resume_object_type_mismatch(self):
         sc = self._make_sc()
         with self.assertRaisesRegex(ParameterError, "incompatible test_label type"):
             sc._validate_resume_object("test_label", 1, "one", ())
 
-    def test_validate_resume_object_missing_attr_raises(self):
+    def test_validate_resume_object_missing_attr(self):
         sc = self._make_sc()
 
         class Obj:
@@ -1375,14 +1455,14 @@ class TestResumeValidationHelpers(unittest.TestCase):
         with self.assertRaisesRegex(ParameterError, "missing test_label attribute"):
             sc._validate_resume_object("test_label", current, saved, ("x",))
 
-    def test_validate_resume_data_invalid_format_version_raises(self):
+    def test_validate_resume_data_bad_format_version(self):
         checkpoint = self._make_checkpoint()
         checkpoint._resume_format_version = "not_a_number"
         sc = self._make_sc()
         with self.assertRaisesRegex(ParameterError, "invalid _resume_format_version"):
             sc._validate_resume_data(checkpoint)
 
-    def test_validate_resume_data_wrong_stopping_crit_type_raises(self):
+    def test_validate_resume_data_wrong_sc_type(self):
         checkpoint = self._make_checkpoint()
         # Replace stopping_crit with a different type
         checkpoint.stopping_crit = CubQMCNetG(
@@ -1395,7 +1475,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
         with self.assertRaisesRegex(ParameterError, "was generated by"):
             sc._validate_resume_data(checkpoint)
 
-    def test_validate_resume_data_n_total_exceeds_n_limit_raises(self):
+    def test_validate_resume_data_n_total_limit(self):
         checkpoint = self._make_checkpoint(n_limit=4096)
         # Build a normal sc; then artificially lower n_limit below n_total
         sc = self._make_sc(n_limit=4096)
@@ -1403,7 +1483,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
         with self.assertRaisesRegex(ParameterError, "exceeds current n_limit"):
             sc._validate_resume_data(checkpoint)
 
-    def test_restore_resume_rng_state_missing_rng_raises(self):
+    def test_restore_resume_rng_state_missing_rng(self):
         sc = self._make_sc()
         data = type("Data", (), {"discrete_distrib": type("NoRNG", (), {})()})()
         with self.assertRaisesRegex(ParameterError, "missing discrete distribution RNG state"):
@@ -1413,7 +1493,7 @@ class TestResumeValidationHelpers(unittest.TestCase):
 class TestDiagnosticsOptionalColumns(unittest.TestCase):
     """Tests for optional columns and edge-case paths in diagnostics helpers."""
 
-    def _make_logger(self, verbose=False):
+    def _make_logger(self, verbose=False, print_live=True):
         sc = type(
             "SC",
             (),
@@ -1421,6 +1501,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
                 "trace_iterations": True,
                 "trace_label": "",
                 "verbose": verbose,
+                "trace_print": print_live,
             },
         )()
         return _IterationTraceLogger(sc)
@@ -1461,14 +1542,14 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
             },
         )()
 
-    def test_get_visible_columns_shows_all_optional_fields(self):
+    def test_get_visible_columns_all_optional(self):
         logger = self._make_logger()
         data = self._make_rich_data()
         cols = logger._get_visible_columns(data)
         for col in ("comb_bound_diff", "bound_half_width", "bias_estimate", "rmse_estimate", "rmse_tol", "n_min"):
             self.assertIn(col, cols, msg=f"Expected column '{col}' in visible columns")
 
-    def test_enable_diagnostics_verbose_true_sets_verbose(self):
+    def test_enable_diagnostics_verbose_true(self):
         resume_util = self._load_resume_util()
         sc = type("SC", (), {})()
         out = resume_util.enable_diagnostics(sc, "demo", verbose=True)
@@ -1476,8 +1557,9 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         self.assertTrue(sc.trace_iterations)
         self.assertEqual(sc.trace_label, "demo")
         self.assertTrue(sc.verbose)
+        self.assertFalse(sc.trace_print)
 
-    def test_enable_diagnostics_verbose_false_sets_verbose_false(self):
+    def test_enable_diagnostics_verbose_false(self):
         resume_util = self._load_resume_util()
         sc = type("SC", (), {})()
         out = resume_util.enable_diagnostics(sc, "demo", verbose=False)
@@ -1485,8 +1567,56 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         self.assertTrue(sc.trace_iterations)
         self.assertEqual(sc.trace_label, "demo")
         self.assertFalse(sc.verbose)
+        self.assertFalse(sc.trace_print)
 
-    def test_print_diagnostic_visible_columns_none_with_all_optional_fields(self):
+    def test_enable_diagnostics_print_live_true(self):
+        resume_util = self._load_resume_util()
+        sc = type("SC", (), {})()
+        out = resume_util.enable_diagnostics(sc, "demo", verbose=False, print_live=True)
+        self.assertIs(out, sc)
+        self.assertTrue(sc.trace_print)
+
+    def test_collect_resume_fresh_warnings_none(self):
+        resume_util = self._load_resume_util()
+        resume_stage = {"total_n": 128, "solution": 1.0, "tol": 0.1}
+        fresh_stage = {"total_n": 128, "solution": 1.15}
+        warning_lines = resume_util.collect_resume_fresh_warnings("DemoSolver", resume_stage, fresh_stage)
+        self.assertEqual(warning_lines, [])
+
+    def test_collect_resume_fresh_warnings_mismatch(self):
+        resume_util = self._load_resume_util()
+        resume_stage = {"total_n": 256, "solution": 1.5, "tol": 0.1}
+        fresh_stage = {"total_n": 128, "solution": 1.2}
+        warning_lines = resume_util.collect_resume_fresh_warnings("DemoSolver", resume_stage, fresh_stage)
+        self.assertEqual(len(warning_lines), 2)
+        self.assertIn("WARNING: DemoSolver: Inconsistent total samples across stages", warning_lines[0])
+        self.assertIn("WARNING: DemoSolver: Resume and fresh solutions differ by more than 2 * tol", warning_lines[1])
+
+    def test_write_combined_report_warnings(self):
+        resume_util = self._load_resume_util()
+        resume_rows = [{
+            "name": "DemoSolver",
+            "status": "skip",
+            "resume": {"total_n": 256, "solution": 1.5, "tol": 0.1},
+        }]
+        fresh_rows = [{
+            "name": "DemoSolver",
+            "status": "skip",
+            "fresh": {"total_n": 128, "solution": 1.2},
+        }]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "report.txt"
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                resume_util.write_combined_report(path, "Demo Title", resume_rows, fresh_rows)
+            report_text = path.read_text(encoding="utf-8")
+        self.assertIn("WARNING: DemoSolver: Inconsistent total samples across stages", report_text)
+        self.assertIn("WARNING: DemoSolver: Resume and fresh solutions differ by more than 2 * tol", report_text)
+        stdout_text = stream.getvalue()
+        self.assertIn("WARNING: DemoSolver: Inconsistent total samples across stages", stdout_text)
+        self.assertIn("WARNING: DemoSolver: Resume and fresh solutions differ by more than 2 * tol", stdout_text)
+
+    def test_print_diagnostic_auto_optional_columns(self):
         """visible_columns=None auto-detects and displays all optional columns."""
         data = self._make_rich_data()
         stream = io.StringIO()
@@ -1496,7 +1626,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         for col in ("bias_estimate", "rmse_tol", "comb_bound_diff", "bound_half_width"):
             self.assertIn(col, output, msg=f"Expected column '{col}' in output header")
 
-    def test_print_diagnostic_with_tolerance_adjusts_decimal_places(self):
+    def test_print_diagnostic_tolerance_decimals(self):
         """A tolerance on data drives the solution decimal-place computation."""
         data = type(
             "Data",
@@ -1514,7 +1644,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         output = stream.getvalue()
         self.assertIn("1.", output)
 
-    def test_print_diagnostic_format_bound_with_float_and_nan(self):
+    def test_print_diagnostic_bound_float_nan(self):
         """_format_bound handles actual floats and NaN values."""
         data = type(
             "Data",
@@ -1538,7 +1668,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         self.assertIn("5.000e-02", output)
         self.assertIn("nan", output)
 
-    def test_print_diagnostic_format_bound_with_non_float_value(self):
+    def test_print_diagnostic_bound_non_float(self):
         """_format_bound handles a value that cannot be cast to float."""
         data = type(
             "Data",
@@ -1556,7 +1686,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         output = stream.getvalue()
         self.assertIn("non-numeric", output)
 
-    def test_emit_with_no_increment_and_no_iter_value_sets_iter_count_none(self):
+    def test_emit_without_iter_sets_none(self):
         """emit() with increment=False, iter_value=None sets data._iter_count=None."""
         logger = self._make_logger()
         data = type("Data", (), {"solution": 1.0, "n_total": 10})()
@@ -1565,7 +1695,17 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
             logger.emit("START", data, increment=False, iter_value=None)
         self.assertIsNone(data._iter_count)
 
-    def test_resume_with_non_int_iter_count_does_not_raise(self):
+    def test_trace_print_false_suppresses_stdout(self):
+        logger = self._make_logger(print_live=False)
+        data = type("Data", (), {"solution": 1.0, "n_total": 10})()
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            logger.iteration(data)
+        self.assertEqual(stream.getvalue(), "")
+        self.assertEqual(len(logger.history), 1)
+        self.assertTrue(logger.history["printed"][0])
+
+    def test_resume_non_int_iter_count(self):
         """resume() silently ignores a non-int _iter_count on the data."""
         logger = self._make_logger()
         data = type(
@@ -1611,7 +1751,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         with self.assertWarns(MaxSamplesWarning):
             sc.integrate()
 
-    def test_cub_mlqmc_resume_rejects_wrong_mean_level_reps_shape(self):
+    def test_cub_mlqmc_resume_bad_mean_level_reps(self):
         """_validate_resume raises ParameterError if mean_level_reps has wrong shape."""
         fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
         sc = CubMLQMC(fo, abs_tol=0.3, n_limit=2**16)
@@ -1624,7 +1764,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         with self.assertRaises(ParameterError):
             sc2.integrate(resume=bad)
 
-    def test_cub_mlqmc_cont_resume_rejects_wrong_mean_level_reps_shape(self):
+    def test_cub_mlqmc_cont_bad_mean_level_reps(self):
         """Continuation resume must reject an incompatible mean_level_reps shape."""
         fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
         sc = CubMLQMCCont(fo, abs_tol=0.3, n_limit=2**16)
@@ -1637,7 +1777,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         with self.assertRaises(ParameterError):
             sc2.integrate(resume=bad)
 
-    def test_cub_mlmc_max_levels_warning_from_bias_path(self):
+    def test_cub_mlmc_max_levels_bias_warning(self):
         """CubMLMC fires MaxLevelsWarning when bias check hits levels_max."""
         fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
         # levels_min == levels_max == 2 so the algorithm cannot add levels
@@ -1682,7 +1822,7 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         # A successful run should have exercised at least one level addition
         self.assertGreater(data.levels, 1)
 
-    def test_cub_mlmc_cont_add_level_and_warmup_in_integrate(self):
+    def test_cub_mlmc_cont_add_level_and_warmup(self):
         """CubMLMCCont _integrate fires _add_level (line 302) and warm-up (lines 241-251)."""
         fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
         # n_tols=1, inflate=1 means exactly one _integrate call at step_tol=rmse_tol

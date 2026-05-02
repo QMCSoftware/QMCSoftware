@@ -1,7 +1,12 @@
 import copy
 import sys
 
-from .diagnostics import _IterationTraceLogger, print_diagnostic  # noqa: F401
+from .diagnostics import (  # noqa: F401
+    _IterationTraceLogger,
+    format_iteration_log as _format_iteration_log,
+    print_diagnostic,
+    print_iteration_log as _print_iteration_log,
+)
 from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import (
     DistributionCompatibilityError,
@@ -89,6 +94,29 @@ class AbstractStoppingCriterion(object):
         """
         return _IterationTraceLogger(self)
 
+    def format_iteration_log(self, history=None, printed_only=True, include_header=True):
+        """Return the stored iteration log for the latest run or supplied history."""
+        if history is None:
+            history = getattr(self, "iteration_history", None)
+        return _format_iteration_log(
+            history,
+            stopping_criterion=self,
+            printed_only=printed_only,
+            include_header=include_header,
+        )
+
+    def print_iteration_log(self, history=None, printed_only=True, include_header=True, file=None):
+        """Print the stored iteration log for the latest run or supplied history."""
+        if history is None:
+            history = getattr(self, "iteration_history", None)
+        return _print_iteration_log(
+            history,
+            stopping_criterion=self,
+            printed_only=printed_only,
+            include_header=include_header,
+            file=file,
+        )
+
     def _prepare_resume_data(self, resume, validate_resume, restore_resume):
         """Validate and restore a resume checkpoint before integration.
 
@@ -107,8 +135,18 @@ class AbstractStoppingCriterion(object):
             return None
         validate_resume(resume)
         data = copy.deepcopy(resume)
+        self._clear_iteration_history(data)
         restore_resume(data)
         return data
+
+    @staticmethod
+    def _clear_iteration_history(data):
+        """Drop copied trace history from a live resume state."""
+        if hasattr(data, "iteration_history"):
+            data.iteration_history = None
+        stopping_crit = getattr(data, "stopping_crit", None)
+        if stopping_crit is not None and hasattr(stopping_crit, "iteration_history"):
+            stopping_crit.iteration_history = None
 
     def _restore_resume_state(self, data):
         """Optional hook for subclasses to align state before resuming.
@@ -189,6 +227,7 @@ class AbstractStoppingCriterion(object):
         data.time_integrate_previous = previous_time
         data.time_integrate_resume = float(elapsed)
         data.time_integrate_total = previous_time + float(elapsed)
+        data.iteration_history = getattr(self, "iteration_history", None)
         self._annotate_checkpoint_metadata(data)
 
     def _resume_value_equal(self, current, saved):

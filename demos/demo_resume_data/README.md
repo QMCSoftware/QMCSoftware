@@ -5,9 +5,9 @@ resume workflow.
 
 Current scope: the resume workflow in this demo covers `CubMCCLTVec`,
 `CubQMCLatticeG`, `CubQMCNetG`, `CubQMCBayesLatticeG` (`CubBayesLatticeG` alias),
-`CubBayesNetG`,
+`CubBayesNetG`, `CubQMCRepStudentT`,
 `CubMLMC`, `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`. It does not cover
-`CubMCCLT`, `CubMCG`, `CubQMCRepStudentT`, or `PFGPCI`, which currently raise `ParameterError` when
+`CubMCCLT`, `CubMCG`, or `PFGPCI`, which currently raise `ParameterError` when
 `resume=...` is supplied.
 
 ## Contents
@@ -20,12 +20,12 @@ Current scope: the resume workflow in this demo covers `CubMCCLTVec`,
   - a loose run followed by resume with a tighter tolerance
   - a fresh tight run from scratch
 
-  It also captures per-iteration diagnostic logs, writes text reports into
+  It also stores per-iteration diagnostic logs on the solver/data objects, writes text reports into
   `output/`, and includes focused multilevel examples for `CubMLMC`,
   `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`.
 
 - `resume_util.py`: Shared helpers for the resume demo scripts, including
-  diagnostic capture, case execution, and text-report generation.
+  case execution, log formatting, and text-report generation.
 
 - `output/`: Generated reports and checkpoint files created when you run the
   notebooks or `check_resume.py`. These artifacts are intentionally not
@@ -40,6 +40,6 @@ python demos/demo_resume_data/check_resume.py
 ```
 
 creates the following file in `output/`:
-- `check_resume_summary.txt`: Combined report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including captured iteration logs.
+- `check_resume_summary.txt`: Combined report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including stored iteration logs.
 
-The script currently runs with `main(verbose=True)` when executed directly, so every logged iteration is printed.
+Each solver now exposes `format_iteration_log()` and `print_iteration_log()` for replaying the stored trace after `integrate()`.

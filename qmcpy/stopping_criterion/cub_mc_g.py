@@ -472,11 +472,8 @@ class CubMCG(AbstractStoppingCriterion):
         data.bound_low = data.solution - data.bound_half_width
         data.bound_high = data.solution + data.bound_half_width
         data.bound_diff = data.bound_high - data.bound_low
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(data, time() - t_start)
+        trace.finalize()
         return data.solution, data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):

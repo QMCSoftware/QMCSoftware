@@ -287,12 +287,9 @@ class CubMCCLT(AbstractStoppingCriterion):
         data.bound_high = data.solution + data.bound_half_width
         data.bound_diff = data.bound_high - data.bound_low
         data.n_total = self.n_init + data.n_mu
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
         trace.iteration(data)
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(data, time() - t_start)
+        trace.finalize()
         return data.solution, data
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):

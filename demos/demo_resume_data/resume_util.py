@@ -1,7 +1,5 @@
 """Utilities for resume demos and text-report generation."""
 
-from contextlib import redirect_stdout
-import io
 import math
 from time import strftime
 
@@ -145,6 +143,11 @@ def print_integration_result(
 
 def print_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     """Print a compact stage-by-stage sample and time summary table."""
+    print(format_stage_summary(rows, title=title, tol_header=tol_header))
+
+
+def format_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
+    """Return a compact stage-by-stage sample and time summary table."""
     tol_values = [
         float(abs_tol)
         for _, abs_tol, *_ in rows
@@ -166,19 +169,23 @@ def print_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     time_w = 8
     sep_len = stage_w + tol_w + total_n_w + new_n_w + iters_w + sol_w + hw_w + time_w + 7
     sep = "-" * sep_len
-    print(f"\n{title}")
-    print(sep)
-    print(f"{'Stage':<{stage_w}} {tol_header:>{tol_w}} {'total n':>{total_n_w}} {'new n':>{new_n_w}}"
-          f" {'iters':>{iters_w}} {'solution':>{sol_w}} {'half-width':>{hw_w}} {'time (s)':>{time_w}}")
-    print(sep)
+    lines = [
+        f"\n{title}",
+        sep,
+        f"{'Stage':<{stage_w}} {tol_header:>{tol_w}} {'total n':>{total_n_w}} {'new n':>{new_n_w}}"
+        f" {'iters':>{iters_w}} {'solution':>{sol_w}} {'half-width':>{hw_w}} {'time (s)':>{time_w}}",
+        sep,
+    ]
     for name, abs_tol, total_n, new_n, iters, solution, hw, tsec in rows:
         iter_str = str(int(iters)) if iters is not None else "-"
         sol_str = f"{float(solution):.{solution_decimals}f}"
         abs_tol_str = f"{float(abs_tol):.0e}" if abs_tol is not None else "---"
-        print(f"{name:<{stage_w}} {abs_tol_str:>{tol_w}} {int(total_n):>{total_n_w},} {int(new_n):>{new_n_w},}"
-              f" {iter_str:>{iters_w}} {sol_str:>{sol_w}} {hw:>{hw_w}.2e} {tsec:>{time_w}.4f}"
+        lines.append(
+            f"{name:<{stage_w}} {abs_tol_str:>{tol_w}} {int(total_n):>{total_n_w},} {int(new_n):>{new_n_w},}"
+            f" {iter_str:>{iters_w}} {sol_str:>{sol_w}} {hw:>{hw_w}.2e} {tsec:>{time_w}.4f}"
         )
-    print(sep)
+    lines.append(sep)
+    return "\n".join(lines)
 
 
 def print_comparison_metrics(
@@ -201,20 +208,40 @@ def print_comparison_metrics(
     print(f"{'Fresh tight time:':<{label_w}} {fresh_wall_time:>{val_w}.4f} s")
 
 
-def enable_diagnostics(stopping_criterion, label, verbose=False):
+def collect_resume_fresh_warnings(name, resume_stage, fresh_stage):
+    """Return warning strings for mismatched resume-vs-fresh outcomes."""
+    warning_lines = []
+
+    resume_n = int(resume_stage.get("total_n", 0))
+    fresh_n = int(fresh_stage.get("total_n", 0))
+    if resume_n != fresh_n:
+        warning_lines.append(
+            f"WARNING: {name}: Inconsistent total samples across stages "
+            f"(resume_n={resume_n}, fresh_n={fresh_n})"
+        )
+
+    try:
+        resume_sol = float(resume_stage.get("solution", float("nan")))
+        fresh_sol = float(fresh_stage.get("solution", float("nan")))
+        resume_tol = float(resume_stage.get("tol", float("nan")))
+    except (TypeError, ValueError):
+        return warning_lines
+    if math.isfinite(resume_sol) and math.isfinite(fresh_sol) and math.isfinite(resume_tol):
+        if abs(resume_sol - fresh_sol) > 2 * resume_tol:
+            warning_lines.append(
+                f"WARNING: {name}: Resume and fresh solutions differ by more than 2 * tol "
+                f"(resume_sol={resume_sol}, fresh_sol={fresh_sol}, tol={resume_tol})"
+            )
+    return warning_lines
+
+
+def enable_diagnostics(stopping_criterion, label, verbose=False, print_live=False):
     """Enable iteration diagnostics on a stopping criterion instance."""
     setattr(stopping_criterion, "trace_iterations", True)
     setattr(stopping_criterion, "trace_label", label)
     setattr(stopping_criterion, "verbose", verbose)
+    setattr(stopping_criterion, "trace_print", print_live)
     return stopping_criterion
-
-
-def capture_integrate(stopping_criterion, *args, **kwargs):
-    """Run ``integrate`` while capturing all printed diagnostic output."""
-    stream = io.StringIO()
-    with redirect_stdout(stream):
-        out = stopping_criterion.integrate(*args, **kwargs)
-    return out, stream.getvalue()
 
 #################################################################
 #  Case factories and runners
@@ -285,11 +312,40 @@ def _get_sc_tol(sc):
     return None, None
 
 
+def _solution_value(solution):
+    """Return a scalar float from a QMCPy solution object."""
+    try:
+        return float(solution.item())
+    except Exception:
+        return float(solution)
+
+
+def _make_stage_record(name, sc, solution, data, inputs, previous_n_total=0):
+    """Build a compact stage record from a completed integration."""
+    total_n = int(getattr(data, "n_total", 0))
+    tol, tol_name = _get_sc_tol(sc)
+    return {
+        "name": name,
+        "tol": tol,
+        "tol_name": tol_name,
+        "total_n": total_n,
+        "new_n": total_n - int(previous_n_total),
+        "iters": getattr(data, "_iter_count", None),
+        "solution": _solution_value(solution),
+        "half_width": _safe_half_width(data),
+        "time": float(getattr(data, "time_integrate", 0.0)),
+        "inputs": inputs,
+        "iteration_log": sc.format_iteration_log(
+            history=getattr(data, "iteration_history", None)
+        ),
+    }
+
+
 def _run_logged_case(factory, label, verbose=False, **integrate_kwargs):
-    """Build, trace, integrate, and return logs plus compact inputs."""
+    """Build, trace, integrate, and return the run outputs plus compact inputs."""
     sc = enable_diagnostics(factory(), label, verbose=verbose)
-    (solution, data), log = capture_integrate(sc, **integrate_kwargs)
-    return solution, data, log.strip(), _format_problem_inputs(sc), sc
+    solution, data = sc.integrate(**integrate_kwargs)
+    return solution, data, _format_problem_inputs(sc), sc
 
 
 def run_resume_case(case, verbose=False):
@@ -297,15 +353,10 @@ def run_resume_case(case, verbose=False):
     name = case["name"]
     row = {"name": name}
     try:
-        sol1, data1, loose_log, loose_inputs, sc1 = _run_logged_case(
+        sol1, data1, loose_inputs, sc1 = _run_logged_case(
             case["loose"], f"{name}-LOOSE", verbose=verbose)
-        old_n = int(getattr(data1, "n_total", 0))
-        # Capture loose stats before passing data1 into resume (may mutate in-place)
-        loose_iters = getattr(data1, "_iter_count", None)
-        loose_hw = _safe_half_width(data1)
-        loose_time_f = float(getattr(data1, "time_integrate", 0.0))
-        loose_solution_f = float(sol1.item())
-        loose_tol, loose_tol_name = _get_sc_tol(sc1)
+        loose_stage = _make_stage_record("Loose", sc1, sol1, data1, loose_inputs)
+        old_n = loose_stage["total_n"]
 
         # Start RESUMED stage with the same solver, retuned to the tight tolerance.
         tight_sc = case["tight"]()
@@ -319,40 +370,16 @@ def run_resume_case(case, verbose=False):
         )
         setattr(sc1, "trace_label", f"{name}-RESUME")
         setattr(sc1, "verbose", verbose)
-        (sol2, data2), resume_log = capture_integrate(sc1, resume=data1)
-        resume_log = resume_log.strip()
+        sol2, data2 = sc1.integrate(resume=data1)
         resume_inputs = _format_problem_inputs(sc1)
-
-        resume_n = int(getattr(data2, "n_total", 0))
-        new_n = resume_n - old_n
+        resume_stage = _make_stage_record(
+            "Resumed", sc1, sol2, data2, resume_inputs, previous_n_total=old_n
+        )
         row.update(
             {
                 "status": "ok",
-                "loose_solution": format_value(sol1, ndigits=7),
-                "resume_solution": format_value(sol2, ndigits=7),
-                "old_n_total": str(old_n),
-                "resume_n_total": str(resume_n),
-                "resume_n_new": str(new_n),
-                "resume_time": format_value(getattr(data2, "time_integrate", float("nan")), ndigits=4),
-                "loose_inputs": loose_inputs,
-                "resume_inputs": resume_inputs,
-                "loose_log": loose_log,
-                "resume_log": resume_log,
-                # Extra numeric fields for stage summary
-                "_loose_abs_tol": loose_tol,
-                "_loose_tol_name": loose_tol_name,
-                "_loose_n": old_n,
-                "_loose_hw": loose_hw,
-                "_loose_iters": loose_iters,
-                "_loose_solution_f": loose_solution_f,
-                "_loose_time_f": loose_time_f,
-                "_resume_abs_tol": _get_sc_tol(sc1)[0],
-                "_resume_tol_name": _get_sc_tol(sc1)[1],
-                "_resume_n": resume_n,
-                "_resume_hw": _safe_half_width(data2),
-                "_resume_iters": getattr(data2, "_iter_count", None),
-                "_resume_solution_f": float(sol2.item()),
-                "_resume_time_f": float(getattr(data2, "time_integrate", 0.0)),
+                "loose": loose_stage,
+                "resume": resume_stage,
             }
         )
     except Exception as exc:
@@ -365,28 +392,13 @@ def run_fresh_case(case, verbose=False):
     name = case["name"]
     row = {"name": name}
     try:
-        sol, data, fresh_log, fresh_inputs, sc = _run_logged_case(
+        sol, data, fresh_inputs, sc = _run_logged_case(
             case["tight"], f"{name}-FRESH", verbose=verbose
         )
-        fresh_n = int(getattr(data, "n_total", 0))
         row.update(
             {
                 "status": "ok",
-                "fresh_solution": format_value(sol, ndigits=7),
-                "fresh_n_total": str(fresh_n),
-                "fresh_time": format_value(
-                    getattr(data, "time_integrate", float("nan")), ndigits=4
-                ),
-                "fresh_inputs": fresh_inputs,
-                "fresh_log": fresh_log,
-                # Extra numeric fields for stage summary
-                "_fresh_abs_tol": _get_sc_tol(sc)[0],
-                "_fresh_tol_name": _get_sc_tol(sc)[1],
-                "_fresh_n": fresh_n,
-                "_fresh_hw": _safe_half_width(data),
-                "_fresh_iters": getattr(data, "_iter_count", None),
-                "_fresh_solution_f": float(sol.item()),
-                "_fresh_time_f": float(getattr(data, "time_integrate", 0.0)),
+                "fresh": _make_stage_record("Fresh", sc, sol, data, fresh_inputs),
             }
         )
     except Exception as exc:
@@ -455,14 +467,17 @@ def write_combined_report(path, title, resume_rows, fresh_rows):
         rstatus = rrow.get("status", "unknown")
         fstatus = frow.get("status", "unknown")
         lines.append(f"[{name}] status={rstatus}")
+        loose_stage = rrow.get("loose", {})
+        resume_stage = rrow.get("resume", {})
+        fresh_stage = frow.get("fresh", {})
 
         # Input sections
-        for section_label, row_obj, row_key in [
-            ("loose_inputs", rrow, "loose_inputs"),
-            ("resume_inputs", rrow, "resume_inputs"),
-            ("fresh_inputs", frow, "fresh_inputs"),
+        for section_label, stage in [
+            ("loose_inputs", loose_stage),
+            ("resume_inputs", resume_stage),
+            ("fresh_inputs", fresh_stage),
         ]:
-            text = row_obj.get(row_key, "")
+            text = stage.get("inputs", "")
             if not text:
                 continue
             lines.append("")
@@ -470,12 +485,12 @@ def write_combined_report(path, title, resume_rows, fresh_rows):
             lines.extend([f"    {line}" for line in text.splitlines()])
 
         # Iteration log sections
-        for section_label, row_obj, row_key in [
-            ("loose_iteration_log", rrow, "loose_log"),
-            ("resume_iteration_log", rrow, "resume_log"),
-            ("fresh_iteration_log", frow, "fresh_log"),
+        for section_label, stage in [
+            ("loose_iteration_log", loose_stage),
+            ("resume_iteration_log", resume_stage),
+            ("fresh_iteration_log", fresh_stage),
         ]:
-            text = row_obj.get(row_key, "")
+            text = stage.get("iteration_log", "")
             if not text:
                 continue
             lines.append("")
@@ -487,60 +502,53 @@ def write_combined_report(path, title, resume_rows, fresh_rows):
             stage_rows = [
                 (
                     "Loose",
-                    rrow.get("_loose_abs_tol"),
-                    rrow.get("_loose_n", 0),
-                    rrow.get("_loose_n", 0),
-                    rrow.get("_loose_iters"),
-                    rrow.get("_loose_solution_f", float("nan")),
-                    rrow.get("_loose_hw", float("nan")),
-                    rrow.get("_loose_time_f", 0.0),
+                    loose_stage.get("tol"),
+                    loose_stage.get("total_n", 0),
+                    loose_stage.get("new_n", 0),
+                    loose_stage.get("iters"),
+                    loose_stage.get("solution", float("nan")),
+                    loose_stage.get("half_width", float("nan")),
+                    loose_stage.get("time", 0.0),
                 ),
                 (
                     "Resumed",
-                    rrow.get("_resume_abs_tol"),
-                    rrow.get("_resume_n", 0),
-                    rrow.get("_resume_n", 0) - rrow.get("_loose_n", 0),
-                    rrow.get("_resume_iters"),
-                    rrow.get("_resume_solution_f", float("nan")),
-                    rrow.get("_resume_hw", float("nan")),
-                    rrow.get("_resume_time_f", 0.0),
+                    resume_stage.get("tol"),
+                    resume_stage.get("total_n", 0),
+                    resume_stage.get("new_n", 0),
+                    resume_stage.get("iters"),
+                    resume_stage.get("solution", float("nan")),
+                    resume_stage.get("half_width", float("nan")),
+                    resume_stage.get("time", 0.0),
                 ),
                 (
                     "Fresh",
-                    frow.get("_fresh_abs_tol"),
-                    frow.get("_fresh_n", 0),
-                    frow.get("_fresh_n", 0),
-                    frow.get("_fresh_iters"),
-                    frow.get("_fresh_solution_f", float("nan")),
-                    frow.get("_fresh_hw", float("nan")),
-                    frow.get("_fresh_time_f", 0.0),
+                    fresh_stage.get("tol"),
+                    fresh_stage.get("total_n", 0),
+                    fresh_stage.get("new_n", 0),
+                    fresh_stage.get("iters"),
+                    fresh_stage.get("solution", float("nan")),
+                    fresh_stage.get("half_width", float("nan")),
+                    fresh_stage.get("time", 0.0),
                 ),
             ]
             # Use target_rmse_tol as the column header when all rows report that name
             tol_names = {
-                rrow.get("_loose_tol_name"),
-                rrow.get("_resume_tol_name"),
-                frow.get("_fresh_tol_name"),
+                loose_stage.get("tol_name"),
+                resume_stage.get("tol_name"),
+                fresh_stage.get("tol_name"),
             } - {None}
             tol_header = "rmse_tol" if tol_names == {"target_rmse_tol"} else "abs_tol"
-            stream = io.StringIO()
-            with redirect_stdout(stream):
-                print_stage_summary(stage_rows, title=f"Stage summary of {name}", tol_header=tol_header)
-            summary_text = stream.getvalue().strip()
+            summary_text = format_stage_summary(
+                stage_rows, title=f"Stage summary of {name}", tol_header=tol_header
+            ).strip()
             lines.append("")
             lines.extend([f"  {line}" for line in summary_text.splitlines()])
 
-        # Compare total n in last rows. If different, print warning
-        resume_n = rrow.get("_resume_n", 0)
-        fresh_n = frow.get("_fresh_n", 0)
-        if resume_n != fresh_n:
-            print(f"  WARNING: {name}: Inconsistent total samples across stages (resume_n={resume_n}, fresh_n={fresh_n})")
-        # Compare solutions in last rows. If > 2 tol, print warning
-        resume_sol = rrow.get("_resume_solution_f", float("nan"))
-        fresh_sol = frow.get("_fresh_solution_f", float("nan"))
-        resume_tol = rrow.get("_resume_abs_tol", float("nan"))
-        if abs(resume_sol - fresh_sol) > 2 * (resume_tol if resume_tol is not None else float("nan")):
-            print(f"  WARNING: {name}: Resume and fresh solutions differ by more than 2 * tol (resume_sol={resume_sol}, fresh_sol={fresh_sol}, tol={resume_tol})")
+        for warning_line in collect_resume_fresh_warnings(
+            name, resume_stage, fresh_stage
+        ):
+            print(f"  {warning_line}")
+            lines.append(f"  {warning_line}")
 
         # Errors
         for row_obj in (rrow, frow):
