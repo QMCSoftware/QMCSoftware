@@ -1,6 +1,6 @@
 from .abstract_cub_mlmc import AbstractCubMLMC
 from ..util.data import Data
-
+import copy
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
@@ -150,10 +150,36 @@ class CubMLMCCont(AbstractCubMLMC):
 
     def _validate_resume(self, data):
         self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if hasattr(data, "level_diffs"):
+            if len(data.level_diffs) != len(data.n_level):
+                raise ParameterError(
+                    "resume data level_diffs length must match n_level length."
+                )
+            for level, (diffs, n_level) in enumerate(zip(data.level_diffs, data.n_level)):
+                if len(np.asarray(diffs)) != int(n_level):
+                    raise ParameterError(
+                        "resume data level_diffs[%d] length must match n_level[%d]."
+                        % (level, level)
+                    )
 
     def _restore_resume_state(self, data):
         # Undo the final data.levels += 1 stored in the returned data.
         data.levels -= 1
+
+    @staticmethod
+    def _checkpoint_rmse_tol(data):
+        for obj in (data, getattr(data, "stopping_crit", None)):
+            try:
+                return float(getattr(obj, "rmse_tol", None))
+            except (TypeError, ValueError):
+                pass
+        return None
+
+    def _can_replay_resume_exactly(self, data):
+        checkpoint_tol = self._checkpoint_rmse_tol(data)
+        if checkpoint_tol is None or not (self.target_rmse_tol < checkpoint_tol):
+            return False
+        return hasattr(data, "level_diffs") and len(data.level_diffs) == len(data.n_level)
 
     def integrate(self, resume=None):
         """Run (or continue) the continuation-MLMC integration.
@@ -177,10 +203,29 @@ class CubMLMCCont(AbstractCubMLMC):
         self._active_trace = trace
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
-            if data is not None:
+            replay_snapshots = None
+            if self._can_replay_resume_exactly(data):
+                replay_data, replay_snapshots = self._replay_resume_exactly(data)
+                if replay_data is not None:
+                    data = replay_data
+            if resume is not None:
+                checkpoint = self._prepare_resume_data(
+                    resume, self._validate_resume, self._restore_resume_state
+                )
+                step_tol = max(
+                    getattr(checkpoint, "rmse_tol", self.target_rmse_tol),
+                    self.target_rmse_tol,
+                )
+                checkpoint.rmse_tol = step_tol
+                trace.resume(checkpoint, step_value=int(checkpoint.levels + 1))
+            if replay_snapshots is not None:
+                for snapshot in replay_snapshots:
+                    trace.iteration(snapshot, step_value=int(snapshot.levels + 1))
+                if replay_snapshots and trace.enabled:
+                    data._iter_count = trace.iter_count
+            elif data is not None:
                 step_tol = max(getattr(data, 'rmse_tol', self.target_rmse_tol), self.target_rmse_tol)
                 data.rmse_tol = step_tol
-                trace.resume(data, step_value=int(data.levels + 1))
                 if step_tol <= self.target_rmse_tol:
                     # Same or looser tolerance: check convergence at target_tol
                     self._integrate(data, skip_level_reset=True, step_tol=step_tol)
@@ -217,26 +262,115 @@ class CubMLMCCont(AbstractCubMLMC):
         data.beta = np.maximum(0, self.beta0)
         data.gamma = np.maximum(0, self.gamma0)
         data.level_integrands = []
+        data.level_diffs = [np.empty(0, dtype=float) for _ in range(data.levels + 1)]
         return data
 
-    def _integrate(self, data, skip_level_reset=False, trace=None, step_tol=None):
-        if step_tol is None:
-            step_tol = self.rmse_tol
-        trace = getattr(self, "_active_trace", None) if trace is None else trace
-        self.theta = self.theta_init
-        if not skip_level_reset:
-            data.levels = int(self.levels_min)
-        self._update_data(data)  # Take warm-up samples if none have been taken so far
-        warmup_drew = data.diff_n_level.sum() > 0
+    @staticmethod
+    def _update_trace_solution(data):
         valid = data.n_level[: data.levels + 1] > 0
         if np.any(valid):
             data.solution = (
                 data.sum_level[0, : data.levels + 1][valid]
                 / data.n_level[: data.levels + 1][valid]
             ).sum()
+
+    def _update_replay_data(self, data):
+        for l in range(data.levels + 1):
+            if l == len(data.level_integrands):
+                data.level_integrands += self.integrand.spawn(levels=int(l))
+            if data.diff_n_level[l] <= 0:
+                continue
+            n_remaining = int(data.diff_n_level[l])
+            if l < len(data.cached_level_diffs):
+                cached = data.cached_level_diffs[l]
+                pos = int(data.cached_level_positions[l])
+                n_cached = min(n_remaining, len(cached) - pos)
+                if n_cached > 0:
+                    dp = cached[pos : pos + n_cached]
+                    data.cached_level_positions[l] += n_cached
+                    self._append_level_diff_samples(data, l, dp)
+                    data.n_level[l] += n_cached
+                    data.sum_level[0, l] += dp.sum()
+                    data.sum_level[1, l] += (dp**2).sum()
+                    data.cost_level[l] += data.level_integrands[l].cost * n_cached
+                    n_remaining -= n_cached
+            if n_remaining > 0:
+                integrand_l = data.level_integrands[l]
+                samples = integrand_l.discrete_distrib(n=n_remaining)
+                pc, pf = integrand_l.f(samples)
+                dp = pf - pc
+                self._append_level_diff_samples(data, l, dp)
+                data.n_level[l] += n_remaining
+                data.sum_level[0, l] += dp.sum()
+                data.sum_level[1, l] += (dp**2).sum()
+                data.cost_level[l] += integrand_l.cost * n_remaining
+        self._refresh_level_statistics(data)
+
+    def _replay_resume_exactly(self, checkpoint):
+        shadow_trace = self._active_trace
+        self._active_trace = None
+        try:
+            shadow = self._construct_data()
+            shadow.level_integrands = list(checkpoint.level_integrands)
+            shadow.cached_level_diffs = [
+                np.asarray(level_diffs, dtype=float) for level_diffs in checkpoint.level_diffs
+            ]
+            shadow.cached_level_positions = np.zeros(
+                len(shadow.cached_level_diffs), dtype=int
+            )
+            snapshots = []
+            for t in range(self.n_tols):
+                step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
+                self._integrate(
+                    shadow,
+                    step_tol=step_tol,
+                    record_snapshots=True,
+                    snapshots=snapshots,
+                    update_data_fn=self._update_replay_data,
+                )
+        finally:
+            self._active_trace = shadow_trace
+        target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels + 1], dtype=int)
+        absorb_index = None
+        for i, snapshot in enumerate(snapshots):
+            if len(snapshot.n_level) < len(target_counts):
+                continue
+            if np.all(snapshot.n_level[: len(target_counts)] >= target_counts):
+                absorb_index = i
+                break
+        if absorb_index is None:
+            return None, None
+        for attr in ("cached_level_diffs", "cached_level_positions"):
+            if hasattr(shadow, attr):
+                delattr(shadow, attr)
+        return shadow, snapshots[absorb_index:]
+
+    def _integrate(
+        self,
+        data,
+        skip_level_reset=False,
+        trace=None,
+        step_tol=None,
+        record_snapshots=False,
+        snapshots=None,
+        update_data_fn=None,
+    ):
+        if step_tol is None:
+            step_tol = self.rmse_tol
+        trace = getattr(self, "_active_trace", None) if trace is None else trace
+        update_data_fn = self._update_data if update_data_fn is None else update_data_fn
+        self.theta = self.theta_init
+        if not skip_level_reset:
+            data.levels = int(self.levels_min)
+        update_data_fn(data)  # Take warm-up samples if none have been taken so far
+        warmup_drew = data.diff_n_level.sum() > 0
+        self._update_trace_solution(data)
         if trace is not None and warmup_drew:
             data.rmse_tol = step_tol
             trace.iteration(data, step_value=int(data.levels + 1))
+        if record_snapshots and warmup_drew:
+            data.rmse_tol = step_tol
+            snapshots.append(copy.deepcopy(data))
 
         converged = False
         while not converged:
@@ -245,16 +379,14 @@ class CubMLMCCont(AbstractCubMLMC):
             if not data.n_level[data.levels] > 0:
                 # This takes n_init warm-up samples at the finest level
                 data.diff_n_level = np.hstack((data.diff_n_level, self.n_init))
-                self._update_data(data)
-                valid = data.n_level[: data.levels + 1] > 0
-                if np.any(valid):
-                    data.solution = (
-                        data.sum_level[0, : data.levels + 1][valid]
-                        / data.n_level[: data.levels + 1][valid]
-                    ).sum()
+                update_data_fn(data)
+                self._update_trace_solution(data)
                 if trace is not None:
                     data.rmse_tol = step_tol
                     trace.iteration(data, step_value=int(data.levels + 1))
+                if record_snapshots:
+                    data.rmse_tol = step_tol
+                    snapshots.append(copy.deepcopy(data))
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 # data.diff_n_level = self._get_next_samples(data)
                 # data.diff_n_level[:data.levels] = 0
@@ -284,16 +416,14 @@ class CubMLMCCont(AbstractCubMLMC):
                 break
 
             # Take additional samples
-            self._update_data(data)
-            valid = data.n_level[: data.levels + 1] > 0
-            if np.any(valid):
-                data.solution = (
-                    data.sum_level[0, : data.levels + 1][valid]
-                    / data.n_level[: data.levels + 1][valid]
-                ).sum()
+            update_data_fn(data)
+            self._update_trace_solution(data)
             if trace is not None:
                 data.rmse_tol = step_tol
                 trace.iteration(data, step_value=int(data.levels + 1))
+            if record_snapshots:
+                data.rmse_tol = step_tol
+                snapshots.append(copy.deepcopy(data))
 
             # Check for convergence
             converged = self._rmse(data) < step_tol

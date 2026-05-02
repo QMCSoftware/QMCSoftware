@@ -799,6 +799,38 @@ class TestResumeFeature(unittest.TestCase):
                     self._multilevel_builder(stopping_criterion, integrand_factory, tol_kwarg, self.tight_abs_tol),
                 )
 
+    def test_cub_mlmc_resume_matches_fresh_total_samples(self):
+        loose_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "level_diffs"))
+
+        resumed_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
+        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        fresh_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
+        sol_fresh, fresh = fresh_sc.integrate()
+
+        self.assertEqual(int(resumed.n_total), int(fresh.n_total))
+        self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
+        self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
+        self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
+
+    def test_cub_mlmc_cont_resume_matches_fresh_total_samples(self):
+        loose_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "level_diffs"))
+
+        resumed_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
+        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        fresh_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
+        sol_fresh, fresh = fresh_sc.integrate()
+
+        self.assertEqual(int(resumed.n_total), int(fresh.n_total))
+        self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
+        self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
+        self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
+
     def test_continuation_resume_uses_target_tol_without_level_reset(self):
         cases = [
             ("CubMLMCCont", CubMLMCCont, self._iid_financial_option, 4),
@@ -1588,11 +1620,20 @@ class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
         bad = copy.deepcopy(checkpoint)
         bad.mean_level_reps = bad.mean_level_reps[:, :-1]  # wrong shape
 
-        sc2 = CubMLQMC(
-            FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30),
-            abs_tol=0.1,
-            n_limit=2**16,
-        )
+        sc2 = CubMLQMC(FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30), abs_tol=0.1, n_limit=2**16)
+        with self.assertRaises(ParameterError):
+            sc2.integrate(resume=bad)
+
+    def test_cub_mlqmc_cont_resume_rejects_wrong_mean_level_reps_shape(self):
+        """Continuation resume must reject an incompatible mean_level_reps shape."""
+        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
+        sc = CubMLQMCCont(fo, abs_tol=0.3, n_limit=2**16)
+        _, checkpoint = sc.integrate()
+
+        bad = copy.deepcopy(checkpoint)
+        bad.mean_level_reps = bad.mean_level_reps[:, :-1]  # wrong shape
+
+        sc2 = CubMLQMCCont(FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30), abs_tol=0.1, n_limit=2**16)
         with self.assertRaises(ParameterError):
             sc2.integrate(resume=bad)
 

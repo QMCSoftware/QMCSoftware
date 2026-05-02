@@ -1,7 +1,6 @@
 from pathlib import Path
-import warnings
-from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC,
-    CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
+from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC, CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, 
+    CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
 
 from resume_util import (make_abs_tol_builder, make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report)
 

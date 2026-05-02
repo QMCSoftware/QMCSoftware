@@ -5,7 +5,7 @@ from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
 from ..integrand import FinancialOption
-from ..util import MaxSamplesWarning, MaxLevelsWarning
+from ..util import MaxSamplesWarning, MaxLevelsWarning, ParameterError
 import numpy as np
 from scipy.stats import norm
 from time import time
@@ -150,6 +150,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
 
     def _validate_resume(self, data):
         self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if np.shape(data.mean_level_reps) != (data.levels, int(self.replications)):
+            raise ParameterError("resume data mean_level_reps shape %s is incompatible with levels=%d, replications=%d." % (np.shape(data.mean_level_reps), data.levels, int(self.replications)))
 
     def _restore_resume_state(self, data):
         # No data.levels adjustment needed for MLQMC (no final += 1 in this variant).

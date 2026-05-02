@@ -5,37 +5,19 @@ from scipy.stats import norm
 
 class AbstractCubMLMC(AbstractStoppingCriterion):
 
-    def _get_next_samples(self, data):
-        ns = np.ceil(
-            np.sqrt(data.var_level / data.cost_per_sample)
-            * np.sqrt(data.var_level * data.cost_per_sample).sum()
-            / ((1 - self.theta) * self.rmse_tol**2)
+    @staticmethod
+    def _append_level_diff_samples(data, level, dp):
+        """Append raw level-difference samples when checkpoint caching is enabled."""
+        if not hasattr(data, "level_diffs"):
+            return
+        while len(data.level_diffs) <= level:
+            data.level_diffs.append(np.empty(0, dtype=float))
+        data.level_diffs[level] = np.concatenate(
+            [np.asarray(data.level_diffs[level], dtype=float), np.asarray(dp, dtype=float)]
         )
-        return ns.astype(int)
 
-    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        assert rel_tol is None, "rel_tol not supported by this stopping criterion."
-        if rmse_tol != None:
-            self.rmse_tol = float(rmse_tol)
-        elif abs_tol != None:
-            self.rmse_tol = float(abs_tol) / norm.ppf(1 - self.alpha / 2.0)
-
-    def _update_data(self, data):
-        for l in range(data.levels + 1):
-            if l == len(data.level_integrands):
-                # haven't spawned this level's integrand yet
-                data.level_integrands += self.integrand.spawn(levels=int(l))
-            integrand_l = data.level_integrands[l]
-            if data.diff_n_level[l] > 0:
-                # evaluate integral at sampling points samples
-                n = data.diff_n_level[l]
-                samples = integrand_l.discrete_distrib(n=n)
-                pc, pf = integrand_l.f(samples)
-                dp = pf - pc
-                data.n_level[l] = data.n_level[l] + data.diff_n_level[l]
-                data.sum_level[0, l] = data.sum_level[0, l] + dp.sum()
-                data.sum_level[1, l] = data.sum_level[1, l] + (dp**2).sum()
-                data.cost_level[l] = data.cost_level[l] + integrand_l.cost * n
+    def _refresh_level_statistics(self, data):
+        """Recompute MLMC summary statistics after level updates."""
         # compute absolute average, variance and cost
         data.mean_level = np.absolute(
             data.sum_level[0, : data.levels + 1] / data.n_level[: data.levels + 1]
@@ -71,6 +53,40 @@ class AbstractCubMLMC(AbstractStoppingCriterion):
             data.gamma = np.maximum(0.5, x[0])
         data.n_total = data.n_level.sum()
 
+    def _get_next_samples(self, data):
+        ns = np.ceil(
+            np.sqrt(data.var_level / data.cost_per_sample)
+            * np.sqrt(data.var_level * data.cost_per_sample).sum()
+            / ((1 - self.theta) * self.rmse_tol**2)
+        )
+        return ns.astype(int)
+
+    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
+        assert rel_tol is None, "rel_tol not supported by this stopping criterion."
+        if rmse_tol != None:
+            self.rmse_tol = float(rmse_tol)
+        elif abs_tol != None:
+            self.rmse_tol = float(abs_tol) / norm.ppf(1 - self.alpha / 2.0)
+
+    def _update_data(self, data):
+        for l in range(data.levels + 1):
+            if l == len(data.level_integrands):
+                # haven't spawned this level's integrand yet
+                data.level_integrands += self.integrand.spawn(levels=int(l))
+            integrand_l = data.level_integrands[l]
+            if data.diff_n_level[l] > 0:
+                # evaluate integral at sampling points samples
+                n = data.diff_n_level[l]
+                samples = integrand_l.discrete_distrib(n=n)
+                pc, pf = integrand_l.f(samples)
+                dp = pf - pc
+                self._append_level_diff_samples(data, l, dp)
+                data.n_level[l] = data.n_level[l] + data.diff_n_level[l]
+                data.sum_level[0, l] = data.sum_level[0, l] + dp.sum()
+                data.sum_level[1, l] = data.sum_level[1, l] + (dp**2).sum()
+                data.cost_level[l] = data.cost_level[l] + integrand_l.cost * n
+        self._refresh_level_statistics(data)
+
     def _add_level(self, data):
         data.levels += 1
         if not len(data.n_level) > data.levels:
@@ -86,6 +102,8 @@ class AbstractCubMLMC(AbstractStoppingCriterion):
             data.n_level = np.hstack((data.n_level, 0))
             data.sum_level = np.hstack((data.sum_level, np.zeros((2, 1))))
             data.cost_level = np.hstack((data.cost_level, 0.0))
+            if hasattr(data, "level_diffs"):
+                data.level_diffs.append(np.empty(0, dtype=float))
         else:
             data.mean_level = np.absolute(
                 data.sum_level[0, : data.levels + 1] / data.n_level[: data.levels + 1]
@@ -98,3 +116,6 @@ class AbstractCubMLMC(AbstractStoppingCriterion):
             data.cost_per_sample = (
                 data.cost_level[: data.levels + 1] / data.n_level[: data.levels + 1]
             )
+            if hasattr(data, "level_diffs"):
+                while len(data.level_diffs) <= data.levels:
+                    data.level_diffs.append(np.empty(0, dtype=float))

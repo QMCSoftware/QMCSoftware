@@ -1,6 +1,6 @@
 from .abstract_cub_mlmc import AbstractCubMLMC
 from ..util.data import Data
-
+import copy
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
@@ -136,6 +136,17 @@ class CubMLMC(AbstractCubMLMC):
 
     def _validate_resume(self, data):
         self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if hasattr(data, "level_diffs"):
+            if len(data.level_diffs) != len(data.n_level):
+                raise ParameterError(
+                    "resume data level_diffs length must match n_level length."
+                )
+            for level, (diffs, n_level) in enumerate(zip(data.level_diffs, data.n_level)):
+                if len(np.asarray(diffs)) != int(n_level):
+                    raise ParameterError(
+                        "resume data level_diffs[%d] length must match n_level[%d]."
+                        % (level, level)
+                    )
 
     def _restore_resume_state(self, data):
         # Undo the final data.levels += 1 stored in the returned data so the
@@ -147,50 +158,99 @@ class CubMLMC(AbstractCubMLMC):
         n_samples = self._get_next_samples(data)
         data.diff_n_level = np.maximum(0, n_samples - data.n_level[: data.levels + 1])
 
-    def integrate(self, resume=None):
-        """Run (or continue) the MLMC integration.
+    def _construct_data(self):
+        data = Data(
+            parameters=[
+                "solution",
+                "n_total",
+                "levels",
+                "n_level",
+                "mean_level",
+                "var_level",
+                "cost_per_sample",
+                "alpha",
+                "beta",
+                "gamma",
+            ]
+        )
+        data.levels = int(self.levels_min)
+        data.n_level = np.zeros(data.levels + 1, dtype=int)
+        data.sum_level = np.zeros((2, data.levels + 1))
+        data.cost_level = np.zeros(data.levels + 1)
+        data.diff_n_level = self.n_init * np.ones(data.levels + 1, dtype=int)
+        data.alpha = np.maximum(0, self.alpha0)
+        data.beta = np.maximum(0, self.beta0)
+        data.gamma = np.maximum(0, self.gamma0)
+        data.level_integrands = []
+        data.level_diffs = [np.empty(0, dtype=float) for _ in range(data.levels + 1)]
+        return data
 
-        Args:
-            resume (Data, optional): Checkpoint returned by a previous
-                ``integrate()`` call.  The new tolerance may be tighter *or*
-                looser than the one used when the checkpoint was created.
-                With a tighter tolerance the algorithm draws additional samples
-                from where it left off.  With a looser tolerance the existing
-                samples already satisfy the requirement and the method returns
-                immediately with no new sampling.
+    @staticmethod
+    def _checkpoint_rmse_tol(data):
+        for obj in (data, getattr(data, "stopping_crit", None)):
+            try:
+                return float(getattr(obj, "rmse_tol", None))
+            except (TypeError, ValueError):
+                pass
+        return None
 
-        Returns:
-            tuple: ``(solution, data)``.
-        """
-        t_start = time()
-        resume_provenance = self._capture_resume_provenance(resume)
-        trace = self._make_trace_logger()
-        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
-        if data is not None:
-            data.rmse_estimate = np.sqrt((data.var_level / data.n_level[:len(data.var_level)]).sum())
-            trace.resume(data, step_value=int(data.levels + 1))
-        if data is None:
-            data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "cost_per_sample", "alpha", "beta", "gamma"])
-            data.levels = int(self.levels_min)
-            data.n_level = np.zeros(data.levels + 1, dtype=int)
-            data.sum_level = np.zeros((2, data.levels + 1))
-            data.cost_level = np.zeros(data.levels + 1)
-            data.diff_n_level = self.n_init * np.ones(data.levels + 1, dtype=int)
-            data.alpha = np.maximum(0, self.alpha0)
-            data.beta = np.maximum(0, self.beta0)
-            data.gamma = np.maximum(0, self.gamma0)
-            data.level_integrands = []
+    def _can_replay_resume_exactly(self, data):
+        checkpoint_tol = self._checkpoint_rmse_tol(data)
+        if checkpoint_tol is None or not (self.rmse_tol < checkpoint_tol):
+            return False
+        return hasattr(data, "level_diffs") and len(data.level_diffs) == len(data.n_level)
 
-        def _update_trace_solution():
-            valid = data.n_level > 0
-            if np.any(valid):
-                data.solution = (data.sum_level[0, valid] / data.n_level[valid]).sum()
-            data.rmse_estimate = np.sqrt((data.var_level / np.maximum(1, data.n_level[:len(data.var_level)])).sum())
+    @staticmethod
+    def _update_trace_solution(data):
+        valid = data.n_level > 0
+        if np.any(valid):
+            data.solution = (data.sum_level[0, valid] / data.n_level[valid]).sum()
+        data.rmse_estimate = np.sqrt(
+            (data.var_level / np.maximum(1, data.n_level[: len(data.var_level)])).sum()
+        )
 
+    def _update_replay_data(self, data):
+        for l in range(data.levels + 1):
+            if l == len(data.level_integrands):
+                data.level_integrands += self.integrand.spawn(levels=int(l))
+            if data.diff_n_level[l] <= 0:
+                continue
+            n_remaining = int(data.diff_n_level[l])
+            if l < len(data.cached_level_diffs):
+                cached = data.cached_level_diffs[l]
+                pos = int(data.cached_level_positions[l])
+                n_cached = min(n_remaining, len(cached) - pos)
+                if n_cached > 0:
+                    dp = cached[pos : pos + n_cached]
+                    data.cached_level_positions[l] += n_cached
+                    self._append_level_diff_samples(data, l, dp)
+                    data.n_level[l] += n_cached
+                    data.sum_level[0, l] += dp.sum()
+                    data.sum_level[1, l] += (dp**2).sum()
+                    data.cost_level[l] += data.level_integrands[l].cost * n_cached
+                    n_remaining -= n_cached
+            if n_remaining > 0:
+                integrand_l = data.level_integrands[l]
+                samples = integrand_l.discrete_distrib(n=n_remaining)
+                pc, pf = integrand_l.f(samples)
+                dp = pf - pc
+                self._append_level_diff_samples(data, l, dp)
+                data.n_level[l] += n_remaining
+                data.sum_level[0, l] += dp.sum()
+                data.sum_level[1, l] += (dp**2).sum()
+                data.cost_level[l] += integrand_l.cost * n_remaining
+        self._refresh_level_statistics(data)
+
+    def _run_integrate_loop(self, data, update_data_fn, trace=None, record_snapshots=False):
+        snapshots = []
         while data.diff_n_level.sum() > 0:
-            self._update_data(data)
-            _update_trace_solution()
-            trace.iteration(data, step_value=int(data.levels + 1))
+            update_data_fn(data)
+            self._update_trace_solution(data)
+            data.rmse_tol = self.rmse_tol
+            if record_snapshots:
+                snapshots.append(copy.deepcopy(data))
+            if trace is not None:
+                trace.iteration(data, step_value=int(data.levels + 1))
             # set optimal number of additional samples
             n_samples = self._get_next_samples(data)
             data.diff_n_level = np.maximum(0, n_samples - data.n_level)
@@ -215,7 +275,6 @@ class CubMLMC(AbstractCubMLMC):
                 rem = (data.mean_level[idx] / 2.0 ** (range_ * data.alpha)).max() / (
                     2.0**data.alpha - 1
                 )
-                # rem = ml(l+1) / (2^alpha - 1)
                 if rem > np.sqrt(self.theta) * self.rmse_tol:
                     if data.levels == self.levels_max:
                         warnings.warn(
@@ -226,8 +285,76 @@ class CubMLMC(AbstractCubMLMC):
                         self._add_level(data)
                         n_samples = self._get_next_samples(data)
                         data.diff_n_level = np.maximum(0, n_samples - data.n_level)
-        # finally, evaluate multilevel estimator
         data.solution = (data.sum_level[0, :] / data.n_level).sum()
+        return snapshots
+
+    def _replay_resume_exactly(self, checkpoint):
+        shadow = self._construct_data()
+        shadow.level_integrands = list(checkpoint.level_integrands)
+        shadow.cached_level_diffs = [
+            np.asarray(level_diffs, dtype=float) for level_diffs in checkpoint.level_diffs
+        ]
+        shadow.cached_level_positions = np.zeros(len(shadow.cached_level_diffs), dtype=int)
+        snapshots = self._run_integrate_loop(
+            shadow, self._update_replay_data, record_snapshots=True
+        )
+        target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels + 1], dtype=int)
+        absorb_index = None
+        for i, snapshot in enumerate(snapshots):
+            if len(snapshot.n_level) < len(target_counts):
+                continue
+            if np.all(snapshot.n_level[: len(target_counts)] >= target_counts):
+                absorb_index = i
+                break
+        if absorb_index is None:
+            return None, None
+        for attr in ("cached_level_diffs", "cached_level_positions"):
+            if hasattr(shadow, attr):
+                delattr(shadow, attr)
+        return shadow, snapshots[absorb_index:]
+
+    def integrate(self, resume=None):
+        """Run (or continue) the MLMC integration.
+
+        Args:
+            resume (Data, optional): Checkpoint returned by a previous
+                ``integrate()`` call.  The new tolerance may be tighter *or*
+                looser than the one used when the checkpoint was created.
+                With a tighter tolerance the algorithm draws additional samples
+                from where it left off.  With a looser tolerance the existing
+                samples already satisfy the requirement and the method returns
+                immediately with no new sampling.
+
+        Returns:
+            tuple: ``(solution, data)``.
+        """
+        t_start = time()
+        resume_provenance = self._capture_resume_provenance(resume)
+        trace = self._make_trace_logger()
+        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+        replay_snapshots = None
+        if self._can_replay_resume_exactly(data):
+            replay_data, replay_snapshots = self._replay_resume_exactly(data)
+            if replay_data is not None:
+                data = replay_data
+        if resume is not None:
+            checkpoint = self._prepare_resume_data(
+                resume, self._validate_resume, self._restore_resume_state
+            )
+            checkpoint.rmse_estimate = np.sqrt(
+                (checkpoint.var_level / checkpoint.n_level[: len(checkpoint.var_level)]).sum()
+            )
+            trace.resume(checkpoint, step_value=int(checkpoint.levels + 1))
+        if replay_snapshots is not None:
+            for snapshot in replay_snapshots:
+                trace.iteration(snapshot, step_value=int(snapshot.levels + 1))
+            if replay_snapshots and trace.enabled:
+                data._iter_count = trace.iter_count
+        else:
+            if data is None:
+                data = self._construct_data()
+            self._run_integrate_loop(data, self._update_data, trace=trace)
+        data.rmse_tol = self.rmse_tol
         data.levels += 1
         self._finalize_integration_data(
             data, time() - t_start, resume_provenance=resume_provenance
