@@ -1,14 +1,8 @@
 # Resume Demo  
 
-This folder contains notebooks and helper scripts for demonstrating QMCPy's
-resume workflow.
+This folder contains notebooks and helper scripts for demonstrating QMCPy's resume workflow.
 
-Current scope: the resume workflow in this demo covers `CubMCCLTVec`,
-`CubQMCLatticeG`, `CubQMCNetG`, `CubQMCBayesLatticeG` (`CubBayesLatticeG` alias),
-`CubBayesNetG`, `CubQMCRepStudentT`,
-`CubMLMC`, `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`. It does not cover
-`CubMCCLT`, `CubMCG`, or `PFGPCI`, which currently raise `ParameterError` when
-`resume=...` is supplied.
+**Current scope:** the resume workflow in this demo covers `CubMCCLTVec`, `CubQMCLatticeG`, `CubQMCNetG`, `CubQMCBayesLatticeG` (`CubBayesLatticeG` alias), `CubBayesNetG`, `CubQMCRepStudentT`, `CubMLMC`, `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`. It does not cover `CubMCCLT`, `CubMCG`, or `PFGPCI`, which currently raise `ParameterError` when `resume=...` is supplied.
 
 ## Contents
 
@@ -20,16 +14,15 @@ Current scope: the resume workflow in this demo covers `CubMCCLTVec`,
   - a loose run followed by resume with a tighter tolerance
   - a fresh tight run from scratch
 
-  It also stores per-iteration diagnostic logs on the solver/data objects, writes text reports into
-  `output/`, and includes focused multilevel examples for `CubMLMC`,
-  `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`.
+- `check_resume_long.py`: Extended version of `check_resume.py` with a more thorough cross-method comparison of:
+  - a loose run followed by resume with a tighter tolerance
+  - a fresh tight run from scratch
 
-- `resume_util.py`: Shared helpers for the resume demo scripts, including
-  case execution, log formatting, and text-report generation.
+  It also stores per-iteration diagnostic logs on the solver/data objects, writes text reports into `output/`, and includes focused multilevel examples for `CubMLMC`, `CubMLMCCont`, `CubMLQMC`, and `CubMLQMCCont`.
 
-- `output/`: Generated reports and checkpoint files created when you run the
-  notebooks or `check_resume.py`. These artifacts are intentionally not
-  tracked in git.
+- `resume_util.py`: Shared helpers for the resume demo scripts, including case execution, log formatting, and text-report generation.
+
+- `output/`: Generated reports and checkpoint files created when you run the notebooks or `check_resume.py`. These artifacts are intentionally not tracked in git.
   
 ## Generated Reports
 
@@ -42,4 +35,15 @@ python demos/demo_resume_data/check_resume.py
 creates the following file in `output/`:
 - `check_resume_summary.txt`: Combined report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including stored iteration logs.
 
-Each solver now stores an in-memory iteration log after `integrate()`. Use `history_df` or `get_iteration_log()` for a formatted table, or `format_iteration_log()` / `print_iteration_log()` for text replay. By default that stored history is throttled; enabling `trace_iterations` lets you opt into live printing, and `verbose=True` stores every iteration. On resumed runs, the new `RESUME` stage is appended to the saved loose-stage history. The demo helper `print_stage_summary(...)` can now rebuild the Loose/Resumed/Fresh summary directly from those stored histories.
+Running
+
+```bash
+python demos/demo_resume_data/check_resume_long.py
+```
+
+creates the following files in `output/`:
+- `check_resume_long_summary.txt`: Extended report of the loose-then-resume and fresh tight-tolerance workflows for each stopping criterion, including stored iteration logs and multilevel examples.
+
+## Iteration Logs
+
+Supported solvers/data objects now keep an in-memory iteration history after `integrate()`. Use `get_iteration_log()` to inspect a table view. Stored history is throttled by default; set `trace_iterations=True` for live per-iteration output, and use `verbose=True` to retain every iteration. 
