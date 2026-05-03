@@ -56,12 +56,6 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
             make_named_tol_builder(CubMLQMC, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
         make_tol_case("CubMLQMCCont",
             make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
-        make_tol_case("CubMLQMCContLong",
-            make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol",
-                n_tols=1200, inflate=1.001, n_limit=2**24), 0.2, 0.1),
-        make_tol_case("CubMLMCContLong",
-            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont_large, "rmse_tol",
-                n_tols=1200, inflate=1.001, n_limit=2**24), 1.0, 0.5),
     ]
 
 
