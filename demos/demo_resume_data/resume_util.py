@@ -288,6 +288,14 @@ def collect_resume_fresh_warnings(name, resume_stage, fresh_stage):
             f"(resume_n={resume_n}, fresh_n={fresh_n})"
         )
 
+    resume_iters = int(resume_stage.get("iters") or 0)
+    fresh_iters = int(fresh_stage.get("iters") or 0)
+    if resume_iters != fresh_iters:
+        warning_lines.append(
+            f"WARNING: {name}: Inconsistent iteration counts across stages "
+            f"(resume_iters={resume_iters}, fresh_iters={fresh_iters})"
+        )
+
     try:
         resume_sol = float(resume_stage.get("solution", float("nan")))
         fresh_sol = float(fresh_stage.get("solution", float("nan")))

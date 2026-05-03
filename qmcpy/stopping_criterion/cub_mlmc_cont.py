@@ -204,8 +204,9 @@ class CubMLMCCont(AbstractCubMLMC):
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
             replay_snapshots = None
+            replay_iter_count = None
             if self._can_replay_resume_exactly(data):
-                replay_data, replay_snapshots = self._replay_resume_exactly(data)
+                replay_data, replay_snapshots, replay_iter_count = self._replay_resume_exactly(data)
                 if replay_data is not None:
                     data = replay_data
             if resume is not None:
@@ -217,6 +218,8 @@ class CubMLMCCont(AbstractCubMLMC):
                     self.target_rmse_tol,
                 )
                 checkpoint.rmse_tol = step_tol
+                if replay_iter_count is not None:
+                    checkpoint._iter_count = replay_iter_count
                 trace.resume(checkpoint, step_value=int(checkpoint.levels + 1))
             if replay_snapshots is not None:
                 for snapshot in replay_snapshots:
@@ -247,6 +250,8 @@ class CubMLMCCont(AbstractCubMLMC):
                 data, time() - t_start, resume_provenance=resume_provenance
             )
             trace.finalize()
+            data.iteration_history = getattr(self, "iteration_history", None)
+            data.history_df = getattr(self, "history_df", None)
             return data.solution, data
         finally:
             self._active_trace = None
@@ -339,11 +344,22 @@ class CubMLMCCont(AbstractCubMLMC):
                 absorb_index = i
                 break
         if absorb_index is None:
-            return None, None
+            return None, None, None
+        same_state = (
+            np.array_equal(
+                np.asarray(snapshots[absorb_index].n_level[: len(target_counts)]),
+                target_counts,
+            )
+            and np.array_equal(
+                np.asarray(snapshots[absorb_index].sum_level[:, : len(target_counts)]),
+                np.asarray(checkpoint.sum_level[:, : len(target_counts)]),
+            )
+        )
+        replay_iter_count = absorb_index + 1 if same_state else absorb_index
         for attr in ("cached_level_diffs", "cached_level_positions"):
             if hasattr(shadow, attr):
                 delattr(shadow, attr)
-        return shadow, snapshots[absorb_index:]
+        return shadow, snapshots[absorb_index:], replay_iter_count
 
     def _integrate(
         self,

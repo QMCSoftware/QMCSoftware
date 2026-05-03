@@ -4,9 +4,8 @@
 from pathlib import Path
 from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC, CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, 
     CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
-from resume_util import (make_named_tol_builder, make_tol_case, print_stage_summary, run_fresh_case, run_resume_case,
-                         stage_summary_rows_from_stage_records, stage_summary_tol_header, write_combined_report)
-
+from resume_util import (make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case,
+                         write_combined_report)
 
 DEFAULT_SEED = 7
 DEFAULT_CONT_SEED = 11
@@ -113,16 +112,16 @@ def _build_cases(seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAU
     )
 
     return [
-        make_tol_case("CubMCCLTVec",       clt_vec_builder,       loose_tol=5e-3,  tight_tol=2e-3),
-        make_tol_case("CubQMCLatticeG",    lattice_builder,       loose_tol=1e-3,  tight_tol=1e-5),
-        make_tol_case("CubQMCNetG",        net_builder,           loose_tol=1e-3,  tight_tol=1e-6),
-        make_tol_case("CubQMCRepStudentT", rep_student_builder,   loose_tol=5e-3,  tight_tol=5e-4),
+        make_tol_case("CubMCCLTVec",       clt_vec_builder,         loose_tol=5e-3,  tight_tol=2e-3),
+        make_tol_case("CubQMCLatticeG",    lattice_builder,         loose_tol=1e-3,  tight_tol=1e-5),
+        make_tol_case("CubQMCNetG",        net_builder,             loose_tol=1e-3,  tight_tol=1e-6),
+        make_tol_case("CubQMCRepStudentT", rep_student_builder,     loose_tol=5e-3,  tight_tol=5e-4),
         make_tol_case("CubQMCBayesLatticeG", bayes_lattice_builder, loose_tol=1e-3, tight_tol=1e-6),
-        make_tol_case("CubBayesNetG",      bayes_net_builder,     loose_tol=1e-3,  tight_tol=2e-6),
-        make_tol_case("CubMLMC",           mlmc_builder,          loose_tol=2.0,   tight_tol=0.5),
-        make_tol_case("CubMLQMC",          mlqmc_builder,         loose_tol=2.0,   tight_tol=0.5),
-        make_tol_case("CubMLMCCont",       mlmc_cont_builder,     loose_tol=1.0,   tight_tol=0.5),
-        make_tol_case("CubMLQMCCont",      mlqmc_cont_builder,    loose_tol=1.0,   tight_tol=0.5),
+        make_tol_case("CubBayesNetG",      bayes_net_builder,       loose_tol=1e-3,  tight_tol=2e-6),
+        make_tol_case("CubMLMC",           mlmc_builder,            loose_tol=2.0,   tight_tol=0.5),
+        make_tol_case("CubMLQMC",          mlqmc_builder,           loose_tol=2.0,   tight_tol=0.5),
+        make_tol_case("CubMLMCCont",       mlmc_cont_builder,       loose_tol=1.0,   tight_tol=0.5),
+        make_tol_case("CubMLQMCCont",      mlqmc_cont_builder,      loose_tol=1.0,   tight_tol=0.5),
     ]
 
 
@@ -138,20 +137,6 @@ def main(verbose=False, seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimensio
         fresh_row = run_fresh_case(case, verbose=verbose)
         resume_rows.append(resume_row)
         fresh_rows.append(fresh_row)
-        if resume_row.get("status") == "ok" and fresh_row.get("status") == "ok":
-            print_stage_summary(
-                rows=stage_summary_rows_from_stage_records(
-                    resume_row.get("loose"),
-                    resume_row.get("resume"),
-                    fresh_row.get("fresh"),
-                ),
-                title=f"Stage summary of {case['name']}",
-                tol_header=stage_summary_tol_header(
-                    resume_row.get("loose"),
-                    resume_row.get("resume"),
-                    fresh_row.get("fresh"),
-                ),
-            )
 
     combined_path = output_dir / "check_resume_long_summary.txt"
     write_combined_report(combined_path, "Stopping Criteria Long-Run Check: Resume vs Fresh (throttle=True)", resume_rows, fresh_rows)

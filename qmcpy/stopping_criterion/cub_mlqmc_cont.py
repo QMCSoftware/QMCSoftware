@@ -1,5 +1,6 @@
 from .abstract_cub_mlqmc import AbstractCubMLQMC
 from ..util.data import Data
+import copy
 from ..discrete_distribution import DigitalNetB2, Lattice, Halton
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
@@ -152,10 +153,20 @@ class CubMLQMCCont(AbstractCubMLQMC):
         self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
         if np.shape(data.mean_level_reps) != (data.levels, int(self.replications)):
             raise ParameterError("resume data mean_level_reps shape %s is incompatible with levels=%d, replications=%d." % (np.shape(data.mean_level_reps), data.levels, int(self.replications)))
+        try:
+            self._validate_level_replay_cache(data)
+        except ValueError as exc:
+            raise ParameterError(str(exc))
 
     def _restore_resume_state(self, data):
         # No data.levels adjustment needed for MLQMC (no final += 1 in this variant).
         pass
+
+    def _can_replay_resume_exactly(self, data):
+        checkpoint_tol = self._checkpoint_rmse_tol(data)
+        if checkpoint_tol is None or not (self.target_rmse_tol < checkpoint_tol):
+            return False
+        return hasattr(data, "level_rep_sums") and hasattr(data, "level_n_increments")
 
     def integrate(self, resume=None):
         """Run (or continue) the continuation-MLQMC integration.
@@ -179,9 +190,14 @@ class CubMLQMCCont(AbstractCubMLQMC):
         self._active_trace = trace
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+            replay_iter_count = None
+            if self._can_replay_resume_exactly(data):
+                replay_iter_count = self._replay_resume_iter_count(data)
             if data is not None:
                 step_tol = max(getattr(data, 'rmse_tol', self.target_rmse_tol), self.target_rmse_tol)
                 data.rmse_tol = step_tol
+                if replay_iter_count is not None:
+                    data._iter_count = replay_iter_count
                 trace.resume(data, step_value=int(data.levels))
                 if step_tol <= self.target_rmse_tol:
                     # Same or looser tolerance: check convergence at target_tol
@@ -204,6 +220,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
                 data, time() - t_start, resume_provenance=resume_provenance
             )
             trace.finalize()
+            data.iteration_history = getattr(self, "iteration_history", None)
+            data.history_df = getattr(self, "history_df", None)
             return data.solution, data
         finally:
             self._active_trace = None
@@ -220,12 +238,86 @@ class CubMLQMCCont(AbstractCubMLQMC):
         data.var_cost_ratio_level = np.tile(np.inf, data.levels)
         data.bias_estimate = np.inf
         data.level_integrands = []
+        data.level_rep_sums = [[] for _ in range(data.levels)]
+        data.level_n_increments = [[] for _ in range(data.levels)]
         return data
 
-    def _integrate(self, data, skip_level_reset=False, trace=None, step_tol=None):
+    def _replay_resume_iter_count(self, checkpoint):
+        shadow_trace = self._active_trace
+        self._active_trace = None
+        try:
+            shadow = self._construct_data()
+            shadow.level_integrands = list(checkpoint.level_integrands)
+            shadow.cached_level_rep_sums = [
+                [np.asarray(rep_sums, dtype=float) for rep_sums in level_rep_sums]
+                for level_rep_sums in checkpoint.level_rep_sums
+            ]
+            shadow.cached_level_n_increments = [
+                [int(n_increment) for n_increment in level_n_increments]
+                for level_n_increments in checkpoint.level_n_increments
+            ]
+            shadow.cached_level_positions = np.zeros(len(shadow.cached_level_rep_sums), dtype=int)
+            snapshots = []
+            checkpoint_tol = float(getattr(checkpoint, "rmse_tol", self.target_rmse_tol))
+            target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels], dtype=int)
+            checkpoint_means = np.asarray(checkpoint.mean_level_reps[: checkpoint.levels])
+            stop_condition = lambda data: (
+                len(data.n_level) >= len(target_counts)
+                and np.array_equal(data.n_level[: len(target_counts)], target_counts)
+                and np.array_equal(
+                    np.asarray(data.mean_level_reps[: checkpoint.levels]),
+                    checkpoint_means,
+                )
+                and float(getattr(data, "rmse_tol", np.inf)) <= checkpoint_tol
+            )
+            for t in range(self.n_tols):
+                step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
+                reached_checkpoint = self._integrate(
+                    shadow,
+                    step_tol=step_tol,
+                    record_snapshots=True,
+                    snapshots=snapshots,
+                    update_data_fn=self._update_replay_data,
+                    stop_condition=stop_condition,
+                )
+                if reached_checkpoint:
+                    break
+        finally:
+            self._active_trace = shadow_trace
+        replay_iter_count = None
+        for i, snapshot in enumerate(snapshots):
+            if len(snapshot.n_level) < len(target_counts):
+                continue
+            if not np.array_equal(snapshot.n_level[: len(target_counts)], target_counts):
+                continue
+            if not np.array_equal(
+                np.asarray(snapshot.mean_level_reps[: checkpoint.levels]),
+                checkpoint_means,
+            ):
+                continue
+            if float(getattr(snapshot, "rmse_tol", np.inf)) <= checkpoint_tol:
+                replay_iter_count = i + 1
+                break
+        if replay_iter_count is None:
+            replay_iter_count, _ = self._resume_match_from_snapshots(snapshots, checkpoint)
+        return replay_iter_count
+
+    def _integrate(
+        self,
+        data,
+        skip_level_reset=False,
+        trace=None,
+        step_tol=None,
+        record_snapshots=False,
+        snapshots=None,
+        update_data_fn=None,
+        stop_condition=None,
+    ):
         if step_tol is None:
             step_tol = self.rmse_tol
         trace = getattr(self, "_active_trace", None) if trace is None else trace
+        update_data_fn = self.update_data if update_data_fn is None else update_data_fn
+        snapshots = [] if snapshots is None else snapshots
         # self.theta = self.theta_init
         if not skip_level_reset:
             data.levels = int(self.levels_min + 1)
@@ -233,10 +325,15 @@ class CubMLQMCCont(AbstractCubMLQMC):
         converged = False
         while not converged:
             # Ensure that we have samples on the finest level
-            self.update_data(data)
+            update_data_fn(data)
             if trace is not None:
                 data.rmse_tol = step_tol
                 trace.iteration(data, step_value=int(data.levels))
+            if record_snapshots:
+                data.rmse_tol = step_tol
+                snapshots.append(copy.deepcopy(data))
+            if stop_condition is not None and stop_condition(data):
+                return True
             self._update_theta(data, step_tol)
 
             while self._varest(data) > (1 - self.theta) * step_tol**2:
@@ -260,10 +357,15 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     warnings.warn(warning_s, MaxSamplesWarning)
                     return
 
-                self.update_data(data)
+                update_data_fn(data)
                 if trace is not None:
                     data.rmse_tol = step_tol
                     trace.iteration(data, step_value=int(data.levels))
+                if record_snapshots:
+                    data.rmse_tol = step_tol
+                    snapshots.append(copy.deepcopy(data))
+                if stop_condition is not None and stop_condition(data):
+                    return True
                 self._update_theta(data, step_tol)
 
             # Check for convergence
@@ -277,6 +379,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     converged = True
                 else:
                     self._add_level(data)
+        return False
 
     def _update_theta(self, data, step_tol):
         # Update error splitting parameter

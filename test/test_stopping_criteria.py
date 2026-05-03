@@ -966,6 +966,8 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
         self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
+        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
+        self.assertIsNotNone(resumed.history_df)
 
     def test_cub_mlmc_cont_resume_matches_fresh_n(self):
         loose_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
@@ -982,6 +984,58 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
         self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
+        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
+        self.assertIsNotNone(resumed.history_df)
+
+    def test_cub_mlqmc_resume_matches_fresh_n(self):
+        loose_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "level_rep_sums"))
+
+        resumed_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
+        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        fresh_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
+        sol_fresh, fresh = fresh_sc.integrate()
+
+        self.assertEqual(int(resumed.n_total), int(fresh.n_total))
+        self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
+        self.assertTrue(np.allclose(resumed.mean_level_reps, fresh.mean_level_reps))
+        self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
+        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
+        self.assertIsNotNone(resumed.history_df)
+
+    def test_cub_mlqmc_cont_resume_matches_fresh_n(self):
+        loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
+        _, checkpoint = loose_sc.integrate()
+        self.assertTrue(hasattr(checkpoint, "level_rep_sums"))
+
+        resumed_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
+        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        fresh_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
+        sol_fresh, fresh = fresh_sc.integrate()
+
+        self.assertEqual(int(resumed.n_total), int(fresh.n_total))
+        self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
+        self.assertTrue(np.allclose(resumed.mean_level_reps, fresh.mean_level_reps))
+        self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
+        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
+        self.assertIsNotNone(resumed.history_df)
+
+    def test_cub_mlqmc_cont_long_resume_matches_fresh_iters(self):
+        kwargs = {"abs_tol": self.tight_abs_tol, "n_tols": 1200, "inflate": 1.001, "n_limit": 2**24}
+        loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_tols=1200, inflate=1.001, n_limit=2**24)
+        _, checkpoint = loose_sc.integrate()
+
+        resumed_sc = CubMLQMCCont(self._qmc_financial_option(), **kwargs)
+        _, resumed = resumed_sc.integrate(resume=checkpoint)
+
+        fresh_sc = CubMLQMCCont(self._qmc_financial_option(), **kwargs)
+        _, fresh = fresh_sc.integrate()
+
+        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
+        self.assertEqual(int(resumed.n_total), int(fresh.n_total))
 
     def test_cont_resume_keeps_levels(self):
         cases = [

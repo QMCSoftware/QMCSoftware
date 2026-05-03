@@ -1,8 +1,7 @@
 from pathlib import Path
 from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC, CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, 
     CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
-from resume_util import (make_named_tol_builder, make_tol_case, print_stage_summary, run_fresh_case, run_resume_case,
-                         stage_summary_rows_from_stage_records, stage_summary_tol_header, write_combined_report)
+from resume_util import make_named_tol_builder, make_tol_case, run_fresh_case, run_resume_case, write_combined_report
 
 DEFAULT_SEED = 7
 DEFAULT_CONT_SEED = 11
@@ -33,22 +32,22 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
 
     return [
         make_tol_case("CubMCCLTVec",
-            make_abs_tol_builder(CubMCCLTVec, iid_keister, rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
+            make_named_tol_builder(CubMCCLTVec, iid_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
             loose_tol, tight_tol),
         make_tol_case("CubQMCLatticeG",
-            make_abs_tol_builder(CubQMCLatticeG, lattice_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**20),
+            make_named_tol_builder(CubQMCLatticeG, lattice_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=2**20),
             1e-3, 1e-5),
         make_tol_case("CubQMCNetG",
-            make_abs_tol_builder(CubQMCNetG, net_keister, rel_tol=rel_tol, n_init=n_init, n_limit=2**22),
+            make_named_tol_builder(CubQMCNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=2**22),
             1e-3, 1e-6),
         make_tol_case("CubQMCRepStudentT",
-            make_abs_tol_builder(CubQMCRepStudentT, net_rep_keister, rel_tol=rel_tol, n_init=2**5, n_limit=2**18),
+            make_named_tol_builder(CubQMCRepStudentT, net_rep_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=2**18),
             loose_tol, tight_tol),
         make_tol_case("CubQMCBayesLatticeG",
-            make_abs_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
+            make_named_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
             loose_tol, tight_tol),
         make_tol_case("CubBayesNetG",
-            make_abs_tol_builder(CubBayesNetG, net_keister, rel_tol=rel_tol, n_init=2**5, n_limit=n_limit), loose_tol, tight_tol),
+            make_named_tol_builder(CubBayesNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=n_limit), loose_tol, tight_tol),
         make_tol_case("CubMLMC",
             make_named_tol_builder(CubMLMC, iid_financial_option, "rmse_tol", n_limit=2**16), 0.2, 0.1),
         make_tol_case("CubMLMCCont",

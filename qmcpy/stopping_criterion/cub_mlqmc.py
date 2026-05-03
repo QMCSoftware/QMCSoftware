@@ -1,5 +1,6 @@
 from .abstract_cub_mlqmc import AbstractCubMLQMC
 from ..util.data import Data
+import copy
 from ..discrete_distribution import DigitalNetB2, Lattice, Halton
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
@@ -128,6 +129,10 @@ class CubMLQMC(AbstractCubMLQMC):
                 "resume data mean_level_reps shape %s is incompatible with levels=%d, replications=%d."
                 % (np.shape(data.mean_level_reps), data.levels, int(self.replications))
             )
+        try:
+            self._validate_level_replay_cache(data)
+        except ValueError as exc:
+            raise ParameterError(str(exc))
 
     def _restore_resume_state(self, data):
         # eval_level is all-False at end of a converged run; the loop's first
@@ -136,6 +141,94 @@ class CubMLQMC(AbstractCubMLQMC):
         # accordingly.  With a looser tolerance the variance/bias conditions are
         # already met and the loop exits immediately.
         pass
+
+    def _can_replay_resume_exactly(self, data):
+        checkpoint_tol = self._checkpoint_rmse_tol(data)
+        if checkpoint_tol is None or not (self.rmse_tol < checkpoint_tol):
+            return False
+        return hasattr(data, "level_rep_sums") and hasattr(data, "level_n_increments")
+
+    def _construct_data(self):
+        data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
+        data.levels = int(self.levels_min + 1)
+        data.n_level = np.zeros(data.levels, dtype=int)
+        data.eval_level = np.ones(data.levels, dtype=bool)
+        data.mean_level_reps = np.zeros((data.levels, int(self.replications)))
+        data.mean_level = np.tile(0.0, data.levels)
+        data.var_level = np.tile(np.inf, data.levels)
+        data.cost_level = np.tile(0.0, data.levels)
+        data.var_cost_ratio_level = np.tile(np.inf, data.levels)
+        data.bias_estimate = np.inf
+        data.level_integrands = []
+        data.level_rep_sums = [[] for _ in range(data.levels)]
+        data.level_n_increments = [[] for _ in range(data.levels)]
+        return data
+
+    def _run_integrate_loop(self, data, update_data_fn, trace=None, record_snapshots=False, stop_condition=None):
+        snapshots = []
+        while True:
+            update_data_fn(data)
+            data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
+            data.rmse_tol = self.rmse_tol
+            if record_snapshots:
+                snapshots.append(copy.deepcopy(data))
+            if stop_condition is not None and stop_condition(data):
+                break
+            if trace is not None:
+                trace.iteration(data, step_value=int(data.levels))
+            if data.var_level.sum() > (self.rmse_tol**2 / 2.0):
+                efficient_level = np.argmax(data.var_cost_ratio_level)
+                data.eval_level[efficient_level] = True
+            elif data.bias_estimate > (self.rmse_tol / np.sqrt(2.0)):
+                if data.levels == self.levels_max + 1:
+                    warnings.warn(
+                        "Failed to achieve weak convergence. levels == levels_max.",
+                        MaxLevelsWarning,
+                    )
+                self._add_level(data)
+            else:
+                break
+            total_next_samples = (
+                self.replications * data.eval_level * data.n_level * 2
+            ).sum()
+            if (data.n_total + total_next_samples) > self.n_limit:
+                warning_s = """
+                Already generated %d samples.
+                Trying to generate %d new samples, which would exceed n_limit = %d.
+                Stopping integration process.
+                Note that error tolerances may no longer be satisfied""" % (
+                    int(data.n_total),
+                    int(total_next_samples),
+                    int(self.n_limit),
+                )
+                warnings.warn(warning_s, MaxSamplesWarning)
+                break
+        return snapshots
+
+    def _replay_resume_iter_count(self, checkpoint):
+        shadow = self._construct_data()
+        shadow.level_integrands = list(checkpoint.level_integrands)
+        shadow.cached_level_rep_sums = [
+            [np.asarray(rep_sums, dtype=float) for rep_sums in level_rep_sums]
+            for level_rep_sums in checkpoint.level_rep_sums
+        ]
+        shadow.cached_level_n_increments = [
+            [int(n_increment) for n_increment in level_n_increments]
+            for level_n_increments in checkpoint.level_n_increments
+        ]
+        shadow.cached_level_positions = np.zeros(len(shadow.cached_level_rep_sums), dtype=int)
+        target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels], dtype=int)
+        snapshots = self._run_integrate_loop(
+            shadow,
+            self._update_replay_data,
+            record_snapshots=True,
+            stop_condition=lambda data: (
+                len(data.n_level) >= len(target_counts)
+                and np.all(data.n_level[: len(target_counts)] >= target_counts)
+            ),
+        )
+        replay_iter_count, _ = self._resume_match_from_snapshots(snapshots, checkpoint)
+        return replay_iter_count
 
     def integrate(self, resume=None):
         """Run (or continue) the MLQMC integration.
@@ -156,57 +249,21 @@ class CubMLQMC(AbstractCubMLQMC):
         resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+        replay_iter_count = None
+        if self._can_replay_resume_exactly(data):
+            replay_iter_count = self._replay_resume_iter_count(data)
         if data is not None:
             data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
+            if replay_iter_count is not None:
+                data._iter_count = replay_iter_count
             trace.resume(data, step_value=int(data.levels))
         if data is None:
-            data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
-            data.levels = int(self.levels_min + 1)
-            data.n_level = np.zeros(data.levels, dtype=int)
-            data.eval_level = np.ones(data.levels, dtype=bool)
-            data.mean_level_reps = np.zeros((data.levels, int(self.replications)))
-            data.mean_level = np.tile(0.0, data.levels)
-            data.var_level = np.tile(np.inf, data.levels)
-            data.cost_level = np.tile(0.0, data.levels)
-            data.var_cost_ratio_level = np.tile(np.inf, data.levels)
-            data.bias_estimate = np.inf
-            data.level_integrands = []
-        while True:
-            self.update_data(data)
-            data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
-            trace.iteration(data, step_value=int(data.levels))
-            if data.var_level.sum() > (self.rmse_tol**2 / 2.0):
-                # double N_l on level with largest V_l/(2^l*N_l)
-                efficient_level = np.argmax(data.var_cost_ratio_level)
-                data.eval_level[efficient_level] = True
-            elif data.bias_estimate > (self.rmse_tol / np.sqrt(2.0)):
-                if data.levels == self.levels_max + 1:
-                    warnings.warn(
-                        "Failed to achieve weak convergence. levels == levels_max.",
-                        MaxLevelsWarning,
-                    )
-                # add another level
-                self._add_level(data)
-            else:
-                # both conditions met
-                break
-            total_next_samples = (
-                self.replications * data.eval_level * data.n_level * 2
-            ).sum()
-            if (data.n_total + total_next_samples) > self.n_limit:
-                warning_s = """
-                Already generated %d samples.
-                Trying to generate %d new samples, which would exceed n_limit = %d.
-                Stopping integration process.
-                Note that error tolerances may no longer be satisfied""" % (
-                    int(data.n_total),
-                    int(total_next_samples),
-                    int(self.n_limit),
-                )
-                warnings.warn(warning_s, MaxSamplesWarning)
-                break
+            data = self._construct_data()
+        self._run_integrate_loop(data, self.update_data, trace=trace)
         self._finalize_integration_data(
             data, time() - t_start, resume_provenance=resume_provenance
         )
         trace.finalize()
+        data.iteration_history = getattr(self, "iteration_history", None)
+        data.history_df = getattr(self, "history_df", None)
         return data.solution, data
