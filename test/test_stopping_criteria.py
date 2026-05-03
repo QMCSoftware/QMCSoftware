@@ -497,9 +497,14 @@ class TestCubMCCLT(unittest.TestCase):
         self.assertNotIn("printed", log_df.columns)
         self.assertIn("stage", log_df.columns)
         self.assertIn("n_total", log_df.columns)
+        self.assertIn("elapsed_time", log_df.columns)
         self.assertRegex(log_df.iloc[-1]["solution"], r"^-?\d+\.\d{7}$")
         self.assertRegex(log_df.iloc[-1]["bound_diff"], r"^-?\d\.\d{3}e[+-]\d{2}$")
         self.assertEqual(len(log_df), len(sc.get_iteration_log(printed_only=False)))
+        raw_log_df = sc.get_iteration_log(formatted=False)
+        self.assertIn("elapsed_time", raw_log_df.columns)
+        self.assertTrue((raw_log_df["elapsed_time"].dropna().diff().fillna(0) >= 0).all())
+        self.assertAlmostEqual(sc.elapsed_time, data.elapsed_time)
 
 
 class TestCubMCG(unittest.TestCase):
@@ -1301,6 +1306,8 @@ class TestResumeFeature(unittest.TestCase):
             resumed.time_integrate_total,
             resumed.time_integrate_previous + resumed.time_integrate_resume,
         )
+        self.assertAlmostEqual(resumed.elapsed_time, resumed.time_integrate_total)
+        self.assertAlmostEqual(tight_sc.elapsed_time, resumed.elapsed_time)
         self.assertFalse(checkpoint.resumed)
         self.assertEqual(checkpoint.n_resume_from, 0)
         self.assertEqual(int(checkpoint.n_total), old_n_total)

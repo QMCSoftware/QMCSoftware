@@ -285,6 +285,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             # Reset flags so the tighter tolerance is re-evaluated from existing samples.
             data.flags_indv = np.tile(False, self.integrand.d_indv)
             data.compute_flags = np.tile(True, self.integrand.d_indv)
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
             trace.resume(data)
         else:
             data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "n_rep", "time_integrate"])
@@ -335,6 +336,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            self._set_elapsed_time(data, time() - t_start, resume_provenance=resume_provenance)
             trace.iteration(data)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated

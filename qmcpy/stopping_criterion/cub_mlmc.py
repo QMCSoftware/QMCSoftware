@@ -241,12 +241,24 @@ class CubMLMC(AbstractCubMLMC):
                 data.cost_level[l] += integrand_l.cost * n_remaining
         self._refresh_level_statistics(data)
 
-    def _run_integrate_loop(self, data, update_data_fn, trace=None, record_snapshots=False):
+    def _run_integrate_loop(
+        self,
+        data,
+        update_data_fn,
+        trace=None,
+        record_snapshots=False,
+        t_start=None,
+        resume_provenance=None,
+    ):
         snapshots = []
         while data.diff_n_level.sum() > 0:
             update_data_fn(data)
             self._update_trace_solution(data)
             data.rmse_tol = self.rmse_tol
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
             if record_snapshots:
                 snapshots.append(copy.deepcopy(data))
             if trace is not None:
@@ -288,7 +300,7 @@ class CubMLMC(AbstractCubMLMC):
         data.solution = (data.sum_level[0, :] / data.n_level).sum()
         return snapshots
 
-    def _replay_resume_exactly(self, checkpoint):
+    def _replay_resume_exactly(self, checkpoint, t_start=None, resume_provenance=None):
         shadow = self._construct_data()
         shadow.level_integrands = list(checkpoint.level_integrands)
         shadow.cached_level_diffs = [
@@ -296,7 +308,11 @@ class CubMLMC(AbstractCubMLMC):
         ]
         shadow.cached_level_positions = np.zeros(len(shadow.cached_level_diffs), dtype=int)
         snapshots = self._run_integrate_loop(
-            shadow, self._update_replay_data, record_snapshots=True
+            shadow,
+            self._update_replay_data,
+            record_snapshots=True,
+            t_start=t_start,
+            resume_provenance=resume_provenance,
         )
         target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels + 1], dtype=int)
         absorb_index = None
@@ -324,7 +340,7 @@ class CubMLMC(AbstractCubMLMC):
                 delattr(shadow, attr)
         return shadow, snapshots[absorb_index:], replay_iter_count
 
-    def integrate(self, resume=None):
+    def integrate(self, resume=None) -> tuple:
         """Run (or continue) the MLMC integration.
 
         Args:
@@ -346,7 +362,9 @@ class CubMLMC(AbstractCubMLMC):
         replay_snapshots = None
         replay_iter_count = None
         if self._can_replay_resume_exactly(data):
-            replay_data, replay_snapshots, replay_iter_count = self._replay_resume_exactly(data)
+            replay_data, replay_snapshots, replay_iter_count = self._replay_resume_exactly(
+                data, t_start=t_start, resume_provenance=resume_provenance
+            )
             if replay_data is not None:
                 data = replay_data
         if resume is not None:
@@ -358,6 +376,7 @@ class CubMLMC(AbstractCubMLMC):
             )
             if replay_iter_count is not None:
                 checkpoint._iter_count = replay_iter_count
+            self._set_elapsed_time(checkpoint, 0.0, resume_provenance=resume_provenance)
             trace.resume(checkpoint, step_value=int(checkpoint.levels + 1))
         if replay_snapshots is not None:
             for snapshot in replay_snapshots:
@@ -367,7 +386,13 @@ class CubMLMC(AbstractCubMLMC):
         else:
             if data is None:
                 data = self._construct_data()
-            self._run_integrate_loop(data, self._update_data, trace=trace)
+            self._run_integrate_loop(
+                data,
+                self._update_data,
+                trace=trace,
+                t_start=t_start,
+                resume_provenance=resume_provenance,
+            )
         data.rmse_tol = self.rmse_tol
         data.levels += 1
         self._finalize_integration_data(

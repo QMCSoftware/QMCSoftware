@@ -287,6 +287,7 @@ class CubMCCLT(AbstractStoppingCriterion):
         data.bound_high = data.solution + data.bound_half_width
         data.bound_diff = data.bound_high - data.bound_low
         data.n_total = self.n_init + data.n_mu
+        self._set_elapsed_time(data, time() - t_start)
         trace.iteration(data)
         self._finalize_integration_data(data, time() - t_start)
         trace.finalize()

@@ -168,7 +168,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
             return False
         return hasattr(data, "level_rep_sums") and hasattr(data, "level_n_increments")
 
-    def integrate(self, resume=None):
+    def integrate(self, resume=None) -> tuple:
         """Run (or continue) the continuation-MLQMC integration.
 
         Args:
@@ -198,24 +198,42 @@ class CubMLQMCCont(AbstractCubMLQMC):
                 data.rmse_tol = step_tol
                 if replay_iter_count is not None:
                     data._iter_count = replay_iter_count
+                self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
                 trace.resume(data, step_value=int(data.levels))
                 if step_tol <= self.target_rmse_tol:
                     # Same or looser tolerance: check convergence at target_tol
-                    self._integrate(data, skip_level_reset=True, step_tol=step_tol)
+                    self._integrate(
+                        data,
+                        skip_level_reset=True,
+                        step_tol=step_tol,
+                        t_start=t_start,
+                        resume_provenance=resume_provenance,
+                    )
                 else:
                     # Tighter tolerance: skip to ladder, preserving level structure for first step
                     first = True
                     for t in range(self.n_tols):
                         next_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
                         if next_tol < step_tol:
-                            self._integrate(data, skip_level_reset=first, step_tol=next_tol)
+                            self._integrate(
+                                data,
+                                skip_level_reset=first,
+                                step_tol=next_tol,
+                                t_start=t_start,
+                                resume_provenance=resume_provenance,
+                            )
                             first = False
             else:
                 data = self._construct_data()
                 # Loop over coarser tolerances
                 for t in range(self.n_tols):
                     step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
-                    self._integrate(data, step_tol=step_tol)
+                    self._integrate(
+                        data,
+                        step_tol=step_tol,
+                        t_start=t_start,
+                        resume_provenance=resume_provenance,
+                    )
             self._finalize_integration_data(
                 data, time() - t_start, resume_provenance=resume_provenance
             )
@@ -312,6 +330,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
         snapshots=None,
         update_data_fn=None,
         stop_condition=None,
+        t_start=None,
+        resume_provenance=None,
     ):
         if step_tol is None:
             step_tol = self.rmse_tol
@@ -326,6 +346,10 @@ class CubMLQMCCont(AbstractCubMLQMC):
         while not converged:
             # Ensure that we have samples on the finest level
             update_data_fn(data)
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
             if trace is not None:
                 data.rmse_tol = step_tol
                 trace.iteration(data, step_value=int(data.levels))
@@ -358,6 +382,10 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     return
 
                 update_data_fn(data)
+                if t_start is not None:
+                    self._set_elapsed_time(
+                        data, time() - t_start, resume_provenance=resume_provenance
+                    )
                 if trace is not None:
                     data.rmse_tol = step_tol
                     trace.iteration(data, step_value=int(data.levels))

@@ -181,7 +181,7 @@ class CubMLMCCont(AbstractCubMLMC):
             return False
         return hasattr(data, "level_diffs") and len(data.level_diffs) == len(data.n_level)
 
-    def integrate(self, resume=None):
+    def integrate(self, resume=None) -> tuple:
         """Run (or continue) the continuation-MLMC integration.
 
         Args:
@@ -206,7 +206,9 @@ class CubMLMCCont(AbstractCubMLMC):
             replay_snapshots = None
             replay_iter_count = None
             if self._can_replay_resume_exactly(data):
-                replay_data, replay_snapshots, replay_iter_count = self._replay_resume_exactly(data)
+                replay_data, replay_snapshots, replay_iter_count = self._replay_resume_exactly(
+                    data, t_start=t_start, resume_provenance=resume_provenance
+                )
                 if replay_data is not None:
                     data = replay_data
             if resume is not None:
@@ -220,6 +222,7 @@ class CubMLMCCont(AbstractCubMLMC):
                 checkpoint.rmse_tol = step_tol
                 if replay_iter_count is not None:
                     checkpoint._iter_count = replay_iter_count
+                self._set_elapsed_time(checkpoint, 0.0, resume_provenance=resume_provenance)
                 trace.resume(checkpoint, step_value=int(checkpoint.levels + 1))
             if replay_snapshots is not None:
                 for snapshot in replay_snapshots:
@@ -231,21 +234,38 @@ class CubMLMCCont(AbstractCubMLMC):
                 data.rmse_tol = step_tol
                 if step_tol <= self.target_rmse_tol:
                     # Same or looser tolerance: check convergence at target_tol
-                    self._integrate(data, skip_level_reset=True, step_tol=step_tol)
+                    self._integrate(
+                        data,
+                        skip_level_reset=True,
+                        step_tol=step_tol,
+                        t_start=t_start,
+                        resume_provenance=resume_provenance,
+                    )
                 else:
                     # Tighter tolerance: skip to ladder, preserving level structure for first step
                     first = True
                     for t in range(self.n_tols):
                         next_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
                         if next_tol < step_tol:
-                            self._integrate(data, skip_level_reset=first, step_tol=next_tol)
+                            self._integrate(
+                                data,
+                                skip_level_reset=first,
+                                step_tol=next_tol,
+                                t_start=t_start,
+                                resume_provenance=resume_provenance,
+                            )
                             first = False
             else:
                 data = self._construct_data()
                 # Loop over coarser tolerances
                 for t in range(self.n_tols):
                     step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
-                    self._integrate(data, step_tol=step_tol)
+                    self._integrate(
+                        data,
+                        step_tol=step_tol,
+                        t_start=t_start,
+                        resume_provenance=resume_provenance,
+                    )
             self._finalize_integration_data(
                 data, time() - t_start, resume_provenance=resume_provenance
             )
@@ -311,7 +331,7 @@ class CubMLMCCont(AbstractCubMLMC):
                 data.cost_level[l] += integrand_l.cost * n_remaining
         self._refresh_level_statistics(data)
 
-    def _replay_resume_exactly(self, checkpoint):
+    def _replay_resume_exactly(self, checkpoint, t_start=None, resume_provenance=None):
         shadow_trace = self._active_trace
         self._active_trace = None
         try:
@@ -332,6 +352,8 @@ class CubMLMCCont(AbstractCubMLMC):
                     record_snapshots=True,
                     snapshots=snapshots,
                     update_data_fn=self._update_replay_data,
+                    t_start=t_start,
+                    resume_provenance=resume_provenance,
                 )
         finally:
             self._active_trace = shadow_trace
@@ -370,6 +392,8 @@ class CubMLMCCont(AbstractCubMLMC):
         record_snapshots=False,
         snapshots=None,
         update_data_fn=None,
+        t_start=None,
+        resume_provenance=None,
     ):
         if step_tol is None:
             step_tol = self.rmse_tol
@@ -383,9 +407,17 @@ class CubMLMCCont(AbstractCubMLMC):
         self._update_trace_solution(data)
         if trace is not None and warmup_drew:
             data.rmse_tol = step_tol
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
             trace.iteration(data, step_value=int(data.levels + 1))
         if record_snapshots and warmup_drew:
             data.rmse_tol = step_tol
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
             snapshots.append(copy.deepcopy(data))
 
         converged = False
@@ -399,9 +431,17 @@ class CubMLMCCont(AbstractCubMLMC):
                 self._update_trace_solution(data)
                 if trace is not None:
                     data.rmse_tol = step_tol
+                    if t_start is not None:
+                        self._set_elapsed_time(
+                            data, time() - t_start, resume_provenance=resume_provenance
+                        )
                     trace.iteration(data, step_value=int(data.levels + 1))
                 if record_snapshots:
                     data.rmse_tol = step_tol
+                    if t_start is not None:
+                        self._set_elapsed_time(
+                            data, time() - t_start, resume_provenance=resume_provenance
+                        )
                     snapshots.append(copy.deepcopy(data))
                 # Alternatively, evaluate optimal number of samples and take between 2 and n_init samples
                 # data.diff_n_level = self._get_next_samples(data)
@@ -436,9 +476,17 @@ class CubMLMCCont(AbstractCubMLMC):
             self._update_trace_solution(data)
             if trace is not None:
                 data.rmse_tol = step_tol
+                if t_start is not None:
+                    self._set_elapsed_time(
+                        data, time() - t_start, resume_provenance=resume_provenance
+                    )
                 trace.iteration(data, step_value=int(data.levels + 1))
             if record_snapshots:
                 data.rmse_tol = step_tol
+                if t_start is not None:
+                    self._set_elapsed_time(
+                        data, time() - t_start, resume_provenance=resume_provenance
+                    )
                 snapshots.append(copy.deepcopy(data))
 
             # Check for convergence

@@ -66,8 +66,9 @@ class AbstractStoppingCriterion(object):
         # parameter checks
         if not hasattr(self, "parameters"):
             self.parameters = []
+        self.elapsed_time = float(getattr(self, "elapsed_time", 0.0))
 
-    def integrate(self, resume=None):
+    def integrate(self, resume=None) -> tuple:
         """Determine the samples needed to satisfy the target tolerance.
 
         Args:
@@ -86,7 +87,7 @@ class AbstractStoppingCriterion(object):
         """
         raise MethodImplementationError(self, "integrate")
 
-    def _make_trace_logger(self):
+    def _make_trace_logger(self) -> _IterationTraceLogger:
         """Create an iteration trace logger for this stopping criterion.
 
         Returns:
@@ -218,12 +219,27 @@ class AbstractStoppingCriterion(object):
         if resume is None:
             return None
         previous_total_time = getattr(
-            resume, "time_integrate_total", getattr(resume, "time_integrate", 0.0)
+            resume,
+            "elapsed_time",
+            getattr(resume, "time_integrate_total", getattr(resume, "time_integrate", 0.0)),
         )
         return {
             "n_total": int(getattr(resume, "n_total", 0)),
             "time_integrate_total": float(previous_total_time),
         }
+
+    @staticmethod
+    def _resume_elapsed_time(resume_provenance=None):
+        if resume_provenance is None:
+            return 0.0
+        return float(resume_provenance.get("time_integrate_total", 0.0))
+
+    def _set_elapsed_time(self, data, elapsed, resume_provenance=None):
+        elapsed_time = self._resume_elapsed_time(resume_provenance) + float(elapsed)
+        self.elapsed_time = elapsed_time
+        if data is not None:
+            data.elapsed_time = elapsed_time
+        return elapsed_time
 
     @staticmethod
     def _qualified_class_name(obj):
@@ -273,6 +289,8 @@ class AbstractStoppingCriterion(object):
         data.time_integrate_previous = previous_time
         data.time_integrate_resume = float(elapsed)
         data.time_integrate_total = previous_time + float(elapsed)
+        data.elapsed_time = data.time_integrate_total
+        self.elapsed_time = data.elapsed_time
         data.iteration_history = getattr(self, "iteration_history", None)
         data.history_df = getattr(self, "history_df", None)
         self._annotate_checkpoint_metadata(data)

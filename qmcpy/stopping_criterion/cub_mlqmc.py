@@ -164,12 +164,25 @@ class CubMLQMC(AbstractCubMLQMC):
         data.level_n_increments = [[] for _ in range(data.levels)]
         return data
 
-    def _run_integrate_loop(self, data, update_data_fn, trace=None, record_snapshots=False, stop_condition=None):
+    def _run_integrate_loop(
+        self,
+        data,
+        update_data_fn,
+        trace=None,
+        record_snapshots=False,
+        stop_condition=None,
+        t_start=None,
+        resume_provenance=None,
+    ):
         snapshots = []
         while True:
             update_data_fn(data)
             data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
             data.rmse_tol = self.rmse_tol
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
             if record_snapshots:
                 snapshots.append(copy.deepcopy(data))
             if stop_condition is not None and stop_condition(data):
@@ -230,7 +243,7 @@ class CubMLQMC(AbstractCubMLQMC):
         replay_iter_count, _ = self._resume_match_from_snapshots(snapshots, checkpoint)
         return replay_iter_count
 
-    def integrate(self, resume=None):
+    def integrate(self, resume=None) -> tuple:
         """Run (or continue) the MLQMC integration.
 
         Args:
@@ -256,10 +269,17 @@ class CubMLQMC(AbstractCubMLQMC):
             data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
             if replay_iter_count is not None:
                 data._iter_count = replay_iter_count
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
             trace.resume(data, step_value=int(data.levels))
         if data is None:
             data = self._construct_data()
-        self._run_integrate_loop(data, self.update_data, trace=trace)
+        self._run_integrate_loop(
+            data,
+            self.update_data,
+            trace=trace,
+            t_start=t_start,
+            resume_provenance=resume_provenance,
+        )
         self._finalize_integration_data(
             data, time() - t_start, resume_provenance=resume_provenance
         )

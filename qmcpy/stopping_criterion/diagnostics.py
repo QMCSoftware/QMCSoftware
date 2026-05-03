@@ -24,6 +24,7 @@ _ITERATION_HISTORY_COLUMNS = (
     "n_total",
     "m",
     "xfull.shape",
+    "elapsed_time",
     "printed",
 )
 
@@ -77,6 +78,7 @@ class IterationHistoryTable(object):
         self._columns["n_total"].append(row.get("n_total"))
         self._columns["m"].append(row.get("m"))
         self._columns["xfull.shape"].append(row.get("xfull.shape"))
+        self._columns["elapsed_time"].append(row.get("elapsed_time"))
         self._columns["printed"].append(bool(printed))
         return len(self) - 1
 
@@ -146,6 +148,9 @@ def _extract_diagnostic_row(data):
         "n_total": int(n_total) if n_total is not None else None,
         "m": int(_safe_get_first_element(m)) if m is not None else None,
         "xfull.shape": getattr(xfull, "shape", None),
+        "elapsed_time": _safe_get_first_element(
+            getattr(data, "elapsed_time", getattr(data, "time_integrate_total", None))
+        ),
     }
 
 
@@ -184,6 +189,8 @@ def _visible_columns_from_row(row, include_n_min=False):
     if include_n_min or row["n_min"] is not None:
         visible_columns.append("n_min")
     visible_columns.append("n_total")
+    if row.get("elapsed_time") is not None:
+        visible_columns.append("elapsed_time")
     if row["m"] is not None:
         visible_columns.append("m")
     if row["xfull.shape"] is not None:
@@ -230,6 +237,7 @@ def _build_history_data(history, index, stopping_criterion=None):
     data.n_min = row["n_min"]
     data.n_total = row["n_total"]
     data.m = row["m"]
+    data.elapsed_time = row.get("elapsed_time")
     data.rel_tol = context.get("rel_tol", None)
     if row["xfull.shape"] is not None:
         data.xfull = type("HistoryShape", (), {"shape": row["xfull.shape"]})()
@@ -299,6 +307,7 @@ def _format_diagnostic_display_values(label, data, row=None):
         "rmse_tol": _format_bound_text(row["rmse_tol"]),
         "n_min": "None" if row["n_min"] is None else str(int(row["n_min"])),
         "n_total": "None" if row["n_total"] is None else str(int(row["n_total"])),
+        "elapsed_time": _format_bound_text(row.get("elapsed_time")),
         "m": "None" if row["m"] is None else str(int(row["m"])),
         "xfull.shape": str(row["xfull.shape"]),
     }
@@ -318,6 +327,7 @@ def _diagnostic_column_widths(solution_width):
         "rmse_tol": 15,
         "n_min": 10,
         "n_total": 10,
+        "elapsed_time": 15,
         "m": 6,
         "xfull.shape": 16,
     }
@@ -475,6 +485,9 @@ class _IterationTraceLogger(object):
         self._resume_seeded = False
         self.history = IterationHistoryTable() if self.store_enabled else None
         self.stopping_criterion.iteration_history = self.history
+        self.stopping_criterion.elapsed_time = float(
+            getattr(stopping_criterion, "elapsed_time", 0.0)
+        )
         if self.history is not None:
             self.history.context = _history_context_from_stopping_criterion(
                 stopping_criterion

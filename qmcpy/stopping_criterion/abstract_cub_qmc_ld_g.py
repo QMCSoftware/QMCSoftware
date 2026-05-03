@@ -277,6 +277,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             if self.ncv > 0:
                 ycvtildefull = data._ycvtildefull
             first_resume_iter = True
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
             trace.resume(data, step_value=int(np.log2(max(1, int(data.n_total)))))
         else:
             data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
@@ -483,6 +484,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            self._set_elapsed_time(data, time() - t_start, resume_provenance=resume_provenance)
             trace.iteration(data, step_value=m)
             # Save transform state so this computation can be resumed later.
             data._ytildefull = ytildefull
