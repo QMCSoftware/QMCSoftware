@@ -1,4 +1,4 @@
-"""Long-run resume check 
+"""Long-run resume check using rel_tol or rmse_tol
 """
 
 from pathlib import Path
@@ -35,27 +35,27 @@ def _build_cases(seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAU
     # Single-level IID/QMC solvers
     # ------------------------------------------------------------------ #
     clt_vec_builder = make_named_tol_builder(
-        CubMCCLTVec, iid_keister, "abs_tol",
+        CubMCCLTVec, iid_keister, "rel_tol",
         n_init=2, n_limit=2**22,
     )
     lattice_builder = make_named_tol_builder(
-        CubQMCLatticeG, lattice_keister, "abs_tol",
+        CubQMCLatticeG, lattice_keister, "rel_tol",
         n_init=2**8, n_limit=2**20,
     )
     net_builder = make_named_tol_builder(
-        CubQMCNetG, net_keister, "abs_tol",
+        CubQMCNetG, net_keister, "rel_tol",
         n_init=2**8, n_limit=2**22,
     )
     rep_student_builder = make_named_tol_builder(
-        CubQMCRepStudentT, net_rep_keister_long, "abs_tol",
+        CubQMCRepStudentT, net_rep_keister_long, "rel_tol",
         rel_tol=0, n_init=2**5, n_limit=2**22,
     )
     bayes_lattice_builder = make_named_tol_builder(
-        CubQMCBayesLatticeG, bayes_lattice_keister, "abs_tol",
+        CubQMCBayesLatticeG, bayes_lattice_keister, "rel_tol",
         n_init=2**2, n_limit=2**22,
     )
     bayes_net_builder = make_named_tol_builder(
-        CubBayesNetG, net_keister, "abs_tol",
+        CubBayesNetG, net_keister, "rel_tol",
         n_init=2**2, n_limit=2**24,
     )
 
@@ -81,7 +81,7 @@ def _build_cases(seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAU
         )
 
     mlqmc_builder = make_named_tol_builder(
-        CubMLQMC, qmc_financial_option_4d, "abs_tol",
+        CubMLQMC, qmc_financial_option_4d, "rmse_tol",
         n_limit=2**24,
     )
 
@@ -107,21 +107,21 @@ def _build_cases(seed=DEFAULT_SEED, cont_seed=DEFAULT_CONT_SEED, dimension=DEFAU
     )
 
     mlqmc_cont_builder = make_named_tol_builder(
-        CubMLQMCCont, qmc_financial_option_cont_large, "abs_tol",
+        CubMLQMCCont, qmc_financial_option_cont_large, "rmse_tol",
         n_tols=1200, inflate=1.001, n_limit=2**24,
     )
 
     return [
-        make_tol_case("CubMCCLTVec",       clt_vec_builder,         loose_tol=5e-3,  tight_tol=2e-3),
-        make_tol_case("CubQMCLatticeG",    lattice_builder,         loose_tol=1e-3,  tight_tol=1e-5),
-        make_tol_case("CubQMCNetG",        net_builder,             loose_tol=1e-3,  tight_tol=1e-6),
-        make_tol_case("CubQMCRepStudentT", rep_student_builder,     loose_tol=5e-3,  tight_tol=5e-4),
-        make_tol_case("CubQMCBayesLatticeG", bayes_lattice_builder, loose_tol=1e-3, tight_tol=1e-6),
-        make_tol_case("CubBayesNetG",      bayes_net_builder,       loose_tol=1e-3,  tight_tol=2e-6),
-        make_tol_case("CubMLMC",           mlmc_builder,            loose_tol=2.0,   tight_tol=0.5),
-        make_tol_case("CubMLQMC",          mlqmc_builder,           loose_tol=2.0,   tight_tol=0.5),
-        make_tol_case("CubMLMCCont",       mlmc_cont_builder,       loose_tol=1.0,   tight_tol=0.5),
-        make_tol_case("CubMLQMCCont",      mlqmc_cont_builder,      loose_tol=1.0,   tight_tol=0.5),
+        make_tol_case("CubMCCLTVec",         clt_vec_builder,         loose_tol=5e-3,  tight_tol=2e-3),
+        make_tol_case("CubQMCLatticeG",      lattice_builder,         loose_tol=1e-3,  tight_tol=1e-5),
+        make_tol_case("CubQMCNetG",          net_builder,             loose_tol=1e-3,  tight_tol=1e-6),
+        make_tol_case("CubQMCRepStudentT",   rep_student_builder,     loose_tol=5e-3,  tight_tol=5e-4),
+        make_tol_case("CubQMCBayesLatticeG", bayes_lattice_builder,   loose_tol=1e-3,  tight_tol=1e-6),
+        make_tol_case("CubBayesNetG",        bayes_net_builder,       loose_tol=1e-3,  tight_tol=2e-6),
+        make_tol_case("CubMLMC",             mlmc_builder,            loose_tol=2.0,   tight_tol=0.5),
+        make_tol_case("CubMLQMC",            mlqmc_builder,           loose_tol=2.0,   tight_tol=0.5),
+        make_tol_case("CubMLMCCont",         mlmc_cont_builder,       loose_tol=1.0,   tight_tol=0.5),
+        make_tol_case("CubMLQMCCont",        mlqmc_cont_builder,      loose_tol=1.0,   tight_tol=0.5),
     ]
 
 

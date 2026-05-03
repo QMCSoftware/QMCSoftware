@@ -1,3 +1,6 @@
+"""Fast-run resume check using abs_tol
+"""
+
 from pathlib import Path
 from qmcpy import (CubBayesNetG, CubMCCLTVec, CubMLMC, CubMLMCCont, CubMLQMC, CubMLQMCCont, CubQMCNetG, CubQMCLatticeG, 
     CubQMCRepStudentT, DigitalNetB2, CubQMCBayesLatticeG, FinancialOption, IIDStdUniform, Keister, Lattice)
@@ -24,11 +27,10 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
     def iid_financial_option_cont():
         return FinancialOption(IIDStdUniform(dimension=dimension, seed=cont_seed), start_price=30, strike_price=30)
 
-    def iid_financial_option_cont_large():
-        return FinancialOption(IIDStdUniform(dimension=4, seed=cont_seed), start_price=300, strike_price=100)
-
     def qmc_financial_option():
         return FinancialOption(Lattice(replications=32, seed=seed), start_price=30, strike_price=30)
+
+    mlmc_n_limit = max(n_limit, 2**20)
 
     return [
         make_tol_case("CubMCCLTVec",
@@ -49,9 +51,9 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
         make_tol_case("CubBayesNetG",
             make_named_tol_builder(CubBayesNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=n_limit), loose_tol, tight_tol),
         make_tol_case("CubMLMC",
-            make_named_tol_builder(CubMLMC, iid_financial_option, "rmse_tol", n_limit=2**16), 0.2, 0.1),
+            make_named_tol_builder(CubMLMC, iid_financial_option, "abs_tol", n_limit=mlmc_n_limit), 0.2, 0.1),
         make_tol_case("CubMLMCCont",
-            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "rmse_tol", n_limit=2**16), 0.1, 0.05),
+            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "abs_tol", n_limit=mlmc_n_limit), 0.1, 0.05),
         make_tol_case("CubMLQMC",
             make_named_tol_builder(CubMLQMC, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
         make_tol_case("CubMLQMCCont",
