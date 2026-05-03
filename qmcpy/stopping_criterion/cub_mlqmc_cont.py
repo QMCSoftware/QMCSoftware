@@ -188,6 +188,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
         resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()
         self._active_trace = trace
+        self._active_t_start = t_start
+        self._active_resume_provenance = resume_provenance
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
             replay_iter_count = None
@@ -206,8 +208,6 @@ class CubMLQMCCont(AbstractCubMLQMC):
                         data,
                         skip_level_reset=True,
                         step_tol=step_tol,
-                        t_start=t_start,
-                        resume_provenance=resume_provenance,
                     )
                 else:
                     # Tighter tolerance: skip to ladder, preserving level structure for first step
@@ -219,8 +219,6 @@ class CubMLQMCCont(AbstractCubMLQMC):
                                 data,
                                 skip_level_reset=first,
                                 step_tol=next_tol,
-                                t_start=t_start,
-                                resume_provenance=resume_provenance,
                             )
                             first = False
             else:
@@ -231,8 +229,6 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     self._integrate(
                         data,
                         step_tol=step_tol,
-                        t_start=t_start,
-                        resume_provenance=resume_provenance,
                     )
             self._finalize_integration_data(
                 data, time() - t_start, resume_provenance=resume_provenance
@@ -243,6 +239,8 @@ class CubMLQMCCont(AbstractCubMLQMC):
             return data.solution, data
         finally:
             self._active_trace = None
+            self._active_t_start = None
+            self._active_resume_provenance = None
 
     def _construct_data(self):
         data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
@@ -333,6 +331,12 @@ class CubMLQMCCont(AbstractCubMLQMC):
         t_start=None,
         resume_provenance=None,
     ):
+        t_start = getattr(self, "_active_t_start", None) if t_start is None else t_start
+        resume_provenance = (
+            getattr(self, "_active_resume_provenance", None)
+            if resume_provenance is None
+            else resume_provenance
+        )
         if step_tol is None:
             step_tol = self.rmse_tol
         trace = getattr(self, "_active_trace", None) if trace is None else trace
