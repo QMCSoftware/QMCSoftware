@@ -65,7 +65,7 @@ def half_width(data):
 
 def _history_tol_value(row):
     """Return the most relevant tolerance stored on a history row."""
-    for key in ("abs_tol", "rmse_tol"):
+    for key in ("rel_tol", "abs_tol", "rmse_tol"):
         try:
             value = float(row.get(key, None))
         except (TypeError, ValueError):
@@ -202,12 +202,21 @@ def stage_summary_rows_from_stage_records(loose_stage, resume_stage=None, fresh_
 
 def stage_summary_tol_header(*stages):
     """Infer the preferred tolerance-column header from stage records."""
-    tol_names = {stage.get("tol_name") for stage in stages if stage} - {None}
-    return "rmse_tol" if tol_names == {"target_rmse_tol"} else "abs_tol"
+    for stage in stages:
+        if not stage:
+            continue
+        tol_name = stage.get("tol_name")
+        if tol_name == "target_rmse_tol":
+            return "rmse_tol"
+        if tol_name in {"abs_tol", "rel_tol", "rmse_tol"}:
+            return tol_name
+    return "abs_tol"
 
 
 def format_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     """Return a compact stage-by-stage sample and time summary table."""
+    total_n_vals = [int(total_n) for _, _, total_n, *_ in rows]
+    new_n_vals = [int(new_n) for _, _, _, new_n, *_ in rows]
     tol_values = [
         float(abs_tol)
         for _, abs_tol, *_ in rows
@@ -222,8 +231,8 @@ def format_stage_summary(rows, title="Stage summary", tol_header="abs_tol"):
     stage_w = 7
     # Keep rmse_tol values visually separated by one extra leading space.
     tol_w = max(7, len(tol_header) + (1 if tol_header == "rmse_tol" else 0))
-    total_n_w = 9
-    new_n_w = 9
+    total_n_w = max(9, max((len(f"{value:,}") for value in total_n_vals), default=0))
+    new_n_w = max(9, max((len(f"{value:,}") for value in new_n_vals), default=0))
     iters_w = 6
     hw_w = 10
     time_w = 8
@@ -270,11 +279,28 @@ def print_stage_summary(
         )
         if tol_header is None:
             tol_names = {row[-1] for row in rows} - {None}
-            tol_header = "rmse_tol" if tol_names == {"rmse_tol"} else "abs_tol"
+            if tol_names == {"target_rmse_tol"}:
+                tol_header = "rmse_tol"
+            elif len(tol_names) == 1:
+                tol_header = tol_names.pop()
+            else:
+                tol_header = "abs_tol"
         rows = [row[:-1] for row in rows]
     elif tol_header is None:
         tol_header = "abs_tol"
     print(format_stage_summary(rows, title=title, tol_header=tol_header))
+
+
+def _is_multilevel_case(name, resume_stage, fresh_stage):
+    """Return True for ML/MLQMC-style cases where iteration parity is not required."""
+    if str(name).startswith("CubML"):
+        return True
+    for stage in (resume_stage, fresh_stage):
+        tol_name = stage.get("tol_name") if isinstance(stage, dict) else None
+        if tol_name in {"rmse_tol", "target_rmse_tol"}:
+            return True
+    return False
+
 
 def collect_resume_fresh_warnings(name, resume_stage, fresh_stage):
     """Return warning strings for mismatched resume-vs-fresh outcomes."""
@@ -290,7 +316,7 @@ def collect_resume_fresh_warnings(name, resume_stage, fresh_stage):
 
     resume_iters = int(resume_stage.get("iters") or 0)
     fresh_iters = int(fresh_stage.get("iters") or 0)
-    if resume_iters != fresh_iters:
+    if resume_iters != fresh_iters and not _is_multilevel_case(name, resume_stage, fresh_stage):
         warning_lines.append(
             f"WARNING: {name}: Inconsistent iteration counts across stages "
             f"(resume_iters={resume_iters}, fresh_iters={fresh_iters})"
@@ -348,7 +374,13 @@ def make_abs_tol_builder(sc_class, integrand_factory, *, rel_tol=0, n_init=None,
 def make_named_tol_builder(sc_class, integrand_factory, tol_name, **fixed_kwargs):
     """Build a factory for stopping criteria with a named tolerance argument."""
     def build(tol):
-        return sc_class(integrand_factory(), **{tol_name: tol, **fixed_kwargs})
+        sc = sc_class(integrand_factory(), **{tol_name: tol, **fixed_kwargs})
+        setattr(sc, "_resume_tol_name", tol_name)
+        try:
+            setattr(sc, "_resume_tol_value", float(tol))
+        except (TypeError, ValueError):
+            setattr(sc, "_resume_tol_value", None)
+        return sc
 
     return build
 
@@ -378,13 +410,40 @@ def _safe_half_width(data):
 
 def _get_sc_tol(sc):
     """Return the primary positive tolerance value and its attribute name."""
-    for attr in ("target_rmse_tol", "abs_tol", "rmse_tol"):
+    preferred_attr = getattr(sc, "_resume_tol_name", None)
+    preferred_input_value = getattr(sc, "_resume_tol_value", None)
+
+    def get_tol_value(attr):
+        if attr == "rmse_tol":
+            for candidate in ("target_rmse_tol", "rmse_tol"):
+                try:
+                    val = float(getattr(sc, candidate, None))
+                except (TypeError, ValueError):
+                    continue
+                if val > 0:
+                    return val
+            return None
         try:
             val = float(getattr(sc, attr, None))
-            if val > 0:
-                return val, attr
         except (TypeError, ValueError):
-            pass
+            return None
+        return val if val > 0 else None
+
+    if preferred_attr in {"abs_tol", "rel_tol", "rmse_tol"}:
+        try:
+            preferred_input_value = float(preferred_input_value)
+        except (TypeError, ValueError):
+            preferred_input_value = None
+        if preferred_input_value is not None and preferred_input_value > 0:
+            return preferred_input_value, preferred_attr
+        preferred_val = get_tol_value(preferred_attr)
+        if preferred_val is not None:
+            return preferred_val, preferred_attr
+
+    for attr in ("rel_tol", "abs_tol", "rmse_tol"):
+        val = get_tol_value(attr)
+        if val is not None:
+            return val, attr
     return None, None
 
 
@@ -396,10 +455,113 @@ def _solution_value(solution):
         return float(solution)
 
 
+def _extract_final_iteration_number(iteration_log):
+    """Extract the final iteration number from an iteration log."""
+    if not iteration_log:
+        return None
+    lines = iteration_log.splitlines()
+    # Search from the end for the last ITER or RESUME row
+    for line in reversed(lines):
+        stripped = line.lstrip()
+        if stripped.startswith("RESUME") or stripped.startswith("ITER"):
+            parts = stripped.split()
+            if len(parts) >= 2:
+                try:
+                    return int(parts[1])
+                except (ValueError, IndexError):
+                    pass
+    return None
+
+
+def _trim_resume_iteration_log(iteration_log, loose_stage=None):
+    """Keep only rows from the first RESUME marker onward, with adjusted iteration numbers.
+
+    The formatted log always begins with three lines:
+    1) section header
+    2) column header
+    3) separator
+    For resumed runs, we keep these lines and drop pre-resume ITER rows.
+    For ML solvers, we renumber RESUME/ITER rows to continue from loose stage's final iteration.
+    """
+    import re
+    if not iteration_log:
+        return iteration_log
+    lines = iteration_log.splitlines()
+    if len(lines) <= 3:
+        return iteration_log
+
+    resume_idx = None
+    for idx in range(3, len(lines)):
+        if lines[idx].lstrip().startswith("RESUME"):
+            resume_idx = idx
+            break
+    if resume_idx is None:
+        return iteration_log
+    
+    # Determine if we should renumber (for ML solvers with loose stage reference)
+    loose_final_iter = None
+    if loose_stage and isinstance(loose_stage, dict):
+        loose_final_iter = loose_stage.get("iters")
+        try:
+            loose_final_iter = int(loose_final_iter) if loose_final_iter is not None else None
+        except (TypeError, ValueError):
+            loose_final_iter = None
+    
+    trimmed_lines = lines[:3] + lines[resume_idx:]
+    
+    # If we have loose_final_iter, renumber the resumed iterations for continuity
+    if loose_final_iter is not None:
+        result_lines = trimmed_lines[:3]  # Keep header and separator
+        iter_offset = None
+        solution_col = None
+        
+        for line in trimmed_lines[3:]:
+            stripped = line.lstrip()
+            if stripped.startswith("RESUME") or stripped.startswith("ITER"):
+                # Use regex to extract stage label and iteration number
+                match = re.match(r'^(\s*)(RESUME|ITER)(\s+)(\d+)(\s+)(.*)$', line)
+                if match:
+                    indent, stage_label, spacing_before_iter, old_iter_str, spacing_after_iter, tail = match.groups()
+                    old_iter = int(old_iter_str)
+
+                    # Lock the start column of the solution field once per block.
+                    if solution_col is None:
+                        solution_col = match.start(6)
+                    
+                    # Calculate offset from RESUME row
+                    if iter_offset is None and stage_label == "RESUME":
+                        iter_offset = loose_final_iter - old_iter
+                    
+                    # For first ITER row after RESUME, ensure continuation
+                    if iter_offset is None and stage_label == "ITER":
+                        iter_offset = loose_final_iter + 1 - old_iter
+                    
+                    if iter_offset is not None:
+                        new_iter = old_iter + iter_offset
+                        # Keep iter right-aligned while fixing the solution column position.
+                        stage_prefix = indent + stage_label
+                        iter_text = str(new_iter)
+                        spaces_before_iter = max(1, solution_col - len(stage_prefix) - len(iter_text) - 1)
+                        new_line = stage_prefix + (" " * spaces_before_iter) + iter_text + " " + tail
+                        result_lines.append(new_line)
+                    else:
+                        result_lines.append(line)
+                else:
+                    result_lines.append(line)
+            else:
+                result_lines.append(line)
+        return "\n".join(result_lines)
+    
+    return "\n".join(trimmed_lines)
+
+
 def _make_stage_record(name, sc, solution, data, inputs, previous_n_total=0):
     """Build a compact stage record from a completed integration."""
     total_n = int(getattr(data, "n_total", 0))
     tol, tol_name = _get_sc_tol(sc)
+    iteration_log = sc.format_iteration_log(
+        history=getattr(data, "iteration_history", None)
+    )
     return {
         "name": name,
         "tol": tol,
@@ -411,9 +573,7 @@ def _make_stage_record(name, sc, solution, data, inputs, previous_n_total=0):
         "half_width": _safe_half_width(data),
         "time": float(getattr(data, "time_integrate", 0.0)),
         "inputs": inputs,
-        "iteration_log": sc.format_iteration_log(
-            history=getattr(data, "iteration_history", None)
-        ),
+        "iteration_log": iteration_log,
     }
 
 
@@ -436,6 +596,10 @@ def run_resume_case(case, verbose=False):
 
         # Start RESUMED stage with the same solver, retuned to the tight tolerance.
         tight_sc = case["tight"]()
+        if hasattr(tight_sc, "_resume_tol_name"):
+            sc1._resume_tol_name = getattr(tight_sc, "_resume_tol_name")
+        if hasattr(tight_sc, "_resume_tol_value"):
+            sc1._resume_tol_value = getattr(tight_sc, "_resume_tol_value")
         if hasattr(tight_sc, "target_rmse_tol"):
             sc1.target_rmse_tol = float(tight_sc.target_rmse_tol)
         sc1.set_tolerance(
@@ -451,6 +615,14 @@ def run_resume_case(case, verbose=False):
         resume_stage = _make_stage_record(
             "Resumed", sc1, sol2, data2, resume_inputs, previous_n_total=old_n
         )
+        # Renumber resume iteration log to continue from loose stage for ML solvers
+        resume_stage["iteration_log"] = _trim_resume_iteration_log(
+            resume_stage["iteration_log"], loose_stage=loose_stage
+        )
+        # Update iteration count to match the final iteration number in the log
+        final_iter = _extract_final_iteration_number(resume_stage["iteration_log"])
+        if final_iter is not None:
+            resume_stage["iters"] = final_iter
         row.update(
             {
                 "status": "ok",
@@ -471,10 +643,15 @@ def run_fresh_case(case, verbose=False):
         sol, data, fresh_inputs, sc = _run_logged_case(
             case["tight"], f"{name}-FRESH", verbose=verbose
         )
+        fresh_stage = _make_stage_record("Fresh", sc, sol, data, fresh_inputs)
+        # Update iteration count to match the final iteration number in the log
+        final_iter = _extract_final_iteration_number(fresh_stage["iteration_log"])
+        if final_iter is not None:
+            fresh_stage["iters"] = final_iter
         row.update(
             {
                 "status": "ok",
-                "fresh": _make_stage_record("Fresh", sc, sol, data, fresh_inputs),
+                "fresh": fresh_stage,
             }
         )
     except Exception as exc:

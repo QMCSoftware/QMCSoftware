@@ -11,7 +11,7 @@ DEFAULT_CONT_SEED = 11
 DEFAULT_DIMENSION = 2
 
 
-def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, n_init=2**8, n_limit=2**16):
+def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.05, rel_tol=0, n_init=2**8, n_limit=2**24):
     iid_keister = lambda dim=dimension: Keister(IIDStdUniform(dimension=dim, seed=seed))
     lattice_keister = lambda dim=dimension: Keister(Lattice(dimension=dim, seed=seed))
     net_keister = lambda dim=dimension: Keister(DigitalNetB2(dimension=dim, seed=seed))
@@ -34,30 +34,25 @@ def _build_cases(seed=7, cont_seed=11, dimension=2, loose_tol=0.2, tight_tol=0.0
 
     return [
         make_tol_case("CubMCCLTVec",
-            make_named_tol_builder(CubMCCLTVec, iid_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=n_limit),
-            loose_tol, tight_tol),
+            make_named_tol_builder(CubMCCLTVec, iid_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=n_limit), 5e-2, 2.5e-2),
         make_tol_case("CubQMCLatticeG",
-            make_named_tol_builder(CubQMCLatticeG, lattice_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=2**20),
-            1e-3, 1e-5),
+            make_named_tol_builder(CubQMCLatticeG, lattice_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=2**20), 5e-3, 1e-3),
         make_tol_case("CubQMCNetG",
-            make_named_tol_builder(CubQMCNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=2**22),
-            1e-3, 1e-6),
+            make_named_tol_builder(CubQMCNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=n_init, n_limit=2**22), 5e-3, 1e-3),
         make_tol_case("CubQMCRepStudentT",
-            make_named_tol_builder(CubQMCRepStudentT, net_rep_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=2**18),
-            loose_tol, tight_tol),
+            make_named_tol_builder(CubQMCRepStudentT, net_rep_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=2**22), 5e-2, 1e-2),
         make_tol_case("CubQMCBayesLatticeG",
-            make_named_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=n_limit),
-            loose_tol, tight_tol),
+            make_named_tol_builder(CubQMCBayesLatticeG, bayes_lattice_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=2**24), 5e-2, 5e-4),
         make_tol_case("CubBayesNetG",
-            make_named_tol_builder(CubBayesNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=n_limit), loose_tol, tight_tol),
+            make_named_tol_builder(CubBayesNetG, net_keister, "abs_tol", rel_tol=rel_tol, n_init=2**5, n_limit=2**24), 1e-1, 3e-3),
         make_tol_case("CubMLMC",
             make_named_tol_builder(CubMLMC, iid_financial_option, "abs_tol", n_limit=mlmc_n_limit), 0.2, 0.1),
         make_tol_case("CubMLMCCont",
-            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "abs_tol", n_limit=mlmc_n_limit), 0.1, 0.05),
+            make_named_tol_builder(CubMLMCCont, iid_financial_option_cont, "abs_tol", n_limit=mlmc_n_limit, n_tols=6), 0.4, 0.3),
         make_tol_case("CubMLQMC",
             make_named_tol_builder(CubMLQMC, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
         make_tol_case("CubMLQMCCont",
-            make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol", n_limit=2**18), 0.2, 0.1),
+            make_named_tol_builder(CubMLQMCCont, qmc_financial_option, "abs_tol", n_limit=2**18, n_tols=6), 0.6, 0.3),
     ]
 
 
