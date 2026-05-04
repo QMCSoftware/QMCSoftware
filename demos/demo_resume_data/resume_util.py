@@ -137,7 +137,7 @@ def stage_summary_rows_from_histories(
         rows.append(
             _stage_row_from_history(
                 "Loose",
-                history.row(loose_index),
+                history._row(loose_index),
                 previous_n_total=0,
                 time_value=_history_time_value(loose_data),
             )
@@ -145,7 +145,7 @@ def stage_summary_rows_from_histories(
         rows.append(
             _stage_row_from_history(
                 "Resumed",
-                history.row(len(history) - 1),
+                history._row(len(history) - 1),
                 previous_n_total=int(history["n_total"][resume_index] or 0),
                 time_value=_history_time_value(resume_data),
             )
@@ -154,7 +154,7 @@ def stage_summary_rows_from_histories(
         rows.append(
             _stage_row_from_history(
                 "Loose" if fresh_solver is not None else "Run",
-                history.row(len(history) - 1),
+                history._row(len(history) - 1),
                 previous_n_total=0,
                 time_value=_history_time_value(loose_data if fresh_solver is not None else resume_data),
             )
@@ -166,7 +166,7 @@ def stage_summary_rows_from_histories(
         rows.append(
             _stage_row_from_history(
                 "Fresh",
-                fresh_history.row(len(fresh_history) - 1),
+                fresh_history._row(len(fresh_history) - 1),
                 previous_n_total=0,
                 time_value=_history_time_value(fresh_data),
             )

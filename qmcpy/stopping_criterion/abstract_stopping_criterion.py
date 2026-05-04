@@ -3,9 +3,9 @@ import sys
 
 from .diagnostics import (  # noqa: F401
     _IterationTraceLogger,
-    format_iteration_log as _format_iteration_log,
-    get_iteration_log_frame as _get_iteration_log_frame,
-    print_iteration_log as _print_iteration_log,
+    _format_iteration_log,
+    _get_iteration_log_frame,
+    _print_iteration_log,
 )
 from ..integrand.abstract_integrand import AbstractIntegrand
 from ..util import (
@@ -128,8 +128,8 @@ class AbstractStoppingCriterion(object):
         Args:
             history (list[dict] | None): Iteration history to format. If ``None``,
                 uses ``self.iteration_history`` when available.
-            printed_only (bool): If ``True``, include only columns that are
-                configured for printed output.
+            printed_only (bool): If ``True``, include only rows that were
+                selected for printed output.
             drop_empty_columns (bool): If ``True``, drop columns with no values.
             formatted (bool): If ``True``, return formatted display values when
                 available.
@@ -152,7 +152,20 @@ class AbstractStoppingCriterion(object):
         )
 
     def format_iteration_log(self, history=None, printed_only=True, include_header=True):
-        """Return the stored iteration log for the latest run or supplied history."""
+        """Return the iteration log as formatted text.
+
+        Args:
+            history (IterationHistoryTable | None, optional): Iteration history
+                to format. If ``None``, uses ``self.iteration_history`` when
+                available. Defaults to None.
+            printed_only (bool, optional): If ``True``, include only rows that
+                were selected for printed output. Defaults to True.
+            include_header (bool, optional): If ``True``, include the trace
+                label header before the table. Defaults to True.
+
+        Returns:
+            str: Formatted iteration log text.
+        """
         if history is None:
             history = getattr(self, "iteration_history", None)
         return _format_iteration_log(
@@ -163,7 +176,22 @@ class AbstractStoppingCriterion(object):
         )
 
     def print_iteration_log(self, history=None, printed_only=True, include_header=True, file=None):
-        """Print the stored iteration log for the latest run or supplied history."""
+        """Print the iteration log for the latest run or supplied history.
+
+        Args:
+            history (IterationHistoryTable | None, optional): Iteration history
+                to print. If ``None``, uses ``self.iteration_history`` when
+                available. Defaults to None.
+            printed_only (bool, optional): If ``True``, print only rows that
+                were selected for printed output. Defaults to True.
+            include_header (bool, optional): If ``True``, include the trace
+                label header before the table. Defaults to True.
+            file (typing.TextIO | None, optional): Output stream. Defaults to
+                ``sys.stdout`` when None.
+
+        Returns:
+            None: This method writes output to ``file``.
+        """
         if history is None:
             history = getattr(self, "iteration_history", None)
         return _print_iteration_log(

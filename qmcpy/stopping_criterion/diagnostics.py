@@ -40,12 +40,14 @@ class IterationHistoryTable(object):
         self.context = None
 
     @property
-    def columns(self):
+    def _column_names(self):
+        """Return the ordered column names stored in the table. """
         return _ITERATION_HISTORY_COLUMNS
 
     @property
-    def shape(self):
-        return (len(self), len(self.columns))
+    def _shape(self):
+        """Return the table dimensions."""
+        return (len(self), len(self._column_names))
 
     def __len__(self):
         return len(self._columns["stage"])
@@ -53,15 +55,16 @@ class IterationHistoryTable(object):
     def __getitem__(self, key):
         if isinstance(key, str):
             return self._columns[key]
-        return self.row(key)
+        return self._row(key)
 
     def __repr__(self):
         return "IterationHistoryTable(rows=%d, columns=%s)" % (
             len(self),
-            self.columns,
+            self._column_names,
         )
 
-    def append(self, stage, row, visible_columns=None, printed=True):
+    def _append(self, stage, row, visible_columns=None, printed=True):
+        """Append one iteration-history row."""
         if self.visible_columns is None and visible_columns is not None:
             self.visible_columns = tuple(visible_columns)
         self._columns["stage"].append(stage)
@@ -82,16 +85,20 @@ class IterationHistoryTable(object):
         self._columns["printed"].append(bool(printed))
         return len(self) - 1
 
-    def mark_printed(self, index, printed=True):
+    def _mark_printed(self, index, printed=True):
+        """Update whether a stored row is marked as printed. """
         self._columns["printed"][index] = bool(printed)
 
-    def row(self, index):
-        return {column: self._columns[column][index] for column in self.columns}
+    def _row(self, index):
+        """Return one row as a dictionary. """
+        return {column: self._columns[column][index] for column in self._column_names}
 
-    def rows(self):
-        return [self.row(index) for index in range(len(self))]
+    def _rows(self):
+        """Return all rows as dictionaries. """
+        return [self._row(index) for index in range(len(self))]
 
-    def to_dict(self):
+    def _to_dict(self):
+        """Return a column-oriented copy of the stored data."""
         return {column: list(values) for column, values in self._columns.items()}
 
 
@@ -216,7 +223,7 @@ def _build_history_stopping_criterion(history, stopping_criterion=None):
 
 
 def _build_history_data(history, index, stopping_criterion=None):
-    row = history.row(index)
+    row = history._row(index)
     context = dict(getattr(history, "context", None) or {})
     data = type("HistoryRowData", (), {})()
     data._iter_count = row["iter"]
@@ -340,19 +347,20 @@ def _align_diagnostic_value(column, value, widths):
     return f"{text:>{widths[column]}}"
 
 
-def get_iteration_log_rows(history, stopping_criterion=None, printed_only=True, formatted=True):
+def _get_iteration_log_rows(history, stopping_criterion=None, printed_only=True, formatted=True):
+    """Return iteration history rows as dictionaries."""
     if history is None or len(history) == 0:
         return []
     visible_columns = history.visible_columns
     if visible_columns is None:
-        visible_columns = _visible_columns_from_row(history.row(0), include_n_min=True)
+        visible_columns = _visible_columns_from_row(history._row(0), include_n_min=True)
     indices = range(len(history))
     if printed_only:
         indices = [index for index in indices if history["printed"][index]]
     rows = []
     for index in indices:
         stage, data = _build_history_data(history, index, stopping_criterion)
-        row = history.row(index)
+        row = history._row(index)
         if formatted:
             display, _ = _format_diagnostic_display_values(stage, data, row=row)
             rows.append({column: display[column] for column in visible_columns})
@@ -364,12 +372,13 @@ def get_iteration_log_rows(history, stopping_criterion=None, printed_only=True, 
     return rows
 
 
-def get_iteration_log_frame(
+def _get_iteration_log_frame(
     history, stopping_criterion=None, printed_only=True, drop_empty_columns=True, formatted=True
 ):
+    """Return iteration history as a pandas DataFrame."""
     import pandas
 
-    rows = get_iteration_log_rows(
+    rows = _get_iteration_log_rows(
         history,
         stopping_criterion=stopping_criterion,
         printed_only=printed_only,
@@ -381,14 +390,14 @@ def get_iteration_log_frame(
     return df
 
 
-def print_iteration_log(
+def _print_iteration_log(
     history,
     stopping_criterion=None,
     printed_only=True,
     include_header=True,
     file=None,
 ):
-    """Print a stored iteration log from an IterationHistoryTable."""
+    """Print an iteration history table. """
     if history is None or len(history) == 0:
         return
     if file is None:
@@ -417,12 +426,12 @@ def print_iteration_log(
             )
 
 
-def format_iteration_log(
+def _format_iteration_log(
     history, stopping_criterion=None, printed_only=True, include_header=True
 ):
-    """Return a stored iteration log as text."""
+    """Return an iteration history table as text. """
     stream = io.StringIO()
-    print_iteration_log(
+    _print_iteration_log(
         history,
         stopping_criterion=stopping_criterion,
         printed_only=printed_only,
@@ -582,7 +591,7 @@ class _IterationTraceLogger(object):
         printed = stage != "ITER" or not self._would_be_throttled(row["iter"])
         history_index = None
         if self.history is not None and (self.store_all or printed):
-            history_index = self.history.append(
+            history_index = self.history._append(
                 stage,
                 row,
                 visible_columns=visible_columns,
@@ -690,7 +699,7 @@ class _IterationTraceLogger(object):
         if self.history is not None:
             if self._last_iter_history_index is None:
                 row = _extract_diagnostic_row(self._last_iter_snapshot)
-                self._last_iter_history_index = self.history.append(
+                self._last_iter_history_index = self.history._append(
                     "ITER",
                     row,
                     visible_columns=self._get_visible_columns(
@@ -699,13 +708,13 @@ class _IterationTraceLogger(object):
                     printed=True,
                 )
             else:
-                self.history.mark_printed(self._last_iter_history_index, True)
+                self.history._mark_printed(self._last_iter_history_index, True)
         self._last_printed_iter_count = self._last_iter_count
 
     def finalize(self):
         """Force-print the last ITER row if throttling suppressed it, then clear snapshot."""
         self._flush_last_if_suppressed()
-        history_df = get_iteration_log_frame(
+        history_df = _get_iteration_log_frame(
             self.history,
             stopping_criterion=self.stopping_criterion,
             printed_only=True,

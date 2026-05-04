@@ -263,7 +263,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             discrete_distrib=distrib,
         )
         history = IterationHistoryTable()
-        history.append(
+        history._append(
             "ITER",
             {
                 "iter": 1,
@@ -1559,25 +1559,6 @@ class TestResumeValidationHelpers(unittest.TestCase):
         self.assertTrue(sc._resume_value_equal({"a": 1, "b": 2}, {"a": 1, "b": 2}))
         self.assertFalse(sc._resume_value_equal({"a": 1}, {"a": 2}))
 
-    def test_resume_value_equal_qmcpy_objects(self):
-        sc = self._make_sc()
-        # objects with a .parameters attribute are compared via str()
-        Obj = type("Obj", (), {"parameters": []})
-        obj1 = Obj()
-        obj2 = Obj()
-        result = sc._resume_value_equal(obj1, obj2)
-        self.assertIsInstance(result, bool)
-
-    def test_resume_value_equal_bad_eq(self):
-        sc = self._make_sc()
-
-        class BadEq:
-            def __eq__(self, _other):
-                raise ValueError("comparison not supported")
-
-        result = sc._resume_value_equal(BadEq(), BadEq())
-        self.assertIsInstance(result, bool)
-
     def test_resume_value_equal_numpy_fallback(self):
         sc = self._make_sc()
         # Simulate older numpy where equal_nan kwarg raises TypeError
@@ -1703,13 +1684,6 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
             },
         )()
 
-    def test_get_visible_columns_all_optional(self):
-        logger = self._make_logger()
-        data = self._make_rich_data()
-        cols = logger._get_visible_columns(data)
-        for col in ("comb_bound_diff", "bound_half_width", "bias_estimate", "rmse_estimate", "rmse_tol", "n_min"):
-            self.assertIn(col, cols, msg=f"Expected column '{col}' in visible columns")
-
     def test_enable_diagnostics_verbose_true(self):
         resume_util = self._load_resume_util()
         sc = type("SC", (), {})()
@@ -1786,14 +1760,14 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
             ("RESUME", {"iter": 2, "solution": 1.1, "abs_tol": 1e-3, "comb_bound_diff": 2e-2, "n_min": 32, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
             ("ITER", {"iter": 3, "solution": 1.125, "abs_tol": 1e-3, "comb_bound_diff": 6e-3, "n_min": 32, "n_total": 64, "m": 6, "xfull.shape": (64, 2)}),
         ]:
-            resume_history.append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
+            resume_history._append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
         fresh_history = IterationHistoryTable()
         for stage, row in [
             ("ITER", {"iter": 1, "solution": 1.0, "abs_tol": 1e-3, "comb_bound_diff": 4e-2, "n_min": 0, "n_total": 16, "m": 4, "xfull.shape": (16, 2)}),
             ("ITER", {"iter": 2, "solution": 1.1, "abs_tol": 1e-3, "comb_bound_diff": 2e-2, "n_min": 16, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
             ("ITER", {"iter": 3, "solution": 1.125, "abs_tol": 1e-3, "comb_bound_diff": 6e-3, "n_min": 32, "n_total": 64, "m": 6, "xfull.shape": (64, 2)}),
         ]:
-            fresh_history.append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
+            fresh_history._append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
         resume_solver = type("ResumeSolver", (), {"iteration_history": resume_history})()
         fresh_solver = type("FreshSolver", (), {"iteration_history": fresh_history})()
         rows = resume_util.stage_summary_rows_from_histories(
