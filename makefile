@@ -278,6 +278,9 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp test/README.md docs/tests.md
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
+	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
+	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
+	@cp docs/assets/logos/qmcpy_logo.png docs/favicon.ico
 
 runmkdocserve:
 	@PORT=$${MKDOCS_PORT:-8000}; \
