@@ -123,7 +123,20 @@ class AbstractStoppingCriterion(object):
     def get_iteration_log(
         self, history=None, printed_only=True, drop_empty_columns=True, formatted=True
     ):
-        """Return the latest iteration log as a pandas DataFrame."""
+        """Return the latest iteration log as a pandas DataFrame.
+
+        Args:
+            history (list[dict] | None): Iteration history to format. If ``None``,
+                uses ``self.iteration_history`` when available.
+            printed_only (bool): If ``True``, include only columns that are
+                configured for printed output.
+            drop_empty_columns (bool): If ``True``, drop columns with no values.
+            formatted (bool): If ``True``, return formatted display values when
+                available.
+
+        Returns:
+            pandas.DataFrame: DataFrame representation of the iteration log.
+        """
         if history is None:
             if printed_only and drop_empty_columns and formatted:
                 cached_history_df = getattr(self, "history_df", None)
