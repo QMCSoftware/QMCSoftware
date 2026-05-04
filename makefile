@@ -93,8 +93,13 @@ doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_b
 ##########################################################
 unittests: ensure_artifacts
 	@mkdir -p $(UNIT_COV_DIR)
+	@PYTHON_BIN=$$(command -v python 2>/dev/null || { [ -n "$$CONDA_PREFIX" ] && command -v "$$CONDA_PREFIX/bin/python" 2>/dev/null; } || { command -v conda >/dev/null 2>&1 && conda run -n qmcpy python -c 'import sys; print(sys.executable)' 2>/dev/null; } || command -v python3 2>/dev/null); \
+	if [ -z "$$PYTHON_BIN" ]; then \
+		echo "No Python interpreter found (tried: python, $$CONDA_PREFIX/bin/python, python3)."; \
+		exit 127; \
+	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	python -m pytest $(PYTEST_XDIST) -x \
+	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \

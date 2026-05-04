@@ -20,7 +20,7 @@ from qmcpy.util.data import Data
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from qmcpy.integrand.abstract_integrand import AbstractIntegrand
 from qmcpy.stopping_criterion.abstract_stopping_criterion import AbstractStoppingCriterion
-from qmcpy.stopping_criterion.diagnostics import IterationHistoryTable, _IterationTraceLogger, print_diagnostic
+from qmcpy.stopping_criterion.diagnostics import _IterationHistoryTable, _IterationTraceLogger, _print_diagnostic
 
 
 # Test functions and parameters
@@ -111,7 +111,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         )()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic("resume", data, table_header=True)
+            _print_diagnostic("resume", data, table_header=True)
         output = stream.getvalue()
         self.assertIn("stage", output)
         self.assertIn("iter", output)
@@ -124,7 +124,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         data = type("Data", (), {"solution": float("nan"), "xfull": None})()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic("start", data)
+            _print_diagnostic("start", data)
         output = stream.getvalue()
         self.assertIn("start", output)
         self.assertIn("nan", output)
@@ -145,12 +145,12 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         )()
         throttled = io.StringIO()
         with redirect_stdout(throttled):
-            print_diagnostic("ITER", data, verbose=False)
+            _print_diagnostic("ITER", data, verbose=False)
         self.assertEqual(throttled.getvalue(), "")
 
         unthrottled = io.StringIO()
         with redirect_stdout(unthrottled):
-            print_diagnostic("ITER", data, verbose=True)
+            _print_diagnostic("ITER", data, verbose=True)
         output = unthrottled.getvalue()
         self.assertIn("ITER", output)
         self.assertIn("1.2500000", output)
@@ -168,7 +168,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         )()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic(
+            _print_diagnostic(
                 "ITER",
                 data,
                 table_header=True,
@@ -242,7 +242,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         )()
         with redirect_stdout(io.StringIO()):
             logger.iteration(data, step_value=7)
-            self.assertIsInstance(logger.history, IterationHistoryTable)
+            self.assertIsInstance(logger.history, _IterationHistoryTable)
             self.assertEqual(len(logger.history), 1)
             self.assertEqual(logger.history["stage"][0], "ITER")
             self.assertEqual(logger.history["iter"][0], 55)
@@ -262,7 +262,7 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
             true_measure=integrand.true_measure,
             discrete_distrib=distrib,
         )
-        history = IterationHistoryTable()
+        history = _IterationHistoryTable()
         history._append(
             "ITER",
             {
@@ -464,7 +464,7 @@ class TestCubMCCLT(unittest.TestCase):
             _, data = sc.integrate()
         self.assertEqual(stream.getvalue(), "")
         self.assertIs(data.iteration_history, sc.iteration_history)
-        self.assertIsInstance(data.iteration_history, IterationHistoryTable)
+        self.assertIsInstance(data.iteration_history, _IterationHistoryTable)
         self.assertEqual(data.iteration_history["stage"][-1], "ITER")
         self.assertTrue(all(data.iteration_history["printed"]))
         self.assertIn("n_total", data.iteration_history.visible_columns)
@@ -488,7 +488,7 @@ class TestCubMCCLT(unittest.TestCase):
             _, data = sc.integrate()
         self.assertEqual(stream.getvalue(), "")
         self.assertIs(data.iteration_history, sc.iteration_history)
-        self.assertIsInstance(data.iteration_history, IterationHistoryTable)
+        self.assertIsInstance(data.iteration_history, _IterationHistoryTable)
         log_df = sc.get_iteration_log()
         self.assertIsInstance(sc.history_df, pd.DataFrame)
         self.assertIs(data.history_df, sc.history_df)
@@ -1753,7 +1753,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
 
     def test_print_stage_summary_from_histories(self):
         resume_util = self._load_resume_util()
-        resume_history = IterationHistoryTable()
+        resume_history = _IterationHistoryTable()
         for stage, row in [
             ("ITER", {"iter": 1, "solution": 1.0, "abs_tol": 1e-2, "comb_bound_diff": 4e-2, "n_min": 0, "n_total": 16, "m": 4, "xfull.shape": (16, 2)}),
             ("ITER", {"iter": 2, "solution": 1.1, "abs_tol": 1e-2, "comb_bound_diff": 2e-2, "n_min": 16, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
@@ -1761,7 +1761,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
             ("ITER", {"iter": 3, "solution": 1.125, "abs_tol": 1e-3, "comb_bound_diff": 6e-3, "n_min": 32, "n_total": 64, "m": 6, "xfull.shape": (64, 2)}),
         ]:
             resume_history._append(stage, row, visible_columns=("stage", "iter", "solution", "comb_bound_diff", "n_min", "n_total", "m", "xfull.shape"), printed=True)
-        fresh_history = IterationHistoryTable()
+        fresh_history = _IterationHistoryTable()
         for stage, row in [
             ("ITER", {"iter": 1, "solution": 1.0, "abs_tol": 1e-3, "comb_bound_diff": 4e-2, "n_min": 0, "n_total": 16, "m": 4, "xfull.shape": (16, 2)}),
             ("ITER", {"iter": 2, "solution": 1.1, "abs_tol": 1e-3, "comb_bound_diff": 2e-2, "n_min": 16, "n_total": 32, "m": 5, "xfull.shape": (32, 2)}),
@@ -1817,7 +1817,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         data = self._make_rich_data()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic("ITER", data, table_header=True, visible_columns=None)
+            _print_diagnostic("ITER", data, table_header=True, visible_columns=None)
         output = stream.getvalue()
         for col in ("bias_estimate", "rmse_tol", "comb_bound_diff", "bound_half_width"):
             self.assertIn(col, output, msg=f"Expected column '{col}' in output header")
@@ -1836,7 +1836,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         )()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic("START", data)
+            _print_diagnostic("START", data)
         output = stream.getvalue()
         self.assertIn("1.", output)
 
@@ -1859,7 +1859,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         )()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic("ITER", data, table_header=True, visible_columns=None)
+            _print_diagnostic("ITER", data, table_header=True, visible_columns=None)
         output = stream.getvalue()
         self.assertIn("5.000e-02", output)
         self.assertIn("nan", output)
@@ -1878,7 +1878,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         )()
         stream = io.StringIO()
         with redirect_stdout(stream):
-            print_diagnostic("ITER", data, table_header=True, visible_columns=None)
+            _print_diagnostic("ITER", data, table_header=True, visible_columns=None)
         output = stream.getvalue()
         self.assertIn("non-numeric", output)
 

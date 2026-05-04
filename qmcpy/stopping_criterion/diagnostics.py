@@ -29,7 +29,7 @@ _ITERATION_HISTORY_COLUMNS = (
 )
 
 
-class IterationHistoryTable(object):
+class _IterationHistoryTable(object):
     """Column-oriented storage for iteration trace rows."""
 
     __slots__ = ("_columns", "visible_columns", "context")
@@ -58,7 +58,7 @@ class IterationHistoryTable(object):
         return self._row(key)
 
     def __repr__(self):
-        return "IterationHistoryTable(rows=%d, columns=%s)" % (
+        return "_IterationHistoryTable(rows=%d, columns=%s)" % (
             len(self),
             self._column_names,
         )
@@ -347,13 +347,17 @@ def _align_diagnostic_value(column, value, widths):
     return f"{text:>{widths[column]}}"
 
 
-def _get_iteration_log_rows(history, stopping_criterion=None, printed_only=True, formatted=True):
+def _get_iteration_log_rows(
+    history, stopping_criterion=None, printed_only=True, formatted=True
+):
     """Return iteration history rows as dictionaries."""
     if history is None or len(history) == 0:
         return []
     visible_columns = history.visible_columns
     if visible_columns is None:
-        visible_columns = _visible_columns_from_row(history._row(0), include_n_min=True)
+        visible_columns = _visible_columns_from_row(
+            history._row(0), include_n_min=True
+        )
     indices = range(len(history))
     if printed_only:
         indices = [index for index in indices if history["printed"][index]]
@@ -373,7 +377,11 @@ def _get_iteration_log_rows(history, stopping_criterion=None, printed_only=True,
 
 
 def _get_iteration_log_frame(
-    history, stopping_criterion=None, printed_only=True, drop_empty_columns=True, formatted=True
+    history,
+    stopping_criterion=None,
+    printed_only=True,
+    drop_empty_columns=True,
+    formatted=True,
 ):
     """Return iteration history as a pandas DataFrame."""
     import pandas
@@ -397,7 +405,7 @@ def _print_iteration_log(
     include_header=True,
     file=None,
 ):
-    """Print an iteration history table. """
+    """Print an iteration history table."""
     if history is None or len(history) == 0:
         return
     if file is None:
@@ -417,7 +425,7 @@ def _print_iteration_log(
             print(f"=== {label} iteration log ===")
         for offset, index in enumerate(indices):
             stage, data = _build_history_data(history, index, stopping_criterion)
-            print_diagnostic(
+            _print_diagnostic(
                 stage,
                 data,
                 table_header=offset == 0,
@@ -429,7 +437,7 @@ def _print_iteration_log(
 def _format_iteration_log(
     history, stopping_criterion=None, printed_only=True, include_header=True
 ):
-    """Return an iteration history table as text. """
+    """Return an iteration history table as text."""
     stream = io.StringIO()
     _print_iteration_log(
         history,
@@ -492,7 +500,7 @@ class _IterationTraceLogger(object):
         self._last_iter_history_index = None
         self._last_printed_iter_count = 0
         self._resume_seeded = False
-        self.history = IterationHistoryTable() if self.store_enabled else None
+        self.history = _IterationHistoryTable() if self.store_enabled else None
         self.stopping_criterion.iteration_history = self.history
         self.stopping_criterion.elapsed_time = float(
             getattr(stopping_criterion, "elapsed_time", 0.0)
@@ -605,7 +613,7 @@ class _IterationTraceLogger(object):
             if printed:
                 self._last_printed_iter_count = self._last_iter_count
         if self.print_enabled:
-            print_diagnostic(
+            _print_diagnostic(
                 stage,
                 data,
                 table_header=not self.table_header_printed,
@@ -689,7 +697,7 @@ class _IterationTraceLogger(object):
         if self._last_iter_count == self._last_printed_iter_count:
             return
         if self.print_enabled:
-            print_diagnostic(
+            _print_diagnostic(
                 "ITER",
                 self._last_iter_snapshot,
                 table_header=False,
@@ -729,7 +737,7 @@ class _IterationTraceLogger(object):
         self._last_iter_snapshot = None
 
 
-def print_diagnostic(
+def _print_diagnostic(
     label,
     data,
     table_header=False,
