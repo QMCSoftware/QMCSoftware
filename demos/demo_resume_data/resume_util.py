@@ -58,11 +58,6 @@ def _format_problem_inputs(stopping_criterion):
 #################################################################
 # Result summaries and diagnostics
 #################################################################
-def half_width(data):
-    """Return the confidence-interval half-width from a QMCPy data object."""
-    return (data.comb_bound_high.item() - data.comb_bound_low.item()) / 2
-
-
 def _history_tol_value(row):
     """Return the most relevant tolerance stored on a history row."""
     for key in ("rel_tol", "abs_tol", "rmse_tol"):
@@ -356,19 +351,6 @@ def make_case(name, loose_factory, tight_factory):
 def make_tol_case(name, builder, loose_tol, tight_tol):
     """Create a case from a scalar-tolerance builder."""
     return make_case(name, lambda: builder(loose_tol), lambda: builder(tight_tol))
-
-
-def make_abs_tol_builder(sc_class, integrand_factory, *, rel_tol=0, n_init=None, n_limit=None):
-    """Build a factory for stopping criteria driven by ``abs_tol``."""
-    def build(abs_tol):
-        kwargs = {"abs_tol": abs_tol, "rel_tol": rel_tol}
-        if n_init is not None:
-            kwargs["n_init"] = n_init
-        if n_limit is not None:
-            kwargs["n_limit"] = n_limit
-        return sc_class(integrand_factory(), **kwargs)
-
-    return build
 
 
 def make_named_tol_builder(sc_class, integrand_factory, tol_name, **fixed_kwargs):
