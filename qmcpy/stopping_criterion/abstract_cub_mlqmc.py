@@ -17,15 +17,6 @@ class AbstractCubMLQMC(AbstractStoppingCriterion):
         data.level_rep_sums[level].append(np.asarray(rep_sums, dtype=float))
         data.level_n_increments[level].append(int(n_increment))
 
-    @staticmethod
-    def _checkpoint_rmse_tol(data):
-        for obj in (data, getattr(data, "stopping_crit", None)):
-            try:
-                return float(getattr(obj, "rmse_tol", None))
-            except (TypeError, ValueError):
-                pass
-        return None
-
     def _validate_level_replay_cache(self, data):
         if not hasattr(data, "level_rep_sums"):
             return

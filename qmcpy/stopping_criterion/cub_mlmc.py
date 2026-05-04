@@ -1,5 +1,4 @@
 from .abstract_cub_mlmc import AbstractCubMLMC
-from ..util.data import Data
 import copy
 from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
@@ -136,17 +135,7 @@ class CubMLMC(AbstractCubMLMC):
 
     def _validate_resume(self, data):
         self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
-        if hasattr(data, "level_diffs"):
-            if len(data.level_diffs) != len(data.n_level):
-                raise ParameterError(
-                    "resume data level_diffs length must match n_level length."
-                )
-            for level, (diffs, n_level) in enumerate(zip(data.level_diffs, data.n_level)):
-                if len(np.asarray(diffs)) != int(n_level):
-                    raise ParameterError(
-                        "resume data level_diffs[%d] length must match n_level[%d]."
-                        % (level, level)
-                    )
+        self._validate_level_diffs(data)
 
     def _restore_resume_state(self, data):
         # Undo the final data.levels += 1 stored in the returned data so the
@@ -157,42 +146,6 @@ class CubMLMC(AbstractCubMLMC):
         # diff_n_level will be all-zero and the main loop exits immediately.
         n_samples = self._get_next_samples(data)
         data.diff_n_level = np.maximum(0, n_samples - data.n_level[: data.levels + 1])
-
-    def _construct_data(self):
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "cost_per_sample",
-                "alpha",
-                "beta",
-                "gamma",
-            ]
-        )
-        data.levels = int(self.levels_min)
-        data.n_level = np.zeros(data.levels + 1, dtype=int)
-        data.sum_level = np.zeros((2, data.levels + 1))
-        data.cost_level = np.zeros(data.levels + 1)
-        data.diff_n_level = self.n_init * np.ones(data.levels + 1, dtype=int)
-        data.alpha = np.maximum(0, self.alpha0)
-        data.beta = np.maximum(0, self.beta0)
-        data.gamma = np.maximum(0, self.gamma0)
-        data.level_integrands = []
-        data.level_diffs = [np.empty(0, dtype=float) for _ in range(data.levels + 1)]
-        return data
-
-    @staticmethod
-    def _checkpoint_rmse_tol(data):
-        for obj in (data, getattr(data, "stopping_crit", None)):
-            try:
-                return float(getattr(obj, "rmse_tol", None))
-            except (TypeError, ValueError):
-                pass
-        return None
 
     def _can_replay_resume_exactly(self, data):
         checkpoint_tol = self._checkpoint_rmse_tol(data)
@@ -208,38 +161,6 @@ class CubMLMC(AbstractCubMLMC):
         data.rmse_estimate = np.sqrt(
             (data.var_level / np.maximum(1, data.n_level[: len(data.var_level)])).sum()
         )
-
-    def _update_replay_data(self, data):
-        for l in range(data.levels + 1):
-            if l == len(data.level_integrands):
-                data.level_integrands += self.integrand.spawn(levels=int(l))
-            if data.diff_n_level[l] <= 0:
-                continue
-            n_remaining = int(data.diff_n_level[l])
-            if l < len(data.cached_level_diffs):
-                cached = data.cached_level_diffs[l]
-                pos = int(data.cached_level_positions[l])
-                n_cached = min(n_remaining, len(cached) - pos)
-                if n_cached > 0:
-                    dp = cached[pos : pos + n_cached]
-                    data.cached_level_positions[l] += n_cached
-                    self._append_level_diff_samples(data, l, dp)
-                    data.n_level[l] += n_cached
-                    data.sum_level[0, l] += dp.sum()
-                    data.sum_level[1, l] += (dp**2).sum()
-                    data.cost_level[l] += data.level_integrands[l].cost * n_cached
-                    n_remaining -= n_cached
-            if n_remaining > 0:
-                integrand_l = data.level_integrands[l]
-                samples = integrand_l.discrete_distrib(n=n_remaining)
-                pc, pf = integrand_l.f(samples)
-                dp = pf - pc
-                self._append_level_diff_samples(data, l, dp)
-                data.n_level[l] += n_remaining
-                data.sum_level[0, l] += dp.sum()
-                data.sum_level[1, l] += (dp**2).sum()
-                data.cost_level[l] += integrand_l.cost * n_remaining
-        self._refresh_level_statistics(data)
 
     def _run_integrate_loop(
         self,

@@ -1146,6 +1146,54 @@ class TestResumeFeature(unittest.TestCase):
                 with self.assertRaises(ParameterError):
                     sc.integrate(resume=object())
 
+    def test_iteration_log_available_for_non_resume_solvers(self):
+        """Solvers that do not support resume should still populate iteration logs."""
+        cases = [
+            (
+                "CubMCCLT",
+                lambda: CubMCCLT(
+                    Keister(self._iid_distribution()),
+                    abs_tol=self.tight_abs_tol,
+                    rel_tol=self.rel_tol,
+                    n_init=self.n_init,
+                    n_limit=self.n_limit,
+                ),
+            ),
+            (
+                "CubMCG",
+                lambda: CubMCG(
+                    Keister(self._iid_distribution()),
+                    abs_tol=self.tight_abs_tol,
+                    rel_tol=self.rel_tol,
+                    n_init=self.n_init,
+                    n_limit=self.n_limit,
+                ),
+            ),
+            ("PFGPCI", self._pfgpci),
+        ]
+
+        for label, stopping_criterion_factory in cases:
+            with self.subTest(stopping_criterion=label):
+                try:
+                    sc = stopping_criterion_factory()
+                except ModuleNotFoundError as exc:
+                    self.skipTest(f"{label} unavailable: {exc}")
+                stream = io.StringIO()
+                with redirect_stdout(stream):
+                    _, data = sc.integrate()
+                self.assertEqual(stream.getvalue(), "")
+                self.assertIs(data.iteration_history, sc.iteration_history)
+                self.assertIsNotNone(sc.iteration_history)
+                self.assertIsNotNone(sc.history_df)
+                self.assertFalse(sc.history_df.empty)
+                raw_log_df = sc.get_iteration_log(formatted=False)
+                self.assertFalse(raw_log_df.empty)
+                self.assertIn("stage", raw_log_df.columns)
+                self.assertIn("n_total", raw_log_df.columns)
+                self.assertTrue((raw_log_df["stage"] == "ITER").any())
+                self.assertEqual(int(raw_log_df.iloc[-1]["n_total"]), int(data.n_total))
+                self.assertIn("ITER", sc.format_iteration_log())
+
     def test_rep_student_t_resume_requires_ysums(self):
         loose_sc = CubQMCRepStudentT(
             Keister(self._net_rep_distribution()),

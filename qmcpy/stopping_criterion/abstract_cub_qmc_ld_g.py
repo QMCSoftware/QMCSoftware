@@ -2,7 +2,6 @@ from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
-from ..integrand import AbstractIntegrand
 import numpy as np
 from time import time
 import warnings
@@ -78,21 +77,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         assert isinstance(error_fun, str) or callable(error_fun)
         # _error_fun_key stores a simple, serializable string and ensures correct state saving
         # in __getstate__(), bypassing serialization of complex lambda functions, which often fails.
-        _error_fun_key = None
-        if isinstance(error_fun, str):
-            _error_fun_key = error_fun.upper()
-            if _error_fun_key == "EITHER":
-                error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            elif _error_fun_key == "BOTH":
-                error_fun = lambda sv, abs_tol, rel_tol: np.minimum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            else:
-                raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
-        self.error_fun = error_fun
-        self._error_fun_key = _error_fun_key  # used by __getstate__ for pickling
+        self.error_fun, self._error_fun_key = self._resolve_error_fun(error_fun)
         self.fudge = fudge
         self.check_cone = check_cone
         self.ft = ft
@@ -120,27 +105,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         ), "Require discrete distribution is randomized"
         self.set_tolerance(abs_tol, rel_tol)
         # control variates
-        self.cv_mu = np.atleast_1d(control_variate_means)
-        self.cv = control_variates
-        if isinstance(self.cv, AbstractIntegrand):
-            self.cv = [self.cv]
-            self.cv_mu = self.cv_mu[None, ...]
-        assert isinstance(
-            self.cv, list
-        ), "cv must be a list of AbstractIntegrand objects"
-        for cv in self.cv:
-            if (
-                (not isinstance(cv, AbstractIntegrand))
-                or (cv.discrete_distrib != self.discrete_distrib)
-                or (cv.d_indv != self.integrand.d_indv)
-            ):
-                raise ParameterError(
-                    """
-                        Each control variates discrete distribution must be an AbstractIntegrand instance 
-                        with the same discrete distribution as the main integrand. d_indv must also match 
-                        that of the main integrand instance for each control variate."""
-                )
-        self.ncv = len(self.cv)
+        self._init_control_variates(control_variates, control_variate_means)
         self.update_beta = update_beta
         if self.ncv > 0:
             assert self.cv_mu.shape == (
@@ -215,11 +180,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         )
         # Rebuild error_fun from its string key if present.
         if isinstance(self.error_fun, str):
-            key = self.error_fun.upper()
-            if key == 'EITHER':
-                self.error_fun = lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)
-            elif key == 'BOTH':
-                self.error_fun = lambda sv, abs_tol, rel_tol: np.minimum(abs_tol, abs(sv) * rel_tol)
+            self.error_fun, _ = self._resolve_error_fun(self.error_fun)
         # Rebuild fudge from its sentinel.
         if self.fudge == '__default_fudge__':
             self.fudge = _default_fudge

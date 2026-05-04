@@ -303,27 +303,7 @@ class CubMCG(AbstractStoppingCriterion):
         )
         assert self.integrand.d_indv == ()
         # control variates
-        self.cv_mu = np.atleast_1d(control_variate_means)
-        self.cv = control_variates
-        if isinstance(self.cv, AbstractIntegrand):
-            self.cv = [self.cv]
-            self.cv_mu = self.cv_mu[None, ...]
-        assert isinstance(
-            self.cv, list
-        ), "cv must be a list of AbstractIntegrand objects"
-        for cv in self.cv:
-            if (
-                (not isinstance(cv, AbstractIntegrand))
-                or (cv.discrete_distrib != self.discrete_distrib)
-                or (cv.d_indv != self.integrand.d_indv)
-            ):
-                raise ParameterError(
-                    """
-                        Each control variates discrete distribution must be an AbstractIntegrand instance 
-                        with the same discrete distribution as the main integrand. d_indv must also match 
-                        that of the main integrand instance for each control variate."""
-                )
-        self.ncv = len(self.cv)
+        self._init_control_variates(control_variates, control_variate_means)
         if self.ncv > 0:
             assert self.cv_mu.shape == (
                 (self.ncv,) + self.integrand.d_indv

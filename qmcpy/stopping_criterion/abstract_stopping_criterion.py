@@ -5,7 +5,6 @@ from .diagnostics import (  # noqa: F401
     _IterationTraceLogger,
     format_iteration_log as _format_iteration_log,
     get_iteration_log_frame as _get_iteration_log_frame,
-    print_diagnostic,
     print_iteration_log as _print_iteration_log,
 )
 from ..integrand.abstract_integrand import AbstractIntegrand
@@ -465,6 +464,92 @@ class AbstractStoppingCriterion(object):
     def _is_power_of_two(n):
         """Return True when *n* is a positive power of two."""
         return n > 0 and (n & (n - 1)) == 0
+
+    @staticmethod
+    def _resolve_error_fun(error_fun):
+        """Resolve an *error_fun* argument from a string keyword or callable.
+
+        Args:
+            error_fun (Union[str, callable]): ``'EITHER'`` or ``'BOTH'`` or a
+                callable with signature ``(sv, abs_tol, rel_tol) -> tol``.
+
+        Returns:
+            tuple[callable, str or None]: The resolved callable and its canonical
+                string key (``'EITHER'`` or ``'BOTH'``), or ``None`` when the
+                input was already a callable.
+
+        Raises:
+            ParameterError: If a string argument is not ``'EITHER'`` or ``'BOTH'``.
+        """
+        _error_fun_key = None
+        if isinstance(error_fun, str):
+            _error_fun_key = error_fun.upper()
+            if _error_fun_key == "EITHER":
+                error_fun = lambda sv, abs_tol, rel_tol: np.maximum(abs_tol, abs(sv) * rel_tol)
+            elif _error_fun_key == "BOTH":
+                error_fun = lambda sv, abs_tol, rel_tol: np.minimum(abs_tol, abs(sv) * rel_tol)
+            else:
+                raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
+        return error_fun, _error_fun_key
+
+    @staticmethod
+    def _checkpoint_rmse_tol(data):
+        """Extract the RMSE tolerance stored in a resume checkpoint.
+
+        Args:
+            data (Data): Resume checkpoint.
+
+        Returns:
+            float or None: The stored ``rmse_tol``, or ``None`` if absent or
+                non-numeric.
+        """
+        for obj in (data, getattr(data, "stopping_crit", None)):
+            try:
+                return float(getattr(obj, "rmse_tol", None))
+            except (TypeError, ValueError):
+                pass
+        return None
+
+    def _init_control_variates(self, control_variates, control_variate_means):
+        """Validate and store control variates and their means.
+
+        Sets ``self.cv``, ``self.cv_mu``, and ``self.ncv`` after validating that
+        every entry in *control_variates* is an ``AbstractIntegrand`` instance
+        that shares the same discrete distribution and ``d_indv`` as the main
+        integrand.
+
+        Args:
+            control_variates (list or AbstractIntegrand): Control variate
+                integrand(s).
+            control_variate_means (array-like): Known means of each control
+                variate.
+
+        Returns:
+            int: Number of control variates (``self.ncv``).
+
+        Raises:
+            ParameterError: If any control variate is incompatible.
+        """
+        self.cv_mu = np.atleast_1d(control_variate_means)
+        self.cv = control_variates
+        if isinstance(self.cv, AbstractIntegrand):
+            self.cv = [self.cv]
+            self.cv_mu = self.cv_mu[None, ...]
+        assert isinstance(self.cv, list), "cv must be a list of AbstractIntegrand objects"
+        for cv in self.cv:
+            if (
+                (not isinstance(cv, AbstractIntegrand))
+                or (cv.discrete_distrib != self.discrete_distrib)
+                or (cv.d_indv != self.integrand.d_indv)
+            ):
+                raise ParameterError(
+                    """
+                        Each control variates discrete distribution must be an AbstractIntegrand instance 
+                        with the same discrete distribution as the main integrand. d_indv must also match 
+                        that of the main integrand instance for each control variate."""
+                )
+        self.ncv = len(self.cv)
+        return self.ncv
 
     def _restore_resume_rng_state(self, data):
         """Deep-copy the saved RNG state into the live discrete distribution.
