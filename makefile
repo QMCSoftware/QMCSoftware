@@ -279,8 +279,13 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
 
-runmkdocserve: 
-	@JUPYTER_PLATFORM_DIRS=1 mkdocs serve
+runmkdocserve:
+	@PORT=$${MKDOCS_PORT:-8000}; \
+	while lsof -iTCP:$$PORT -sTCP:LISTEN >/dev/null 2>&1; do \
+		PORT=$$((PORT+1)); \
+	done; \
+	echo "Starting mkdocs on http://127.0.0.1:$$PORT"; \
+	JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
 	
 doc: uml copydocs runmkdocserve
 
