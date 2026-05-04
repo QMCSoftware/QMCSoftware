@@ -1,5 +1,6 @@
 import copy
 import sys
+from typing import TYPE_CHECKING
 
 from .diagnostics import (  # noqa: F401
     _IterationTraceLogger,
@@ -15,6 +16,9 @@ from ..util import (
     _univ_repr,
 )
 import numpy as np
+
+if TYPE_CHECKING:
+    import pandas
 
 
 # Optional diagnostic hook for resume-aware stopping criteria.
@@ -122,7 +126,7 @@ class AbstractStoppingCriterion(object):
 
     def get_iteration_log(
         self, history=None, printed_only=True, drop_empty_columns=True, formatted=True
-    ):
+    ) -> "pandas.DataFrame":
         """Return the latest iteration log as a pandas DataFrame.
 
         Args:
@@ -151,7 +155,7 @@ class AbstractStoppingCriterion(object):
             formatted=formatted,
         )
 
-    def format_iteration_log(self, history=None, printed_only=True, include_header=True):
+    def format_iteration_log(self, history=None, printed_only=True, include_header=True) -> str:
         """Return the iteration log as formatted text.
 
         Args:
@@ -175,7 +179,7 @@ class AbstractStoppingCriterion(object):
             include_header=include_header,
         )
 
-    def print_iteration_log(self, history=None, printed_only=True, include_header=True, file=None):
+    def print_iteration_log(self, history=None, printed_only=True, include_header=True, file=None) -> None:
         """Print the iteration log for the latest run or supplied history.
 
         Args:
