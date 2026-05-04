@@ -141,19 +141,28 @@ class AbstractStoppingCriterion(object):
         Returns:
             pandas.DataFrame: DataFrame representation of the iteration log.
         """
+        use_cache = history is None and printed_only and drop_empty_columns and formatted
+        if use_cache:
+            cached_history_df = getattr(self, "history_df", None)
+            if cached_history_df is not None:
+                return cached_history_df
         if history is None:
-            if printed_only and drop_empty_columns and formatted:
-                cached_history_df = getattr(self, "history_df", None)
-                if cached_history_df is not None:
-                    return cached_history_df
             history = getattr(self, "iteration_history", None)
-        return _get_iteration_log_frame(
+        result = _get_iteration_log_frame(
             history,
             stopping_criterion=self,
             printed_only=printed_only,
             drop_empty_columns=drop_empty_columns,
             formatted=formatted,
         )
+        if use_cache:
+            # Cache for future calls and populate the last data object so that
+            # data.history_df is available after calling get_iteration_log().
+            self.history_df = result
+            last_data = getattr(self, "_last_finalized_data", None)
+            if last_data is not None:
+                last_data.history_df = result
+        return result
 
     def format_iteration_log(self, history=None, printed_only=True, include_header=True) -> str:
         """Return the iteration log as formatted text.

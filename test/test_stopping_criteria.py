@@ -925,10 +925,11 @@ class TestResumeFeature(unittest.TestCase):
     def test_resume_appends_iteration_history(self):
         loose_sc = self._qmc_rep_student_t_builder(self.loose_abs_tol)()
         _, checkpoint = loose_sc.integrate()
-        loose_df = checkpoint.history_df.copy()
+        loose_df = loose_sc.get_iteration_log()
 
         resumed_sc = self._qmc_rep_student_t_builder(self.tight_abs_tol)()
         _, resumed = resumed_sc.integrate(resume=checkpoint)
+        resumed_sc.get_iteration_log()  # populate history_df
 
         self.assertIsInstance(resumed_sc.history_df, pd.DataFrame)
         self.assertIs(resumed.history_df, resumed_sc.history_df)
@@ -972,7 +973,7 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
         self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
-        self.assertIsNotNone(resumed.history_df)
+        self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlmc_cont_resume_matches_fresh_n(self):
         loose_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
@@ -990,7 +991,7 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.sum_level, fresh.sum_level))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
         self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
-        self.assertIsNotNone(resumed.history_df)
+        self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_resume_matches_fresh_n(self):
         loose_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
@@ -1008,7 +1009,7 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.mean_level_reps, fresh.mean_level_reps))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
         self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
-        self.assertIsNotNone(resumed.history_df)
+        self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_cont_resume_matches_fresh_n(self):
         loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
@@ -1026,7 +1027,7 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.allclose(resumed.mean_level_reps, fresh.mean_level_reps))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
         self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
-        self.assertIsNotNone(resumed.history_df)
+        self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_cont_long_resume_matches_fresh_iters(self):
         kwargs = {"abs_tol": self.tight_abs_tol, "n_tols": 1200, "inflate": 1.001, "n_limit": 2**24}
@@ -1184,6 +1185,7 @@ class TestResumeFeature(unittest.TestCase):
                 self.assertEqual(stream.getvalue(), "")
                 self.assertIs(data.iteration_history, sc.iteration_history)
                 self.assertIsNotNone(sc.iteration_history)
+                log_df = sc.get_iteration_log()
                 self.assertIsNotNone(sc.history_df)
                 self.assertFalse(sc.history_df.empty)
                 raw_log_df = sc.get_iteration_log(formatted=False)

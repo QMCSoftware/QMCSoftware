@@ -722,18 +722,16 @@ class _IterationTraceLogger(object):
     def finalize(self):
         """Force-print the last ITER row if throttling suppressed it, then clear snapshot."""
         self._flush_last_if_suppressed()
-        history_df = _get_iteration_log_frame(
-            self.history,
-            stopping_criterion=self.stopping_criterion,
-            printed_only=True,
-            drop_empty_columns=True,
-            formatted=True,
-        )
+        # DataFrame is built lazily in get_iteration_log() to avoid pandas
+        # construction overhead on every integrate() call when tracing is off.
         self.stopping_criterion.iteration_history = self.history
-        self.stopping_criterion.history_df = history_df
+        self.stopping_criterion.history_df = None
+        # Keep a weak reference to the data object so get_iteration_log() can
+        # populate data.history_df lazily when it is first called.
+        self.stopping_criterion._last_finalized_data = self._last_data
         if self.enabled and self._last_data is not None:
             self._last_data.iteration_history = self.history
-            self._last_data.history_df = history_df
+            self._last_data.history_df = None
         self._last_iter_snapshot = None
 
 
