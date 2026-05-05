@@ -23,6 +23,8 @@ qmcpy.egg-info/
 *.pyc
 *.vrb
 *.npy
+*.pkl
+*.gz
 .DS_Store
 .idea/
 .pytest_cache/'raw.githubusercontent.com/*'
