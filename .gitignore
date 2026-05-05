@@ -24,8 +24,8 @@ qmcpy.egg-info/
 *.pyc
 *.vrb
 *.npy
-*.gz
 *.pkl
+*.gz
 .DS_Store
 .idea/
 demos/.jupyter
