@@ -261,8 +261,9 @@ class CubMLMCCont(AbstractCubMLMC):
             ).sum()
 
     def _replay_resume_exactly(self, checkpoint, t_start=None, resume_provenance=None):
-        shadow_trace = self._active_trace
-        self._active_trace = None
+        """Ensure iteration number in `replay_iter_count` same in LOOSE-last and RESUMED-first iterations, 
+            by simply saving `level_rep_sums` and `level_n_increments`."""
+        shadow_trace = self._active_trace = None
         try:
             shadow = self._construct_data()
             shadow.level_integrands = list(checkpoint.level_integrands)

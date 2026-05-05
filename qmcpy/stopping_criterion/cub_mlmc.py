@@ -222,6 +222,7 @@ class CubMLMC(AbstractCubMLMC):
         return snapshots
 
     def _replay_resume_exactly(self, checkpoint, t_start=None, resume_provenance=None):
+        """Replay cached per-level diffs to reconstruct checkpoint state and trace rows."""
         shadow = self._construct_data()
         shadow.level_integrands = list(checkpoint.level_integrands)
         shadow.cached_level_diffs = [
