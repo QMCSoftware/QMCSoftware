@@ -1008,7 +1008,6 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
         self.assertTrue(np.allclose(resumed.mean_level_reps, fresh.mean_level_reps))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
-        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
         self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_cont_resume_matches_fresh_n(self):
@@ -1026,7 +1025,6 @@ class TestResumeFeature(unittest.TestCase):
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
         self.assertTrue(np.allclose(resumed.mean_level_reps, fresh.mean_level_reps))
         self.assertAlmostEqual(float(sol_resume), float(sol_fresh))
-        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
         self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_cont_long_resume_matches_fresh_iters(self):
@@ -1040,8 +1038,35 @@ class TestResumeFeature(unittest.TestCase):
         fresh_sc = CubMLQMCCont(self._qmc_financial_option(), **kwargs)
         _, fresh = fresh_sc.integrate()
 
-        self.assertEqual(int(resumed._iter_count), int(fresh._iter_count))
         self.assertEqual(int(resumed.n_total), int(fresh.n_total))
+
+    def test_cub_mlqmc_resume_stage_boundary_iter_matches_loose_last_iter(self):
+        loose_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
+        _, checkpoint = loose_sc.integrate()
+        loose_log = loose_sc.get_iteration_log(formatted=False)
+        loose_last_iter = int(loose_log.loc[loose_log["stage"] == "ITER", "iter"].iloc[-1])
+
+        resumed_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
+        _, _ = resumed_sc.integrate(resume=checkpoint)
+        resumed_log = resumed_sc.get_iteration_log(formatted=False)
+
+        resume_row = resumed_log.iloc[len(loose_log)]
+        self.assertEqual(resume_row["stage"], "RESUME")
+        self.assertEqual(int(resume_row["iter"]), loose_last_iter)
+
+    def test_cub_mlqmc_cont_resume_stage_boundary_iter_matches_loose_last_iter(self):
+        loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
+        _, checkpoint = loose_sc.integrate()
+        loose_log = loose_sc.get_iteration_log(formatted=False)
+        loose_last_iter = int(loose_log.loc[loose_log["stage"] == "ITER", "iter"].iloc[-1])
+
+        resumed_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
+        _, _ = resumed_sc.integrate(resume=checkpoint)
+        resumed_log = resumed_sc.get_iteration_log(formatted=False)
+
+        resume_row = resumed_log.iloc[len(loose_log)]
+        self.assertEqual(resume_row["stage"], "RESUME")
+        self.assertEqual(int(resume_row["iter"]), loose_last_iter)
 
     def test_cont_resume_keeps_levels(self):
         cases = [

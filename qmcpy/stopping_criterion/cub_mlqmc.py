@@ -218,31 +218,6 @@ class CubMLQMC(AbstractCubMLQMC):
                 break
         return snapshots
 
-    def _replay_resume_iter_count(self, checkpoint):
-        shadow = self._construct_data()
-        shadow.level_integrands = list(checkpoint.level_integrands)
-        shadow.cached_level_rep_sums = [
-            [np.asarray(rep_sums, dtype=float) for rep_sums in level_rep_sums]
-            for level_rep_sums in checkpoint.level_rep_sums
-        ]
-        shadow.cached_level_n_increments = [
-            [int(n_increment) for n_increment in level_n_increments]
-            for level_n_increments in checkpoint.level_n_increments
-        ]
-        shadow.cached_level_positions = np.zeros(len(shadow.cached_level_rep_sums), dtype=int)
-        target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels], dtype=int)
-        snapshots = self._run_integrate_loop(
-            shadow,
-            self._update_replay_data,
-            record_snapshots=True,
-            stop_condition=lambda data: (
-                len(data.n_level) >= len(target_counts)
-                and np.all(data.n_level[: len(target_counts)] >= target_counts)
-            ),
-        )
-        replay_iter_count, _ = self._resume_match_from_snapshots(snapshots, checkpoint)
-        return replay_iter_count
-
     def integrate(self, resume=None) -> tuple:
         """Run (or continue) the MLQMC integration.
 
@@ -262,13 +237,8 @@ class CubMLQMC(AbstractCubMLQMC):
         resume_provenance = self._capture_resume_provenance(resume)
         trace = self._make_trace_logger()
         data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
-        replay_iter_count = None
-        if self._can_replay_resume_exactly(data):
-            replay_iter_count = self._replay_resume_iter_count(data)
         if data is not None:
             data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
-            if replay_iter_count is not None:
-                data._iter_count = replay_iter_count
             self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
             trace.resume(data, step_value=int(data.levels))
         if data is None:

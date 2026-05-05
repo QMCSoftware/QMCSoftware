@@ -177,12 +177,9 @@ class CubMLMCCont(AbstractCubMLMC):
         Returns:
             tuple: ``(solution, data)``.
         """
-        t_start = time()
-        resume_provenance = self._capture_resume_provenance(resume)
-        trace = self._make_trace_logger()
-        self._active_trace = trace
-        self._active_t_start = t_start
-        self._active_resume_provenance = resume_provenance
+        self._active_t_start = t_start = time()
+        self._active_trace = trace = self._make_trace_logger()
+        self._active_resume_provenance = resume_provenance = self._capture_resume_provenance(resume)
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
             replay_snapshots = None

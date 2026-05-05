@@ -184,22 +184,14 @@ class CubMLQMCCont(AbstractCubMLQMC):
         Returns:
             tuple: ``(solution, data)``.
         """
-        t_start = time()
-        resume_provenance = self._capture_resume_provenance(resume)
-        trace = self._make_trace_logger()
-        self._active_trace = trace
-        self._active_t_start = t_start
-        self._active_resume_provenance = resume_provenance
+        self._active_t_start = t_start = time()
+        self._active_trace = trace = self._make_trace_logger()
+        self._active_resume_provenance = resume_provenance = self._capture_resume_provenance(resume)
         try:
             data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
-            replay_iter_count = None
-            if self._can_replay_resume_exactly(data):
-                replay_iter_count = self._replay_resume_iter_count(data)
             if data is not None:
                 step_tol = max(getattr(data, 'rmse_tol', self.target_rmse_tol), self.target_rmse_tol)
                 data.rmse_tol = step_tol
-                if replay_iter_count is not None:
-                    data._iter_count = replay_iter_count
                 self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
                 trace.resume(data, step_value=int(data.levels))
                 if step_tol <= self.target_rmse_tol:
@@ -257,66 +249,6 @@ class CubMLQMCCont(AbstractCubMLQMC):
         data.level_rep_sums = [[] for _ in range(data.levels)]
         data.level_n_increments = [[] for _ in range(data.levels)]
         return data
-
-    def _replay_resume_iter_count(self, checkpoint):
-        shadow_trace = self._active_trace
-        self._active_trace = None
-        try:
-            shadow = self._construct_data()
-            shadow.level_integrands = list(checkpoint.level_integrands)
-            shadow.cached_level_rep_sums = [
-                [np.asarray(rep_sums, dtype=float) for rep_sums in level_rep_sums]
-                for level_rep_sums in checkpoint.level_rep_sums
-            ]
-            shadow.cached_level_n_increments = [
-                [int(n_increment) for n_increment in level_n_increments]
-                for level_n_increments in checkpoint.level_n_increments
-            ]
-            shadow.cached_level_positions = np.zeros(len(shadow.cached_level_rep_sums), dtype=int)
-            snapshots = []
-            checkpoint_tol = float(getattr(checkpoint, "rmse_tol", self.target_rmse_tol))
-            target_counts = np.asarray(checkpoint.n_level[: checkpoint.levels], dtype=int)
-            checkpoint_means = np.asarray(checkpoint.mean_level_reps[: checkpoint.levels])
-            stop_condition = lambda data: (
-                len(data.n_level) >= len(target_counts)
-                and np.array_equal(data.n_level[: len(target_counts)], target_counts)
-                and np.array_equal(
-                    np.asarray(data.mean_level_reps[: checkpoint.levels]),
-                    checkpoint_means,
-                )
-                and float(getattr(data, "rmse_tol", np.inf)) <= checkpoint_tol
-            )
-            for t in range(self.n_tols):
-                step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
-                reached_checkpoint = self._integrate(
-                    shadow,
-                    step_tol=step_tol,
-                    record_snapshots=True,
-                    snapshots=snapshots,
-                    update_data_fn=self._update_replay_data,
-                    stop_condition=stop_condition,
-                )
-                if reached_checkpoint:
-                    break
-        finally:
-            self._active_trace = shadow_trace
-        replay_iter_count = None
-        for i, snapshot in enumerate(snapshots):
-            if len(snapshot.n_level) < len(target_counts):
-                continue
-            if not np.array_equal(snapshot.n_level[: len(target_counts)], target_counts):
-                continue
-            if not np.array_equal(
-                np.asarray(snapshot.mean_level_reps[: checkpoint.levels]),
-                checkpoint_means,
-            ):
-                continue
-            if float(getattr(snapshot, "rmse_tol", np.inf)) <= checkpoint_tol:
-                replay_iter_count = i + 1
-                break
-        if replay_iter_count is None:
-            replay_iter_count, _ = self._resume_match_from_snapshots(snapshots, checkpoint)
-        return replay_iter_count
 
     def _integrate(
         self,
