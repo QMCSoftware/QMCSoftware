@@ -1,8 +1,7 @@
 import unittest, pytest
 import os
 import shutil
-import subprocess
-from __init__ import BaseNotebookTest
+from __init__ import BaseNotebookTest, pip_install
 
 
 @pytest.mark.slow
@@ -13,9 +12,7 @@ class NotebookTests(BaseNotebookTest):
 
     def setUp(self):
         super().setUp()  # Call parent setUp first to initialize timing attributes
-        subprocess.run(
-            ["pip", "install", "-q", "seaborn>=0.13.0", "tueplots"], check=False
-        )
+        pip_install("seaborn>=0.13.0", "tueplots")
         # Create the JOSS2026.outputs directory that the notebook expects
         self.output_dir = os.path.join(self.notebook_dir, "JOSS2026.outputs")
         if not os.path.exists(self.output_dir):

@@ -16,7 +16,7 @@ class NotebookTests(BaseNotebookTest):
             "qmcpy_util.py",
             "quantlib_util.py",
         ]
-        self.fix_gbm_symlinks(notebook_dir, symlinks_to_fix)
+        self.fix_symlinks(notebook_dir, symlinks_to_fix)
         replacements = {
             "cf.is_debug = False": "cf.is_debug = True",
             "n_samples = 2**12": "n_samples = 4",

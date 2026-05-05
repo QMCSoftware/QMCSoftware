@@ -1,11 +1,12 @@
 from .abstract_cub_mlqmc import AbstractCubMLQMC
 from ..util.data import Data
+import copy
 from ..discrete_distribution import DigitalNetB2, Lattice, Halton
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
 from ..integrand import FinancialOption
-from ..util import MaxSamplesWarning, MaxLevelsWarning
+from ..util import MaxSamplesWarning, MaxLevelsWarning, ParameterError
 import numpy as np
 from scipy.stats import norm
 from time import time
@@ -13,6 +14,11 @@ import warnings
 
 
 class CubMLQMCCont(AbstractCubMLQMC):
+    _RESUME_REQUIRED_FIELDS = (
+        "levels", "n_level", "eval_level", "mean_level_reps", "mean_level",
+        "var_level", "cost_level", "var_cost_ratio_level", "bias_estimate", "level_integrands"
+    )
+
     """
     Multilevel Quasi-Monte Carlo stopping criterion with continuation.
 
@@ -116,9 +122,10 @@ class CubMLQMCCont(AbstractCubMLQMC):
         ]
         # initialization
         if rmse_tol:
-            self.target_tol = float(rmse_tol)
+            self.target_rmse_tol = float(rmse_tol)
         else:  # use absolute tolerance
-            self.target_tol = float(abs_tol) / norm.ppf(1 - alpha / 2)
+            self.target_rmse_tol = float(abs_tol) / norm.ppf(1 - alpha / 2)
+        self.rmse_tol = self.target_rmse_tol  # user-facing attribute; never mutated after __init__
         self.n_init = n_init
         self.n_limit = n_limit
         self.levels_min = levels_min
@@ -126,6 +133,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
         self.theta_init = theta_init
         self.theta = theta_init
         self.n_tols = n_tols
+        self._active_trace = None
         self.alpha = alpha
         self.inflate = inflate
         assert self.inflate >= 1
@@ -141,34 +149,93 @@ class CubMLQMCCont(AbstractCubMLQMC):
         self.replications = self.discrete_distrib.replications
         assert self.replications >= 4, "require at least 4 replications"
 
-    def integrate(self):
-        t_start = time()
-        data = self._construct_data()
-        # Loop over coarser tolerances
-        for t in range(self.n_tols):
-            self.rmse_tol = (
-                self.inflate ** (self.n_tols - t - 1) * self.target_tol
-            )  # Set new target tolerance
-            self._integrate(data)
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
-        return data.solution, data
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if np.shape(data.mean_level_reps) != (data.levels, int(self.replications)):
+            raise ParameterError("resume data mean_level_reps shape %s is incompatible with levels=%d, replications=%d." % (np.shape(data.mean_level_reps), data.levels, int(self.replications)))
+        try:
+            self._validate_level_replay_cache(data)
+        except ValueError as exc:
+            raise ParameterError(str(exc))
+
+    def _restore_resume_state(self, data):
+        # No data.levels adjustment needed for MLQMC (no final += 1 in this variant).
+        pass
+
+    def _can_replay_resume_exactly(self, data):
+        checkpoint_tol = self._checkpoint_rmse_tol(data)
+        if checkpoint_tol is None or not (self.target_rmse_tol < checkpoint_tol):
+            return False
+        return hasattr(data, "level_rep_sums") and hasattr(data, "level_n_increments")
+
+    def integrate(self, resume=None) -> tuple:
+        """Run (or continue) the continuation-MLQMC integration.
+
+        Args:
+            resume (Data, optional): Checkpoint returned by a previous
+                ``integrate()`` call.  The new tolerance may be tighter *or*
+                looser than the one used when the checkpoint was created.
+                With a tighter tolerance the algorithm picks up the tolerance
+                ladder from ``max(checkpoint_rmse_tol, target_rmse_tol)`` and
+                continues down to ``target_rmse_tol``.  With a looser tolerance
+                the first step immediately converges on the existing samples
+                and no additional ladder steps are needed.
+
+        Returns:
+            tuple: ``(solution, data)``.
+        """
+        self._active_t_start = t_start = time()
+        self._active_trace = trace = self._make_trace_logger()
+        self._active_resume_provenance = resume_provenance = self._capture_resume_provenance(resume)
+        try:
+            data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+            if data is not None:
+                step_tol = max(getattr(data, 'rmse_tol', self.target_rmse_tol), self.target_rmse_tol)
+                data.rmse_tol = step_tol
+                self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
+                trace.resume(data, step_value=int(data.levels))
+                if step_tol <= self.target_rmse_tol:
+                    # Same or looser tolerance: check convergence at target_tol
+                    self._integrate(
+                        data,
+                        skip_level_reset=True,
+                        step_tol=step_tol,
+                    )
+                else:
+                    # Tighter tolerance: skip to ladder, preserving level structure for first step
+                    first = True
+                    for t in range(self.n_tols):
+                        next_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
+                        if next_tol < step_tol:
+                            self._integrate(
+                                data,
+                                skip_level_reset=first,
+                                step_tol=next_tol,
+                            )
+                            first = False
+            else:
+                data = self._construct_data()
+                # Loop over coarser tolerances
+                for t in range(self.n_tols):
+                    step_tol = self.inflate ** (self.n_tols - t - 1) * self.target_rmse_tol
+                    self._integrate(
+                        data,
+                        step_tol=step_tol,
+                    )
+            self._finalize_integration_data(
+                data, time() - t_start, resume_provenance=resume_provenance
+            )
+            trace.finalize()
+            data.iteration_history = getattr(self, "iteration_history", None)
+            data.history_df = getattr(self, "history_df", None)
+            return data.solution, data
+        finally:
+            self._active_trace = None
+            self._active_t_start = None
+            self._active_resume_provenance = None
 
     def _construct_data(self):
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "bias_estimate",
-            ]
-        )
+        data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
         data.levels = int(self.levels_min + 1)
         data.n_level = np.zeros(data.levels, dtype=int)
         data.eval_level = np.ones(data.levels, dtype=bool)
@@ -179,19 +246,57 @@ class CubMLQMCCont(AbstractCubMLQMC):
         data.var_cost_ratio_level = np.tile(np.inf, data.levels)
         data.bias_estimate = np.inf
         data.level_integrands = []
+        data.level_rep_sums = [[] for _ in range(data.levels)]
+        data.level_n_increments = [[] for _ in range(data.levels)]
         return data
 
-    def _integrate(self, data):
+    def _integrate(
+        self,
+        data,
+        skip_level_reset=False,
+        trace=None,
+        step_tol=None,
+        record_snapshots=False,
+        snapshots=None,
+        update_data_fn=None,
+        stop_condition=None,
+        t_start=None,
+        resume_provenance=None,
+    ):
+        t_start = getattr(self, "_active_t_start", None) if t_start is None else t_start
+        resume_provenance = (
+            getattr(self, "_active_resume_provenance", None)
+            if resume_provenance is None
+            else resume_provenance
+        )
+        if step_tol is None:
+            step_tol = self.rmse_tol
+        trace = getattr(self, "_active_trace", None) if trace is None else trace
+        update_data_fn = self.update_data if update_data_fn is None else update_data_fn
+        snapshots = [] if snapshots is None else snapshots
         # self.theta = self.theta_init
-        data.levels = int(self.levels_min + 1)
+        if not skip_level_reset:
+            data.levels = int(self.levels_min + 1)
 
         converged = False
         while not converged:
             # Ensure that we have samples on the finest level
-            self.update_data(data)
-            self._update_theta(data)
+            update_data_fn(data)
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
+            if trace is not None:
+                data.rmse_tol = step_tol
+                trace.iteration(data, step_value=int(data.levels))
+            if record_snapshots:
+                data.rmse_tol = step_tol
+                snapshots.append(copy.deepcopy(data))
+            if stop_condition is not None and stop_condition(data):
+                return True
+            self._update_theta(data, step_tol)
 
-            while self._varest(data) > (1 - self.theta) * self.rmse_tol**2:
+            while self._varest(data) > (1 - self.theta) * step_tol**2:
                 efficient_level = np.argmax(data.var_cost_ratio_level[: data.levels])
                 data.eval_level[efficient_level] = True
 
@@ -212,11 +317,23 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     warnings.warn(warning_s, MaxSamplesWarning)
                     return
 
-                self.update_data(data)
-                self._update_theta(data)
+                update_data_fn(data)
+                if t_start is not None:
+                    self._set_elapsed_time(
+                        data, time() - t_start, resume_provenance=resume_provenance
+                    )
+                if trace is not None:
+                    data.rmse_tol = step_tol
+                    trace.iteration(data, step_value=int(data.levels))
+                if record_snapshots:
+                    data.rmse_tol = step_tol
+                    snapshots.append(copy.deepcopy(data))
+                if stop_condition is not None and stop_condition(data):
+                    return True
+                self._update_theta(data, step_tol)
 
             # Check for convergence
-            converged = self._rmse(data) < self.rmse_tol
+            converged = self._rmse(data) < step_tol
             if not converged:
                 if data.levels == self.levels_max:
                     warnings.warn(
@@ -226,8 +343,9 @@ class CubMLQMCCont(AbstractCubMLQMC):
                     converged = True
                 else:
                     self._add_level(data)
+        return False
 
-    def _update_theta(self, data):
+    def _update_theta(self, data, step_tol):
         # Update error splitting parameter
         max_levels = len(data.n_level)
         A = np.ones((2, 2))
@@ -238,7 +356,7 @@ class CubMLQMCCont(AbstractCubMLQMC):
         x = np.linalg.lstsq(A, y, rcond=None)[0]
         alpha = max(0.5, -x[0])
         real_bias = 2 ** (x[1] + max_levels * x[0]) / (2**alpha - 1)
-        self.theta = max(0.01, min(0.125, (real_bias / self.rmse_tol) ** 2))
+        self.theta = max(0.01, min(0.125, (real_bias / step_tol) ** 2))
 
     def _rmse(self, data):
         # Returns an estimate for the root mean square error

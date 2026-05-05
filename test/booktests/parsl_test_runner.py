@@ -4,14 +4,33 @@ import glob
 import os
 import re
 import platform
+import sys
 from pathlib import Path
 
 
 @bash_app
-def run_single_test(test_file, stdout="test_output.txt", stderr="test_error.txt"):
-    """Run a single test file using bash"""
+def run_single_test(
+    test_file,
+    python_executable=None,
+    stdout="test_output.txt",
+    stderr="test_error.txt",
+):
+    """Run a single test file using the same Python as the parent runner.
+
+    The `bash_app` body returns a shell command string, so quote dynamic
+    arguments here without relying on additional module imports in the worker
+    context.
+    """
+    def shell_quote(value):
+        """Return a POSIX-safe single-quoted shell argument."""
+        value = str(value)
+        return "'" + value.replace("'", "'\"'\"'") + "'"
+
+    python_executable = python_executable or sys.executable
+    python_executable = shell_quote(python_executable)
+    test_file = shell_quote(test_file)
     return f"""
-    PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" python -m coverage run --append --source=../../qmcpy/ -m unittest {test_file} 2>&1
+    PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" {python_executable} -m coverage run --append --source=../../qmcpy/ -m unittest {test_file} 2>&1
     """
 
 
@@ -24,8 +43,6 @@ def execute_parallel_tests():
     # Ensure logs directory exists
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
-
-    import sys
 
     # Only treat arguments before the first option (starting with '-') as test modules
     test_modules = []
@@ -57,6 +74,7 @@ def execute_parallel_tests():
     for i, module in enumerate(test_modules):
         future = run_single_test(
             module,
+            python_executable=sys.executable,
             stdout=f"logs/test_{i}_{module}.out",
             stderr=f"logs/test_{i}_{module}.err",
         )
@@ -105,6 +123,7 @@ def execute_parallel_tests():
                     # for debugging purposes while capturing retry output separately
                     retry_future = run_single_test(
                         module,
+                        python_executable=sys.executable,
                         stdout=f"logs/test_{index}_{module}_retry.out",
                         stderr=f"logs/test_{index}_{module}_retry.err",
                     )

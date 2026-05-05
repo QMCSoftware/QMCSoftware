@@ -27,11 +27,14 @@ find_local_only_files:
 	./scripts/find_local_only_folders.sh 
 
 clean_local_only_files:
-	rm -fr test/booktests/.ipynb_checkpoints/ .pytest_cache/ .ruff_cache/ __pycache__/ */__pycache__/ */*/__pycache__/ raw.githubusercontent.com/ */raw.githubusercontent.com/ */*/raw.githubusercontent.com/ site/ build/ .pdm-build/ artifacts/ */*/logs/ */*/runinfo/ 
+	rm -fr test/booktests/.ipynb_checkpoints/ .pytest_cache/ .ruff_cache/ __pycache__/ */__pycache__/ */*/__pycache__/ raw.githubusercontent.com/ */raw.githubusercontent.com/ */*/raw.githubusercontent.com/ site/ build/ .pdm-build/ artifacts/logs/ artifacts/booktests/ */*/logs/ */*/runinfo/ 
 	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
 	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
 		rm -f "$$f"; > /dev/null 2>&1; \
 	done
+
+clean_coverage:
+	rm -fr artifacts/coverage/ .coverage*
 
 ##########################################################
 # Doctests
@@ -90,8 +93,13 @@ doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_b
 ##########################################################
 unittests: ensure_artifacts
 	@mkdir -p $(UNIT_COV_DIR)
+	@PYTHON_BIN=$$(command -v python 2>/dev/null || { [ -n "$$CONDA_PREFIX" ] && command -v "$$CONDA_PREFIX/bin/python" 2>/dev/null; } || { command -v conda >/dev/null 2>&1 && conda run -n qmcpy python -c 'import sys; print(sys.executable)' 2>/dev/null; } || command -v python3 2>/dev/null); \
+	if [ -z "$$PYTHON_BIN" ]; then \
+		echo "No Python interpreter found (tried: python, $$CONDA_PREFIX/bin/python, python3)."; \
+		exit 127; \
+	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	python -m pytest $(PYTEST_XDIST) -x \
+	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
@@ -270,9 +278,17 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp test/README.md docs/tests.md
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
+	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
+	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
+	@cp docs/assets/logos/qmcpy_logo.png docs/favicon.ico
 
-runmkdocserve: 
-	@JUPYTER_PLATFORM_DIRS=1 mkdocs serve
+runmkdocserve:
+	@PORT=$${MKDOCS_PORT:-8000}; \
+	while lsof -iTCP:$$PORT -sTCP:LISTEN >/dev/null 2>&1; do \
+		PORT=$$((PORT+1)); \
+	done; \
+	echo "Starting mkdocs on http://127.0.0.1:$$PORT"; \
+	JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
 	
 doc: uml copydocs runmkdocserve
 
