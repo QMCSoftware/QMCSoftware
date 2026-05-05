@@ -629,6 +629,47 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 % (self.replications, self.gen_mats.shape[0])
             )
 
+    def _try_gen_samples_float(self, r, n, d, n_start, mmax, r_x, return_binary):
+        if return_binary or "NUS" in self.randomize:
+            return None
+        if self.order == "GRAY":
+            gen_float = getattr(qmctoolscl, "dnb2_gen_gray_float", None)
+        elif self.order == "RADICAL INVERSE":
+            gen_float = getattr(qmctoolscl, "dnb2_gen_natural_float", None)
+        else:
+            return None
+        if gen_float is None:
+            return None
+        x = np.empty((r, n, d), dtype=np.float64)
+        tmaxes_new = np.tile(self.t, int(r)).astype(np.uint64)
+        if "DS" in self.randomize:
+            apply_shift = np.uint8(1)
+            lshift = np.uint64(
+                (self.t - self._t_curr) if "LMS" not in self.randomize else 0
+            )
+            lshifts = np.tile(lshift, int(r))
+            shiftsb = self.rshift
+        else:
+            apply_shift = np.uint8(0)
+            lshifts = np.zeros(max(1, int(r_x)), dtype=np.uint64)
+            shiftsb = np.zeros((max(1, int(r)), int(d)), dtype=np.uint64)
+        gen_float(
+            r,
+            n,
+            d,
+            n_start,
+            mmax,
+            r_x,
+            apply_shift,
+            lshifts,
+            shiftsb,
+            tmaxes_new,
+            self.gen_mats,
+            x,
+            backend="c",
+        )
+        return x
+
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min == 0 and self.randomize in ["FALSE", "LMS"] and warn:
             warnings.warn(
@@ -644,7 +685,6 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
         )
         n_start = np.uint64(n_min)
         mmax = np.uint64(self.m_max)
-        xb = np.empty((r_x, n, d), dtype=np.uint64)
         if not ( (n_min == 0 or np.log2(n_min) % 1 == 0) and (n_max == 0 or np.log2(n_max) % 1 == 0)):
             if self.order == "GRAY":
                 if warn:
@@ -653,6 +693,11 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
                 raise ParameterError("DigitalNetB2 in radical inverse order requires n_min and n_max be 0 or powers of 2")
             else:
                 raise ValueError("invalid digital net order")
+        r = np.uint64(self.replications)
+        x = self._try_gen_samples_float(r, n, d, n_start, mmax, r_x, return_binary)
+        if x is not None:
+            return x
+        xb = np.empty((r_x, n, d), dtype=np.uint64)
         if self.order == "GRAY":
             qmctoolscl.dnb2_gen_gray(
                 r_x, n, d, n_start, mmax, self.gen_mats, xb, backend="c"
@@ -663,7 +708,6 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             )
         else:
             raise ValueError("invalid digital net order")
-        r = np.uint64(self.replications)
         if "NUS" in self.randomize:
             if self.alpha == 1:
                 xrb = np.empty((r, n, d), dtype=np.uint64)
