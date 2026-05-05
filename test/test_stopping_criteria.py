@@ -95,6 +95,9 @@ class _DummyStoppingCriterion(AbstractStoppingCriterion):
         super().__init__(allowed_distribs or [_DummyDiscreteDistribution], allow_vectorized_integrals)
 
 
+########################################################################
+# Abstract Base Tests
+########################################################################
 class TestAbstractStoppingCriterion(unittest.TestCase):
     def test_print_diagnostic_header_and_values(self):
         data = type(
@@ -411,7 +414,11 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         self.assertFalse(identity_dependency)
         self.assertTrue(np.allclose(alphas_indv, [0.15, 0.15, 0.3]))
 
-class TestStoppingCriterionImportFallbacks(unittest.TestCase):
+
+########################################################################
+# Import Fallback Tests
+########################################################################
+class TestFallbacks(unittest.TestCase):
     def test_import_fallback_classes(self):
         original_import = builtins.__import__
 
@@ -430,7 +437,11 @@ class TestStoppingCriterionImportFallbacks(unittest.TestCase):
             with self.assertRaises(ModuleNotFoundError):
                 sc_mod.SuggesterSimple()
         importlib.reload(importlib.import_module("qmcpy.stopping_criterion"))
-        
+
+
+########################################################################
+# CubMCCLT Tests
+########################################################################
 class TestCubMCCLT(unittest.TestCase):
     """Unit tests for CubMCCLT StoppingCriterion."""
 
@@ -507,6 +518,9 @@ class TestCubMCCLT(unittest.TestCase):
         self.assertAlmostEqual(sc.elapsed_time, data.elapsed_time)
 
 
+########################################################################
+# CubMCG Tests
+########################################################################
 class TestCubMCG(unittest.TestCase):
     """Unit tests for CubMCG StoppingCriterion."""
 
@@ -525,6 +539,9 @@ class TestCubMCG(unittest.TestCase):
         self.assertLess(abs(solution - keister_2d_exact), tol)
 
 
+########################################################################
+# CubQMCCLT Tests
+########################################################################
 class TestCubQMCCLT(unittest.TestCase):
     """Unit tests for CubQMCCLT StoppingCriterion."""
 
@@ -558,6 +575,9 @@ class TestCubQMCCLT(unittest.TestCase):
         ))
 
 
+########################################################################
+# CubQMCLatticeG Tests
+########################################################################
 class TestCubQMCLatticeG(unittest.TestCase):
     """Unit tests for CubQMCLatticeG StoppingCriterion."""
 
@@ -581,6 +601,8 @@ class TestCubQMCLatticeG(unittest.TestCase):
         ))
 
 
+########################################################################
+# CubQMCNetG Tests
 class TestCubQMCNetG(unittest.TestCase):
     """Unit tests for CubQMCNetG StoppingCriterion."""
 
@@ -604,6 +626,9 @@ class TestCubQMCNetG(unittest.TestCase):
         ))
 
 
+########################################################################
+# CubBayesLatticeG Tests
+########################################################################
 class TestCubBayesLatticeG(unittest.TestCase):
     """Unit tests for CubBayesLatticeG StoppingCriterion."""
 
@@ -642,6 +667,9 @@ class TestCubBayesLatticeG(unittest.TestCase):
         ))
 
 
+########################################################################
+# CubBayesNetG Tests
+########################################################################
 class TestCubBayesNetG(unittest.TestCase):
     """Unit tests for CubBayesNetG StoppingCriterion."""
 
@@ -665,7 +693,10 @@ class TestCubBayesNetG(unittest.TestCase):
         ))
 
 
-class TestMultilevelStoppingCriteria(unittest.TestCase):
+########################################################################
+# Multilevel Core Tests
+########################################################################
+class TestMLStoppingCriteria(unittest.TestCase):
     def _iid_financial_option(self):
         return FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
 
@@ -767,6 +798,139 @@ class TestMultilevelStoppingCriteria(unittest.TestCase):
                             sc._integrate(data, skip_level_reset=True)
                     add_level.assert_not_called()
 
+
+########################################################################
+# Continuation AbsTol Tests
+########################################################################
+class TestCubMLMCContAbsTol(unittest.TestCase):
+    """Tests for the abs_tol (not rmse_tol) code path in multilevel cont. criteria."""
+
+    def test_mlmc_cont_abs_tol_branch_is_reachable(self):
+        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
+        sc = CubMLMCCont(fo, abs_tol=0.5)
+        # Verify that target_rmse_tol was set (via abs_tol branch, not rmse_tol)
+        self.assertGreater(sc.target_rmse_tol, 0.0)
+
+    def test_mlqmc_cont_abs_tol_branch_is_reachable(self):
+        fo = FinancialOption(Lattice(replications=32, seed=7), start_price=30, strike_price=30)
+        sc = CubMLQMCCont(fo, abs_tol=0.5)
+        self.assertGreater(sc.target_rmse_tol, 0.0)
+
+
+########################################################################
+# Bias Convergence Path Tests
+########################################################################
+class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
+    """Tests that exercise the bias-convergence level-addition paths."""
+
+    def setUp(self):
+        warnings.filterwarnings("ignore", category=MaxSamplesWarning)
+        warnings.filterwarnings("ignore", category=MaxLevelsWarning)
+
+    def test_cub_mlmc_cont_n_limit_warning(self):
+        """CubMLMCCont must warn MaxSamplesWarning when n_limit is exceeded inside _integrate."""
+        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
+        sc = CubMLMCCont(fo, rmse_tol=0.001, n_limit=2**10)
+        with self.assertWarns(MaxSamplesWarning):
+            sc.integrate()
+
+    def test_cub_mlqmc_resume_bad_mean_level_reps(self):
+        """_validate_resume raises ParameterError if mean_level_reps has wrong shape."""
+        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
+        sc = CubMLQMC(fo, abs_tol=0.3, n_limit=2**16)
+        _, checkpoint = sc.integrate()
+
+        bad = copy.deepcopy(checkpoint)
+        bad.mean_level_reps = bad.mean_level_reps[:, :-1]  # wrong shape
+
+        sc2 = CubMLQMC(FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30), abs_tol=0.1, n_limit=2**16)
+        with self.assertRaises(ParameterError):
+            sc2.integrate(resume=bad)
+
+    def test_cub_mlqmc_cont_bad_mean_level_reps(self):
+        """Continuation resume must reject an incompatible mean_level_reps shape."""
+        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
+        sc = CubMLQMCCont(fo, abs_tol=0.3, n_limit=2**16)
+        _, checkpoint = sc.integrate()
+
+        bad = copy.deepcopy(checkpoint)
+        bad.mean_level_reps = bad.mean_level_reps[:, :-1]  # wrong shape
+
+        sc2 = CubMLQMCCont(FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30), abs_tol=0.1, n_limit=2**16)
+        with self.assertRaises(ParameterError):
+            sc2.integrate(resume=bad)
+
+    def test_cub_mlmc_max_levels_bias_warning(self):
+        """CubMLMC fires MaxLevelsWarning when bias check hits levels_max."""
+        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
+        # levels_min == levels_max == 2 so the algorithm cannot add levels
+        sc = CubMLMC(fo, rmse_tol=0.001, levels_min=2, levels_max=2, n_limit=int(1e10))
+        N = 100
+
+        def fake_update_data(data):
+            n = data.levels + 1
+            data.n_level = np.full(n, N, dtype=int)
+            data.sum_level = np.ones((2, n)) * N
+            data.cost_level = np.ones(n, dtype=float) * N
+            # mean_level large enough so rem >> sqrt(theta)*rmse_tol
+            data.mean_level = np.ones(n)
+            data.var_level = np.ones(n) * 1e-8
+            data.cost_per_sample = np.ones(n)
+            data.alpha = 1.0
+            data.beta = 1.0
+            data.gamma = 1.0
+            data.n_total = N * n
+
+        # Return n_level so diff_n_level = max(0, n_level - n_level) = 0
+        # -> triggers the bias convergence check inside the loop
+        with patch.object(sc, "_update_data", side_effect=fake_update_data):
+            with patch.object(sc, "_get_next_samples",
+                              side_effect=lambda data: data.n_level.copy()):
+                with self.assertWarns(MaxLevelsWarning):
+                    sc.integrate()
+
+    def test_cub_mlmc_add_level_from_bias_path(self):
+        """CubMLMC adds levels through the bias convergence path."""
+        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
+        sc = CubMLMC(fo, rmse_tol=0.5, n_limit=int(1e10))
+        _, data = sc.integrate()
+        # A successful run must have added at least one level beyond levels_min=2
+        self.assertGreater(data.levels, 2)
+
+    def test_cub_mlqmc_bias_add_level_path(self):
+        """CubMLQMC exercises the elif bias > rmse_tol/sqrt(2) -> _add_level path."""
+        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
+        sc = CubMLQMC(fo, abs_tol=0.5, n_limit=int(1e10))
+        _, data = sc.integrate()
+        # A successful run should have exercised at least one level addition
+        self.assertGreater(data.levels, 1)
+
+    def test_cub_mlmc_cont_add_level_and_warmup(self):
+        """CubMLMCCont _integrate fires _add_level (line 302) and warm-up (lines 241-251)."""
+        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
+        # n_tols=1, inflate=1 means exactly one _integrate call at step_tol=rmse_tol
+        sc = CubMLMCCont(fo, rmse_tol=0.1, n_tols=1, inflate=1.0, n_limit=int(1e10))
+
+        call_count = [0]
+
+        def patched_rmse(data):
+            call_count[0] += 1
+            # First call: force non-convergence -> _add_level fires (line 302)
+            if call_count[0] <= 1:
+                return sc.target_rmse_tol * 3.0
+            # Subsequent calls: converge
+            return sc.target_rmse_tol * 0.3
+
+        with patch.object(sc, "_rmse", side_effect=patched_rmse):
+            _, data = sc.integrate()
+
+        # levels > levels_min+1 = 3 confirms _add_level fired inside _integrate
+        self.assertGreater(data.levels, 3)
+
+
+########################################################################
+# Resume Feature Tests
+########################################################################
 class TestResumeFeature(unittest.TestCase):
     """Tests for the resume parameter of integrate() across all stopping criteria."""
 
@@ -887,6 +1051,51 @@ class TestResumeFeature(unittest.TestCase):
         else:
             _run_assertions()
 
+    def _assert_resume_boundary_and_final_parity(
+        self,
+        label,
+        loose_builder,
+        tight_builder,
+        skip_exceptions=(),
+    ):
+        def _run_assertions():
+            loose_sc = loose_builder()
+            _, checkpoint = loose_sc.integrate()
+            loose_log = loose_sc.get_iteration_log(formatted=False)
+            loose_last_iter = int(loose_log.loc[loose_log["stage"] == "ITER", "iter"].iloc[-1])
+
+            resumed_sc = tight_builder()
+            _, resumed = resumed_sc.integrate(resume=checkpoint)
+            resumed_log = resumed_sc.get_iteration_log(formatted=False)
+            resume_row = resumed_log.iloc[len(loose_log)]
+            self.assertEqual(resume_row["stage"], "RESUME")
+            self.assertEqual(
+                int(resume_row["iter"]),
+                loose_last_iter,
+                msg=f"{label} RESUME-first iter should match LOOSE-final iter",
+            )
+
+            fresh_sc = tight_builder()
+            _, fresh = fresh_sc.integrate()
+            self.assertEqual(
+                int(resumed.n_total),
+                int(fresh.n_total),
+                msg=f"{label} resumed-final n_total should match fresh-final n_total",
+            )
+            self.assertEqual(
+                int(resumed._iter_count),
+                int(fresh._iter_count),
+                msg=f"{label} resumed-final iter count should match fresh-final iter count",
+            )
+
+        if skip_exceptions:
+            try:
+                _run_assertions()
+            except skip_exceptions as exc:
+                self.skipTest(f"{label} resume parity skipped: {exc}")
+        else:
+            _run_assertions()
+
     def test_resume_none_matches_fresh_start(self):
         """resume=None must behave identically to a fresh start."""
         make_sc = self._keister_builder(CubQMCLatticeG, self._lattice_distribution, self.tight_abs_tol)
@@ -920,6 +1129,32 @@ class TestResumeFeature(unittest.TestCase):
                 self._qmc_rep_student_t_builder(self.loose_abs_tol),
                 self._qmc_rep_student_t_builder(self.tight_abs_tol),
                 compare_to_fresh=True,
+            )
+
+    def test_non_ml_resume_boundary_and_final_iteration_parity(self):
+        """Non-ML resume solvers should keep iteration numbering and final totals in sync."""
+        cases = [
+            ("CubMCCLTVec", CubMCCLTVec, self._iid_distribution, (ImportError, NotImplementedError)),
+            ("CubQMCLatticeG", CubQMCLatticeG, self._lattice_distribution, ()),
+            ("CubQMCNetG", CubQMCNetG, self._net_distribution, ()),
+            ("CubBayesLatticeG", CubBayesLatticeG, self._lattice_distribution, ()),
+            ("CubBayesNetG", CubBayesNetG, self._net_distribution, ()),
+        ]
+
+        for label, stopping_criterion, distribution_factory, skip_exceptions in cases:
+            with self.subTest(stopping_criterion=label):
+                self._assert_resume_boundary_and_final_parity(
+                    label,
+                    self._keister_builder(stopping_criterion, distribution_factory, self.loose_abs_tol),
+                    self._keister_builder(stopping_criterion, distribution_factory, self.tight_abs_tol),
+                    skip_exceptions=skip_exceptions,
+                )
+
+        with self.subTest(stopping_criterion="CubQMCRepStudentT"):
+            self._assert_resume_boundary_and_final_parity(
+                "CubQMCRepStudentT",
+                self._qmc_rep_student_t_builder(self.loose_abs_tol),
+                self._qmc_rep_student_t_builder(self.tight_abs_tol),
             )
 
     def test_resume_appends_iteration_history(self):
@@ -1555,6 +1790,10 @@ class TestResumeFeature(unittest.TestCase):
             )
             self.assertFalse(repeated_previous_sample)
 
+
+########################################################################
+# Resume Validation Helper Tests
+########################################################################
 class TestResumeValidationHelpers(unittest.TestCase):
     """Fine-grained tests for AbstractStoppingCriterion._validate_resume_* helpers."""
 
@@ -1659,6 +1898,9 @@ class TestResumeValidationHelpers(unittest.TestCase):
             sc._restore_resume_rng_state(data)
 
 
+########################################################################
+# Diagnostics Optional Column Tests
+########################################################################
 class TestDiagnosticsOptionalColumns(unittest.TestCase):
     """Tests for optional columns and edge-case paths in diagnostics helpers."""
 
@@ -1960,130 +2202,6 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         stream = io.StringIO()
         with redirect_stdout(stream):
             logger.resume(data)  # must not raise
-
-
-class TestCubMLMCContinuationAbsTol(unittest.TestCase):
-    """Tests for the abs_tol (not rmse_tol) code path in multilevel cont. criteria."""
-
-    def test_mlmc_cont_abs_tol_branch_is_reachable(self):
-        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
-        sc = CubMLMCCont(fo, abs_tol=0.5)
-        # Verify that target_rmse_tol was set (via abs_tol branch, not rmse_tol)
-        self.assertGreater(sc.target_rmse_tol, 0.0)
-
-    def test_mlqmc_cont_abs_tol_branch_is_reachable(self):
-        fo = FinancialOption(Lattice(replications=32, seed=7), start_price=30, strike_price=30)
-        sc = CubMLQMCCont(fo, abs_tol=0.5)
-        self.assertGreater(sc.target_rmse_tol, 0.0)
-
-
-class TestCubMLMCBiasConvergencePaths(unittest.TestCase):
-    """Tests that exercise the bias-convergence level-addition paths."""
-
-    def setUp(self):
-        warnings.filterwarnings("ignore", category=MaxSamplesWarning)
-        warnings.filterwarnings("ignore", category=MaxLevelsWarning)
-
-    def test_cub_mlmc_cont_n_limit_warning(self):
-        """CubMLMCCont must warn MaxSamplesWarning when n_limit is exceeded inside _integrate."""
-        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
-        sc = CubMLMCCont(fo, rmse_tol=0.001, n_limit=2**10)
-        with self.assertWarns(MaxSamplesWarning):
-            sc.integrate()
-
-    def test_cub_mlqmc_resume_bad_mean_level_reps(self):
-        """_validate_resume raises ParameterError if mean_level_reps has wrong shape."""
-        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
-        sc = CubMLQMC(fo, abs_tol=0.3, n_limit=2**16)
-        _, checkpoint = sc.integrate()
-
-        bad = copy.deepcopy(checkpoint)
-        bad.mean_level_reps = bad.mean_level_reps[:, :-1]  # wrong shape
-
-        sc2 = CubMLQMC(FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30), abs_tol=0.1, n_limit=2**16)
-        with self.assertRaises(ParameterError):
-            sc2.integrate(resume=bad)
-
-    def test_cub_mlqmc_cont_bad_mean_level_reps(self):
-        """Continuation resume must reject an incompatible mean_level_reps shape."""
-        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
-        sc = CubMLQMCCont(fo, abs_tol=0.3, n_limit=2**16)
-        _, checkpoint = sc.integrate()
-
-        bad = copy.deepcopy(checkpoint)
-        bad.mean_level_reps = bad.mean_level_reps[:, :-1]  # wrong shape
-
-        sc2 = CubMLQMCCont(FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30), abs_tol=0.1, n_limit=2**16)
-        with self.assertRaises(ParameterError):
-            sc2.integrate(resume=bad)
-
-    def test_cub_mlmc_max_levels_bias_warning(self):
-        """CubMLMC fires MaxLevelsWarning when bias check hits levels_max."""
-        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
-        # levels_min == levels_max == 2 so the algorithm cannot add levels
-        sc = CubMLMC(fo, rmse_tol=0.001, levels_min=2, levels_max=2, n_limit=int(1e10))
-        N = 100
-
-        def fake_update_data(data):
-            n = data.levels + 1
-            data.n_level = np.full(n, N, dtype=int)
-            data.sum_level = np.ones((2, n)) * N
-            data.cost_level = np.ones(n, dtype=float) * N
-            # mean_level large enough so rem >> sqrt(theta)*rmse_tol
-            data.mean_level = np.ones(n)
-            data.var_level = np.ones(n) * 1e-8
-            data.cost_per_sample = np.ones(n)
-            data.alpha = 1.0
-            data.beta = 1.0
-            data.gamma = 1.0
-            data.n_total = N * n
-
-        # Return n_level so diff_n_level = max(0, n_level - n_level) = 0
-        # → triggers the bias convergence check inside the loop
-        with patch.object(sc, "_update_data", side_effect=fake_update_data):
-            with patch.object(sc, "_get_next_samples",
-                              side_effect=lambda data: data.n_level.copy()):
-                with self.assertWarns(MaxLevelsWarning):
-                    sc.integrate()
-
-    def test_cub_mlmc_add_level_from_bias_path(self):
-        """CubMLMC adds levels through the bias convergence path."""
-        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
-        sc = CubMLMC(fo, rmse_tol=0.5, n_limit=int(1e10))
-        _, data = sc.integrate()
-        # A successful run must have added at least one level beyond levels_min=2
-        self.assertGreater(data.levels, 2)
-
-    def test_cub_mlqmc_bias_add_level_path(self):
-        """CubMLQMC exercises the elif bias > rmse_tol/sqrt(2) → _add_level path."""
-        fo = FinancialOption(Lattice(replications=16, seed=7), start_price=30, strike_price=30)
-        sc = CubMLQMC(fo, abs_tol=0.5, n_limit=int(1e10))
-        _, data = sc.integrate()
-        # A successful run should have exercised at least one level addition
-        self.assertGreater(data.levels, 1)
-
-    def test_cub_mlmc_cont_add_level_and_warmup(self):
-        """CubMLMCCont _integrate fires _add_level (line 302) and warm-up (lines 241-251)."""
-        fo = FinancialOption(IIDStdUniform(seed=7), start_price=30, strike_price=30)
-        # n_tols=1, inflate=1 means exactly one _integrate call at step_tol=rmse_tol
-        sc = CubMLMCCont(fo, rmse_tol=0.1, n_tols=1, inflate=1.0, n_limit=int(1e10))
-
-        call_count = [0]
-
-        def patched_rmse(data):
-            call_count[0] += 1
-            # First call: force non-convergence → _add_level fires (line 302)
-            if call_count[0] <= 1:
-                return sc.target_rmse_tol * 3.0
-            # Subsequent calls: converge
-            return sc.target_rmse_tol * 0.3
-
-        with patch.object(sc, "_rmse", side_effect=patched_rmse):
-            _, data = sc.integrate()
-
-        # levels > levels_min+1 = 3 confirms _add_level fired inside _integrate
-        self.assertGreater(data.levels, 3)
-
 
 if __name__ == "__main__":
     unittest.main()
