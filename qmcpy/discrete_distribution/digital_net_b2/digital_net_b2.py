@@ -6,7 +6,7 @@ import numpy as np
 from numpy.lib.npyio import DataSource
 import warnings
 from copy import deepcopy
-
+import platform
 
 class DigitalNetB2(AbstractLDDiscreteDistribution):
     r"""
@@ -630,6 +630,8 @@ class DigitalNetB2(AbstractLDDiscreteDistribution):
             )
 
     def _try_gen_samples_float(self, r, n, d, n_start, mmax, r_x, return_binary):
+        if platform.system() == "Darwin": # MacOS seems to still be faster with the original non-fused implementation for some reason. 
+            return None
         if return_binary or "NUS" in self.randomize:
             return None
         if self.order == "GRAY":
