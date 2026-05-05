@@ -776,11 +776,11 @@ if __name__=="__main__":
         print("%d (%.1f sec) "%(i,time.perf_counter()-t0_overall),end='',flush=True)
         # original
         t0 = time.perf_counter()
-        x = DigitalNetB2Original(d,randomize="LMS DS")(n)
+        x = DigitalNetB2Original(d,randomize="LMS DS",order="GRAY")(n)
         times_dnb2_original[i] = time.perf_counter()-t0
         # new 
         t0 = time.perf_counter()
-        x = qp.DigitalNetB2(d,randomize="LMS DS")(n)
+        x = qp.DigitalNetB2(d,randomize="LMS DS",order="GRAY")(n)
         times_dnb2_new[i] = time.perf_counter()-t0
         # scipy 
         t0 = time.perf_counter()
