@@ -29,16 +29,17 @@ assert m1>=0
 assert (m2>=0).all()
 assert (m1<m2).all()
 
-epsilon = np.sqrt(gamma/(alpha2*R1)*(float(p)**((1-r)*m1)-float(p)**((1-r)*m2))/(p**m2-p**m1))
+epsilon_cheb = np.sqrt(gamma/(alpha2*R1)*(float(p)**((1-r)*m1)-float(p)**((1-r)*m2))/(p**m2-p**m1))
 
 n1 = p**m1
 n2 = p**m2
 
 fig,ax = pyplot.subplots(nrows=1,ncols=1,figsize=(PW/1.5,PW/2))
-ax.plot(n2,epsilon,'-o')
+ax.plot(n2,epsilon_cheb,'-o')
 ax.set_xscale('log',base=p)
 ax.set_yscale('log',base=10)
 ax.set_xlabel(r'$n_2$')
 ax.set_ylabel(r'$\varepsilon$')
+ax.set_title("Chebychev")
 fig.suptitle(r"If $\varepsilon$ below the line then RQMC with $n_2$ outperforms RQMC with $n_1 = %d$"%n1)
 fig.savefig("rqmc_be_cheb.png",dpi=256,bbox_inches='tight')
