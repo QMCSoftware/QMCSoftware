@@ -981,6 +981,71 @@ class TestResumeFeature(unittest.TestCase):
             n_limit=self.n_limit_rep,
         )
 
+    def _configure_resume_solver(self, loose_sc, tight_builder):
+        tight_sc = tight_builder()
+        abs_tol = getattr(tight_sc, "abs_tol", None)
+        rel_tol = getattr(tight_sc, "rel_tol", None)
+        rmse_tol = getattr(tight_sc, "target_rmse_tol", getattr(tight_sc, "rmse_tol", None))
+        resume_attrs = set(getattr(tight_sc, "parameters", ())) | {
+            "abs_tol",
+            "rel_tol",
+            "rmse_tol",
+            "target_rmse_tol",
+            "n_init",
+            "n_limit",
+            "n_tols",
+            "inflate",
+        }
+        for attr in resume_attrs:
+            if hasattr(tight_sc, attr):
+                setattr(loose_sc, attr, copy.deepcopy(getattr(tight_sc, attr)))
+        if hasattr(loose_sc, "set_tolerance"):
+            loose_sc.set_tolerance(abs_tol=abs_tol, rel_tol=rel_tol, rmse_tol=rmse_tol)
+        loose_sc.iteration_history = None
+        loose_sc.history_df = None
+        if hasattr(loose_sc, "_last_finalized_data"):
+            loose_sc._last_finalized_data = None
+        return loose_sc
+
+    def _run_resume_pair(self, label, loose_builder, tight_builder):
+        loose_sc = loose_builder()
+        _, checkpoint = loose_sc.integrate()
+        self.assertIs(
+            checkpoint.stopping_crit,
+            loose_sc,
+            msg=f"{label} LOOSE stage should keep the original solver instance",
+        )
+        checkpoint_n_total = int(checkpoint.n_total)
+        checkpoint_xfull = (
+            np.array(checkpoint.xfull, copy=True) if hasattr(checkpoint, "xfull") else None
+        )
+        loose_log = loose_sc.get_iteration_log(formatted=False).copy()
+        loose_df = loose_sc.get_iteration_log().copy()
+
+        resumed_sc = self._configure_resume_solver(loose_sc, tight_builder)
+        self.assertIs(
+            resumed_sc,
+            loose_sc,
+            msg=f"{label} RESUMED stage should reuse the LOOSE solver instance",
+        )
+        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
+        self.assertIs(
+            resumed.stopping_crit,
+            loose_sc,
+            msg=f"{label} RESUMED stage should finalize with the reused solver instance",
+        )
+        return {
+            "loose_sc": loose_sc,
+            "checkpoint": checkpoint,
+            "checkpoint_n_total": checkpoint_n_total,
+            "checkpoint_xfull": checkpoint_xfull,
+            "loose_log": loose_log,
+            "loose_df": loose_df,
+            "resumed_sc": resumed_sc,
+            "sol_resume": sol_resume,
+            "resumed": resumed,
+        }
+
     def _assert_resume_behavior(
         self,
         label,
@@ -992,18 +1057,21 @@ class TestResumeFeature(unittest.TestCase):
         skip_exceptions=(),
     ):
         def _run_assertions():
-            sc1 = loose_builder()
-            _, data1 = sc1.integrate()
-            old_n_total = int(data1.n_total)
-            old_xfull = (
-                np.array(data1.xfull, copy=True) if hasattr(data1, "xfull") else None
-            )
-
-            sc2 = tight_builder()
-            sol2, data2 = sc2.integrate(resume=data1)
+            stages = self._run_resume_pair(label, loose_builder, tight_builder)
+            sc1 = stages["loose_sc"]
+            data1 = stages["checkpoint"]
+            old_n_total = stages["checkpoint_n_total"]
+            old_xfull = stages["checkpoint_xfull"]
+            sol2 = stages["sol_resume"]
+            data2 = stages["resumed"]
 
             self.assertIsNot(
                 data2, data1, msg=f"{label} resume should not mutate the input checkpoint"
+            )
+            self.assertIs(
+                data1.stopping_crit,
+                sc1,
+                msg=f"{label} resume should not rewrite the checkpoint solver instance",
             )
             self.assertTrue(hasattr(data2, "n_total"), msg=f"{label} missing n_total")
             self.assertTrue(
@@ -1028,7 +1096,22 @@ class TestResumeFeature(unittest.TestCase):
 
             if compare_to_fresh:
                 sc3 = tight_builder()
+                self.assertIsNot(
+                    sc3,
+                    sc1,
+                    msg=f"{label} FRESH stage should use a distinct solver instance",
+                )
                 sol3, data3 = sc3.integrate()
+                self.assertIs(
+                    data3.stopping_crit,
+                    sc3,
+                    msg=f"{label} FRESH stage should finalize with its own solver instance",
+                )
+                self.assertIsNot(
+                    data3.stopping_crit,
+                    data2.stopping_crit,
+                    msg=f"{label} FRESH stage should not share the RESUMED solver instance",
+                )
                 self.assertTrue(
                     np.allclose(sol2, sol3, rtol=rtol, atol=atol),
                     msg=f"{label} resume solution diverged from fresh run",
@@ -1060,13 +1143,14 @@ class TestResumeFeature(unittest.TestCase):
         skip_exceptions=(),
     ):
         def _run_assertions():
-            loose_sc = loose_builder()
-            _, checkpoint = loose_sc.integrate()
-            loose_log = loose_sc.get_iteration_log(formatted=False)
+            stages = self._run_resume_pair(label, loose_builder, tight_builder)
+            loose_sc = stages["loose_sc"]
+            checkpoint = stages["checkpoint"]
+            resumed = stages["resumed"]
+            resumed_sc = stages["resumed_sc"]
+            loose_log = stages["loose_log"]
             loose_last_iter = int(loose_log.loc[loose_log["stage"] == "ITER", "iter"].iloc[-1])
 
-            resumed_sc = tight_builder()
-            _, resumed = resumed_sc.integrate(resume=checkpoint)
             resumed_log = resumed_sc.get_iteration_log(formatted=False)
             resume_row = resumed_log.iloc[len(loose_log)]
             self.assertEqual(resume_row["stage"], "RESUME")
@@ -1077,7 +1161,22 @@ class TestResumeFeature(unittest.TestCase):
             )
 
             fresh_sc = tight_builder()
+            self.assertIsNot(
+                fresh_sc,
+                loose_sc,
+                msg=f"{label} FRESH stage should use a distinct solver instance",
+            )
             _, fresh = fresh_sc.integrate()
+            self.assertIs(
+                fresh.stopping_crit,
+                fresh_sc,
+                msg=f"{label} FRESH stage should finalize with its own solver instance",
+            )
+            self.assertIsNot(
+                fresh.stopping_crit,
+                resumed.stopping_crit,
+                msg=f"{label} FRESH stage should not share the RESUMED solver instance",
+            )
             self.assertEqual(
                 int(resumed.n_total),
                 int(fresh.n_total),
@@ -1159,12 +1258,15 @@ class TestResumeFeature(unittest.TestCase):
             )
 
     def test_resume_appends_iteration_history(self):
-        loose_sc = self._qmc_rep_student_t_builder(self.loose_abs_tol)()
-        _, checkpoint = loose_sc.integrate()
-        loose_df = loose_sc.get_iteration_log()
-
-        resumed_sc = self._qmc_rep_student_t_builder(self.tight_abs_tol)()
-        _, resumed = resumed_sc.integrate(resume=checkpoint)
+        stages = self._run_resume_pair(
+            "CubQMCRepStudentT",
+            self._qmc_rep_student_t_builder(self.loose_abs_tol),
+            self._qmc_rep_student_t_builder(self.tight_abs_tol),
+        )
+        loose_sc = stages["loose_sc"]
+        resumed_sc = stages["resumed_sc"]
+        resumed = stages["resumed"]
+        loose_df = stages["loose_df"]
         resumed_sc.get_iteration_log()  # populate history_df
 
         self.assertIsInstance(resumed_sc.history_df, pd.DataFrame)
@@ -1194,15 +1296,25 @@ class TestResumeFeature(unittest.TestCase):
                 )
 
     def test_cub_mlmc_resume_matches_fresh_n(self):
-        loose_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
-        _, checkpoint = loose_sc.integrate()
+        stages = self._run_resume_pair(
+            "CubMLMC",
+            lambda: CubMLMC(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml),
+            lambda: CubMLMC(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml),
+        )
+        loose_sc = stages["loose_sc"]
+        checkpoint = stages["checkpoint"]
+        sol_resume = stages["sol_resume"]
+        resumed = stages["resumed"]
         self.assertTrue(hasattr(checkpoint, "level_diffs"))
-
-        resumed_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
-        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
 
         fresh_sc = CubMLMC(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
         sol_fresh, fresh = fresh_sc.integrate()
+        self.assertIsNot(fresh_sc, loose_sc)
+        self.assertIs(fresh.stopping_crit, fresh_sc)
+        self.assertIsNot(
+            fresh.stopping_crit, resumed.stopping_crit,
+            msg="CubMLMC FRESH stage should not share the RESUMED solver instance",
+        )
 
         self.assertEqual(int(resumed.n_total), int(fresh.n_total))
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
@@ -1212,15 +1324,25 @@ class TestResumeFeature(unittest.TestCase):
         self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlmc_cont_resume_fresh_n(self):
-        loose_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml)
-        _, checkpoint = loose_sc.integrate()
+        stages = self._run_resume_pair(
+            "CubMLMCCont",
+            lambda: CubMLMCCont(self._iid_financial_option(), rmse_tol=self.loose_abs_tol, n_limit=self.n_limit_ml),
+            lambda: CubMLMCCont(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml),
+        )
+        loose_sc = stages["loose_sc"]
+        checkpoint = stages["checkpoint"]
+        sol_resume = stages["sol_resume"]
+        resumed = stages["resumed"]
         self.assertTrue(hasattr(checkpoint, "level_diffs"))
-
-        resumed_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
-        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
 
         fresh_sc = CubMLMCCont(self._iid_financial_option(), rmse_tol=self.tight_abs_tol, n_limit=self.n_limit_ml)
         sol_fresh, fresh = fresh_sc.integrate()
+        self.assertIsNot(fresh_sc, loose_sc)
+        self.assertIs(fresh.stopping_crit, fresh_sc)
+        self.assertIsNot(
+            fresh.stopping_crit, resumed.stopping_crit,
+            msg="CubMLMCCont FRESH stage should not share the RESUMED solver instance",
+        )
 
         self.assertEqual(int(resumed.n_total), int(fresh.n_total))
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
@@ -1230,15 +1352,25 @@ class TestResumeFeature(unittest.TestCase):
         self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_resume_matches_fresh_n(self):
-        loose_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
-        _, checkpoint = loose_sc.integrate()
+        stages = self._run_resume_pair(
+            "CubMLQMC",
+            lambda: CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18),
+            lambda: CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18),
+        )
+        loose_sc = stages["loose_sc"]
+        checkpoint = stages["checkpoint"]
+        sol_resume = stages["sol_resume"]
+        resumed = stages["resumed"]
         self.assertTrue(hasattr(checkpoint, "level_rep_sums"))
-
-        resumed_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
-        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
 
         fresh_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
         sol_fresh, fresh = fresh_sc.integrate()
+        self.assertIsNot(fresh_sc, loose_sc)
+        self.assertIs(fresh.stopping_crit, fresh_sc)
+        self.assertIsNot(
+            fresh.stopping_crit, resumed.stopping_crit,
+            msg="CubMLQMC FRESH stage should not share the RESUMED solver instance",
+        )
 
         self.assertEqual(int(resumed.n_total), int(fresh.n_total))
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
@@ -1247,15 +1379,25 @@ class TestResumeFeature(unittest.TestCase):
         self.assertIsNotNone(resumed.iteration_history)
 
     def test_cub_mlqmc_cont_resume_fresh_n(self):
-        loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
-        _, checkpoint = loose_sc.integrate()
+        stages = self._run_resume_pair(
+            "CubMLQMCCont",
+            lambda: CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18),
+            lambda: CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18),
+        )
+        loose_sc = stages["loose_sc"]
+        checkpoint = stages["checkpoint"]
+        sol_resume = stages["sol_resume"]
+        resumed = stages["resumed"]
         self.assertTrue(hasattr(checkpoint, "level_rep_sums"))
-
-        resumed_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
-        sol_resume, resumed = resumed_sc.integrate(resume=checkpoint)
 
         fresh_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
         sol_fresh, fresh = fresh_sc.integrate()
+        self.assertIsNot(fresh_sc, loose_sc)
+        self.assertIs(fresh.stopping_crit, fresh_sc)
+        self.assertIsNot(
+            fresh.stopping_crit, resumed.stopping_crit,
+            msg="CubMLQMCCont FRESH stage should not share the RESUMED solver instance",
+        )
 
         self.assertEqual(int(resumed.n_total), int(fresh.n_total))
         self.assertTrue(np.array_equal(resumed.n_level, fresh.n_level))
@@ -1265,25 +1407,41 @@ class TestResumeFeature(unittest.TestCase):
 
     def test_cub_mlqmc_cont_long_resume_n_parity(self):
         kwargs = {"abs_tol": self.tight_abs_tol, "n_tols": 1200, "inflate": 1.001, "n_limit": 2**24}
-        loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_tols=1200, inflate=1.001, n_limit=2**24)
-        _, checkpoint = loose_sc.integrate()
-
-        resumed_sc = CubMLQMCCont(self._qmc_financial_option(), **kwargs)
-        _, resumed = resumed_sc.integrate(resume=checkpoint)
+        stages = self._run_resume_pair(
+            "CubMLQMCCont",
+            lambda: CubMLQMCCont(
+                self._qmc_financial_option(),
+                abs_tol=self.loose_abs_tol,
+                n_tols=1200,
+                inflate=1.001,
+                n_limit=2**24,
+            ),
+            lambda: CubMLQMCCont(self._qmc_financial_option(), **kwargs),
+        )
+        loose_sc = stages["loose_sc"]
+        resumed = stages["resumed"]
 
         fresh_sc = CubMLQMCCont(self._qmc_financial_option(), **kwargs)
         _, fresh = fresh_sc.integrate()
+        self.assertIsNot(fresh_sc, loose_sc)
+        self.assertIs(fresh.stopping_crit, fresh_sc)
+        self.assertIsNot(
+            fresh.stopping_crit, resumed.stopping_crit,
+            msg="CubMLQMCCont FRESH stage should not share the RESUMED solver instance",
+        )
 
         self.assertEqual(int(resumed.n_total), int(fresh.n_total))
 
     def test_cub_mlqmc_resume_iter_boundary(self):
-        loose_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
-        _, checkpoint = loose_sc.integrate()
-        loose_log = loose_sc.get_iteration_log(formatted=False)
+        stages = self._run_resume_pair(
+            "CubMLQMC",
+            lambda: CubMLQMC(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18),
+            lambda: CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18),
+        )
+        loose_sc = stages["loose_sc"]
+        resumed_sc = stages["resumed_sc"]
+        loose_log = stages["loose_log"]
         loose_last_iter = int(loose_log.loc[loose_log["stage"] == "ITER", "iter"].iloc[-1])
-
-        resumed_sc = CubMLQMC(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
-        _, _ = resumed_sc.integrate(resume=checkpoint)
         resumed_log = resumed_sc.get_iteration_log(formatted=False)
 
         resume_row = resumed_log.iloc[len(loose_log)]
@@ -1291,13 +1449,15 @@ class TestResumeFeature(unittest.TestCase):
         self.assertEqual(int(resume_row["iter"]), loose_last_iter)
 
     def test_cub_mlqmc_cont_resume_iter_boundary(self):
-        loose_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18)
-        _, checkpoint = loose_sc.integrate()
-        loose_log = loose_sc.get_iteration_log(formatted=False)
+        stages = self._run_resume_pair(
+            "CubMLQMCCont",
+            lambda: CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.loose_abs_tol, n_limit=2**18),
+            lambda: CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18),
+        )
+        loose_sc = stages["loose_sc"]
+        resumed_sc = stages["resumed_sc"]
+        loose_log = stages["loose_log"]
         loose_last_iter = int(loose_log.loc[loose_log["stage"] == "ITER", "iter"].iloc[-1])
-
-        resumed_sc = CubMLQMCCont(self._qmc_financial_option(), abs_tol=self.tight_abs_tol, n_limit=2**18)
-        _, _ = resumed_sc.integrate(resume=checkpoint)
         resumed_log = resumed_sc.get_iteration_log(formatted=False)
 
         resume_row = resumed_log.iloc[len(loose_log)]
