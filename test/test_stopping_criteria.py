@@ -517,6 +517,17 @@ class TestCubMCCLT(unittest.TestCase):
         self.assertTrue((raw_log_df["elapsed_time"].dropna().diff().fillna(0) >= 0).all())
         self.assertAlmostEqual(sc.elapsed_time, data.elapsed_time)
 
+    def test_iter_log_rejects_unknown_view(self):
+        sc = CubMCCLT(
+            Keister(IIDStdUniform(dimension=2, seed=7)),
+            abs_tol=0.5,
+            n_init=64,
+            n_limit=4096,
+        )
+        _, _ = sc.integrate()
+        with self.assertRaises(ParameterError):
+            sc.get_iteration_log(view="unknown")
+
 
 ########################################################################
 # CubMCG Tests
@@ -1277,6 +1288,37 @@ class TestResumeFeature(unittest.TestCase):
             list(loose_df["stage"]),
         )
         self.assertEqual(resumed.history_df["stage"].iloc[len(loose_df)], "RESUME")
+
+    def test_resume_iteration_log_views(self):
+        stages = self._run_resume_pair(
+            "CubQMCRepStudentT",
+            self._qmc_rep_student_t_builder(self.loose_abs_tol),
+            self._qmc_rep_student_t_builder(self.tight_abs_tol),
+        )
+        current_log = stages["resumed_sc"].get_iteration_log(formatted=False, view="all")
+        without_resume = stages["resumed_sc"].get_iteration_log(
+            formatted=False, view="without_resume"
+        )
+        stage_last = stages["resumed_sc"].get_iteration_log(
+            formatted=False, view="stage_last"
+        )
+
+        self.assertEqual(int((current_log["stage"] == "RESUME").sum()), 1)
+        self.assertFalse((without_resume["stage"] == "RESUME").any())
+        self.assertEqual(len(without_resume), len(current_log) - 1)
+
+        expected_rows = []
+        for index, row in current_log.iterrows():
+            if row["stage"] == "RESUME":
+                expected_rows.append(without_resume.loc[: index - 1].iloc[-1])
+        expected_rows.append(without_resume.iloc[-1])
+
+        self.assertEqual(len(stage_last), len(expected_rows))
+        for (_, actual), expected in zip(stage_last.iterrows(), expected_rows):
+            self.assertTrue(
+                actual.equals(expected),
+                msg="stage_last should keep one non-RESUME stop row per stage",
+            )
 
     def test_resume_increases_multilevel_samples(self):
         """Multilevel resume runs should retain or increase sample work."""
