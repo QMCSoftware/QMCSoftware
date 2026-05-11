@@ -18,6 +18,7 @@ nav:
       - Quickstart: demos/quickstart.ipynb
       - Pricing Options: demos/pricing_options.ipynb 
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
+    - Resume Feature: demos/demo_resume_data/resume_examples.ipynb
     - Publication Notebooks:
       - 2026 JOSS Paper: demos/talk_paper_demos/JOSS2026/joss2026.ipynb
       - 2025 Sorokin Thesis: demos/talk_paper_demos/SorokinThesis2025/sorokin_thesis_2025.ipynb
@@ -66,6 +67,9 @@ nav:
   - Blogs: 
     - SciPyWrapper: blogs/scipywrapper/index.md
     - GBM with QMCPy: blogs/gbm-qmcpy/index.md
+    - Iteration Log: demos/demo_resume_data/Iteration_Log_Tolerance_Demo.ipynb
+    - Resume Feature: demos/demo_resume_data/accuracy_and_resume.ipynb
+    - SciPyWrapper: demos/scipywrapper_dependence_custom/blog.md
   # - Papers: 
   #   - JOSS: paper/paper.md
   - For Developers:
