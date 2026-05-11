@@ -1,0 +1,1 @@
+"""Accumulate data module."""
