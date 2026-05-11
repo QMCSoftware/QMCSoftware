@@ -2,14 +2,27 @@ from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
 from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
-from ..integrand import AbstractIntegrand
 import numpy as np
 import scipy as sc
 from time import time
 import warnings
 
 
+def _default_fudge(m):
+    """Default fudge factor: 5 * 2**(-m)."""
+    return 5.0 * 2.0 ** (-m)
+
+
+def _lstsq_pyfunc(x, y):
+    """Least-squares solve used by the vectorized vlstsq attribute."""
+    return np.linalg.lstsq(x.T, y, rcond=None)[0]
+
+
 class AbstractCubQMCLDG(AbstractStoppingCriterion):
+    _RESUME_REQUIRED_FIELDS = (
+        "solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n", "n_max", "xfull", "yfull"
+    )
+    _RESUME_STATE_FIELDS = ("_ytildefull", "_kappanumap")
 
     def __init__(
         self,
@@ -63,18 +76,9 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             )
             self.n_limit = dd_n_limit
         assert isinstance(error_fun, str) or callable(error_fun)
-        if isinstance(error_fun, str):
-            if error_fun.upper() == "EITHER":
-                error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            elif error_fun.upper() == "BOTH":
-                error_fun = lambda sv, abs_tol, rel_tol: np.minimum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            else:
-                raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
-        self.error_fun = error_fun
+        # _error_fun_key stores a simple, serializable string and ensures correct state saving
+        # in __getstate__(), bypassing serialization of complex lambda functions, which often fails.
+        self.error_fun, self._error_fun_key = self._resolve_error_fun(error_fun)
         self.fudge = fudge
         self.check_cone = check_cone
         self.ft = ft
@@ -102,27 +106,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         ), "Require discrete distribution is randomized"
         self.set_tolerance(abs_tol, rel_tol)
         # control variates
-        self.cv_mu = np.atleast_1d(control_variate_means)
-        self.cv = control_variates
-        if isinstance(self.cv, AbstractIntegrand):
-            self.cv = [self.cv]
-            self.cv_mu = self.cv_mu[None, ...]
-        assert isinstance(
-            self.cv, list
-        ), "cv must be a list of AbstractIntegrand objects"
-        for cv in self.cv:
-            if (
-                (not isinstance(cv, AbstractIntegrand))
-                or (cv.discrete_distrib != self.discrete_distrib)
-                or (cv.d_indv != self.integrand.d_indv)
-            ):
-                raise ParameterError(
-                    """
-                        Each control variates discrete distribution must be an AbstractIntegrand instance 
-                        with the same discrete distribution as the main integrand. d_indv must also match 
-                        that of the main integrand instance for each control variate."""
-                )
-        self.ncv = len(self.cv)
+        self._init_control_variates(control_variates, control_variate_means)
         self.update_beta = update_beta
         if self.ncv > 0:
             assert self.cv_mu.shape == (
@@ -132,7 +116,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         else:
             self.update_beta = False
         self.vlstsq = np.vectorize(
-            lambda x, y: np.linalg.lstsq(x.T, y, rcond=None)[0],
+            _lstsq_pyfunc,
             signature="(k,m),(m)->(k)",
         )
 
@@ -172,59 +156,133 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
         beta = self.vlstsq(x4beta, y4beta)
         return beta
 
-    def integrate(self):
-        t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "time_integrate",
-            ]
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # omg_circ and omg_hat are local lambdas that pickle cannot serialize.
+        # Replace them with sentinels; __setstate__ rebuilds them.
+        state['omg_circ'] = '__default__'
+        state['omg_hat'] = '__default__'
+        # error_fun is also a local lambda when constructed from a string keyword.
+        # Replace with the canonical string form so it can be reconstructed.
+        if self._error_fun_key is not None:
+            state['error_fun'] = self._error_fun_key
+        # fudge may be a local lambda (e.g. default arg in subclass __init__).
+        # If it's the default, replace with a sentinel; otherwise leave for pickle.
+        if getattr(self.fudge, '__name__', None) == '<lambda>':
+            state['fudge'] = '__default_fudge__'
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Rebuild omg_circ and omg_hat from their sentinels.
+        self.omg_circ = lambda m: 2 ** (-m)
+        self.omg_hat = lambda m: self.fudge(m) / (
+            (1 + self.fudge(self.r_lag)) * self.omg_circ(self.r_lag)
         )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (0,))
+        # Rebuild error_fun from its string key if present.
+        if isinstance(self.error_fun, str):
+            self.error_fun, _ = self._resolve_error_fun(self.error_fun)
+        # Rebuild fudge from its sentinel.
+        if self.fudge == '__default_fudge__':
+            self.fudge = _default_fudge
+
+    def _validate_resume(self, data):
+        required_fields = self._RESUME_REQUIRED_FIELDS
+        state_fields = self._RESUME_STATE_FIELDS
         if self.ncv > 0:
-            data.ycvfull = np.empty(self.integrand.d_indv + (self.ncv, 0))
-        data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
-        data.muhat = np.tile(np.nan, self.integrand.d_indv)
-        data.beta = np.tile(np.nan, self.integrand.d_indv + (self.ncv,))
+            required_fields = required_fields + ("ycvfull", "beta")
+            state_fields = state_fields + ("_ycvtildefull",)
+        self._validate_resume_with_state(
+            data, required_fields=required_fields, state_fields=state_fields
+        )
+        n_total = int(data.n_total)
+        output_shape = self.integrand.d_indv + (n_total,)
+        self._validate_resume_shape("xfull", data.xfull, (n_total, self.integrand.d))
+        self._validate_resume_shape("yfull", data.yfull, output_shape)
+        self._validate_resume_shape("_ytildefull", data._ytildefull, output_shape)
+        self._validate_resume_shape("_kappanumap", data._kappanumap, output_shape)
+        self._validate_resume_shape("n", data.n, self.integrand.d_indv)
+        if int(np.max(np.asarray(data.n))) != n_total:
+            raise ParameterError("resume data n must be consistent with n_total.")
+        if int(data.n_max) != n_total:
+            raise ParameterError("resume data n_total must match n_max.")
+        if not self._is_power_of_two(n_total):
+            raise ParameterError("resume data n_total must be a power of 2.")
+        if self.ncv > 0:
+            cv_shape = self.integrand.d_indv + (self.ncv, n_total)
+            self._validate_resume_shape("ycvfull", data.ycvfull, cv_shape)
+            self._validate_resume_shape(
+                "_ycvtildefull", data._ycvtildefull, cv_shape
+            )
+            self._validate_resume_shape(
+                "beta", data.beta, self.integrand.d_indv + (self.ncv,)
+            )
+
+    def integrate(self, resume=None):
+        t_start = time()
+        resume_provenance = self._capture_resume_provenance(resume)
+        first_resume_iter = False
+        trace = self._make_trace_logger()
+
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
+        )
+        if data is not None:
+            # Reset flags so all components are re-evaluated against the new tolerance.
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            # Set n_min to n_total so the next actual batch starts after the prior samples.
+            data.n_min = int(data.n_total)
+            # Restore the transform state stored by the previous integrate() call.
+            ytildefull = data._ytildefull
+            kappanumap = data._kappanumap
+            if self.ncv > 0:
+                ycvtildefull = data._ycvtildefull
+            first_resume_iter = True
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
+            trace.resume(data, step_value=int(np.log2(max(1, int(data.n_total)))))
+        else:
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (0,))
+            if self.ncv > 0:
+                data.ycvfull = np.empty(self.integrand.d_indv + (self.ncv, 0))
+            data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
+            data.muhat = np.tile(np.nan, self.integrand.d_indv)
+            data.beta = np.tile(np.nan, self.integrand.d_indv + (self.ncv,))
         while True:
             m = int(np.log2(data.n_max))
-            xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull, xnext], 0)
-            ynext = self.integrand.f(
-                xnext,
-                periodization_transform=self.ptransform,
-                compute_flags=data.compute_flags,
-            )
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            if self.ncv > 0:
-                ycvnext = [None] * self.ncv
-                for k in range(self.ncv):
-                    ycvnext_k = self.cv[k].f(
-                        xnext,
-                        periodization_transform=self.ptransform,
-                        compute_flags=data.compute_flags,
-                    )
-                    ycvnext_k[~data.compute_flags] = np.nan
-                    ycvnext[k] = ycvnext_k
-                ycvnext = np.stack(ycvnext, -2)
-                data.ycvfull = np.concatenate([data.ycvfull, ycvnext], -1)
             mllstart = m - self.r_lag - 1
             nllstart = 2**mllstart
-            if data.n_min == 0:  # first iteration
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
+                data.xfull = np.concatenate([data.xfull, xnext], 0)
+                ynext = self.integrand.f(
+                    xnext,
+                    periodization_transform=self.ptransform,
+                    compute_flags=data.compute_flags,
+                )
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+                if self.ncv > 0:
+                    ycvnext = [None] * self.ncv
+                    for k in range(self.ncv):
+                        ycvnext_k = self.cv[k].f(
+                            xnext,
+                            periodization_transform=self.ptransform,
+                            compute_flags=data.compute_flags,
+                        )
+                        ycvnext_k[~data.compute_flags] = np.nan
+                        ycvnext[k] = ycvnext_k
+                    ycvnext = np.stack(ycvnext, -2)
+                    data.ycvfull = np.concatenate([data.ycvfull, ycvnext], -1)
+            if not first_resume_iter and data.n_min == 0:  # first fresh iteration
                 n = int(2**m)
                 ytildefull = self.ft(ynext) / np.sqrt(n)
                 kappanumap = self._update_kappanumap(
@@ -249,7 +307,7 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
                         0,
                         m,
                     )
-            else:  # any iteration after the first
+            elif not first_resume_iter:  # any iteration after the first
                 mnext = int(m - 1)
                 n = int(2**mnext)
                 if not self.update_beta:  # do not update the beta coefficients
@@ -388,6 +446,13 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            self._set_elapsed_time(data, time() - t_start, resume_provenance=resume_provenance)
+            trace.iteration(data, step_value=m)
+            # Save transform state so this computation can be resumed later.
+            data._ytildefull = ytildefull
+            data._kappanumap = kappanumap
+            if self.ncv > 0:
+                data._ycvtildefull = ycvtildefull
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
@@ -402,13 +467,13 @@ class AbstractCubQMCLDG(AbstractStoppingCriterion):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
+        trace.finalize()
         return data.solution, data
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
