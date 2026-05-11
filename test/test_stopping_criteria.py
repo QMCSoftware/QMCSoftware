@@ -20,7 +20,7 @@ from qmcpy.util.data import Data
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
 from qmcpy.integrand.abstract_integrand import AbstractIntegrand
 from qmcpy.stopping_criterion.abstract_stopping_criterion import AbstractStoppingCriterion
-from qmcpy.stopping_criterion.diagnostics import _IterationHistoryTable, _IterationTraceLogger, _print_diagnostic
+from qmcpy.stopping_criterion.diagnostics import _IterationHistoryTable, _IterationTraceLogger, _print_diagnostic, _get_iteration_log_frame
 
 
 # Test functions and parameters
@@ -413,6 +413,13 @@ class TestAbstractStoppingCriterion(unittest.TestCase):
         alphas_indv, identity_dependency = sc._compute_indv_alphas(np.array([0.3, 0.6]))
         self.assertFalse(identity_dependency)
         self.assertTrue(np.allclose(alphas_indv, [0.15, 0.15, 0.3]))
+
+    def test_log_all_resume(self):
+        # when all rows are RESUME, stage_last view returns empty DataFrame
+        log_df = pd.DataFrame({"stage": ["RESUME", "RESUME"], "iter": [1, 2], "solution": [1.0, 2.0]})
+        result = AbstractStoppingCriterion._apply_iteration_log_view(log_df, "stage_last")
+        self.assertEqual(len(result), 0)
+        self.assertListEqual(list(result.columns), list(log_df.columns))
 
 
 ########################################################################
@@ -2396,8 +2403,7 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         data = type(
             "Data",
             (),
-            {
-                "_iter_count": object(),  # cannot be converted to int
+            {"_iter_count": object(),  # cannot be converted to int
                 "solution": 1.0,
                 "n_total": 10,
             },
@@ -2405,6 +2411,19 @@ class TestDiagnosticsOptionalColumns(unittest.TestCase):
         stream = io.StringIO()
         with redirect_stdout(stream):
             logger.resume(data)  # must not raise
+
+    def test_log_all_none_columns(self):
+        # drop_empty_columns=True removes columns that are all NaN
+        history = _IterationHistoryTable()
+        history._append("ITER",
+                        {"iter": 1, "solution": 1.0, "n_total": 16, "bias_estimate": None},
+                        visible_columns=("stage", "iter", "solution", "n_total", "bias_estimate"),
+                        printed=True,
+                        )
+        df_dropped = _get_iteration_log_frame(history, drop_empty_columns=True, formatted=False)
+        df_kept = _get_iteration_log_frame(history, drop_empty_columns=False, formatted=False)
+        self.assertNotIn("bias_estimate", df_dropped.columns)
+        self.assertIn("bias_estimate", df_kept.columns)
 
 if __name__ == "__main__":
     unittest.main()
