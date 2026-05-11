@@ -318,7 +318,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if return_binary:
-           raise ParameterError("Kronecker does not support return_binary=True")
+            raise ParameterError("Kronecker does not support return_binary=True")
         i = np.arange(n_min,n_max)
         points = ((i[:,None] * self.gen_vec[:,None,:]) + self.shift[:, None, :]) % 1
         return points

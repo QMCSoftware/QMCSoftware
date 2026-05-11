@@ -1,7 +1,6 @@
 import unittest, pytest
-import subprocess
 import os
-from __init__ import BaseNotebookTest
+from __init__ import BaseNotebookTest, pip_install
 
 
 @pytest.mark.slow
@@ -10,9 +9,7 @@ class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()
         # Install required packages
-        subprocess.run(
-            ["pip", "install", "-q", "matplotlib", "scipy", "seaborn==0.8"], check=False
-        )
+        pip_install("matplotlib", "scipy", "seaborn==0.8")
         # Create outputs directory if needed
         os.makedirs("outputs_nb", exist_ok=True)
 

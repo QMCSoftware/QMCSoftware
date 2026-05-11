@@ -4,7 +4,7 @@ from ...util import ParameterError,ParameterWarning
 from ..digital_net_b2 import DigitalNetB2
 import qmctoolscl
 import numpy as np
-from math import *
+from math import comb
 from copy import deepcopy
 
 

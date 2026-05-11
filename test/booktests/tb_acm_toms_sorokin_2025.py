@@ -1,18 +1,17 @@
 import unittest
 import os
-import subprocess
 from testbook import testbook
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import TB_TIMEOUT, BaseNotebookTest, pip_install
 
 
 @unittest.skip("Skipping NotebookTests class")
 class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()  # Call parent setUp first to initialize timing attributes
-        subprocess.run(["pip", "install", "-q", "tueplots"], check=False)
+        pip_install("tueplots")
         os.makedirs("outputs", exist_ok=True)
 
     @testbook(

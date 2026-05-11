@@ -1,10 +1,8 @@
 import unittest
-import subprocess
 import os
-import sys
 import shutil
 from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import TB_TIMEOUT, BaseNotebookTest, pip_install
 
 
 @unittest.skip("Skipping NotebookTests class")
@@ -14,9 +12,7 @@ class NotebookTests(BaseNotebookTest):
         super().setUp()
         print("setUp working directory:", os.getcwd())
         # Install required packages
-        subprocess.run(
-            ["pip", "install", "-q", "sympy", "matplotlib", "scipy"], check=False
-        )
+        pip_install("sympy", "matplotlib", "scipy")
         # Create outputs directory if needed
         os.makedirs("outputs", exist_ok=True)
         # Copy pickle files from demos directory to the notebook's working directory

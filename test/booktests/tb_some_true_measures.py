@@ -1,7 +1,6 @@
 import unittest
-import subprocess
 from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+from __init__ import TB_TIMEOUT, BaseNotebookTest, pip_install
 
 
 class NotebookTests(BaseNotebookTest):
@@ -9,7 +8,7 @@ class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()
         # Install required packages
-        subprocess.run(["pip", "install", "-q", "scipy", "matplotlib"], check=False)
+        pip_install("scipy", "matplotlib")
 
     @testbook("../../demos/some_true_measures.ipynb", execute=True, timeout=TB_TIMEOUT)
     def test_some_true_measures_notebook(self, tb):

@@ -9,7 +9,7 @@ from ..util.data import Data
 
 from ..util import ExactGPyTorchRegressionModel
 
-from ..util import MaxSamplesWarning
+from ..util import MaxSamplesWarning, ParameterError
 import warnings
 import time
 import numpy as np
@@ -67,7 +67,7 @@ class SuggesterSimple(Suggester):
         assert d == self.sampler.d
         try:
             x = self.sampler(n_min=self.n_min, n_max=n_max)
-        except:
+        except Exception:
             x = self.sampler(n)
         self.n_min = n_max
         return x
@@ -268,8 +268,11 @@ class PFGPCI(AbstractStoppingCriterion):
             else self.failure_threshold - y
         )
 
-    def integrate(self, seed=None, refit=False):
+    def integrate(self, seed=None, refit=False, resume=None):
         t0 = time.time()
+        trace = self._make_trace_logger()
+        if resume is not None:
+            raise ParameterError("PFGPCI does not support resume.")
         dnb2 = DigitalNetB2(self.d, randomize="DS", order="GRAY", seed=seed)
         data = PFGPCIData(
             self,
@@ -312,18 +315,24 @@ class PFGPCI(AbstractStoppingCriterion):
                 ydraw = np.atleast_1d(self.integrand.f(xdraw).squeeze())
             ydrawtf = self._affine_tf(ydraw)
             data.update_data(batch_count, xdraw, ydrawtf)
+            data.solution = data.solutions[-1]
+            data.error_bound = data.error_bounds[-1]
+            data.bound_low = data.ci_low[-1]
+            data.bound_high = data.ci_high[-1]
+            data.bound_diff = data.bound_high - data.bound_low
+            data.bound_half_width = data.error_bound
+            data.n_total = int(sum(data.n_batch))
+            self._set_elapsed_time(data, time.time() - t0)
+            trace.iteration(data)
             batch_count += 1
-            if data.error_bounds[-1] <= self.abs_tol:
+            if data.error_bound <= self.abs_tol:
                 break
             if sum(data.n_batch) == self.n_limit:
                 warnings.warn("n_limit reached. ", MaxSamplesWarning)
                 break
-        data.solution = data.solutions[-1]
-        data.error_bound = data.error_bounds[-1]
-        data.bound_low = data.ci_low[-1]
-        data.bound_high = data.ci_high[-1]
-        data.n_total = sum(data.n_batch)
-        data.time_integrate = time.time() - t0
+        elapsed = time.time() - t0
+        self._set_elapsed_time(data, elapsed)
+        self._finalize_integration_data(data, elapsed)
         data.n_sum = np.cumsum(data.n_batch)
         data.n_batch = np.array(data.n_batch)
         data.error_bounds = np.array(data.error_bounds)
@@ -336,6 +345,7 @@ class PFGPCI(AbstractStoppingCriterion):
             data.in_ci = (data.ci_low <= data.solutions_ref) * (
                 data.solutions_ref <= data.ci_high
             )
+        trace.finalize()
         return data.solution, data
 
 
@@ -415,14 +425,7 @@ class PFGPCIData(Data):
         )
         self.saved_gps = [self.gpyt_model.state_dict()]
         super(PFGPCIData, self).__init__(
-            parameters=[
-                "solution",
-                "error_bound",
-                "bound_low",
-                "bound_high",
-                "n_total",
-                "time_integrate",
-            ]
+            parameters=["solution", "error_bound", "bound_low", "bound_high", "n_total", "time_integrate"]
         )
 
     def update_data(self, batch_count, xdraw, ydrawtf):
@@ -510,7 +513,7 @@ class PFGPCIData(Data):
         elif self.d == 2 and not trace_only and self.saved_gps != []:
             fig, gs = self.plot_2d(**kwargs)
         else:
-            from matplotlib import pyplot, gridspec
+            from matplotlib import gridspec
 
             fig = pyplot.figure(constrained_layout=False, figsize=(8, 4))
             gs = gridspec.GridSpec(1, 2, figure=fig)

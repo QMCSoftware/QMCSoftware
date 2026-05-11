@@ -16,7 +16,7 @@ All of the code lives in:
 * `qmcpy/true_measure/scipy_wrapper.py`
 * `demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb`
 * `test/test_scipy_wrapper_custom.py`
-* `demos/scipywrapper_dependence_custom/blog.md`
+* `docs/blogs/scipywrapper/index.md`
 
 
 ---
@@ -318,4 +318,3 @@ A few ideas that came up while I was working on this:
    When log densities are available for joint distributions, the weights can be used inside some of the adaptive algorithms. Connecting the new joint weights to those estimators would open up more advanced applications.
 
 For now, the main takeaway is that `SciPyWrapper` is no longer limited to independent, library provided marginals. It can live in a world where dependence is the rule, where distributions are sometimes hand built, and where users still get clear guidance when something looks off.
-

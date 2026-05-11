@@ -1,7 +1,8 @@
 # General Python
 PATH
 .pdm-python
-*raw.githubusercontent.com*
+.pytest_cache/
+raw.githubusercontent.com/*
 packages.svg
 .pypirc
 test_readme.py
@@ -24,9 +25,10 @@ qmcpy.egg-info/
 *.pyc
 *.vrb
 *.npy
+*.pkl
+*.gz
 .DS_Store
 .idea/
-.pytest_cache/'raw.githubusercontent.com/*'
 demos/.jupyter
 demos/prob_failure_gp_ci_plots/
 demos/fgpr_figs/

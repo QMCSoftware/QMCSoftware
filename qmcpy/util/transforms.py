@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.special
-from . import ParameterError
 from .torch_numpy_ops import get_npt
 
 EPS64 = float(np.finfo(np.float64).eps)
