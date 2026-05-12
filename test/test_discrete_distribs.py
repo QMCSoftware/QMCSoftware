@@ -48,7 +48,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             IIDStdUniform(d, seed=7),
             Lattice(d, seed=7),
             DigitalNetB2(d, seed=7),
-            Halton(d, seed=7),
+            Halton(d, seed=7, warn=False),
         ]:
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
@@ -339,7 +339,7 @@ class TestDigitalNetB2(unittest.TestCase):
                     dnb2 = DigitalNetB2(dimension=5,replications=replications,randomize=randomize,order=order,alpha=alpha)
                     x_full = dnb2(16,warn=False) 
                     self.assertEqual(x_full.shape,(replications, 16, 5))
-                    self.assertTrue((x_full[:,:4,:]==dnb2(0,4)).all())
+                    self.assertTrue((x_full[:,:4,:]==dnb2(0,4,warn=False)).all())
                     self.assertTrue((x_full[:,4:8,:]==dnb2(4,8)).all())
                     self.assertTrue((x_full[:,8:16,:]==dnb2(8,16)).all())
                     self.assertTrue((x_full[:,4:16,:]==dnb2(4,16)).all())
