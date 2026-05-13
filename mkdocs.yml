@@ -4,6 +4,7 @@ nav:
   - Components: components.md
   - Contributing: CONTRIBUTING.md
   - Community: community.md
+  - Leadership: QMCPy_Shared_Leadership.md
   - Package Reference:
     - Discrete Distributions: api/discrete_distributions.md
     - True Measures: api/true_measures.md
