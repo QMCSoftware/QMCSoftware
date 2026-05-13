@@ -86,7 +86,7 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 ### 4. Test
 **Lead:** Sou-Cheng Choi
 
-**Co-Lead:** Brandon Sharp ("probationary")
+**Co-Lead:** Brandon Sharp (probationary)
 
 #### Key Responsibilities
 - **Test Coverage**: Ensure all PRs with new components include both doctests and unit tests where applicable.
