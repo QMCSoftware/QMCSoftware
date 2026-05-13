@@ -22,8 +22,12 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
         self.d = getattr(sampler, 'd', None)
         if self.d is None:
             raise ParameterError("Point set must have attribute 'd' for dimension.")
+        
         #This will change when point set functionality is added, since n is already determined for them
+        if not isinstance(n, list):
+            raise ParameterError("n must be a list of sample size(s).")
         self.n = n
+        
         #More valid integrands to be added later
         self.valid_integrands = ['sum_ueu','mc2','piece_lin_gauss','ind_sum_normal','smooth_gauss','ridge_johnson_su','genz_oscillatory', 'genz_corner_peak', 'ra_sum', 'ra_prod', 'ra_sin', 'keister']
         self.true_values = {}
@@ -45,7 +49,7 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
                 self.true_values[integrand_type] = integrand(2**21).mean()
             #More integrands to be added later
         
-    def error_approx(self, err_type, integrands=['sum_ueu','mc2','piece_lin_gauss','ind_sum_normal','smooth_gauss','ridge_johnson_su'], repetitions=30, genz_coeff=2, filename='err_approx.csv'):
+    def error_approx(self, err_type, integrands=['sum_ueu','mc2','piece_lin_gauss','ind_sum_normal','smooth_gauss','ridge_johnson_su'], repetitions=30, genz_coeff=2, filename=None):
         r"""
         Args:
             err_type     (str): Type of error approximation to compute. Options are:
@@ -77,7 +81,7 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
                 - Defaults to 30.
             genz_coeff (int): Optional. The type of coefficients to use for genz integrands, as described in genz.py
                 - Must be 1, 2, or 3, defaults to 2.
-            filename (string): Name of the output csv file, defaults to err_approx.csv
+            filename (string): Optional. If specified, the name of the output csv file.
 
         Returns:
             errors (csv file): Each integrand is a row and each sample size is a column, both in the same order they were called in.
@@ -127,7 +131,11 @@ class ErrorApproximation(AbstractDiscreteDistribution): #Will add functionality 
             else:
                 integrand = QMCIntegrals(self.sampler, kind_func=integrand_type)
                 err_dict[str(integrand_type)] = self.err(integrand_type,integrand,repetitions,err_type)
-        np.savetxt(filename, [err_dict[str(type)] for type in integrand_types], delimiter=', ')
+        
+        if filename != None:
+            if filename[-4::] != '.csv':
+                filename += '.csv'
+            np.savetxt(filename, [err_dict[str(type)] for type in integrand_types], delimiter=', ')
         return [err_dict[str(type)] for type in integrand_types]
         
     def err(self, integrand_type, integrand, repetitions, err_type):

@@ -22,25 +22,7 @@ class QMCIntegrals(AbstractIntegrand):
         if self.kind_func not in ["sum_ueu","mc2","piece_lin_gauss","ind_sum_normal","smooth_gauss","ridge_johnson_su","ra_sum","ra_prod","ra_sin"]:
             raise ParameterError("Invalid integrand %s" % self.kind_func)
         
-        if self.kind_func=="sum_ueu":
-            self.g = self.sum_ueu
-        elif self.kind_func=="mc2":
-            self.g = self.mc2
-        elif self.kind_func=="piece_lin_gauss":
-            self.g = self.piece_lin_gauss
-        elif self.kind_func=="ind_sum_normal":
-            self.g = self.ind_sum_normal
-        elif self.kind_func=="smooth_gauss":
-            self.g = self.smooth_gauss
-        elif self.kind_func=="ridge_johnson_su":
-            self.g = self.ridge_johnson_su
-
-        elif self.kind_func=="ra_sum":
-            self.g = self.ra_sum
-        elif self.kind_func=="ra_prod":
-            self.g = self.ra_prod
-        elif self.kind_func=="ra_sin":
-            self.g = self.ra_sin
+        self.g = self.__getattribute__(self.kind_func)
         
         super(QMCIntegrals,self).__init__(dimension_indv=(),dimension_comb=(),parallel=False)
 
