@@ -67,7 +67,7 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 - **Documentation Standards**: Ensure all pull requests (PRs) with new components include appropriate documentation for those components.
 - **Demo Integration**: Verify that demos are properly rendered into the documentation website.
 - **API Documentation**: Maintain comprehensive package reference documentation.
-- **Content Development**: Oversee the creation of blog posts, tutorials, and other content that highlights QMCPy's features, research applications, and community contributions.
+- **Content Development**: Oversee the creation of blog posts, tutorials, and other content that highlight QMCPy's features, research applications, and community contributions.
 - **Editorial Oversight**: Coordinate peer reviews for blog posts and other content, ensuring quality and alignment with QMCPy's goals.
 - **Website Management**: Oversee the "Documentation" and "Blogs" sections of the QMCPy website, ensuring they are up-to-date and well-integrated with other sections like "News" and "Events."
 - **Content Strategy**: Develop a cohesive strategy for documentation and communication topics, aligning them with QMCPy's broader goals.
