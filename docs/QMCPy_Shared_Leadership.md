@@ -85,6 +85,7 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 
 ### 4. Test
 **Lead:** Sou-Cheng Choi
+
 **Co-Lead:** Brandon Sharp
 
 #### Key Responsibilities
