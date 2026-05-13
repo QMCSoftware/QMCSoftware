@@ -85,7 +85,8 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 
 ### 4. Test
 **Lead:** Sou-Cheng Choi
-**Co-Lead:** Brandon Sharp
+
+**Co-Lead:** Brandon Sharp ("probationary")
 
 #### Key Responsibilities
 - **Test Coverage**: Ensure all PRs with new components include both doctests and unit tests where applicable.
@@ -116,7 +117,7 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
   - Enhanced README formatting
   - Contributing guidelines
 - **Distribution Channels**: Oversee publishing QMCPy to additional distribution platforms (e.g., Conda) beyond PyPI.
-- **Best Practices**: Research and implement development and community engagement practices from popular scientific packages (e.g., NumPy, SciPy, pandas).
+- **Best Practices**: Research and implement development and community engagement practices from popular scientific packages (e.g., NumPy, SciPy, Pandas).
 - **Community Building**: Explore opportunities to integrate QMCPy into other packages and ecosystems to increase visibility and sustainability.
 - **Outreach**: Support efforts to promote QMCPy at conferences, workshops, and through publications.
 
