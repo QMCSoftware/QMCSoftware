@@ -365,3 +365,5 @@ based on their relative accuracies.
 
 The authors thank Fred Hickernell, Joshua Jay Herman and Jiangrui Kang
 for their insightful feedback and help with the blog post.
+
+--8<-- "snippets/blog-authors/gbm-qmcpy.md"
