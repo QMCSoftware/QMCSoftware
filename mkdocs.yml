@@ -82,8 +82,6 @@ nav:
     - What Makes a Sequence Low Discrepancy?: blogs/what-makes-a-sequence-low-discrepancy/index.md
     - A QMCPy Quick Start: blogs/a-qmcpy-quick-start/index.md
     - Why Add Q to MC?: blogs/why-add-q-to-mc/index.md
-  # - Papers: 
-  #   - JOSS: paper/paper.md
   - For Developers:
     - Release Manual: RELEASE.md
     - Testing Guidelines: 
