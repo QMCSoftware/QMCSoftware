@@ -245,9 +245,9 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             elif b_order == 4:
                 bern_poly = lambda x: (((x * (1 - x)) ** 2) - 1 / 30)
             else:
-                print("Error: Bernoulli order not implemented !")
+                raise ParameterError("Bernoulli order not implemented")
 
-            kernel_func = lambda x: bern_poly(x)
+            kernel_func = bern_poly
         else:
             b = order
             kernel_func = (

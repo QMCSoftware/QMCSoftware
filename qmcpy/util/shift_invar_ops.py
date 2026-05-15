@@ -25,13 +25,11 @@ class Polynomial:
 
     def __call__(self, x):
         if isinstance(x, np.ndarray):
-            npt = np
             powers = np.arange(self.order - 1, -1, -1, dtype=x.dtype)
             coeffs = np.array(self.coeffs, dtype=x.dtype)
         else:
             import torch
 
-            npt = torch
             powers = torch.arange(
                 self.order - 1, -1, -1, dtype=x.dtype, device=x.device
             )

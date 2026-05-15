@@ -278,7 +278,24 @@ jobs:
       # -----------------------------------------------------------   
       - name: Run unittests (parallel)
         run: make unittests
-      
+
+      # -----------------------------------------------------------
+      # Upload doctest + unittest coverage BEFORE booktests wipe artifacts/
+      # -----------------------------------------------------------
+      - name: Upload pre-booktest coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: alltests
+          fail_ci_if_error: false
+          files: >-
+            ./artifacts/coverage/unit/coverage.json,
+            ./artifacts/coverage/doctests/minimal/coverage.json,
+            ./artifacts/coverage/doctests/torch/coverage.json,
+            ./artifacts/coverage/doctests/gpytorch/coverage.json,
+            ./artifacts/coverage/doctests/botorch/coverage.json
+
       # -----------------------------------------------------------
       # Free disk + conda cache before booktests (OS-specific)
       # -----------------------------------------------------------
@@ -315,5 +332,17 @@ jobs:
         shell: pwsh
         run: |
           make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
+
+      # -----------------------------------------------------------
+      # Upload coverage to Codecov
+      # -----------------------------------------------------------
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: alltests
+          fail_ci_if_error: false
+          files: ./artifacts/coverage/booktests/coverage.json
   
 # For success reports, see https://github.com/QMCSoftware/QMCSoftware/actions?query=is%3Asuccess+workflow%3AAll+Tests

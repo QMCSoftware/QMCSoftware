@@ -17,7 +17,7 @@ class NotebookTests(BaseNotebookTest):
         notebook_path, notebook_dir = self.locate_notebook(
             "../../demos/GBM/gbm_examples.ipynb"
         )
-        self.fix_gbm_symlinks(notebook_dir, symlinks_to_fix)
+        self.fix_symlinks(notebook_dir, symlinks_to_fix)
         # Toggle code cell [3] cf.is_debug -> True before executing
         replacements = {"cf.is_debug = False": "cf.is_debug = True"}
         self.run_notebook(notebook_path, replacements)

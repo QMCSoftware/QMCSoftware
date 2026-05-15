@@ -314,6 +314,6 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             omega3_1D = lambda x: (s1(x) + s2(x) + ts3(x))
             kernFunc = omega3_1D
         else:
-            NotYetImplemented("cubBayesNet_g: kernel order not yet supported")
+            raise NotYetImplemented("cubBayesNet_g: kernel order not yet supported")
 
         return kernFunc

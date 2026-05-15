@@ -3,9 +3,7 @@ from qmcpy.util import *
 import qmctoolscl
 import os
 import unittest
-import ctypes
 import numpy as np
-import time
 import numpy.testing as npt
 import tempfile
 import warnings
@@ -50,7 +48,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             IIDStdUniform(d, seed=7),
             Lattice(d, seed=7),
             DigitalNetB2(d, seed=7),
-            Halton(d, seed=7),
+            Halton(d, seed=7, warn=False),
         ]:
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
@@ -332,6 +330,20 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertEqual(x.shape, (4, 2))
         self.assertTrue(np.isfinite(x).all())
         self.assertTrue(((x >= 0) & (x < 1)).all())
+    
+    def test_repeated_sampling(self):
+        for order in ["GRAY","NATURAL"]:
+            for randomize in ["FALSE","LMS DS","LMS","DS","OWEN"]:
+                for alpha in [1,2]:
+                    replications = 3 if randomize!="FALSE" else 1
+                    dnb2 = DigitalNetB2(dimension=5,replications=replications,randomize=randomize,order=order,alpha=alpha)
+                    x_full = dnb2(16,warn=False) 
+                    self.assertEqual(x_full.shape,(replications, 16, 5))
+                    self.assertTrue((x_full[:,:4,:]==dnb2(0,4,warn=False)).all())
+                    self.assertTrue((x_full[:,4:8,:]==dnb2(4,8)).all())
+                    self.assertTrue((x_full[:,8:16,:]==dnb2(8,16)).all())
+                    self.assertTrue((x_full[:,4:16,:]==dnb2(4,16)).all())
+
 
 
 class TestHalton(unittest.TestCase):
@@ -345,7 +357,7 @@ class TestHalton(unittest.TestCase):
         self.assertTrue((x0123[5:7, [1, 3]] == x13).all())
 
     def test_unrandomized(self):
-        x_ur = Halton(dimension=2, randomize=False).gen_samples(4, warn=False)
+        x_ur = Halton(dimension=2, randomize=False, warn=False).gen_samples(4, warn=False)
         x_true = np.array(
             [[0, 0], [1.0 / 2, 1.0 / 3], [1.0 / 4, 2.0 / 3], [3.0 / 4, 1.0 / 9]]
         )
