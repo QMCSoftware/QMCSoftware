@@ -78,7 +78,7 @@ import numpy as np
 def keister(x):
     """
     x: nxd numpy ndarray with n samples d dimensions
-    returns n-vector of the Kesiter function evaluations
+    returns n-vector of the Keister function evaluations
     """
     d = x.shape[1]
     norm_x = np.sqrt((x**2).sum(1))
