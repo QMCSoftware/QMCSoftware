@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Analysis of Quasi-Monte Carlo Efficiency for Asian Option Pricing
 
+--8<-- "snippets/blog-authors/analysis-of-qmc-efficiency-for-asian-option-pricing.md"
+
+July 15, 2025
+
+This post compares IID Monte Carlo and QMCPy QMC methods for arithmetic Asian option pricing, focusing on sample counts, timings, and empirical stability.
+
 ## Introduction: The Asian Option Pricing Challenge
 
 Asian options are especially difficult to price because their payoffs involve the average price of an underlying asset over a period of time. In comparison to simpler European options, arithmetic (or average) Asian options generally do not have a simple closed-form solution because of their path dependence. As a result, they are commonly approximated using numerical methods, including Monte Carlo (MC) simulation.
@@ -142,5 +148,3 @@ For this arithmetic Asian option example, the tested QMC workflows achieved the 
 ## References
 
 - Choi, S.-C. T., et al., “QMCPy: A Quasi-Monte Carlo Python Library,” [https://qmcpy.org](https://qmcpy.org).
-
---8<-- "snippets/blog-authors/analysis-of-qmc-efficiency-for-asian-option-pricing.md"

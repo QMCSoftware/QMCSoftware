@@ -6,6 +6,12 @@ Image handling: original local image references were preserved.
 
 # Extending QMCPy's `SciPyWrapper` to Support Dependent and Custom Distributions
 
+--8<-- "snippets/blog-authors/scipywrapper.md"
+
+April 18, 2026
+
+This post describes the updated `SciPyWrapper` interface for dependent joint distributions, custom marginals, and validation warnings.
+
 #### Introduction
 
 `SciPyWrapper` is one of QMCPy's most useful interfaces: it maps low-discrepancy samples on `[0,1]^d` to probability models used in simulation and integration. The original interface served independent univariate marginals from `scipy.stats` effectively, but many modern workflows require richer structure, including dependence and custom distribution families.
@@ -172,5 +178,3 @@ The updated `SciPyWrapper` preserves simplicity for existing users and adds the 
 1. Choi, S.-C., Hickernell, F., McCourt, M., Sorokin, A. QMCPy: A Quasi-Monte Carlo Python Library. https://qmcsoftware.github.io/QMCSoftware/
 2. SciPy Statistics Documentation. https://docs.scipy.org/doc/scipy/reference/stats.html
 3. QMCSoftware repository. https://github.com/QMCSoftware/QMCSoftware
-
---8<-- "snippets/blog-authors/scipywrapper.md"

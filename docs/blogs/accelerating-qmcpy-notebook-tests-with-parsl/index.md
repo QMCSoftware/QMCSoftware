@@ -6,6 +6,12 @@ Image handling: TeX image references were replaced with local image files.
 
 # Accelerating QMCPy Notebook Tests with Parsl
 
+--8<-- "snippets/blog-authors/accelerating-qmcpy-notebook-tests-with-parsl.md"
+
+November 29, 2025
+
+This post describes how Parsl parallelism can accelerate QMCPy notebook testing while preserving the structure of the existing testbook workflow.
+
 ## Introduction
 
 Notebook regression testing ensures that interactive examples and analyses
@@ -165,5 +171,3 @@ expand this approach to Python doctests and unit testing with `pytest` or
 4. Babuji, Y. et al. Parsl: Pervasive Parallel Programming in Python.
    *Proceedings of the 28th International Symposium on High-Performance
    Parallel and Distributed Computing* (2019).
-
---8<-- "snippets/blog-authors/accelerating-qmcpy-notebook-tests-with-parsl.md"

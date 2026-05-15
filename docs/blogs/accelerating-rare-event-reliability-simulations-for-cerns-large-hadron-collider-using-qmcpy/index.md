@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Accelerating Rare-event Reliability Simulations for CERN's Large Hadron Collider using QMCPy
 
+--8<-- "snippets/blog-authors/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy.md"
+
+April 7, 2023
+
+This post shows how QMCPy can improve rare-event Monte Carlo reliability simulations in CERN's AvailSim4 framework.
+
 In this blog post, we share an example for using the QMCPy package to
 accelerate rare-event Monte Carlo (MC) simulations in AvailSim4 [1]. The
 effort is part of a more general study of advanced MC methods for
@@ -182,5 +188,3 @@ averages, such as the numbers of events of interest.
    reliability simulations for Large Hadron Collider Protection
    Systems*. MSc Thesis.
    [https://cds.cern.ch/record/2808520](https://cds.cern.ch/record/2808520).
-
---8<-- "snippets/blog-authors/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy.md"

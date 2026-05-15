@@ -1,5 +1,11 @@
 # What Makes a Sequence Low Discrepancy?
 
+--8<-- "snippets/blog-authors/what-makes-a-sequence-low-discrepancy.md"
+
+July 8, 2020
+
+This post introduces discrepancy as a way to measure uniformity and explains why low-discrepancy sequences improve QMC integration.
+
 The first blog post, [Why Add Q to MC?](../why-add-q-to-mc/index.md),
 introduced the concept of evenly spread points, which are commonly
 referred to as *low discrepancy* (LD) points. This is in contrast to
@@ -209,5 +215,3 @@ construct certain popular LD sequences [4, 5].
    University Press, Cambridge (2010).
 5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo
    Methods*. SIAM, Philadelphia (1992).
-
---8<-- "snippets/blog-authors/what-makes-a-sequence-low-discrepancy.md"

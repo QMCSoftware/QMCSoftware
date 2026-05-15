@@ -6,6 +6,12 @@ Image handling: no content images were present in the original post.
 
 # Bayesian Stopping Criteria
 
+--8<-- "snippets/blog-authors/bayesian-stopping-criteria.md"
+
+May 19, 2022
+
+This post explains Bayesian stopping criteria for QMC integration and how matching kernels with lattice or digital net designs reduces credible-interval costs.
+
 The blog [Why Add Q to MC?](../why-add-q-to-mc/index.md) explained the
 advantages of carefully chosen, low discrepancy sampling sites for
 approximating multivariate integrals, or equivalently, expectations of
@@ -271,5 +277,3 @@ this
 9. Fino, B. J., & Algazi, V. R. Unified matrix treatment of the fast
    Walsh-Hadamard transform. *IEEE Transactions on Computers*, C-25,
    1142-1146 (1976).
-
---8<-- "snippets/blog-authors/bayesian-stopping-criteria.md"

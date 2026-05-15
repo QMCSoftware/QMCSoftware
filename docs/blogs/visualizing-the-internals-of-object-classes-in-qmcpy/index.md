@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Visualizing the Internals of Object Classes in QMCPy
 
+--8<-- "snippets/blog-authors/visualizing-the-internals-of-object-classes-in-qmcpy.md"
+
+February 25, 2021
+
+This post uses UML diagrams to explain QMCPy's object-oriented architecture and relationships among its core classes.
+
 As a software library grows, so does its complexity. This comment
 certainly applies to QMCPy [1], our Python library for high-dimensional
 numerical integration.
@@ -182,5 +188,3 @@ extra details including private fields and methods.
    [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
    2020.
 2. Unhelkar, B. *Software Engineering with UML*. CRC Press, 2017.
-
---8<-- "snippets/blog-authors/visualizing-the-internals-of-object-classes-in-qmcpy.md"

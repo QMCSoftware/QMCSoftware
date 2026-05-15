@@ -7,6 +7,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Visualizing the Generated Samples Helps
 
+--8<-- "snippets/blog-authors/visualizing-the-generated-samples-helps.md"
+
+February 25, 2026
+
+This post introduces QMCPy's `plot_proj` function for visualizing two-dimensional projections of discrete distributions and true measures.
+
 It is a universal truth that visuals better appeal to the human mind
 than a group of numbers listed out. With visuals, it is easier for us to
 discern patterns and identify any flaws in the logic behind our
@@ -124,5 +130,3 @@ projections, and the `math_ind` parameter allows the user to either input
 mathematical or Python dimensions for the sampler based on one's
 preference. This function could also be developed in the future to
 support other distributions such as Brownian Motion.
-
---8<-- "snippets/blog-authors/visualizing-the-generated-samples-helps.md"

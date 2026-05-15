@@ -1,3 +1,1 @@
-## Authors
-
---8<-- "snippets/authors/fred-hickernell.md"
+Fred J. Hickernell

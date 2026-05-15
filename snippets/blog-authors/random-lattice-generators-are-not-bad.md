@@ -1,3 +1,1 @@
-## Authors
-
---8<-- "snippets/authors/bocheng-david-zhang.md"
+Bocheng David Zhang

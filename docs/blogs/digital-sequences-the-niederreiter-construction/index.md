@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Digital Sequences, the Niederreiter Construction
 
+--8<-- "snippets/blog-authors/digital-sequences-the-niederreiter-construction.md"
+
+June 4, 2021
+
+This post explains the digital construction of Niederreiter sequences and compares their QMCPy performance with Sobol' sequences.
+
 The previous blog post on
 [What Makes a Sequence "Low Discrepancy"?](../what-makes-a-sequence-low-discrepancy/index.md)
 introduced the concept of so-called low discrepancy (LD) points. In the
@@ -312,5 +318,3 @@ Sobol' sequences when utilized by the `CubQMCNetG` stopping criterion.
    Philadelphia (1992).
 6. Bitbucket repository of Adrian Ebert.
    [https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/).
-
---8<-- "snippets/blog-authors/digital-sequences-the-niederreiter-construction.md"

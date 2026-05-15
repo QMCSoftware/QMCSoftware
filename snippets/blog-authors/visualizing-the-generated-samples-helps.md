@@ -1,3 +1,1 @@
-## Authors
-
---8<-- "snippets/authors/aadit-jain.md"
+Aadit Jain

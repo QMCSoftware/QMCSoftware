@@ -6,6 +6,12 @@ Image handling: original WordPress image URL was replaced with a local image fil
 
 # A QMCPy Quick Start
 
+--8<-- "snippets/blog-authors/a-qmcpy-quick-start.md"
+
+July 6, 2020
+
+This quick start introduces QMCPy through the Keister integration problem and shows how a discrete distribution, true measure, integrand, and stopping criterion fit together.
+
 QMCPy is an open-source, object-oriented
 [quasi-Monte Carlo (QMC)](../why-add-q-to-mc/index.md) software framework in
 Python 3. It contains standardized parent classes for modeling
@@ -162,5 +168,3 @@ more details.
    integration based on rank-1 lattices. In *Monte Carlo and
    Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014*,
    407-422. Springer-Verlag, Berlin, 2016. arXiv:1411.1966.
-
---8<-- "snippets/blog-authors/a-qmcpy-quick-start.md"

@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Why Add Q to MC?
 
+--8<-- "snippets/blog-authors/why-add-q-to-mc.md"
+
+June 25, 2020
+
+This post motivates quasi-Monte Carlo by comparing IID sampling with more evenly spread points for numerical integration.
+
 Quasi-Monte Carlo (QMC) methods can sometimes speed up simple Monte Carlo (MC) calculations by orders of magnitude. What makes them work so well?
 
 MC methods use computer generated random numbers to generate various scenarios. When computing financial risk, the scenarios may be possible financial market outcomes. When assessing the resiliency of the power grid, the scenarios represent power demand and power grid failures under different future weather conditions.
@@ -45,5 +51,3 @@ QMCPy [1] is our open source Python library that implements QMC methods, includi
 ## References
 
 1. Choi, S.-C. T., Hickernell, F. J., McCourt, M. & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
-
---8<-- "snippets/blog-authors/why-add-q-to-mc.md"

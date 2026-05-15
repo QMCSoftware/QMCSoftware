@@ -6,6 +6,12 @@ Image handling: no content images were present in the original post.
 
 # Safe Handling of QMC Points
 
+--8<-- "snippets/blog-authors/safe-handling-of-qmc-points.md"
+
+August 31, 2020
+
+This post explains why QMC points should not be handled like IID samples and warns against unsafe practices such as skipping, thinning, and arbitrary sample sizes.
+
 A Quasi-Monte Carlo construction of $n$ points in $d$ dimensions may
 look like IID points, but they must be used with a bit more care.
 Because QMC can give errors that are $o(1/n)$ as $n \to \infty$,
@@ -185,5 +191,3 @@ Halton sequence counters those striping artifacts more surely than a
 burn-in would. It also moves the point at the origin to a uniformly
 distributed random point. This is another instance where RQMC is safer
 and more effective than plain QMC.
-
---8<-- "snippets/blog-authors/safe-handling-of-qmc-points.md"

@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Random Lattice Generators are Not Bad
 
+--8<-- "snippets/blog-authors/random-lattice-generators-are-not-bad.md"
+
+May 16, 2023
+
+This post discusses random lattice generating vectors in QMCPy and compares mean, median, and randomly shifted lattice rules.
+
 Generating vectors are used by lattice generators to compute point
 sets. Previous works [1, 2, 3, 4] commonly applied greedy
 component-by-component (CBC) algorithms to construct generating
@@ -239,5 +245,3 @@ potential.
    (2022). [https://doi.org/10.1137/22M1473625](https://doi.org/10.1137/22M1473625)
 6. Keister, B. D. Multidimensional quadrature algorithms. *Computers in
    Physics* 10, 119-122 (1996).
-
---8<-- "snippets/blog-authors/random-lattice-generators-are-not-bad.md"

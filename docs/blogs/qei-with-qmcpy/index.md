@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # qEI with QMCPy
 
+--8<-- "snippets/blog-authors/qei-with-qmcpy.md"
+
+July 19, 2020
+
+This post demonstrates how QMCPy low-discrepancy samples can improve Monte Carlo estimation of q-Expected Improvement in Bayesian optimization.
+
 Quasi-Monte Carlo methods (QMC) are a valuable tool for sampling random
 variables in a structured fashion. This allows for computing key
 statistics of random variables
@@ -107,5 +113,3 @@ more about the QMCPy project and how QMC can help your work.
 
 For a related executable notebook, see the
 [qEI demo for blog](../../demos/qei-demo-for-blog.ipynb).
-
---8<-- "snippets/blog-authors/qei-with-qmcpy.md"

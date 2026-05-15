@@ -7,6 +7,12 @@ Image handling: no local images were supplied or required.
 
 # CubMCCLTVec: Vectorizing the CubMCCLT Algorithm
 
+--8<-- "snippets/blog-authors/cubmccltvec-vectorizing-the-cubmcclt-algorithm.md"
+
+February 25, 2026
+
+This post introduces `CubMCCLTVec`, a vectorized extension of `CubMCCLT` for confidence intervals on vector-valued quantities of interest.
+
 Recent work by Aleksei G. Sorokin and Jagadeeswaran Rathinavel [1]
 discuss extending stopping criterion for a scalar mean to stopping
 criterion for vector quantities of interest formulated as functions of
@@ -245,5 +251,3 @@ to functions with multiple outputs allows us to utilize the existing
    0377-0427.
    [https://www.sciencedirect.com/science/article/pii/S0377042706004250](https://www.sciencedirect.com/science/article/pii/S0377042706004250)
    (2007).
-
---8<-- "snippets/blog-authors/cubmccltvec-vectorizing-the-cubmcclt-algorithm.md"

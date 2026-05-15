@@ -1,5 +1,1 @@
-## Authors
-
---8<-- "snippets/authors/joshua-jay-herman.md"
---8<-- "snippets/authors/brandon-sharp.md"
---8<-- "snippets/authors/sou-cheng-choi.md"
+Joshua Jay Herman, Brandon Sharp, and Sou-Cheng Choi

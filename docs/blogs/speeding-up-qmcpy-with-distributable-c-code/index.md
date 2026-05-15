@@ -6,6 +6,12 @@ Image handling: no content images were present in the original post.
 
 # Speeding up QMCPy with Distributable C Code
 
+--8<-- "snippets/blog-authors/speeding-up-qmcpy-with-distributable-c-code.md"
+
+February 25, 2021
+
+This post explains how QMCPy uses distributable C extensions through `ctypes` and packaging metadata to speed up low-discrepancy generators.
+
 Many Python packages rely on underlying C or C++ code to speed up their
 numerical methods. For example, [NumPy](https://numpy.org/) calls C and
 C++ extensions in order to speed up matrix manipulation algorithms.
@@ -188,5 +194,3 @@ include qmcpy/discrete_distribution/lattice/generating_vectors/*.npy
    47, 159-164.
    [https://pubsonline.informs.org/doi/abs/10.1287/opre.47.1.159](https://pubsonline.informs.org/doi/abs/10.1287/opre.47.1.159).
    1999.
-
---8<-- "snippets/blog-authors/speeding-up-qmcpy-with-distributable-c-code.md"

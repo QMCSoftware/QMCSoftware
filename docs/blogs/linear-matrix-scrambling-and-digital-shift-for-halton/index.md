@@ -6,6 +6,12 @@ Image handling: original WordPress image URLs were replaced with local image fil
 
 # Linear Matrix Scrambling and Digital Shift for Halton
 
+--8<-- "snippets/blog-authors/linear-matrix-scrambling-and-digital-shift-for-halton.md"
+
+September 29, 2025
+
+This post introduces linear matrix scrambling and digital shifts for Halton sequences and shows how these randomizations affect point generation.
+
 ## Introduction: Halton Sequences and Their Randomizations
 
 The Halton sequence is a common low-discrepancy sequence used for
@@ -186,5 +192,3 @@ problematic.
 3. Owen, A. B. & Pan, Z. Gain coefficients for scrambled Halton points.
    2023. [arXiv:2308.08035](https://arxiv.org/abs/2308.08035)
    [math.NA].
-
---8<-- "snippets/blog-authors/linear-matrix-scrambling-and-digital-shift-for-halton.md"
