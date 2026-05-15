@@ -87,7 +87,8 @@ class FrankCopula(AbstractTrueMeasure):
         self.range = _build_marginal_range(self.marginals)
 
         super(FrankCopula, self).__init__()
-        assert len(self.marginals) == self.d
+        if len(self.marginals) != self.d:
+            raise DimensionError("Length of marginals must match sampler dimension.")
 
     def _parse_theta(self, theta):
         try:

@@ -70,8 +70,12 @@ class StudentTCopula(AbstractTrueMeasure):
         self.range = _build_marginal_range(self.marginals)
 
         super(StudentTCopula, self).__init__()
-        assert len(self.marginals) == self.d
-        assert self.correlation.shape == (self.d, self.d)
+        if len(self.marginals) != self.d:
+            raise DimensionError("Length of marginals must match sampler dimension.")
+        if self.correlation.shape != (self.d, self.d):
+            raise ValueError(
+                f"correlation shape {self.correlation.shape} must match sampler dimension {self.d}."
+            )
 
     def _parse_df(self, df):
         try:

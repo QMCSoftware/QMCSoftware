@@ -85,12 +85,12 @@ def _build_marginal_range(marginals):
             try:
                 ranges.append(marginal.interval(1.0))
                 continue
-            except Exception:
+            except (AttributeError, TypeError, ValueError, FloatingPointError):
                 pass
 
         try:
             ranges.append((marginal.ppf(eps), marginal.ppf(1.0 - eps)))
-        except Exception:
+        except (AttributeError, TypeError, ValueError, FloatingPointError):
             ranges.append((-np.inf, np.inf))
 
     return np.asarray(ranges, dtype=float)
