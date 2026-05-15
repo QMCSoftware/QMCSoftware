@@ -66,12 +66,12 @@ nav:
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
         - Copula TrueMeasure Examples: demos/copula_examples/copula_examples.ipynb
   - Blogs: 
-    - SciPyWrapper: blogs/scipywrapper/index.md
-    - GBM with QMCPy: blogs/gbm-qmcpy/index.md
     - Iteration Log: demos/demo_resume_data/Iteration_Log_Tolerance_Demo.ipynb
     - Resume Feature: demos/demo_resume_data/accuracy_and_resume.ipynb
   # - Papers: 
   #   - JOSS: paper/paper.md
+    - SciPyWrapper: blogs/scipywrapper/index.md
+    - GBM with QMCPy: blogs/gbm-qmcpy/index.md
   - For Developers:
     - Release Manual: RELEASE.md
     - Testing Guidelines: 
