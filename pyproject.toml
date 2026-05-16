@@ -81,7 +81,7 @@ test = [
     "pandas >= 1.3.0",
     "yfinance >= 0.2.0",
     "quantlib == 1.38",
-    "ipywidgets == 8.1.7",
+    "ipywidgets >= 8.1.7, < 9",
     "nbconvert >= 7.2.9",
     "pytest-xdist >= 3.8.0",
     ]
