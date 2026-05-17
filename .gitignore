@@ -2,7 +2,7 @@
 .pdm-python
 .pytest_cache/
 raw.githubusercontent.com/*
-packages.svg
+*.svg
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
@@ -114,3 +114,4 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
