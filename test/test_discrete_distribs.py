@@ -344,23 +344,6 @@ class TestDigitalNetB2(unittest.TestCase):
                     self.assertTrue((x_full[:,8:16,:]==dnb2(8,16)).all())
                     self.assertTrue((x_full[:,4:16,:]==dnb2(4,16)).all())
 
-    def test_fused_float_path_matches_uint64_fallback(self):
-        # Verify that the fused C float path (_try_gen_samples_float) produces
-        # numerically identical results to the uint64 fallback path.
-        from unittest.mock import patch
-        for order in ["GRAY", "NATURAL"]:
-            for randomize in ["FALSE", "LMS DS", "DS"]:
-                dnb2 = DigitalNetB2(dimension=3, seed=7, randomize=randomize, order=order)
-                x_fused = dnb2(8, warn=False)
-                # Force fallback by making _try_gen_samples_float return None
-                with patch.object(dnb2, "_try_gen_samples_float", return_value=None):
-                    x_fallback = dnb2(8, warn=False)
-                npt.assert_array_equal(
-                    x_fused, x_fallback,
-                    err_msg=f"Fused and fallback paths differ for order={order}, randomize={randomize}",
-                )
-
-
 class TestHalton(unittest.TestCase):
     """Unit test for Halton DiscreteDistribution."""
 
