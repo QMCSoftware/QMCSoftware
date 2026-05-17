@@ -64,6 +64,7 @@ nav:
       - Importance Sampling with True Measures:
         - Some True Measures: demos/some_true_measures.ipynb
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
+        - Acceptance-Rejection Sampling: demos/acceptance_rejection.ipynb
   - Blogs: 
     - Iteration Log: demos/demo_resume_data/Iteration_Log_Tolerance_Demo.ipynb
     - Resume Feature: demos/demo_resume_data/accuracy_and_resume.ipynb
