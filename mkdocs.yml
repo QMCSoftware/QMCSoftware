@@ -91,6 +91,7 @@ nav:
     - Testing Guidelines: 
       - Doc tests and unit tests on `qmcpy`: tests.md
       - Unit tests on Jupyter Notebooks: booktests.md
+    - JOSS 2026 Paper: paper/paper.md
   
 
 plugins:
@@ -220,4 +221,5 @@ extra_javascript:
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
 
 extra_css:
+  - stylesheets/paper.css
   - https://unpkg.com/katex@0/dist/katex.min.css

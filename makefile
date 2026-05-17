@@ -267,13 +267,15 @@ uml:
 # run ` mkdocs build -v` to debug
 ##########################################################
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
-	@cp -r paper docs/paper
+	@rm -rf docs/paper docs/demos
 	@cp README.md docs/README.md 
 	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
 	@cp -r paper docs
+	@rm -f docs/paper/README.md
+	@./scripts/render_paper_for_mkdocs.sh
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
 	@mkdir -p docs/stats
