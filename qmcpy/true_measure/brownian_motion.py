@@ -1,6 +1,7 @@
 from .gaussian import Gaussian
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
+from scipy.stats import norm
 
 
 class BrownianMotion(Gaussian):
@@ -41,6 +42,23 @@ class BrownianMotion(Gaussian):
                 [0.44891984, 2.53987304, 4.7224811 ],
                 [0.23147948, 2.25289769, 3.00039101],
                 [2.06762574, 3.21756319, 4.93375923]]])
+
+        With Brownian Bridge construction
+
+        >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge')
+        >>> true_measure(2)
+        array([[-0.29376184,  0.41054648,  0.13428456,  0.3095377 ],
+               [-0.32948661, -1.19527027, -1.17959535, -1.58454187]])
+        >>> true_measure
+        BrownianMotion (AbstractTrueMeasure)
+            time_vec        [0.25 0.5  0.75 1.  ]
+            drift           0
+            mean            [0. 0. 0. 0.]
+            covariance      [[0.25 0.25 0.25 0.25]
+                             [0.25 0.5  0.5  0.5 ]
+                             [0.25 0.5  0.75 0.75]
+                             [0.25 0.5  0.75 1.  ]]
+            decomp_type     BROWNIANBRIDGE
     """
 
     def __init__(
@@ -65,8 +83,9 @@ class BrownianMotion(Gaussian):
             diffusion (int): Diffusion $\sigma^2$.
             decomp_type (str): Method for decomposition for covariance matrix. Options include
 
-                - `'PCA'` for principal component analysis, or
-                - `'Cholesky'` for cholesky decomposition.
+                - `'PCA'` for principal component analysis,
+                - `'Cholesky'` for cholesky decomposition, or
+                - `'BrownianBridge'` for brownian bridge construction.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
         """
         self.parameters = ["time_vec", "drift", "mean", "covariance", "decomp_type"]
@@ -97,3 +116,35 @@ class BrownianMotion(Gaussian):
         return BrownianMotion(
             sampler, t_final=self.t, drift=self.drift, decomp_type=self.decomp_type
         )
+
+    def _transform(self, x):
+        if self.decomp_type == "BROWNIANBRIDGE":
+            z = norm.ppf(x)
+            w = self._bridge_transform(z)
+            return self.drift_time_vec_plus_init + np.sqrt(self.diffusion) * w
+        return super()._transform(x)
+
+    def _bridge_transform(self, z):
+        """Build Brownian Bridge path from standard normal samples."""
+        w_all = np.zeros(z.shape[:-1] + (self.d + 1,))
+        w_all[..., self.d] = np.sqrt(self.t) * z[..., 0]  # bridge endpoint
+        z_idx = [1]
+        self._bridge_helper(w_all, z, 0, self.d, z_idx)
+        return w_all[..., 1:]
+
+    def _bridge_helper(self, w_all, z, left, right, z_idx):
+        """Recursively fill in Brownian Bridge path."""
+        mid = (left + right) // 2
+        if mid == left:
+            return
+        t_left = 0.0 if left == 0 else self.time_vec[left - 1]
+        t_mid = self.time_vec[mid - 1]
+        t_right = self.time_vec[right - 1]
+        mean = w_all[..., left] + (t_mid - t_left) / (t_right - t_left) * (
+            w_all[..., right] - w_all[..., left]
+        )  # conditional mean
+        std = np.sqrt((t_mid - t_left) * (t_right - t_mid) / (t_right - t_left))  # conditional std
+        w_all[..., mid] = mean + std * z[..., z_idx[0]]
+        z_idx[0] += 1
+        self._bridge_helper(w_all, z, left, mid, z_idx)
+        self._bridge_helper(w_all, z, mid, right, z_idx)
