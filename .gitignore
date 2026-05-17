@@ -2,7 +2,7 @@
 .pdm-python
 .pytest_cache/
 raw.githubusercontent.com/*
-*.svg
+packages.svg
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
