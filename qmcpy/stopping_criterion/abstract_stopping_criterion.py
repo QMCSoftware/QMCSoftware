@@ -21,10 +21,6 @@ if TYPE_CHECKING:
     import pandas
 
 
-# Optional diagnostic hook for resume-aware stopping criteria.
-IS_PRINT_DIAGNOSTIC = False
-
-
 class AbstractStoppingCriterion(object):
     _RESUME_FORMAT_VERSION = 1  # Increment when checkpoint format changes in a non-backwards-compatible way
     _ITERATION_LOG_VIEWS = ("all", "current", "without_resume", "stage_last")
