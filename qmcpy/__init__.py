@@ -22,6 +22,7 @@ from .kernel import (
     KernelMultiTask,
     KernelMultiTaskDerivs,
 )
+from .true_measure.acceptance_rejection import AcceptanceRejection, AcceptanceRejectionReal
 from .fast_transform import (
     fftbr,
     ifftbr,
@@ -37,4 +38,4 @@ from .fast_transform import (
 from .util import plot_proj, mlmc_test
 
 name = "qmcpy"
-__version__ = "2.2"
+__version__ = "2.3"

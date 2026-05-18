@@ -12,16 +12,16 @@ try:
 except ImportError:
 
     def fftbr_torch(*args, **kwargs):
-        raise Exception("fftbr_torch requires torch but no installation found")
+        raise ModuleNotFoundError("fftbr_torch requires torch but no installation found")
 
     def ifftbr_torch(*args, **kwargs):
-        raise Exception("ifftbr_torch requires torch but no installation found")
+        raise ModuleNotFoundError("ifftbr_torch requires torch but no installation found")
 
     def fwht_torch(*args, **kwargs):
-        raise Exception("fwht_torch requires torch but no installation found")
+        raise ModuleNotFoundError("fwht_torch requires torch but no installation found")
 
     def omega_fftbr_torch(*args, **kwargs):
-        raise Exception("omega_fftbr_torch requires torch but no installation found")
+        raise ModuleNotFoundError("omega_fftbr_torch requires torch but no installation found")
 
     def omega_fwht_torch(*args, **kwargs):
-        raise Exception("omega_fwht_torch requires torch but no installation found")
+        raise ModuleNotFoundError("omega_fwht_torch requires torch but no installation found")

@@ -1,12 +1,12 @@
 from .abstract_cub_mlqmc import AbstractCubMLQMC
 from ..util.data import Data
+import copy
 from ..discrete_distribution import DigitalNetB2, Lattice, Halton
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
-from ..true_measure import Gaussian
 from ..integrand import FinancialOption
-from ..util import MaxSamplesWarning, ParameterError, MaxLevelsWarning
+from ..util import MaxSamplesWarning, MaxLevelsWarning, ParameterError
 import numpy as np
 from scipy.stats import norm
 from time import time
@@ -14,6 +14,11 @@ import warnings
 
 
 class CubMLQMC(AbstractCubMLQMC):
+    _RESUME_REQUIRED_FIELDS = (
+        "levels", "n_level", "eval_level", "mean_level_reps", "mean_level",
+        "var_level", "cost_level", "var_cost_ratio_level", "bias_estimate", "level_integrands"
+    )
+
     """
     Multilevel Quasi-Monte Carlo stopping criterion.
 
@@ -117,19 +122,34 @@ class CubMLQMC(AbstractCubMLQMC):
         self.replications = self.discrete_distrib.replications
         assert self.replications >= 4, "require at least 4 replications"
 
-    def integrate(self):
-        t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "n_total",
-                "levels",
-                "n_level",
-                "mean_level",
-                "var_level",
-                "bias_estimate",
-            ]
-        )
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if np.shape(data.mean_level_reps) != (data.levels, int(self.replications)):
+            raise ParameterError(
+                "resume data mean_level_reps shape %s is incompatible with levels=%d, replications=%d."
+                % (np.shape(data.mean_level_reps), data.levels, int(self.replications))
+            )
+        try:
+            self._validate_level_replay_cache(data)
+        except ValueError as exc:
+            raise ParameterError(str(exc)) from exc
+
+    def _restore_resume_state(self, data):
+        # eval_level is all-False at end of a converged run; the loop's first
+        # update_data call is a no-op, then the algorithm re-evaluates variance
+        # and bias against the new rmse_tol (tighter or looser) and samples
+        # accordingly.  With a looser tolerance the variance/bias conditions are
+        # already met and the loop exits immediately.
+        pass
+
+    def _can_replay_resume_exactly(self, data):
+        checkpoint_tol = self._checkpoint_rmse_tol(data)
+        if checkpoint_tol is None or not (self.rmse_tol < checkpoint_tol):
+            return False
+        return hasattr(data, "level_rep_sums") and hasattr(data, "level_n_increments")
+
+    def _construct_data(self):
+        data = Data(parameters=["solution", "n_total", "levels", "n_level", "mean_level", "var_level", "bias_estimate"])
         data.levels = int(self.levels_min + 1)
         data.n_level = np.zeros(data.levels, dtype=int)
         data.eval_level = np.ones(data.levels, dtype=bool)
@@ -140,10 +160,36 @@ class CubMLQMC(AbstractCubMLQMC):
         data.var_cost_ratio_level = np.tile(np.inf, data.levels)
         data.bias_estimate = np.inf
         data.level_integrands = []
+        data.level_rep_sums = [[] for _ in range(data.levels)]
+        data.level_n_increments = [[] for _ in range(data.levels)]
+        return data
+
+    def _run_integrate_loop(
+        self,
+        data,
+        update_data_fn,
+        trace=None,
+        record_snapshots=False,
+        stop_condition=None,
+        t_start=None,
+        resume_provenance=None,
+    ):
+        snapshots = []
         while True:
-            self.update_data(data)
+            update_data_fn(data)
+            data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
+            data.rmse_tol = self.rmse_tol
+            if t_start is not None:
+                self._set_elapsed_time(
+                    data, time() - t_start, resume_provenance=resume_provenance
+                )
+            if record_snapshots:
+                snapshots.append(copy.deepcopy(data))
+            if stop_condition is not None and stop_condition(data):
+                break
+            if trace is not None:
+                trace.iteration(data, step_value=int(data.levels))
             if data.var_level.sum() > (self.rmse_tol**2 / 2.0):
-                # double N_l on level with largest V_l/(2^l*N_l)
                 efficient_level = np.argmax(data.var_cost_ratio_level)
                 data.eval_level[efficient_level] = True
             elif data.bias_estimate > (self.rmse_tol / np.sqrt(2.0)):
@@ -152,10 +198,8 @@ class CubMLQMC(AbstractCubMLQMC):
                         "Failed to achieve weak convergence. levels == levels_max.",
                         MaxLevelsWarning,
                     )
-                # add another level
                 self._add_level(data)
             else:
-                # both conditions met
                 break
             total_next_samples = (
                 self.replications * data.eval_level * data.n_level * 2
@@ -172,9 +216,44 @@ class CubMLQMC(AbstractCubMLQMC):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        return snapshots
+
+    def integrate(self, resume=None) -> tuple:
+        """Run (or continue) the MLQMC integration.
+
+        Args:
+            resume (Data, optional): Checkpoint returned by a previous
+                ``integrate()`` call.  The new tolerance may be tighter *or*
+                looser than the one used when the checkpoint was created.
+                With a tighter tolerance the algorithm draws additional samples
+                from where it left off.  With a looser tolerance the existing
+                samples already satisfy the requirement and the method returns
+                immediately with no new sampling.
+
+        Returns:
+            tuple: ``(solution, data)``.
+        """
+        t_start = time()
+        resume_provenance = self._capture_resume_provenance(resume)
+        trace = self._make_trace_logger()
+        data = self._prepare_resume_data(resume, self._validate_resume, self._restore_resume_state)
+        if data is not None:
+            data.rmse_estimate = np.sqrt(data.var_level[:data.levels].sum() + data.bias_estimate**2)
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
+            trace.resume(data, step_value=int(data.levels))
+        if data is None:
+            data = self._construct_data()
+        self._run_integrate_loop(
+            data,
+            self.update_data,
+            trace=trace,
+            t_start=t_start,
+            resume_provenance=resume_provenance,
+        )
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
+        trace.finalize()
+        data.iteration_history = getattr(self, "iteration_history", None)
+        data.history_df = getattr(self, "history_df", None)
         return data.solution, data
