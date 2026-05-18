@@ -37,6 +37,7 @@ class TestTrueMeasure(unittest.TestCase):
             BrownianMotion(
                 DigitalNetB2(d, seed=7), t_final=2, drift=3, decomp_type="Cholesky"
             ),
+            BrownianMotion(DigitalNetB2(d, seed=7), decomp_type="BrownianBridge"),
             BernoulliCont(DigitalNetB2(d, seed=7)),
             BernoulliCont(DigitalNetB2(d, seed=7), lam=[0.25, 0.75]),
             SciPyWrapper(
@@ -391,6 +392,36 @@ class TestBrownianMotion(unittest.TestCase):
                 decimal=10,
                 err_msg="Parent BrownianMotion covariance changed unexpectedly",
             )
+
+    def test_brownian_bridge_output_reproducibility(self):
+        """Test that Brownian Bridge construction produces expected values with fixed seed."""
+        bb = BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="BrownianBridge")
+
+        samples = bb.gen_samples(2)
+
+        # Expected output based on fixed seed
+        expected_samples = np.array(
+            [
+                [-0.29376184, 0.41054648, 0.13428456, 0.3095377],
+                [-0.32948661, -1.19527027, -1.17959535, -1.58454187],
+            ]
+        )
+
+        np.testing.assert_array_almost_equal(
+            samples,
+            expected_samples,
+            decimal=6,
+            err_msg="Brownian Bridge sample generation output changed unexpectedly",
+        )
+
+    def test_brownian_bridge_decomp_type(self):
+        """Test BrownianBridge as a decomposition type for BrownianMotion."""
+        bm = BrownianMotion(
+            DigitalNetB2(4, seed=self.seed, replications=2), 
+            decomp_type="BrownianBridge")
+        samples = bm.gen_samples(2)
+        self.assertEqual(samples.shape, (2, 2, 4))
+        self.assertEqual(samples.dtype, np.float64)
 
 
 class TestGeometricBrownianMotion(unittest.TestCase):
