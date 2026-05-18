@@ -423,6 +423,12 @@ class TestBrownianMotion(unittest.TestCase):
         self.assertEqual(samples.shape, (2, 2, 4))
         self.assertEqual(samples.dtype, np.float64)
 
+    def test_brownian_bridge_no_matrix_decomp(self):
+        """BrownianBridge raises NotImplementedError when matrix decomposition is called."""
+        bm = BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="BrownianBridge")
+        with self.assertRaises(NotImplementedError):
+            bm._compute_decomposition()
+
 
 class TestGeometricBrownianMotion(unittest.TestCase):
     def setUp(self):
