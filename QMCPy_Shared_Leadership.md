@@ -61,7 +61,7 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 ### 3. Documentation and Communication
 **Lead:** Sou-Cheng Choi
 
-**Co-Lead:** Jiangrui Kang
+**Co-Lead:** Jiangrui Kang and Larysa Matiukha
 
 #### Key Responsibilities
 - **Documentation Standards**: Ensure all pull requests (PRs) with new components include appropriate documentation for those components.
