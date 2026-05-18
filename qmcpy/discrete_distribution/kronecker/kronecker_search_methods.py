@@ -1,38 +1,72 @@
 import numpy as np
 from sympy import gcdex, primerange, prime
+np.set_printoptions(precision=17)
 #https://github.com/sympy/sympy/releases
 
 # I can't find where Jimmy's code for the kronecker search from SURE 2025 is, so I've temporarily put my method here
-# Currently, this produces results that are very similar but not identical to my matlab code, which is a bit concerning.
-# The wssd of the two methods are typically the same to 2-3 decimal places, depending on N and d
 
-def KTildeEx(t):
-    b = t * (t - 1) + 1/6
-    step = 1 + b * (1 / (np.arange(1, len(t) + 1) ** 2))
-    k = np.prod(step)
-    return k
+def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0=None, return_coeffs=False):
+    """
+    Args:
+        N (int): The maximum sample size to be searched over.
+        dMax (int): The maximum dimension for which to find the generating vector.
+        searchsize (int): The number of primes to search over for each component of the generating vector.
+        coord_weights (array-like, optional): An array of coordinate weights to use in the search. If None, weights are set to j^(-2).
+        alpha_0 (float, optional): The value for the first component of the generating vector. If None, the golden ratio is used. Note that alpha_0 is taken mod 1.
+        return_coeffs (bool, optional): Whether to return the coefficients of the linear transformation. Default is False.
+    Returns:
+        alpha, coeff (tuple):
+        - alpha (numpy array): The generating vector found by the search.
+        - coeff (numpy array, optional): The coefficients of the linear transformation used in the search, returned only if return_coeffs is True. A description of the coeff array is found below.
+    Complexity:
+        The time complexity of the search is O(searchsize^2 * dMax * N).
+    Approach:
+        Uses the quadratic Bernoulli polynomial kernel to conduct a CBC search for a generating vector, minimizing the weighted sum of squared discrepancies (wssd) with weights w_n = n.
+    Details on coeff array:
+        The coeff array, if returned, is a (dMax-1) x 4 array where each row corresponds to a dimension from 2 to dMax. The columns correspond to the coefficients of the linear transformation used to compute the alpha component for that dimension. Specifically,
+        - alpha[dim+1] = (coeff[dim, 0] * alpha[dim] + coeff[dim, 1]) / (coeff[dim, 2] * alpha[dim] + coeff[dim, 3])
+    """
 
-def kronecker_search_march_2026(N, dMax, searchsize):
     if searchsize < 2:
         raise ValueError("searchsize must be at least 2.")
     if N < 2:
         raise ValueError("N must be at least 2.")
     if dMax < 1:
         raise ValueError("dMax must be at least 1.")
+    if coord_weights is not None and len(coord_weights) < dMax:
+        raise ValueError("Length of coord_weights must be greater than or equal to dMax.")
     
-    # search over the first n primes, n = searchsize
-    searchspace = np.array(list(primerange(1, prime(searchsize)+1)))
 
-    alpha = np.zeros(dMax)
-    # we pick the golden ratio as the first alpha
-    alpha[0] = (np.sqrt(5) - 1) / 2
-    alpha[0] = (np.sqrt(5) - 1) / 2
+    # the quadratic Bernoulli polynomial
+    bernoulli2 = lambda t: t * (t - 1) + 1/6
     
-    diff = np.cumsum(1.0 / np.arange(N, 1, -1))
+    # define coordinate weights if not provided, default to j^(-2)
+    if coord_weights is None:
+        coord_weights = np.array([j**(-2) for j in range(1, dMax + 1)], dtype=np.float64)
+
+    # search over the first n primes, n = searchsize
+    searchspace = np.array(list(primerange(1, prime(searchsize)+1)), dtype=np.float64)
+
+    # alpha is our generating vector, will be found cbc
+    alpha = np.zeros(dMax, dtype=np.float64)
+
+    # we pick the golden ratio as the first component of alpha, or let the user specify
+    if alpha_0 is None:
+        alpha[0] = np.float64((np.sqrt(5) - 1) / 2)
+    else:
+        alpha[0] = np.mod(alpha_0, 1,dtype=np.float64)
+
+    # precompute several constants for the wssd calculation
+    diff = np.cumsum(1.0 / np.arange(N, 1, -1,dtype=np.float64))
     freq = np.cumsum(diff)
     freq = np.flip(freq)
-    
-    # Compute Bezout coefficients for all pairs in the search space
+
+    num = N * (N + 1) / 2
+
+    nK0 = (1 + coord_weights/6)
+    nK0 = N * np.cumprod(nK0)
+
+    # precompute Bezout coefficients for all pairs of primes in the search space
     bezoutCoeffs = np.zeros((searchsize, searchsize))
     for i in range(searchsize - 1):
         a = searchspace[i]
@@ -40,49 +74,83 @@ def kronecker_search_march_2026(N, dMax, searchsize):
             c = searchspace[j]
             # Use sympy.gcdex to get Bezout coefficients
             d_coeff, b_coeff, _ = gcdex(int(a), int(c))
-            bezoutCoeffs[i, j] = b_coeff
-            bezoutCoeffs[j, i] = d_coeff
-    bezoutCoeffs = np.abs(bezoutCoeffs)
-    
+            bezoutCoeffs[i, j] = np.float64(b_coeff)
+            bezoutCoeffs[j, i] = np.float64(d_coeff)
+
+
     # setting up some useful variables for the search
-    coeff = np.zeros((dMax - 1, 4))
-    num = N * (N + 1) / 2
-    t = np.mod(alpha[0] * np.arange(1,N), 1)
-    kPrev = 1 + (t * (t - 1) + 1/6)
+    coeff = np.zeros((dMax - 1, 4)) # stores the coefficients of the linear transformation at each dimension
+    t = alpha[0] * np.arange(1, N) % 1 # t vector is the vector of coordinates generated for the first dimension
+    kPrev = 1 + coord_weights[0] * bernoulli2(t) # gets the k vector for the first dimension, which is used in the wssd calculation and updated each dimension of the search.
+    # The k vector is Ktilde(x_i) for i = 1,...,N-1, where Ktilde is the kernel and x_i are the points generated by the alpha vector, up to the current dimension.
     
     # the main search loop
     for dim in range(1, dMax):
-        best = np.array([0, 0, 0, 0, np.inf])
-        nK0 = N * KTildeEx(np.zeros(dim+1))
+        best_wssd = np.inf # stores the current wssd found for each dimension, initialized to infinity
+        best_alpha = 0 # stores the current best alpha component found for this dimension, initialized to 0
+        best_k = None # stores the k vector for the current best alpha, used to update the k vector for the next dimension after the search is done for this dimension
         for i in range(searchsize):
-            p1 = searchspace[i]
+            p1 = searchspace[i] 
             for j in range(searchsize):
-                if j == i:
+                if j == i: # the two primes have to be distinct, so we skip this case
                     continue
+
                 p2 = searchspace[j]
+
                 b = bezoutCoeffs[i, j]
                 d = bezoutCoeffs[j, i]
-                alpha_dim = (p1 * alpha[dim - 1] + b) / (p2 * alpha[dim - 1] + d)
-                t = (alpha_dim * np.arange(1, N)) - np.floor(alpha_dim * np.arange(1, N))
-                k_vector = kPrev * (1 + (t * (t - 1) + 1/6) / ((dim+1) ** 2))
+
+                if b < 0: # we search over both minimal Bezout coefficients
+                    b1 = -b
+                    d1 = d
+                    b2 = np.abs(b + p1)
+                    d2 = np.abs(d -p2)
+                else:
+                    d1 = -d
+                    b1 = b
+                    d2 = np.abs(d + p2)
+                    b2 = np.abs(b - p1)
                 
-                wssd = nK0 - num + 2 * np.dot(freq, k_vector)
+                alpha_dim1 = (p1 * alpha[dim - 1] + b1) / (p2 * alpha[dim - 1] + d1) # the linear transformation to get the next alpha_dim candidate to test
+                alpha_dim2 = (p1 * alpha[dim - 1] + b2) / (p2 * alpha[dim - 1] + d2) # the other candidate from the linear transformation
+                t1 = (alpha_dim1 * np.arange(1, N)) - np.floor(alpha_dim1 * np.arange(1, N)) # vector of coordinates generated by this candidate component
+                t2 = (alpha_dim2 * np.arange(1, N)) - np.floor(alpha_dim2 * np.arange(1, N)) 
+                k_vector1 = kPrev * (1 + bernoulli2(t1) * coord_weights[dim]) # get the k vector for this candidate component, used in the wssd calculation
+                k_vector2 = kPrev * (1 + bernoulli2(t2) * coord_weights[dim]) 
+
+                wssd1 = np.dot(freq, k_vector1)
+                wssd2 = np.dot(freq, k_vector2)
+
+                if wssd1 < wssd2:
+                    b = b1
+                    d = d1
+                    wssd = wssd1
+                    k_vector = k_vector1
+                    alpha_dim = alpha_dim1
+                else:
+                    b = b2
+                    d = d2
+                    wssd = wssd2
+                    k_vector = k_vector2
+                    alpha_dim = alpha_dim2
                 
-                if wssd < best[4]:
-                    best[0] = p1
-                    best[1] = b
-                    best[2] = p2
-                    best[3] = d
-                    best[4] = wssd
-        
-        alpha_d = (best[0] * alpha[dim - 1] + best[1]) / (best[2] * alpha[dim - 1] + best[3])
-        alpha[dim] = np.mod(alpha_d, 1)
-        t = np.mod(alpha[dim] * np.arange(1, N), 1)
-        kPrev = kPrev * (1 + (t * (t - 1) + 1/6) / ((dim+1) ** 2))
-        coeff[dim - 1, :] = [best[0], best[1], best[2], best[3]]
-        #print(coeff[dim - 1, :], best[4]) #debugging line to check the coefficients and wssd at each dimension
-    
+                if wssd < best_wssd: # if this candidate has a better wssd than the best found so far, we update the best coefficients and wssd
+                    coeff[dim-1, 0] = p1
+                    coeff[dim-1, 1] = b
+                    coeff[dim-1, 2] = p2
+                    coeff[dim-1, 3] = d
+                    best_wssd = wssd
+                    best_alpha = alpha_dim % 1
+                    best_k = k_vector
+        alpha[dim] = best_alpha # update the alpha vector with the best candidate found for this dimension
+
+        kPrev = best_k # update the k vector for the next dimension with the k vector of the best candidate found for this dimension
+
+        # print(coeff[dim - 1, :], (nK0[dim] - num + 2 * best_wssd)) # debugging line to check the coefficients and wssd at each dimension
+    if return_coeffs:
+        return alpha, coeff
     return alpha
 
 # quick and dirty test
-# print(kronecker_search_march_2026(10000, 20, 50))
+# print(kronecker_search_march_2026(2**15, 3, 50))
+
