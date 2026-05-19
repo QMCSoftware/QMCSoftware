@@ -1,5 +1,6 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
+PYTEST ?=
 
 # set environment variable for documentation
 export JUPYTER_PLATFORM_DIRS=1
@@ -159,7 +160,7 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	COVERAGE_FILE=../../$(BOOKTEST_COV_DIR)/.coverage \
-	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py \
+	python -W ignore -m pytest $(PYTEST_XDIST) $(PYTEST) -v tb_*.py \
 		--cov=qmcpy \
 		--cov-append \
 		--cov-report=term \
