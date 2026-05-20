@@ -20,7 +20,7 @@ In a git enabled terminal (e.g. [bash](https://gitforwindows.org/) for Windows) 
 git clone https://github.com/QMCSoftware/QMCSoftware.git
 cd QMCSoftware
 git checkout develop
-conda create --name qmcpy python=3.12
+conda create --name qmcpy python=3.13
 conda activate qmcpy
 pip install -e .[dev]
 ~~~
@@ -54,6 +54,7 @@ pip install -e ".[class,dev]"
 Doctests and unittests take a few minute to run with
 
 ~~~bash
+pip install -e ".[dev,docs,test]"
 make tests_no_docker
 ~~~
 
@@ -66,12 +67,6 @@ make tests
 Please see the targets in the makefile for more granular control over tests.
 
 ## Documentation
-
-~~~bash
-pip install -e ".[docs]"
-~~~
-
-This installs the documentation extras, including `pylint`.
 
 ### Ensure `pyreverse` is on your PATH
 

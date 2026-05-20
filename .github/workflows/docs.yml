@@ -35,3 +35,5 @@ jobs:
       - run: make uml
       - run: make copydocs
       - run: mkdocs gh-deploy --force
+        env:
+          NO_MKDOCS_2_WARNING: "1"
