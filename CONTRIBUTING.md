@@ -2,9 +2,13 @@
 
 Thank you for your interest in contributing to the QMCPy package!
 
-Please submit **pull requests** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
+Please submit **pull requests (PRs)** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
 
-If you develop a new component please consider writing a blog for [qmcpy.org](https://qmcpy.org)
+For planned releases, open related PRs with enough lead time so review can begin at least one week before the release date.
+
+For complex or mathematical contributions, schedule at least one PR review meeting before merging. 
+
+If you develop a new component, please consider writing a blog for the[qmcpy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
 
 Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
 
