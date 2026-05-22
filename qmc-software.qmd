@@ -43,9 +43,11 @@ If you prefer not to use GitHub pull requests, you may instead email updates to 
 #| echo: false
 #| output: asis
 
-exec(open("utilities/qmc_software_table.py").read())
+import runpy
 
-render_qmc_software_table(
+helper_namespace = runpy.run_path("utilities/qmc_software_table.py")
+
+helper_namespace["render_qmc_software_table"](
     data_path="data/qmc-software.yml",
     mode="web",
 )
