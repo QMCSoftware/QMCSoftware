@@ -1,0 +1,59 @@
+---
+title: "Quasi-Monte Carlo Software Packages"
+format:
+  html:
+    page-layout: full
+---
+
+This page is intended to be a community-maintained resource for software related to quasi-Monte Carlo methods. Contributions are welcome.  
+
+Please submit a pull request targeting the `develop` branch with corrections or additions to the [`qmc-software.yml`](data/qmc-software.yml) data file.
+
+If you prefer not to use GitHub pull requests, you may instead email updates to [Fred Hickernell](mailto:hickernell@illinoistech.edu).
+
+
+<style>
+.qmc-software-table {
+  font-size: 0.95rem;
+}
+
+.qmc-software-table td {
+  vertical-align: top;
+}
+
+.software-desc,
+.software-related {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.status-nowrap {
+  white-space: normal;
+}
+
+.qmc-software-table thead th {
+  background-color: #222;
+  color: white;
+}
+
+</style>
+
+
+```{python}
+#| echo: false
+#| output: asis
+
+exec(open("utilities/qmc_software_table.py").read())
+
+render_qmc_software_table(
+    data_path="data/qmc-software.yml",
+    mode="web",
+)
+```
+
+
+
+
+
+
+
