@@ -1,14 +1,32 @@
 import html
 import yaml
 from pathlib import Path
+from urllib.parse import urlparse
+
+
+def is_safe_url(url):
+    allowed_schemes = {"http", "https", "mailto"}
+
+    parsed = urlparse(url)
+
+    return (
+        parsed.scheme in allowed_schemes
+        or url == ""
+    )
 
 
 def render_link(label, url=""):
     label = html.escape(str(label))
-    url = html.escape(str(url or ""))
+    url = str(url or "").strip()
+
+    if not is_safe_url(url):
+        url = ""
+
+    url = html.escape(url)
 
     if url:
         return f'<a href="{url}">{label}</a>'
+
     return label
 
 
