@@ -153,7 +153,7 @@
 - name: Magic Point Shop
   url: https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/
   description: >
-    QMC point generators and generating vectors for digial sequences and lattice sequences
+    QMC point generators and generating vectors for digital sequences and lattice sequences
   language: C++, MATLAB, Python, plain text
   status: Mature
   contact:
