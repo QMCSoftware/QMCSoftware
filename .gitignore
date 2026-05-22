@@ -117,3 +117,7 @@ _ags/*
 /sc_*
 sc_*
 
+
+/qmc-software.html
+/qmc-software_files/
+/.quarto-watch-logs/
