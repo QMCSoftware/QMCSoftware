@@ -58,7 +58,7 @@ def sort_key(row):
 def render_qmc_software_table(data_path, mode="web", start=0, stop=None):
     data_path = Path(data_path)
 
-    with data_path.open() as f:
+    with data_path.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
     data = sorted(data, key=sort_key)
