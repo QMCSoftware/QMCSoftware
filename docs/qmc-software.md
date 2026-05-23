@@ -130,7 +130,7 @@ If you prefer not to use GitHub pull requests, you may instead email updates to 
 </span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
-  <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br>Aleksei Sorokin</td>
+  <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
 </tr>
 
 <tr>
