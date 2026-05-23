@@ -1,4 +1,4 @@
-- name: qmcpy
+- name: QMCPy
   url: https://qmcpy.org
   related:
     - name: QMCToolsCL
