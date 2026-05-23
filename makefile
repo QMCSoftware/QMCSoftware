@@ -53,6 +53,7 @@ doctests_minimal: ensure_artifacts
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
 		--ignore qmcpy/integrand/hartmann6d.py \
+		--ignore qmcpy/discrete_distribution/mpmc/ \
 
 doctests_torch: ensure_artifacts
 	@mkdir -p $(DOCTEST_COV_DIR)/torch
@@ -75,6 +76,12 @@ doctests_botorch: ensure_artifacts
 	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/botorch/coverage.json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
+doctests_mpmc:
+	@mkdir -p $(DOCTEST_COV_DIR)/mpmc
+	COVERAGE_FILE=$(DOCTEST_COV_DIR)/mpmc/.coverage \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/mpmc/coverage.json --no-header --cov-append \
+		--doctest-modules qmcpy/discrete_distribution/mpmc/*.py \
+
 doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issues/96
 	@mkdir -p $(DOCTEST_COV_DIR)/umbridge
 	@docker --version
@@ -85,9 +92,14 @@ doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issu
 doctests_markdown:
 	@phmutest docs/*.md --replmode --log -c
 
-doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
-doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+doctests_no_docker_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+
+doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_mpmc
+
+doctests_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+
+doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge doctests_mpmc
 
 ##########################################################
 # Unit Tests in `test/` folder (OFFICIAL coverage)
@@ -106,6 +118,8 @@ unittests: ensure_artifacts
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
 		--no-header \
 		test/ -W ignore::DeprecationWarning
+
+tests_no_docker_no_mpmc: doctests_no_docker_no_mpmc unittests coverage
 
 ##########################################################
 # Unit Tests for `*.ipynb` in `demos/` folder
@@ -128,6 +142,8 @@ check_booktests:
 	done
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
 	@echo "Total test files: $$(find test/booktests -name 'tb_*.py' | wc -l)"
+
+tests_no_mpmc: doctests_no_mpmc unittests coverage
 
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files ensure_artifacts
 	@echo "\nNotebook tests"

@@ -1,0 +1,257 @@
+from types import SimpleNamespace
+from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from qmcpy.util import ParameterError
+from tqdm import tqdm
+import numpy as np
+import torch
+import torch.optim as optim
+import warnings
+
+from .utils import (
+    L2star, L2ctr, L2ext, L2per, L2sym, L2mix,
+    L2star_weighted, L2ctr_weighted, L2ext_weighted, L2per_weighted,
+    L2sym_weighted, L2mix_weighted,
+)
+from .models import *
+
+
+_DISCREPANCY = {
+    'L2star': L2star, 'L2ctr': L2ctr, 'L2ext': L2ext, 'L2per': L2per, 'L2sym': L2sym, 'L2mix': L2mix,
+    'L2star_weighted': L2star_weighted, 'L2ctr_weighted': L2ctr_weighted, 'L2ext_weighted': L2ext_weighted,
+    'L2per_weighted': L2per_weighted, 'L2sym_weighted': L2sym_weighted, 'L2mix_weighted': L2mix_weighted,
+}
+
+class MPMC(AbstractLDDiscreteDistribution):
+    """
+    Low-discrepancy generator trained by MPMC. Produces nbatch independent pointsets of size n in [0,1]^d.
+    
+    Requires PyTorch and PyTorch Geometric. Install with:
+    
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        pip install torch-geometric torch-scatter torch-cluster
+    
+    For GPU support or platform-specific details, see https://pytorch.org/get-started/locally/
+    
+    Examples:    
+        >>> mpmc = MPMC(dimension=2, loss_fn='L2star', epochs=100)  # doctest: +SKIP
+        >>> points = mpmc.gen_samples(n=50)  # doctest: +SKIP
+        >>> points.shape  # doctest: +SKIP
+        (50, 2)
+        >>> print(mpmc)  # doctest: +SKIP
+        MPMC Generator Object
+            dim             2
+            randomize       SHIFT
+            loss_fn         L2star
+            epochs          100
+            lr              0.001
+            nlayers         3
+            nhid            32
+            weight_decay    1e-06
+            radius          0.35
+            nbatch          1
+    """
+
+    def __init__(
+        self,
+        randomize='shift',
+        seed=None,
+        dimension=2,
+        replications=1,       
+        d_max=None,            
+        lr=1e-3,
+        nlayers=3,
+        weight_decay=1e-6,
+        nhid=32,
+        epochs=50_000,
+        start_reduce=40_000,
+        radius=0.35,
+        nbatch=1,
+        loss_fn='L2star',
+        weights=None,
+    ):
+        self.mimics = 'StdUniform'
+        self.low_discrepancy = True
+
+        self.parameters = [
+            'dim', 'randomize', 'loss_fn', 'epochs', 'lr', 'nlayers', 'nhid',
+            'weight_decay', 'radius', 'nbatch'
+        ]
+
+        # core config
+        self.dim = int(dimension)
+        self.lr = float(lr)
+        self.nlayers = int(nlayers)
+        self.weight_decay = float(weight_decay)
+        self.nhid = int(nhid)
+        self.epochs = int(epochs)
+        self.start_reduce = int(start_reduce)
+        self.radius = float(radius)
+        self.loss_fn = str(loss_fn)
+        self.nbatch = int(nbatch) if nbatch is not None else int(replications)
+        self.d_max = self.dim  # kept for compat
+
+        self.torch_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        self.weights = None
+        if weights is not None:
+            # accept list/np/torch → torch.float32 on device
+            self.weights = torch.as_tensor(weights, dtype=torch.float32, device=self.torch_device)
+            if self.weights.dim() != 1 or self.weights.numel() != self.dim:
+                raise ValueError(f"weights must be 1-D length d={self.dim}; got {tuple(self.weights.shape)}")
+
+        # ensure weighted function name & presence of weights are consistent
+        is_weighted_name = self.loss_fn.endswith('weighted')
+        if is_weighted_name and self.weights is None:
+            raise ValueError("Must specify `weights` for weighted loss function.")
+        if (self.weights is not None) and (not is_weighted_name):
+            warnings.warn("`weights` provided; switching to weighted discrepancy.", stacklevel=1)
+            self.loss_fn = self.loss_fn + '_weighted'
+
+        if (self.weights is None) and (self.dim > 5):
+            warnings.warn("Product coordinate weights are recommended for dimension > 5.", stacklevel=1)
+
+        # init AbstractLDDiscreteDistribution base class (sets self.rng, self.d, etc.)
+        # AbstractDiscreteDistribution.__init__ signature is
+        #   __init__(self, dimension, replications, seed, d_limit, n_limit)
+        # so pass the number of replications (nbatch) and reasonable limits.
+        super(MPMC, self).__init__(int(self.dim), self.nbatch, seed, d_limit=np.inf, n_limit=np.inf)
+
+        # randomization mode
+        rnd = str(randomize).strip().upper()
+        if rnd in ('TRUE', 'SHIFT'):
+            self.randomize = 'SHIFT'
+        elif rnd in ('FALSE', 'NONE', 'NO'):
+            self.randomize = 'FALSE'
+        else:
+            raise ParameterError(f"randomize must be in {{'shift','false'}}; got '{randomize}'")
+
+        # pre-draw shifts if needed: shape (nbatch, d)
+        if self.randomize == 'SHIFT':
+            self.shift = self.rng.uniform(size=(self.nbatch, self.d))
+
+        # backward-compat mirror
+        self.replications = self.nbatch
+
+    # --------------------------
+    # Core API
+    # --------------------------
+    def _gen_samples(self, n_min, n_max, return_binary, warn, return_unrandomized=False):
+        assert n_min==0, "MPMC requires n_min=0 as it does not support indexing subsequencing"
+        assert return_binary is False, "MPMC requires return_binary=True"
+        n = int(n_max-n_min)
+        # training config
+        args = SimpleNamespace(
+            lr=self.lr,
+            nlayers=self.nlayers,
+            weight_decay=self.weight_decay,
+            nhid=self.nhid,
+            nbatch=self.nbatch,
+            epochs=self.epochs,
+            start_reduce=self.start_reduce,
+            radius=self.radius,
+            nsamples=n,
+            dim=self.dim,
+            loss_fn=self.loss_fn,
+            weights=self.weights,
+        )
+
+        x = self._train(args)  # (nbatch, n, d)
+
+        if self.randomize == 'FALSE':
+            if self.nbatch == 1:
+                return x[0]
+            return x
+
+        xr = (x + self.shift[:, None, :]) % 1.0
+
+        if self.nbatch == 1:
+            xr0, x0 = xr[0], x[0]
+            return (xr0, x0) if return_unrandomized else xr0
+
+        return (xr, x) if return_unrandomized else xr
+
+    def __repr__(self):
+        out = f"{self.__class__.__name__} Generator Object\n"
+        for p in self.parameters:
+            p_val = getattr(self, p)
+            out += f"    {p:<15} {str(p_val)}\n"
+        return out
+
+    def _spawn(self, child_seed, dimension):
+        """Spawn a child generator with same config (QMCPy hook)."""
+        return MPMC(
+            randomize=self.randomize,
+            seed=child_seed,
+            dimension=dimension,
+            nbatch=self.nbatch,
+            lr=self.lr,
+            nlayers=self.nlayers,
+            weight_decay=self.weight_decay,
+            nhid=self.nhid,
+            epochs=self.epochs,
+            start_reduce=self.start_reduce,
+            radius=self.radius,
+            loss_fn=self.loss_fn,
+            weights=self.weights.detach().cpu().tolist() if self.weights is not None else None,
+        )
+
+    # --------------------------
+    # Training
+    # --------------------------
+    def _train(self, args: SimpleNamespace):
+        """
+        Returns:
+            x (np.ndarray): shape `(nbatch, nsamples, dim)`
+        """
+        model = MPMC_net(
+            dim=args.dim, nhid=args.nhid, nlayers=args.nlayers,
+            nsamples=args.nsamples, nbatch=args.nbatch,
+            radius=args.radius, loss_fn=args.loss_fn, weights=args.weights
+        ).to(self.torch_device)
+
+        optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+        best_loss = float('inf')
+        patience = 0
+        end_result = None
+
+        # adaptive schedule
+        reduce_point = 10
+
+        for epoch in tqdm(range(args.epochs),
+                          desc=f"Training: N={args.nsamples}, d={args.dim}, loss={args.loss_fn}"):
+
+            model.train()
+            optimizer.zero_grad()
+            loss, X = model()          # X: (nbatch, n, d)
+            loss.backward()
+            optimizer.step()
+
+            if epoch % 100 == 0:
+                with torch.no_grad():
+                    # compute batch discrepancies using the configured loss
+                    fn = _DISCREPANCY[args.loss_fn]
+                    if args.loss_fn.endswith('weighted'):
+                        batched = fn(X, args.weights)
+                    else:
+                        batched = fn(X)
+                    min_disc = batched.min().item()
+
+                if min_disc < best_loss:
+                    best_loss = min_disc
+                    end_result = X.detach().cpu().numpy()
+
+                # LR schedule after start_reduce
+                if (epoch + 1) >= args.start_reduce:
+                    if min_disc > best_loss:
+                        patience += 1
+                    if patience == reduce_point:
+                        patience = 0
+                        for g in optimizer.param_groups:
+                            g['lr'] = max(g['lr'] / 10.0, 1e-6)
+                        # stop early if lr already tiny
+                        if optimizer.param_groups[0]['lr'] <= 1e-6:
+                            break
+
+        if end_result is None:
+            end_result = X.detach().cpu().numpy()
+        return end_result

@@ -1,4 +1,5 @@
 # General Python
+PATH
 .pdm-python
 .pytest_cache/
 raw.githubusercontent.com/*
