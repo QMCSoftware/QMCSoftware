@@ -271,9 +271,11 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@rm -rf docs/paper docs/demos
 	@cp README.md docs/README.md 
 	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
+	@perl -0pi -e 's!\(docs/qmc-software\.md\)!\(qmc-software.md\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
+	@find docs/demos -mindepth 2 -name README.md -delete
 	@cp -r paper docs
 	@rm -f docs/paper/README.md
 	@./scripts/render_paper_for_mkdocs.sh
