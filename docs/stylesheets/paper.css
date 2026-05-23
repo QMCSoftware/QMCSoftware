@@ -86,7 +86,7 @@
 .software-desc,
 .software-related {
   font-size: 0.9em;
-  color: #555;
+  color: var(--md-default-fg-color--light);
 }
 
 .status-nowrap {
