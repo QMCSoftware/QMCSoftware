@@ -4,6 +4,15 @@ This page is intended to be a community-maintained resource for software related
 
 Please submit a pull request targeting the `develop` branch with corrections or additions to the [`qmc-software.yml`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/data/qmc-software.yml) data file.
 
+The rendered table is generated automatically from the YAML data file during the documentation build process. Contributors normally only need to edit `qmc-software.yml`.
+
+To preview the page locally:
+
+```bash
+python scripts/make_qmc_software_page.py
+mkdocs serve
+```
+
 If you prefer not to use GitHub pull requests, you may instead email updates to [Fred Hickernell](mailto:hickernell@illinoistech.edu).
 
 

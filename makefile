@@ -279,6 +279,7 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@./scripts/render_paper_for_mkdocs.sh
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
+	@python scripts/make_qmc_software_page.py
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
 	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
