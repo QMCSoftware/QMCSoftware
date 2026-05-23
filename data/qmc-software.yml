@@ -52,7 +52,7 @@
 - name: PyTorch Sobol Engine
   url: https://pytorch.org/docs/stable/generated/torch.quasirandom.SobolEngine.html
   description: >
-    PyTorch's implementation of the Sobol sequence for generating low-discrepancy samples in machine learning applications  
+    PyTorch's implementation of the Sobol sequence for generating low-discrepancy samples in machine learning applications
   language: Python
   status: "Active"
   contact: []
@@ -83,12 +83,12 @@
   contact: 
     - name: Marius Hofert
       url: mailto:mhofert@hku.hk
-    - Christiane Lemieux 
+    - Christiane Lemieux
 
 - name: QuasiMonteCarlo.jl
   url:  https://docs.sciml.ai/QuasiMonteCarlo/stable/
   description: >
-    Julia package for generating low-discrepancy sequences and performing quasi-Monte Carlo integration, designed for high-performance scientific computing 
+    Julia package for generating low-discrepancy sequences and performing quasi-Monte Carlo integration, designed for high-performance scientific computing
   language: Julia
   status: "Active"
   contact: 
