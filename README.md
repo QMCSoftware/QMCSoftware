@@ -47,7 +47,11 @@ We maintain a list of [publications on the development and use of QMCPy](https:/
 PyPI download statistics are tracked automatically in [stats/pypi_downloads.md](https://github.com/QMCSoftware/QMCSoftware/blob/pypi-stats/stats/pypi_downloads.md) (in the pypi-stats branch).
 
 ### Other quasi-Monte Carlo software
-A page listing other QMC software is available in this branch at [`docs/qmc-software.md`](docs/qmc-software.md) and will be published at [qmc-software](https://qmcsoftware.github.io/QMCSoftware/qmc-software/) after release.
+A page listing other QMC software is available in this branch at
+[`docs/qmc-software.md`](docs/qmc-software.md).
+
+The page content is generated automatically from
+[`data/qmc-software.yml`](data/qmc-software.yml).  
 
 ## Development
 
