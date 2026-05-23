@@ -31,10 +31,14 @@ mkdocs serve
 
 """
 
-table = helper["render_qmc_software_table"](
-    data_path=DATA_PATH,
-    mode="web",
-    return_string=True,
-)
+def main():
+    table = helper["render_qmc_software_table"](
+        data_path=DATA_PATH,
+        mode="web",
+        return_string=True,
+    )
+    OUT_PATH.write_text(content + table + "\n", encoding="utf-8")
 
-OUT_PATH.write_text(content + table + "\n", encoding="utf-8")
+
+if __name__ == "__main__":
+    main()
