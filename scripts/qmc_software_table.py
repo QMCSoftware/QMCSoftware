@@ -74,8 +74,14 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
     data_path = Path(data_path)
 
     with data_path.open(encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-
+    data = yaml.safe_load(f)
+    
+    if not isinstance(data, list) or not all(isinstance(row, dict) for row in data):
+        raise ValueError(
+            f"Expected YAML file at {data_path} "
+            f"to contain a top-level list of mappings."
+        )
+    
     data = sorted(data, key=sort_key)
     data = data[start:stop]
 
@@ -106,7 +112,7 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
 
         language = html.escape(row.get("language", ""))
         raw_status = html.escape(row.get("status", ""))
-        desc = html.escape(row.get("description", ""))
+        desc = html.escape(" ".join(str(row.get("description", "")).split()))
 
         if mode == "web":
             status = raw_status.replace(
@@ -182,4 +188,3 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
 </table>
 </div>
 """)
-        

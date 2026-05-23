@@ -32,32 +32,28 @@ If you prefer not to use GitHub pull requests, you may instead email updates to 
 
 
 <tr>
-  <td><a href="https://www.boost.org/doc/libs/latest/doc/html/boost_random/reference.html#boost_random.reference.concepts.quasi_random_number_generator">Boost Random Number Library</a><br><span class="software-desc">Part of the Boost C++ Libraries, offering a wide range of random number generators, including some low-discrepancy sequences
-</span></td>
+  <td><a href="https://www.boost.org/doc/libs/latest/doc/html/boost_random/reference.html#boost_random.reference.concepts.quasi_random_number_generator">Boost Random Number Library</a><br><span class="software-desc">Part of the Boost C++ Libraries, offering a wide range of random number generators, including some low-discrepancy sequences</span></td>
   <td>C++</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td></td>
 </tr>
 
 <tr>
-  <td><a href="https://www.broda.co.uk">BRODA</a><br><span class="software-desc">Commercial software offering a range of quasi-Monte Carlo methods for financial modeling and risk analysis
-</span></td>
+  <td><a href="https://www.broda.co.uk">BRODA</a><br><span class="software-desc">Commercial software offering a range of quasi-Monte Carlo methods for financial modeling and risk analysis</span></td>
   <td>C++ / Fortran</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td><a href="mailto:info@broda.co.uk">✉ Sergei Kucherenko</a></td>
 </tr>
 
 <tr>
-  <td><a href="https://snl-dakota.github.io/docs/6.19.0/users/usingdakota/reference/method-sampling-sample_type-low_discrepancy.html">Dakota</a><br><span class="software-desc">Software toolkit for optimization and uncertainty quantification, including support for lattices and digital nets
-</span></td>
+  <td><a href="https://snl-dakota.github.io/docs/6.19.0/users/usingdakota/reference/method-sampling-sample_type-low_discrepancy.html">Dakota</a><br><span class="software-desc">Software toolkit for optimization and uncertainty quantification, including support for lattices and digital nets</span></td>
   <td></td>
   <td><span class="status-nowrap">Mature</span></td>
   <td>Pieterjan Robbe</td>
 </tr>
 
 <tr>
-  <td><a href="https://github.com/llxu2017/halton">Halton</a><br><span class="software-desc">Random-start randomly permuted Halton sequences
-</span></td>
+  <td><a href="https://github.com/llxu2017/halton">Halton</a><br><span class="software-desc">Random-start randomly permuted Halton sequences</span></td>
   <td>C++</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td></td>
