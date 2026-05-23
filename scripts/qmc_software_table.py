@@ -106,7 +106,7 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
 
         language = html.escape(row.get("language", ""))
         raw_status = html.escape(row.get("status", ""))
-        desc = html.escape(row.get("description", ""))
+        desc = html.escape(" ".join(str(row.get("description", "")).split()))
 
         if mode == "web":
             status = raw_status.replace(
