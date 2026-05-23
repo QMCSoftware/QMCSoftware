@@ -182,4 +182,3 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
 </table>
 </div>
 """)
-        
