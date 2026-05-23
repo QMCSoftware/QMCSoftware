@@ -120,7 +120,8 @@
   language: plain text
   status: "Active, Collaboration welcome"
   contact: 
-    - Aleksei Sorokin
+    - name: Aleksei Sorokin
+      url: https://alegresor.github.io
 
 - name: Owen's Scrambled Points
   url: https://artowen.su.domains/code/
