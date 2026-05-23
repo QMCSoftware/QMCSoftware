@@ -90,7 +90,7 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
 
     print("""
 <div class="table-responsive">
-<table class="table table-striped table-hover align-middle qmc-software-table">
+<table class="qmc-software-table">
 <thead>
 <tr>
     <th style="width: 48%;">Name</th>

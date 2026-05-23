@@ -55,6 +55,11 @@
   overflow-wrap: anywhere;
 }
 
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .qmc-software-table {
   width: 100%;
   border-collapse: collapse;

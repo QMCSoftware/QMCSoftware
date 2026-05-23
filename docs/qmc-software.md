@@ -22,7 +22,7 @@ mkdocs serve
 
 
 <div class="table-responsive">
-<table class="table table-striped table-hover align-middle qmc-software-table">
+<table class="qmc-software-table">
 <thead>
 <tr>
     <th style="width: 48%;">Name</th>
