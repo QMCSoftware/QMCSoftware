@@ -140,9 +140,9 @@
   status: Mature
 
 - name: 
-    - label: Lattice 
+    - label: Lattice
       url: https://web.maths.unsw.edu.au/~fkuo/lattice/index.html
-    - label: Sobol' 
+    - label: Sobol'
       url: https://web.maths.unsw.edu.au/~fkuo/sobol/index.html
   description: >
     Generating vectors for Sobol' sequences and lattice rules
