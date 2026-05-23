@@ -51,7 +51,7 @@ A page listing other QMC software is available in this branch at
 [`docs/qmc-software.md`](docs/qmc-software.md).
 
 The page content is generated automatically from
-[`data/qmc-software.yml`](data/qmc-software.yml).  
+[`data/qmc-software.yml`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/data/qmc-software.yml).
 
 ## Development
 
