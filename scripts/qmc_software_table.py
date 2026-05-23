@@ -74,7 +74,7 @@ def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_
     data_path = Path(data_path)
 
     with data_path.open(encoding="utf-8") as f:
-    data = yaml.safe_load(f)
+        data = yaml.safe_load(f)
     
     if not isinstance(data, list) or not all(isinstance(row, dict) for row in data):
         raise ValueError(
