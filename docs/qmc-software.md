@@ -1,0 +1,172 @@
+# Quasi-Monte Carlo Software Packages
+
+This page is intended to be a community-maintained resource for software related to quasi-Monte Carlo methods. Contributions are welcome.
+
+Please submit a pull request targeting the `develop` branch with corrections or additions to the [`qmc-software.yml`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/data/qmc-software.yml) data file.
+
+If you prefer not to use GitHub pull requests, you may instead email updates to [Fred Hickernell](mailto:hickernell@illinoistech.edu).
+
+
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle qmc-software-table">
+<thead>
+<tr>
+    <th style="width: 48%;">Name</th>
+    <th style="width: 14%;">Language</th>
+    <th style="width: 20%;">Development Status</th>
+
+  <th style="width: 18%;">Contact</th>
+
+</tr>
+</thead>
+<tbody>
+
+
+<tr>
+  <td><a href="https://www.boost.org/doc/libs/latest/doc/html/boost_random/reference.html#boost_random.reference.concepts.quasi_random_number_generator">Boost Random Number Library</a><br><span class="software-desc">Part of the Boost C++ Libraries, offering a wide range of random number generators, including some low-discrepancy sequences
+</span></td>
+  <td>C++</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://www.broda.co.uk">BRODA</a><br><span class="software-desc">Commercial software offering a range of quasi-Monte Carlo methods for financial modeling and risk analysis
+</span></td>
+  <td>C++ / Fortran</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td><a href="mailto:info@broda.co.uk">✉ Sergei Kucherenko</a></td>
+</tr>
+
+<tr>
+  <td><a href="https://snl-dakota.github.io/docs/6.19.0/users/usingdakota/reference/method-sampling-sample_type-low_discrepancy.html">Dakota</a><br><span class="software-desc">Software toolkit for optimization and uncertainty quantification, including support for lattices and digital nets
+</span></td>
+  <td></td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Pieterjan Robbe</td>
+</tr>
+
+<tr>
+  <td><a href="https://github.com/llxu2017/halton">Halton</a><br><span class="software-desc">Random-start randomly permuted Halton sequences
+</span></td>
+  <td>C++</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://github.com/umontreal-simul/latnetbuilder">LatNet Builder</a><br><span class="software-desc">Library for constructing low-discrepancy lattice rules and digital nets
+</span></td>
+  <td>C++ / Python</td>
+  <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
+  <td>Pierre L’Ecuyer</td>
+</tr>
+
+<tr>
+  <td><a href="https://web.maths.unsw.edu.au/~fkuo/lattice/index.html">Lattice</a> / <a href="https://web.maths.unsw.edu.au/~fkuo/sobol/index.html">Sobol&#x27;</a><br><span class="software-desc">Generating vectors for Sobol&#x27; sequences and lattice rules
+</span></td>
+  <td>plain text</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Frances Kuo<br>Stephen Joe</td>
+</tr>
+
+<tr>
+  <td><a href="https://github.com/QMCSoftware/LDData">LDData</a><br><span class="software-desc">Database of low discrepancy generators
+</span></td>
+  <td>plain text</td>
+  <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
+  <td>Aleksei Sorokin</td>
+</tr>
+
+<tr>
+  <td><a href="https://people.cs.kuleuven.be/~dirk.nuyens/qmc-generators/">Magic Point Shop</a><br><span class="software-desc">QMC point generators and generating vectors for digital sequences and lattice sequences
+</span></td>
+  <td>C++, MATLAB, Python, plain text</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Dirk Nuyens</td>
+</tr>
+
+<tr>
+  <td><a href="https://www.mathworks.com/help/stats/generating-quasi-random-numbers.html">MATLAB Statistics &amp; Machine Learning Toolbox</a><br><span class="software-desc">Produces quasi-random samples in the unit hypercube, including Sobol and Halton sequences</span></td>
+  <td>MATLAB</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td><a href="mailto:lwalsh@mathworks.com">✉ Liam Walsh</a></td>
+</tr>
+
+<tr>
+  <td><a href="https://support.nag.com/numeric/nl/nagdoc_latest/clhtml/g05/g05intro.html">NAG Quasi-Random Number Generators</a><br><span class="software-desc">NAG&#x27;s implementation of quasi-random number generators for use in Monte Carlo simulations
+</span></td>
+  <td>Fortran, C, C++</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://docs.nvidia.com/cuda/curand/index.html">NVIDIA cuRAND</a><br><span class="software-desc">NVIDIA&#x27;s library for generating random and quasi-random numbers on GPUs
+</span></td>
+  <td>C++ / CUDA</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://artowen.su.domains/code/">Owen&#x27;s Scrambled Points</a><br><span class="software-desc">Nested uniform scrambling of Sobol&#x27; sequences and pointer to randomized Halton sequences
+</span></td>
+  <td>R</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Art Owen</td>
+</tr>
+
+<tr>
+  <td><a href="https://pytorch.org/docs/stable/generated/torch.quasirandom.SobolEngine.html">PyTorch Sobol Engine</a><br><span class="software-desc">PyTorch&#x27;s implementation of the Sobol sequence for generating low-discrepancy samples in machine learning applications  
+</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://qmcpy.org">qmcpy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various low discrepancy sequences and data-driven error estimation
+</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
+  <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br>Aleksei Sorokin</td>
+</tr>
+
+<tr>
+  <td><a href="https://cran.r-project.org/web/packages/qrng/index.html">qrng</a><br><span class="software-desc">R package for generating low-discrepancy sequences, including Sobol and Halton sequences, for statistical computing and data analysis
+</span></td>
+  <td>R</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td><a href="mailto:mhofert@hku.hk">✉ Marius Hofert</a><br>Christiane Lemieux</td>
+</tr>
+
+<tr>
+  <td><a href="https://docs.sciml.ai/QuasiMonteCarlo/stable/">QuasiMonteCarlo.jl</a><br><span class="software-desc">Julia package for generating low-discrepancy sequences and performing quasi-Monte Carlo integration, designed for high-performance scientific computing 
+</span></td>
+  <td>Julia</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td><a href="https://julialang.org/slack/">Chris Rackauckas</a></td>
+</tr>
+
+<tr>
+  <td><a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">scipy.stats.qmc</a><br><span class="software-desc">Part of the SciPy library, providing low-discrepancy sequence generators and sampling methods for scientific computing in Python
+</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Pamphile Roy</td>
+</tr>
+
+<tr>
+  <td><a href="https://github.com/umontreal-simul/ssj">Stochastic Simulation in Java (SSJ)</a><br><span class="software-desc">Java library for stochastic simulation, including low-discrepancy sequence generators and sampling methods
+</span></td>
+  <td>Java</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Pierre L’Ecuyer</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+

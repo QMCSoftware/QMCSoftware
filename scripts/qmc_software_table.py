@@ -1,7 +1,10 @@
-import html
-import yaml
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from urllib.parse import urlparse
+
+import html
+import yaml
 
 
 def is_safe_url(url):
@@ -55,7 +58,19 @@ def sort_key(row):
     return str(name_field or "").lower()
 
 
-def render_qmc_software_table(data_path, mode="web", start=0, stop=None):
+def render_qmc_software_table(data_path, mode="web", start=0, stop=None, return_string=False):
+    if return_string:
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            render_qmc_software_table(
+                data_path=data_path,
+                mode=mode,
+                start=start,
+                stop=stop,
+                return_string=False,
+            )
+        return buffer.getvalue()
+
     data_path = Path(data_path)
 
     with data_path.open(encoding="utf-8") as f:
