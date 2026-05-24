@@ -424,10 +424,64 @@ class TestBrownianMotion(unittest.TestCase):
         self.assertEqual(samples.dtype, np.float64)
 
     def test_brownian_bridge_no_matrix_decomp(self):
-        """BrownianBridge raises NotImplementedError when matrix decomposition is called."""
+        """BrownianBridge raises ParameterError when matrix decomposition is called."""
         bm = BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="BrownianBridge")
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(ParameterError):
             bm._compute_decomposition()
+
+    def test_brownian_bridge_manual_replications(self):
+        """Manually construct a d=4 BrownianBridge path and compare with the automated version."""
+        d, n, reps = 4, 4, 2
+        t = np.linspace(1 / d, 1.0, d)
+
+        # Automated result
+        automated = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed, replications=reps), 
+            decomp_type="BrownianBridge"
+        ).gen_samples(n)
+
+        # Manual construction
+        u = DigitalNetB2(d, seed=self.seed, replications=reps).gen_samples(n)
+        z = scipy.stats.norm.ppf(u)
+
+        w_0 = np.zeros((reps, n, 1))
+
+        z_1 = z[..., 0:1]
+        z_2 = z[..., 1:2]
+        z_3 = z[..., 2:3]
+        z_4 = z[..., 3:4]
+
+        w_4 = np.sqrt(t[3]) * z_1
+
+        mean = w_0 + (t[1] - 0.0) / (t[3] - 0.0) * (w_4 - w_0)
+        std = np.sqrt((t[1] - 0.0) * (t[3] - t[1]) / (t[3] - 0.0))
+        w_2 = mean + std * z_2
+
+        mean = w_0 + (t[0] - 0.0) / (t[1] - 0.0) * (w_2 - w_0)
+        std  = np.sqrt((t[0] - 0.0) * (t[1] - t[0]) / (t[1] - 0.0))
+        w_1  = mean + std * z_3
+
+        mean = w_2 + (t[2] - t[1]) / (t[3] - t[1]) * (w_4 - w_2)
+        std  = np.sqrt((t[2] - t[1]) * (t[3] - t[2]) / (t[3] - t[1]))
+        w_3  = mean + std * z_4
+
+        expected = np.concatenate([w_1, w_2, w_3, w_4], axis=-1)
+
+        # Check consistency
+        self.assertEqual(automated.shape, (reps, n, d))
+        np.testing.assert_array_almost_equal(
+            expected, automated, decimal=10,
+            err_msg="Manual d=4 BrownianBridge path with replications does not match automated version."
+        )
+
+    def test_brownian_bridge_warning_for_non_power_of_2(self):
+        """BrownianBridge issues ParameterWarning for suboptimal d but still produces valid output."""
+        from qmcpy.util import ParameterWarning
+        with self.assertWarns(ParameterWarning):
+            bm = BrownianMotion(DigitalNetB2(6, seed=self.seed), decomp_type='BrownianBridge')
+        samples = bm.gen_samples(4)
+        self.assertEqual(samples.shape, (4, 6))
+        self.assertEqual(samples.dtype, np.float64)
 
 
 class TestGeometricBrownianMotion(unittest.TestCase):

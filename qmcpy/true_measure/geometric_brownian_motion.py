@@ -64,7 +64,7 @@ class GeometricBrownianMotion(BrownianMotion):
             initial_value (float): Positive initial value of the process, $S_0$.
             drift (float): Drift coefficient $\gamma$.
             diffusion (float): Positive diffusion coefficient $\sigma^2$, where $\sigma$ is volatility.
-            decomp_type (str): Method of decomposition, either "PCA" or "Cholesky".
+            decomp_type (str): Method of decomposition, either "PCA", "Cholesky", or "BrownianBridge".
             lazy_load (bool): If True, defer GBM-specific computations until needed.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
         """

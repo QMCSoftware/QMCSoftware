@@ -1,5 +1,8 @@
 from .gaussian import Gaussian
 from ..discrete_distribution import DigitalNetB2
+from ..util import ParameterError, ParameterWarning
+import itertools
+import warnings
 import numpy as np
 from scipy.stats import norm
 
@@ -59,6 +62,22 @@ class BrownianMotion(Gaussian):
                              [0.25 0.5  0.75 0.75]
                              [0.25 0.5  0.75 1.  ]]
             decomp_type     BROWNIANBRIDGE
+
+        With Brownian Bridge construction and independent replications
+
+        >>> x = BrownianMotion(DigitalNetB2(4,seed=7,replications=2),decomp_type='BrownianBridge')(4)
+        >>> x.shape
+        (2, 4, 4)
+        >>> x
+        array([[[ 0.04484101, -0.29731996, -1.04191919, -0.52563328],
+                [ 0.87558334,  1.92143976,  2.08376103,  1.11013376],
+                [-0.80997908, -0.78736531, -1.0898902 , -1.83225558],
+                [ 0.05962007, -0.468423  , -0.34412952,  0.25695731]],
+        <BLANKLINE>
+               [[ 0.16587623,  0.21948663,  0.42804882,  0.75273167],
+                [-0.48841768, -0.399158  , -0.24069416, -1.34288222],
+                [ 0.37699251,  0.81486745,  0.49041687,  0.07723829],
+                [-0.03747174, -0.74367511, -1.0608936 , -0.41141702]]])
     """
 
     def __init__(
@@ -109,6 +128,16 @@ class BrownianMotion(Gaussian):
             decomp_type,
             lazy_decomp,
         )
+        if self.decomp_type not in ("PCA", "CHOLESKY", "BROWNIANBRIDGE"):
+            raise ParameterError(
+                f"decomp_type must be 'PCA', 'Cholesky', or 'BrownianBridge'. Got '{decomp_type}'."
+            )
+        if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
+            warnings.warn(
+                f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.", 
+                ParameterWarning,
+                stacklevel=2
+            )
         self.range = np.array([[-np.inf, np.inf]])
         super(Gaussian, self).__init__()
 
@@ -128,7 +157,7 @@ class BrownianMotion(Gaussian):
         """Build Brownian Bridge path from standard normal samples."""
         w_all = np.zeros(z.shape[:-1] + (self.d + 1,))
         w_all[..., self.d] = np.sqrt(self.t) * z[..., 0]  # bridge endpoint
-        z_idx = [1]
+        z_idx = itertools.count(1)
         self._bridge_helper(w_all, z, 0, self.d, z_idx)
         return w_all[..., 1:]
 
@@ -144,7 +173,6 @@ class BrownianMotion(Gaussian):
             w_all[..., right] - w_all[..., left]
         )  # conditional mean
         std = np.sqrt((t_mid - t_left) * (t_right - t_mid) / (t_right - t_left))  # conditional std
-        w_all[..., mid] = mean + std * z[..., z_idx[0]]
-        z_idx[0] += 1
+        w_all[..., mid] = mean + std * z[..., next(z_idx)]
         self._bridge_helper(w_all, z, left, mid, z_idx)
         self._bridge_helper(w_all, z, mid, right, z_idx)

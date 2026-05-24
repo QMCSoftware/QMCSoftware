@@ -58,6 +58,7 @@ nav:
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - GBM Examples: demos/GBM/gbm_examples.ipynb
+      - Brownian Bridge: demos/brownian_bridge.ipynb
       - Control Variates: demos/control_variates.ipynb 
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb 
       - Ray Tracing: demos/ray_tracing.ipynb 

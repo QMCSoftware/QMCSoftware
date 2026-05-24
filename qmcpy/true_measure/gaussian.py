@@ -101,7 +101,7 @@ class Gaussian(AbstractTrueMeasure):
             self._setup_scipy_mvn()
 
     def _compute_decomposition(self):
-        """Compute matrix decomposition (PCA or Cholesky). Raises NotImplementedError for BrownianBridge."""
+        """Compute matrix decomposition (PCA or Cholesky). Raises ParameterError for BrownianBridge."""
         if self._a_cache is not None:
             return self._a_cache
 
@@ -115,7 +115,7 @@ class Gaussian(AbstractTrueMeasure):
         elif self.decomp_type == "CHOLESKY":
             self._a_cache = cholesky(self.sigma)
         elif self.decomp_type == "BROWNIANBRIDGE":
-            raise NotImplementedError("BROWNIANBRIDGE does not use matrix decomposition")
+            raise ParameterError("BrownianBridge does not use matrix decomposition")
         else:
             raise ParameterError("decomp_type should be 'PCA' or 'Cholesky'")
         return self._a_cache
