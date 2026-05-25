@@ -196,6 +196,14 @@ jobs:
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
       # -----------------------------------------------------------
+      # Colab readiness smoke tests (Linux only)
+      # -----------------------------------------------------------
+      - name: Run Colab readiness smoke tests (Linux)
+        if: runner.os == 'Linux'
+        shell: bash -l {0}
+        run: |
+          make check_colab_notebooks
+      # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
       - name: Install minimal LaTeX (Linux)
