@@ -67,10 +67,13 @@ nav:
       - Importance Sampling with True Measures:
         - Some True Measures: demos/some_true_measures.ipynb
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
+        - Copula TrueMeasure Examples: demos/copula_examples/copula_examples.ipynb
         - Acceptance-Rejection Sampling: demos/acceptance_rejection.ipynb
   - Blogs: 
     - Iteration Log: demos/demo_resume_data/Iteration_Log_Tolerance_Demo.ipynb
     - Resume Feature: demos/demo_resume_data/accuracy_and_resume.ipynb
+  # - Papers: 
+  #   - JOSS: paper/paper.md
     - SciPyWrapper: blogs/scipywrapper/index.md
     - Visualizing the Generated Samples Helps: blogs/visualizing-the-generated-samples-helps/index.md
     - "CubMCCLTVec: Vectorizing the CubMCCLT Algorithm": blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md

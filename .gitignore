@@ -34,6 +34,8 @@ demos/prob_failure_gp_ci_plots/
 demos/fgpr_figs/
 demos/GBM/images/*.png
 demos/GBM/outputs/*.*
+demos/copula_examples/figures/*.png
+!demos/copula_examples/figures/.gitkeep
 
 # tests
 .coverage
