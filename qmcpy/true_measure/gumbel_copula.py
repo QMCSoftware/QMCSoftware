@@ -27,12 +27,50 @@ class GumbelCopula(AbstractTrueMeasure):
     The boundary case ``theta = 1`` is the independent copula.
 
     Examples:
+        >>> import numpy as np
         >>> import scipy.stats as stats
         >>> sampler = DigitalNetB2(2, seed=7)
         >>> marginals = [stats.expon(), stats.gamma(a=3)]
         >>> tm = GumbelCopula(sampler, marginals=marginals, theta=2.0)
-        >>> tm(4).shape
+        >>> np.round(tm(4), 4)
+        array([[1.2788, 5.1093],
+               [0.1785, 1.5853],
+               [4.3247, 3.8953],
+               [0.5614, 2.5536]])
+        >>> tm  # doctest: +ELLIPSIS
+        GumbelCopula (AbstractTrueMeasure)
+            marginals       [<...rv_continuous_frozen object at ...>
+                             <...rv_continuous_frozen object at ...>]
+            theta           2^(1)
+        >>> rep_tm = GumbelCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, theta=2.0)
+        >>> rep_tm(4).shape
+        (2, 4, 2)
+        >>> GumbelCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=2.0)(4).shape
+        (4, 3)
+        >>> independent_tm = GumbelCopula(DigitalNetB2(2, seed=7), marginals=[stats.uniform(), stats.uniform()], theta=1.0)
+        >>> np.round(independent_tm(4), 4)
+        array([[0.7216, 0.915 ],
+               [0.1635, 0.4296],
+               [0.9868, 0.0344],
+               [0.4296, 0.5588]])
+        >>> independent_tm(4).shape
         (4, 2)
+
+    **References:**
+
+    1.  Roger B. Nelsen. *An Introduction to Copulas*. Second Edition,
+        Springer Series in Statistics, Springer, 2006.
+        [doi:10.1007/0-387-28678-0](https://doi.org/10.1007/0-387-28678-0).
+
+    2.  Mathieu Cambou, Marius Hofert, and Christiane Lemieux.
+        "Quasi-random numbers for copula models."
+        [arXiv:1508.03483](https://arxiv.org/abs/1508.03483).
+
+    3.  Marius Hofert, Martin Maechler, and Alexander J. McNeil.
+        "Likelihood inference for Archimedean copulas in high dimensions
+        under known margins." Journal of Multivariate Analysis 110,
+        133-150, 2012.
+        [doi:10.1016/j.jmva.2012.02.019](https://doi.org/10.1016/j.jmva.2012.02.019).
     """
 
     def __init__(self, sampler, marginals, theta):
@@ -99,6 +137,8 @@ class GumbelCopula(AbstractTrueMeasure):
         return np.logaddexp.reduce(np.stack(logs, axis=0), axis=0)
 
     def _log_abs_psi_derivative(self, t, order):
+        # Conditional CDFs and densities use ratios of generator derivatives.
+        # Taking logs keeps those ratios stable for small uniforms and large theta.
         t = np.maximum(np.asarray(t, dtype=float), np.finfo(float).tiny)
         return -(t ** self._alpha) + self._log_polynomial(t, order)
 

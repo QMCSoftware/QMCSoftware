@@ -36,12 +36,44 @@ class ClaytonCopula(AbstractTrueMeasure):
     Clayton copulas have positive lower-tail dependence for ``theta > 0``.
 
     Examples:
+        >>> import numpy as np
         >>> import scipy.stats as stats
         >>> sampler = DigitalNetB2(2, seed=7)
         >>> marginals = [stats.expon(), stats.gamma(a=3)]
         >>> tm = ClaytonCopula(sampler, marginals=marginals, theta=2.0)
-        >>> tm(4).shape
+        >>> np.round(tm(4), 4)
+        array([[1.2788, 6.1924],
+               [0.1785, 1.4743],
+               [4.3247, 1.9924],
+               [0.5614, 2.7949]])
+        >>> tm  # doctest: +ELLIPSIS
+        ClaytonCopula (AbstractTrueMeasure)
+            marginals       [<...rv_continuous_frozen object at ...>
+                             <...rv_continuous_frozen object at ...>]
+            theta           2^(1)
+        >>> rep_tm = ClaytonCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, theta=2.0)
+        >>> rep_tm(4).shape
+        (2, 4, 2)
+        >>> ClaytonCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=2.0)(4).shape
+        (4, 3)
+        >>> ClaytonCopula(DigitalNetB2(2, seed=7), marginals=marginals, theta=1e-8)(4).shape
         (4, 2)
+
+    **References:**
+
+    1.  Roger B. Nelsen. *An Introduction to Copulas*. Second Edition,
+        Springer Series in Statistics, Springer, 2006.
+        [doi:10.1007/0-387-28678-0](https://doi.org/10.1007/0-387-28678-0).
+
+    2.  Mathieu Cambou, Marius Hofert, and Christiane Lemieux.
+        "Quasi-random numbers for copula models."
+        [arXiv:1508.03483](https://arxiv.org/abs/1508.03483).
+
+    3.  Marius Hofert, Martin Maechler, and Alexander J. McNeil.
+        "Likelihood inference for Archimedean copulas in high dimensions
+        under known margins." Journal of Multivariate Analysis 110,
+        133-150, 2012.
+        [doi:10.1016/j.jmva.2012.02.019](https://doi.org/10.1016/j.jmva.2012.02.019).
     """
 
     def __init__(self, sampler, marginals, theta):
@@ -79,6 +111,8 @@ class ClaytonCopula(AbstractTrueMeasure):
         return theta
 
     def _log_phi(self, u):
+        # Work in log space for phi(u) = u^{-theta} - 1 to avoid overflow
+        # when theta is large or u is close to zero.
         u = _clip_unit_interval(u)
         a = -self.theta * np.log(u)
         return np.log(np.expm1(a))

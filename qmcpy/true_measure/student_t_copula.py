@@ -32,13 +32,45 @@ class StudentTCopula(AbstractTrueMeasure):
     Cholesky factor, and then univariate ``t.cdf``.
 
     Examples:
+        >>> import numpy as np
         >>> import scipy.stats as stats
         >>> sampler = DigitalNetB2(2, seed=7)
         >>> marginals = [stats.norm(), stats.gamma(a=3, scale=2)]
         >>> corr = [[1.0, 0.6], [0.6, 1.0]]
         >>> tm = StudentTCopula(sampler, marginals=marginals, correlation=corr, df=4)
-        >>> tm(4).shape
+        >>> np.round(tm(4), 4)
+        array([[ 0.5877, 10.8302],
+               [-0.9804,  3.2911],
+               [ 2.2192,  2.6062],
+               [-0.1775,  5.3428]])
+        >>> tm  # doctest: +ELLIPSIS
+        StudentTCopula (AbstractTrueMeasure)
+            marginals       [<...rv_continuous_frozen object at ...>
+                             <...rv_continuous_frozen object at ...>]
+            correlation     [[1.  0.6]
+                             [0.6 1. ]]
+            df              2^(2)
+        >>> rep_tm = StudentTCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, correlation=corr, df=4)
+        >>> rep_tm(4).shape
+        (2, 4, 2)
+        >>> StudentTCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]], df=4)(4).shape
+        (4, 1)
+        >>> StudentTCopula(DigitalNetB2(2, seed=7), marginals=marginals, correlation=corr, df=1)(4).shape
         (4, 2)
+
+    **References:**
+
+    1.  Roger B. Nelsen. *An Introduction to Copulas*. Second Edition,
+        Springer Series in Statistics, Springer, 2006.
+        [doi:10.1007/0-387-28678-0](https://doi.org/10.1007/0-387-28678-0).
+
+    2.  Mathieu Cambou, Marius Hofert, and Christiane Lemieux.
+        "Quasi-random numbers for copula models."
+        [arXiv:1508.03483](https://arxiv.org/abs/1508.03483).
+
+    3.  M. Rosenblatt. "Remarks on a Multivariate Transformation."
+        The Annals of Mathematical Statistics 23(3), 470-472, 1952.
+        [doi:10.1214/aoms/1177729394](https://doi.org/10.1214/aoms/1177729394).
     """
 
     def __init__(self, sampler, marginals, correlation, df):

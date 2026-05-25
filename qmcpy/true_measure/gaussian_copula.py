@@ -8,6 +8,7 @@ from .copula import (
     _validate_dimension,
     _validate_marginals,
 )
+from .gaussian import Gaussian
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 
@@ -33,13 +34,38 @@ class GaussianCopula(AbstractTrueMeasure):
     copula joint density. Otherwise weights are treated as one with a warning.
 
     Examples:
+        >>> import numpy as np
         >>> import scipy.stats as stats
         >>> sampler = DigitalNetB2(2, seed=7)
         >>> marginals = [stats.beta(a=2, b=5), stats.gamma(a=3, scale=2)]
         >>> corr = [[1.0, 0.6], [0.6, 1.0]]
         >>> tm = GaussianCopula(sampler, marginals=marginals, correlation=corr)
-        >>> tm(4).shape
-        (4, 2)
+        >>> np.round(tm(4), 4)
+        array([[ 0.3726, 11.5225],
+               [ 0.1236,  3.3233],
+               [ 0.6874,  4.955 ],
+               [ 0.2348,  5.3863]])
+        >>> tm  # doctest: +ELLIPSIS
+        GaussianCopula (AbstractTrueMeasure)
+            marginals       [<...rv_continuous_frozen object at ...>
+                             <...rv_continuous_frozen object at ...>]
+            correlation     [[1.  0.6]
+                             [0.6 1. ]]
+        >>> rep_tm = GaussianCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, correlation=corr)
+        >>> rep_tm(4).shape
+        (2, 4, 2)
+        >>> GaussianCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]])(4).shape
+        (4, 1)
+
+    **References:**
+
+    1.  Roger B. Nelsen. *An Introduction to Copulas*. Second Edition,
+        Springer Series in Statistics, Springer, 2006.
+        [doi:10.1007/0-387-28678-0](https://doi.org/10.1007/0-387-28678-0).
+
+    2.  Mathieu Cambou, Marius Hofert, and Christiane Lemieux.
+        "Quasi-random numbers for copula models."
+        [arXiv:1508.03483](https://arxiv.org/abs/1508.03483).
     """
 
     def __init__(self, sampler, marginals, correlation):
@@ -59,7 +85,16 @@ class GaussianCopula(AbstractTrueMeasure):
         _validate_dimension(self, self.marginals)
         self.correlation = _validate_correlation_matrix(correlation, self.d)
 
-        self._chol = np.linalg.cholesky(self.correlation)
+        self._gaussian_transform = Gaussian(
+            sampler,
+            mean=np.zeros(self.d),
+            covariance=self.correlation,
+            decomp_type="Cholesky",
+        )
+        # Gaussian copula density:
+        # c(u) = |R|^{-1/2} exp(-0.5 z^T (R^{-1} - I) z), z = Phi^{-1}(u).
+        # The identity subtraction removes the independent standard-normal density
+        # already accounted for by the marginal normal transforms.
         self._corr_inv_minus_eye = np.linalg.inv(self.correlation) - np.eye(self.d)
         _, self._logdet_corr = np.linalg.slogdet(self.correlation)
         self._warned_missing_weight = False
@@ -79,8 +114,7 @@ class GaussianCopula(AbstractTrueMeasure):
         _validate_dimension(x.shape[-1], self.marginals)
 
         u = _clip_unit_interval(x)
-        z = norm.ppf(u)
-        z_dep = z @ self._chol.T
+        z_dep = self._gaussian_transform._transform(u)
         u_dep = _clip_unit_interval(norm.cdf(z_dep))
 
         return _apply_marginal_ppfs(u_dep, self.marginals)

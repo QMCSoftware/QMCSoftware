@@ -51,12 +51,53 @@ class FrankCopula(AbstractTrueMeasure):
     CDF.
 
     Examples:
+        >>> import numpy as np
         >>> import scipy.stats as stats
         >>> sampler = DigitalNetB2(3, seed=7)
         >>> marginals = [stats.norm(), stats.gamma(a=3), stats.expon()]
         >>> tm = FrankCopula(sampler, marginals=marginals, theta=5.0)
-        >>> tm(4).shape
-        (4, 3)
+        >>> np.round(tm(4), 4)
+        array([[ 0.3389,  4.3854,  1.6179],
+               [-0.8788,  1.309 ,  0.2446],
+               [ 1.2692,  3.017 ,  0.3051],
+               [-0.1109,  2.998 ,  1.44  ]])
+        >>> tm  # doctest: +ELLIPSIS
+        FrankCopula (AbstractTrueMeasure)
+            marginals       [<...rv_continuous_frozen object at ...>
+                             <...rv_continuous_frozen object at ...>
+                             <...rv_continuous_frozen object at ...>]
+            theta           5
+        >>> rep_tm = FrankCopula(DigitalNetB2(3, seed=7, replications=2), marginals=marginals, theta=5.0)
+        >>> rep_tm(4).shape
+        (2, 4, 3)
+        >>> neg_tm = FrankCopula(DigitalNetB2(2, seed=7), marginals=[stats.uniform(), stats.uniform()], theta=-2.0)
+        >>> np.round(neg_tm(4), 4)
+        array([[0.7216, 0.86  ],
+               [0.1635, 0.5892],
+               [0.9868, 0.0155],
+               [0.4296, 0.5863]])
+        >>> FrankCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=-2.0)  # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        qmcpy.util.exceptions_warnings.ParameterError: theta < 0 is only supported for d=2 FrankCopula.
+        >>> FrankCopula(DigitalNetB2(5, seed=7), marginals=[stats.uniform()] * 5, theta=5.0)(4).shape
+        (4, 5)
+
+    **References:**
+
+    1.  Roger B. Nelsen. *An Introduction to Copulas*. Second Edition,
+        Springer Series in Statistics, Springer, 2006.
+        [doi:10.1007/0-387-28678-0](https://doi.org/10.1007/0-387-28678-0).
+
+    2.  Mathieu Cambou, Marius Hofert, and Christiane Lemieux.
+        "Quasi-random numbers for copula models."
+        [arXiv:1508.03483](https://arxiv.org/abs/1508.03483).
+
+    3.  Marius Hofert, Martin Maechler, and Alexander J. McNeil.
+        "Likelihood inference for Archimedean copulas in high dimensions
+        under known margins." Journal of Multivariate Analysis 110,
+        133-150, 2012.
+        [doi:10.1016/j.jmva.2012.02.019](https://doi.org/10.1016/j.jmva.2012.02.019).
     """
 
     def __init__(self, sampler, marginals, theta):
@@ -123,6 +164,8 @@ class FrankCopula(AbstractTrueMeasure):
         return np.minimum(z, -tiny)
 
     def _log_abs_polylog_negative_order(self, z, n):
+        # Frank conditional CDFs involve derivatives of the generator that can
+        # be very small or very large, so evaluate their absolute value in log space.
         z = np.asarray(z, dtype=float)
         coefficients = self._eulerian_coefficients(n)
 
