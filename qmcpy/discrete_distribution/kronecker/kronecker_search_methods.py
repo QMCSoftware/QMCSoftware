@@ -1,30 +1,33 @@
 import numpy as np
 from sympy import gcdex, primerange, prime
+import time
 np.set_printoptions(precision=17)
 #https://github.com/sympy/sympy/releases
 
+
 # I can't find where Jimmy's code for the kronecker search from SURE 2025 is, so I've temporarily put my method here
 
-def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0=None, return_coeffs=False):
+def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, gen_vec_init=None):
     """
     Args:
         N (int): The maximum sample size to be searched over.
         dMax (int): The maximum dimension for which to find the generating vector.
         searchsize (int): The number of primes to search over for each component of the generating vector.
         coord_weights (array-like, optional): An array of coordinate weights to use in the search. If None, weights are set to j^(-2).
-        alpha_0 (float, optional): The value for the first component of the generating vector. If None, the golden ratio is used. Note that alpha_0 is taken mod 1.
-        return_coeffs (bool, optional): Whether to return the coefficients of the linear transformation. Default is False.
+        gen_vec_init (array-like, optional): The initial value for the generating vector. If None, the golden ratio is used for the first component. Note that gen_vec_init is taken mod 1.
     Returns:
-        alpha, coeff (tuple):
-        - alpha (numpy array): The generating vector found by the search.
-        - coeff (numpy array, optional): The coefficients of the linear transformation used in the search, returned only if return_coeffs is True. A description of the coeff array is found below.
-    Complexity:
-        The time complexity of the search is O(searchsize^2 * dMax * N).
+        generating_vector, wssd, discrepancies, coeff (tuple):
+        - generating_vector (numpy array): The generating vector found by the search.
+        - wssd (float): The weighted sum of squared discrepancies for n = 1,...,N, for the generating vector found.
+        - discrepancies (numpy array): The discrepancies for n = 1,...,N.
+        - coeff (numpy array): The coefficients of the linear transformation used in the search. A description of the coeff array is found below.
+    Time cost:
+        The time cost of the search is O(searchsize^2 * dMax * N).
     Approach:
         Uses the quadratic Bernoulli polynomial kernel to conduct a CBC search for a generating vector, minimizing the weighted sum of squared discrepancies (wssd) with weights w_n = n.
     Details on coeff array:
-        The coeff array, if returned, is a (dMax-1) x 4 array where each row corresponds to a dimension from 2 to dMax. The columns correspond to the coefficients of the linear transformation used to compute the alpha component for that dimension. Specifically,
-        - alpha[dim+1] = (coeff[dim, 0] * alpha[dim] + coeff[dim, 1]) / (coeff[dim, 2] * alpha[dim] + coeff[dim, 3])
+        The coeff array is a (dMax-1) x 4 array where each row corresponds to a dimension from 2 to dMax. The columns correspond to the coefficients of the linear transformation used to compute the gen_vec component for that dimension. Specifically,
+        - gen_vec[dim+1] = (coeff[dim, 0] * gen_vec[dim] + coeff[dim, 1]) / (coeff[dim, 2] * gen_vec[dim] + coeff[dim, 3])
     """
 
     if searchsize < 2:
@@ -47,14 +50,14 @@ def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0
     # search over the first n primes, n = searchsize
     searchspace = np.array(list(primerange(1, prime(searchsize)+1)), dtype=np.float64)
 
-    # alpha is our generating vector, will be found cbc
-    alpha = np.zeros(dMax, dtype=np.float64)
+    # gen_vec is our generating vector, will be found cbc
+    gen_vec = np.zeros(dMax, dtype=np.float64)
 
-    # we pick the golden ratio as the first component of alpha, or let the user specify
-    if alpha_0 is None:
-        alpha[0] = np.float64((np.sqrt(5) - 1) / 2)
+    # we pick the golden ratio as the first component of gen_vec, or let the user specify
+    if gen_vec_init is None:
+        gen_vec[0] = np.float64((np.sqrt(5) - 1) / 2)
     else:
-        alpha[0] = np.mod(alpha_0, 1,dtype=np.float64)
+        gen_vec[0] = np.mod(gen_vec_init, 1,dtype=np.float64)
 
     # precompute several constants for the wssd calculation
     diff = np.cumsum(1.0 / np.arange(N, 1, -1,dtype=np.float64))
@@ -80,15 +83,15 @@ def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0
 
     # setting up some useful variables for the search
     coeff = np.zeros((dMax - 1, 4)) # stores the coefficients of the linear transformation at each dimension
-    t = alpha[0] * np.arange(1, N) % 1 # t vector is the vector of coordinates generated for the first dimension
+    t = gen_vec[0] * np.arange(1, N) % 1 # t vector is the vector of coordinates generated for the first dimension
     kPrev = 1 + coord_weights[0] * bernoulli2(t) # gets the k vector for the first dimension, which is used in the wssd calculation and updated each dimension of the search.
-    # The k vector is Ktilde(x_i) for i = 1,...,N-1, where Ktilde is the kernel and x_i are the points generated by the alpha vector, up to the current dimension.
+    # The k vector is Ktilde(x_i) for i = 1,...,N-1, where Ktilde is the kernel and x_i are the points generated by the gen_vec vector, up to the current dimension.
     
     # the main search loop
     for dim in range(1, dMax):
         best_wssd = np.inf # stores the current wssd found for each dimension, initialized to infinity
-        best_alpha = 0 # stores the current best alpha component found for this dimension, initialized to 0
-        best_k = None # stores the k vector for the current best alpha, used to update the k vector for the next dimension after the search is done for this dimension
+        best_gen_vec = 0 # stores the current best gen_vec component found for this dimension, initialized to 0
+        best_k = None # stores the k vector for the current best gen_vec, used to update the k vector for the next dimension after the search is done for this dimension
         for i in range(searchsize):
             p1 = searchspace[i] 
             for j in range(searchsize):
@@ -111,10 +114,10 @@ def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0
                     d2 = np.abs(d + p2)
                     b2 = np.abs(b - p1)
                 
-                alpha_dim1 = (p1 * alpha[dim - 1] + b1) / (p2 * alpha[dim - 1] + d1) # the linear transformation to get the next alpha_dim candidate to test
-                alpha_dim2 = (p1 * alpha[dim - 1] + b2) / (p2 * alpha[dim - 1] + d2) # the other candidate from the linear transformation
-                t1 = (alpha_dim1 * np.arange(1, N)) - np.floor(alpha_dim1 * np.arange(1, N)) # vector of coordinates generated by this candidate component
-                t2 = (alpha_dim2 * np.arange(1, N)) - np.floor(alpha_dim2 * np.arange(1, N)) 
+                gen_vec_dim1 = (p1 * gen_vec[dim - 1] + b1) /  (p2 * gen_vec[dim - 1] + d1) # the linear transformation to get the next gen_vec_dim candidate to test
+                gen_vec_dim2 = (p1 * gen_vec[dim - 1] + b2) / (p2 * gen_vec[dim - 1] + d2) # the other candidate from the linear transformation
+                t1 = (gen_vec_dim1 * np.arange(1, N)) - np.floor(gen_vec_dim1 * np.arange(1, N)) # vector of coordinates generated by this candidate component
+                t2 = (gen_vec_dim2 * np.arange(1, N)) - np.floor(gen_vec_dim2 * np.arange(1, N)) 
                 k_vector1 = kPrev * (1 + bernoulli2(t1) * coord_weights[dim]) # get the k vector for this candidate component, used in the wssd calculation
                 k_vector2 = kPrev * (1 + bernoulli2(t2) * coord_weights[dim]) 
 
@@ -126,13 +129,13 @@ def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0
                     d = d1
                     wssd = wssd1
                     k_vector = k_vector1
-                    alpha_dim = alpha_dim1
+                    gen_vec_dim = gen_vec_dim1
                 else:
                     b = b2
                     d = d2
                     wssd = wssd2
                     k_vector = k_vector2
-                    alpha_dim = alpha_dim2
+                    gen_vec_dim = gen_vec_dim2
                 
                 if wssd < best_wssd: # if this candidate has a better wssd than the best found so far, we update the best coefficients and wssd
                     coeff[dim-1, 0] = p1
@@ -140,17 +143,35 @@ def kronecker_search_march_2026(N, dMax, searchsize, coord_weights=None, alpha_0
                     coeff[dim-1, 2] = p2
                     coeff[dim-1, 3] = d
                     best_wssd = wssd
-                    best_alpha = alpha_dim % 1
+                    best_gen_vec = gen_vec_dim % 1
                     best_k = k_vector
-        alpha[dim] = best_alpha # update the alpha vector with the best candidate found for this dimension
+        gen_vec[dim] = best_gen_vec # update the gen_vec vector with the best candidate found for this dimension
 
         kPrev = best_k # update the k vector for the next dimension with the k vector of the best candidate found for this dimension
+        best_wssd = nK0[dim] - num + 2 * best_wssd # calculate the best wssd for this dimension using the formula from the paper, which involves the nK0 constants precomputed at the beginning of the function. This is used for debugging and to check the wssd at each dimension of the search.
 
         # print(coeff[dim - 1, :], (nK0[dim] - num + 2 * best_wssd)) # debugging line to check the coefficients and wssd at each dimension
-    if return_coeffs:
-        return alpha, coeff
-    return alpha
+    
+    # Adapted from Jimmy's code for calculating the discrepancies for n = 1,...,N from SURE 2025
+    n_array = np.arange(1, N + 1)
+    k_tilde = lambda x, coord_weight: np.prod(1 + bernoulli2(x) * coord_weight, axis=1)
+    k_tilde_terms = k_tilde(gen_vec * np.arange(N).reshape((N, 1)) - np.floor(gen_vec * np.arange(N).reshape((N, 1))), coord_weights)
+
+    left_sum = np.cumsum(k_tilde_terms[1:]) * n_array[1:]
+    right_sum = np.cumsum(n_array[:-1] * k_tilde_terms[1:])
+        
+    k_tilde_zero_terms = k_tilde_terms[0] * n_array
+    summation = np.zeros(N)
+    summation[1:] = left_sum - right_sum
+    discrepancies = (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - 1
+
+    return gen_vec, best_wssd, discrepancies, coeff
+
 
 # quick and dirty test
-# print(kronecker_search_march_2026(2**15, 3, 50))
-
+start = time.time()
+a, wssd, _, _ = kronecker_search_march_2026(2**10, 20, 50)
+print(a)
+print(wssd)
+end = time.time()
+print("Run time (seconds): ", end - start)
