@@ -18,7 +18,7 @@
 - name: QMC.jl
   url: https://github.com/QMCSoftware/QMC.jl
   description: >
-    Experimental implementation of QMCPy
+    Translation of QMCPy to Julia
   language: Julia
   status: Active, Pre-mature, Collaboration welcome
   contact:
@@ -31,7 +31,7 @@
 - name: BoTorch
   url: https://botorch.org/docs/samplers
   description: >
-    Bayesian optimization library with Monte Carlo samplers, including a Sobol randomized quasi-Monte Carlo normal sampler
+    Bayesian optimization library that leverages PyTorch's (Q)MC samplers
   language: Python
   status: Active
   contact:

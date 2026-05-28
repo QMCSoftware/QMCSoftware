@@ -44,7 +44,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://botorch.org/docs/samplers">BoTorch</a><br><span class="software-desc">Bayesian optimization library with Monte Carlo samplers, including a Sobol randomized quasi-Monte Carlo normal sampler</span></td>
+  <td><a href="https://botorch.org/docs/samplers">BoTorch</a><br><span class="software-desc">Bayesian optimization library that leverages PyTorch's (Q)MC samplers</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Meta / BoTorch developers</td>
@@ -170,7 +170,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://github.com/QMCSoftware/QMC.jl">QMC.jl</a><br><span class="software-desc">Experimental implementation of QMCPy</span></td>
+  <td><a href="https://github.com/QMCSoftware/QMC.jl">QMC.jl</a><br><span class="software-desc">Translation of QMCPy ssto Julia</span></td>
   <td>Julia</td>
   <td><span class="status-nowrap">Active, Pre-mature<br>Collaboration welcome</span></td>
   <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
@@ -228,5 +228,4 @@ mkdocs serve
 </tbody>
 </table>
 </div>
-
 
