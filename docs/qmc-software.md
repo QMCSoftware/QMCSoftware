@@ -44,10 +44,24 @@ mkdocs serve
 </tr>
 
 <tr>
+  <td><a href="https://botorch.org/docs/samplers">BoTorch</a><br><span class="software-desc">Bayesian optimization library with Monte Carlo samplers, including a Sobol randomized quasi-Monte Carlo normal sampler</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Meta / BoTorch developers</td>
+</tr>
+
+<tr>
   <td><a href="https://www.broda.co.uk">BRODA</a><br><span class="software-desc">Commercial software offering a range of quasi-Monte Carlo methods for financial modeling and risk analysis</span></td>
   <td>C++ / Fortran</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td><a href="mailto:info@broda.co.uk">✉ Sergei Kucherenko</a></td>
+</tr>
+
+<tr>
+  <td><a href="https://chaospy.readthedocs.io/en/master/user_guide/fundamentals/quasi_random_samples.html">Chaospy</a><br><span class="software-desc">Python library for uncertainty quantification with quasi-random sampling rules including Halton, Hammersley, Korobov, and Sobol sequences</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Chaospy developers</td>
 </tr>
 
 <tr>
@@ -58,10 +72,24 @@ mkdocs serve
 </tr>
 
 <tr>
+  <td><a href="https://www.gnu.org/software/gsl/doc/html/qrng.html">GNU Scientific Library</a><br><span class="software-desc">C library providing quasi-random sequence generators including Niederreiter, Sobol, Halton, and reverse Halton sequences</span></td>
+  <td>C</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>GSL Team</td>
+</tr>
+
+<tr>
   <td><a href="https://github.com/llxu2017/halton">Halton</a><br><span class="software-desc">Random-start randomly permuted Halton sequences</span></td>
   <td>C++</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://oneapi-spec.uxlfoundation.org/specifications/oneapi/v1.1-rev-1/elements/onemkl/source/domains/rng/engines-basic-random-number-generators">Intel oneMKL</a><br><span class="software-desc">High-performance math library whose RNG domain includes Sobol and Niederreiter quasi-random number generators</span></td>
+  <td>C++ / Data Parallel C++</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Intel / oneAPI developers</td>
 </tr>
 
 <tr>
@@ -114,6 +142,13 @@ mkdocs serve
 </tr>
 
 <tr>
+  <td><a href="https://openturns.github.io/openturns/latest/user_manual/_generated/openturns.LowDiscrepancySequence.html">OpenTURNS</a><br><span class="software-desc">Open-source uncertainty quantification platform with low-discrepancy sequences including Faure, Halton, reverse Halton, Haselgrove, and Sobol sequences</span></td>
+  <td>Python / C++</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Michaël Baudin<br>Anne Dutfoy<br>Bertrand Iooss<br>Anne-Laure Popelin</td>
+</tr>
+
+<tr>
   <td><a href="https://artowen.su.domains/code/">Owen&#x27;s Scrambled Points</a><br><span class="software-desc">Nested uniform scrambling of Sobol&#x27; sequences and pointer to randomized Halton sequences</span></td>
   <td>R</td>
   <td><span class="status-nowrap">Mature</span></td>
@@ -121,10 +156,24 @@ mkdocs serve
 </tr>
 
 <tr>
+  <td><a href="https://pydoe3.readthedocs.io/en/latest/reference/low_discrepancy_sequences/">PyDOE3</a><br><span class="software-desc">Python design-of-experiments package with low-discrepancy designs including Sukharev grids, Sobol, Halton, rank-1 lattices, Korobov sequences, and Cranley-Patterson randomization</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>PyDOE3 developers</td>
+</tr>
+
+<tr>
   <td><a href="https://pytorch.org/docs/stable/generated/torch.quasirandom.SobolEngine.html">PyTorch Sobol Engine</a><br><span class="software-desc">PyTorch&#x27;s implementation of the Sobol sequence for generating low-discrepancy samples in machine learning applications</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td></td>
+</tr>
+
+<tr>
+  <td><a href="https://github.com/QMCSoftware/QMC.jl">QMC.jl</a><br><span class="software-desc">Experimental implementation of QMCPy</span></td>
+  <td>Julia</td>
+  <td><span class="status-nowrap">Active, Pre-mature<br>Collaboration welcome</span></td>
+  <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
 </tr>
 
 <tr>
@@ -149,6 +198,13 @@ mkdocs serve
 </tr>
 
 <tr>
+  <td><a href="https://cran.r-project.org/web/packages/randtoolbox/index.html">randtoolbox</a><br><span class="software-desc">R package providing pseudo-random and quasi-random generators, including Torus, Sobol, Halton, and Van der Corput sequences</span></td>
+  <td>R</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Christophe Dutang</td>
+</tr>
+
+<tr>
   <td><a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">scipy.stats.qmc</a><br><span class="software-desc">Part of the SciPy library, providing low-discrepancy sequence generators and sampling methods for scientific computing in Python</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
@@ -160,6 +216,13 @@ mkdocs serve
   <td>Java</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Pierre L’Ecuyer</td>
+</tr>
+
+<tr>
+  <td><a href="https://www.tensorflow.org/probability/api_docs/python/tfp/mcmc/sample_halton_sequence">TensorFlow Probability</a><br><span class="software-desc">TensorFlow function for generating deterministic or randomized Halton low-discrepancy sequences</span></td>
+  <td>Python</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>TensorFlow Probability developers</td>
 </tr>
 
 </tbody>

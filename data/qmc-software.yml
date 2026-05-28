@@ -15,6 +15,94 @@
     - name: Aleksei Sorokin
       url: https://alegresor.github.io
 
+- name: QMC.jl
+  url: https://github.com/QMCSoftware/QMC.jl
+  description: >
+    Experimental implementation of QMCPy
+  language: Julia
+  status: Active, Pre-mature, Collaboration welcome
+  contact:
+    - Sou-Cheng Choi
+    - name: Fred Hickernell
+      url: https://github.com/fjhickernell
+    - name: Aleksei Sorokin
+      url: https://alegresor.github.io
+
+- name: BoTorch
+  url: https://botorch.org/docs/samplers
+  description: >
+    Bayesian optimization library with Monte Carlo samplers, including a Sobol randomized quasi-Monte Carlo normal sampler
+  language: Python
+  status: Active
+  contact:
+    - Meta / BoTorch developers
+
+- name: Chaospy
+  url: https://chaospy.readthedocs.io/en/master/user_guide/fundamentals/quasi_random_samples.html
+  description: >
+    Python library for uncertainty quantification with quasi-random sampling rules including Halton, Hammersley, Korobov, and Sobol sequences
+  language: Python
+  status: Active
+  contact:
+    - Chaospy developers
+
+- name: GNU Scientific Library
+  url: https://www.gnu.org/software/gsl/doc/html/qrng.html
+  description: >
+    C library providing quasi-random sequence generators including Niederreiter, Sobol, Halton, and reverse Halton sequences
+  language: C
+  status: Mature
+  contact:
+    - GSL Team
+
+- name: Intel oneMKL
+  url: https://oneapi-spec.uxlfoundation.org/specifications/oneapi/v1.1-rev-1/elements/onemkl/source/domains/rng/engines-basic-random-number-generators
+  description: >
+    High-performance math library whose RNG domain includes Sobol and Niederreiter quasi-random number generators
+  language: C++ / Data Parallel C++
+  status: Mature
+  contact:
+    - Intel / oneAPI developers
+
+- name: OpenTURNS
+  url: https://openturns.github.io/openturns/latest/user_manual/_generated/openturns.LowDiscrepancySequence.html
+  description: >
+    Open-source uncertainty quantification platform with low-discrepancy sequences including Faure, Halton, reverse Halton, Haselgrove, and Sobol sequences
+  language: Python / C++
+  status: Active
+  contact:
+    - Michaël Baudin
+    - Anne Dutfoy
+    - Bertrand Iooss
+    - Anne-Laure Popelin
+
+- name: PyDOE3
+  url: https://pydoe3.readthedocs.io/en/latest/reference/low_discrepancy_sequences/
+  description: >
+    Python design-of-experiments package with low-discrepancy designs including Sukharev grids, Sobol, Halton, rank-1 lattices, Korobov sequences, and Cranley-Patterson randomization
+  language: Python
+  status: Active
+  contact:
+    - PyDOE3 developers
+
+- name: randtoolbox
+  url: https://cran.r-project.org/web/packages/randtoolbox/index.html
+  description: >
+    R package providing pseudo-random and quasi-random generators, including Torus, Sobol, Halton, and Van der Corput sequences
+  language: R
+  status: Active
+  contact:
+    - Christophe Dutang
+
+- name: TensorFlow Probability
+  url: https://www.tensorflow.org/probability/api_docs/python/tfp/mcmc/sample_halton_sequence
+  description: >
+    TensorFlow function for generating deterministic or randomized Halton low-discrepancy sequences
+  language: Python
+  status: Active
+  contact:
+    - TensorFlow Probability developers
+
 - name: LatNet Builder
   url: https://github.com/umontreal-simul/latnetbuilder
   description: >
