@@ -17,41 +17,40 @@ concurrency:
 
 jobs:
   tests:
-    name: Unit Tests on ${{ matrix.runner }} (Python ${{ matrix.python-version }})
-    runs-on: ${{ matrix.runner }}
+    name: Unit Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - runner: macos-15-intel
+          - os: macos-latest
             python-version: "3.5"
-          - runner: macos-15-intel
+          - os: macos-latest
             python-version: "3.8"
-          - runner: macos-15-intel
+          - os: macos-latest
             python-version: "3.11"
-          - runner: macos-15-intel
+          - os: macos-latest
             python-version: "3.14"
-          - runner: ubuntu-20.04
+          - os: ubuntu-latest
             python-version: "3.6"
-          - runner: ubuntu-24.04
+          - os: ubuntu-latest
             python-version: "3.9"
-          - runner: ubuntu-24.04
+          - os: ubuntu-latest
             python-version: "3.12"
-          - runner: windows-latest
+          - os: windows-latest
             python-version: "3.7"
-          - runner: windows-latest
+          - os: windows-latest
             python-version: "3.10"
-          - runner: windows-latest
+          - os: windows-latest
             python-version: "3.13"
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
-          cache: pip
-          cache-dependency-path: |
-            requirements/ci-unittests.txt
+          miniconda-version: "latest"
+          auto-activate-base: true
+          conda-remove-defaults: true
+          use-only-tar-bz2: true
 
       - name: Remove old coverage data (Unix)
         if: runner.os != 'Windows'
@@ -65,15 +64,167 @@ jobs:
           Remove-Item -Path .coverage* -Force -ErrorAction SilentlyContinue -Confirm:$false
           Remove-Item -Path coverage.json -Force -ErrorAction SilentlyContinue -Confirm:$false
 
-      - name: Install unit-test dependencies
+      - name: Add 12GB swap (Linux)
+        if: runner.os == 'Linux'
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install -r requirements/ci-unittests.txt
+          set -euxo pipefail
+          echo "=== Existing swap devices ==="
+          swapon --show || true
+
+          current_swap_mb=$(free -m | awk '/^Swap:/ {print $2}')
+          if [ "${current_swap_mb:-0}" -ge 12000 ]; then
+            echo "Sufficient swap already present (${current_swap_mb} MB). Skipping swap creation."
+            free -h
+            exit 0
+          fi
+
+          SWAPFILE=/tmp/qmcsoftware_swapfile
+
+          if [ -f "$SWAPFILE" ]; then
+            sudo swapoff "$SWAPFILE" || true
+            sudo rm -f "$SWAPFILE"
+          fi
+
+          sudo fallocate -l 12G "$SWAPFILE"
+          sudo chmod 600 "$SWAPFILE"
+          sudo mkswap "$SWAPFILE"
+          sudo swapon "$SWAPFILE"
+
+          echo "=== Swap after setup ==="
+          swapon --show
+          free -h
+
+      - name: Add 12GB swap (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          sudo mkfile 12g /private/var/vm/tempswapfile
+          sudo chmod 600 /private/var/vm/tempswapfile
+
+      - name: Configure pagefile (Windows) via CIM (12GB)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $drive    = "D:"
+          $initialMB = 12288
+          $maxMB     = 12288
+          $pagefile  = "$drive\pagefile.sys"
+          Write-Host "Configuring pagefile: $pagefile (Initial=${initialMB}MB, Max=${maxMB}MB)"
+          $cs = Get-CimInstance Win32_ComputerSystem
+          if ($cs.AutomaticManagedPagefile) {
+            Set-CimInstance -InputObject $cs -Property @{ AutomaticManagedPagefile = $false } | Out-Null
+          }
+          $escaped = $pagefile.Replace('\','\\')
+          $pfs = Get-CimInstance Win32_PageFileSetting -Filter "Name='$escaped'" -ErrorAction SilentlyContinue
+          if ($null -eq $pfs) {
+            New-CimInstance -ClassName Win32_PageFileSetting -Property @{
+              Name        = $pagefile
+              InitialSize = $initialMB
+              MaximumSize = $maxMB
+            } | Out-Null
+          } else {
+            Set-CimInstance -InputObject $pfs -Property @{
+              InitialSize = $initialMB
+              MaximumSize = $maxMB
+            } | Out-Null
+          }
+          "=== Pagefile settings ==="
+          Get-CimInstance Win32_PageFileSetting | Format-Table Name,InitialSize,MaximumSize -Auto
+
+      - name: Free space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+
+      - name: Free space (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          conda clean --all --yes
+          pip cache purge || true
+          df -h
+
+      - name: Free space (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          conda clean --all --yes || true
+          pip cache purge || true
+          Get-Volume | Select-Object DriveLetter, Size, SizeRemaining | Format-Table
+
+      - name: Show runner resources
+        if: runner.os != 'Windows'
+        run: |
+          echo "CPUs: $(nproc || sysctl -n hw.ncpu)"
+          free -h || vm_stat
+          df -h
+
+      - name: Show runner resources
+        if: runner.os == 'Windows'
+        run: |
+          Get-WmiObject Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize
+          Get-ComputerInfo -Property CsTotalPhysicalMemory
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/pip/wheels
+            ~/Library/Caches/pip
+            ~/Library/Caches/pip/wheels
+            ~\AppData\Local\pip\Cache
+            ~\AppData\Local\pip\Cache\wheels
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache wheel files
+        uses: actions/cache@v4
+        with:
+          path: ./.wheels
+          key: ${{ runner.os }}-wheels-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-wheels-
+
+      - name: Build and cache wheels (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch,test_umbridge] || true
+
+      - name: Install Python dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]"
+
+      - name: Build and cache wheels (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || true
+
+      - name: Install Python dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch]"
+
+      - name: Build and cache wheels (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || Write-Host 'wheel build step completed'
+
+      - name: Install Python dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
 
       - name: Show Python version
         run: |
           python --version
           python -m pip --version
 
-      - name: Run unittests
+      - name: Run unittests (parallel)
         run: make unittests
