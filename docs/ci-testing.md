@@ -30,4 +30,4 @@ There is no nightly CI schedule.
 - [tests.md](tests.md): local Makefile targets and coverage commands.
 - [booktests.md](booktests.md): notebook-test mechanics and developer commands.
 
-When workflow files change, update this page together with `mkdocs.yml`, `README.md`, and [tests.md](tests.md) if local guidance changes.
+When workflow files `.github/workflows/*.yml` change, update this page together with `mkdocs.yml`, `README.md`, and [tests.md](tests.md) if applicable.
