@@ -2,8 +2,7 @@ name: Docs
 on:
   push:
     branches:
-      - master 
-      - main
+      - master
       # - develop
 permissions:
   contents: write
