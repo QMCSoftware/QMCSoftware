@@ -15,18 +15,18 @@
     - name: Aleksei Sorokin
       url: https://alegresor.github.io
 
-- name: QMC.jl
-  url: https://github.com/QMCSoftware/QMC.jl
-  description: >
-    Translation of QMCPy to Julia
-  language: Julia
-  status: Active, Pre-mature, Collaboration welcome
-  contact:
-    - Sou-Cheng Choi
-    - name: Fred Hickernell
-      url: https://github.com/fjhickernell
-    - name: Aleksei Sorokin
-      url: https://alegresor.github.io
+# - name: QMC.jl
+#   url: https://github.com/QMCSoftware/QMC.jl
+#   description: >
+#     Translation of QMCPy to Julia
+#   language: Julia
+#   status: Active, Pre-mature, Collaboration welcome
+#   contact:
+#     - Sou-Cheng Choi
+#     - name: Fred Hickernell
+#       url: https://github.com/fjhickernell
+#     - name: Aleksei Sorokin
+#       url: https://alegresor.github.io
 
 - name: BoTorch
   url: https://botorch.org/docs/samplers
@@ -153,6 +153,26 @@
   contact: 
     - Pieterjan Robbe
 
+- name: GAIL
+  url: https://www.mathworks.com/matlabcentral/fileexchange/64375-guaranteed-automatic-integration-library
+  description: >
+    Guaranteed Automatic Integration Library for one-, multi-, and infinite-dimensional integration with rigorous error guarantees
+  language: MATLAB
+  status: Mature
+  contact:
+    - Sou-Cheng Choi
+    - Fred Hickernell
+    - Yuhan Ding
+
+- name: Fast CBC constructions
+  url: https://people.cs.kuleuven.be/~dirk.nuyens/fast-cbc/
+  description: >
+    Matlab/Octave routines for fast component-by-component construction of rank-1 lattice rules, lattice sequences, and polynomial lattice sequences
+  language: MATLAB / Octave
+  status: Mature
+  contact:
+    - Dirk Nuyens
+
 - name: scipy.stats.qmc
   url: https://docs.scipy.org/doc/scipy/reference/stats.qmc.html
   description: >
@@ -247,7 +267,25 @@
   language: C++, MATLAB, Python, plain text
   status: Mature
   contact:
-    - name: Dirk Nuyens
+    - Dirk Nuyens
+
+- name: QMC4PDE
+  url: https://people.cs.kuleuven.be/~dirk.nuyens/qmc4pde/
+  description: >
+    Software for constructing randomly shifted lattice rules and interlaced polynomial lattice rules for elliptic PDEs with random diffusion coefficients
+  language: Python / MATLAB / C++
+  status: Active
+  contact:
+    - Frances Y. Kuo; Dirk Nuyens
+
+- name: QMC Algorithms for Graphics Software
+  url: https://arxiv.org/abs/2307.15584
+  description: >
+    Reference  with compact copy-and-paste algorithms for low-discrepancy sequences
+  language: C++ / CUDA-style pseudocode
+  status: Reference
+  contact:
+    - Alexander Keller; Carsten Wächter; Nikolaus Binder
 
 - name: Stochastic Simulation in Java (SSJ)
   url: https://github.com/umontreal-simul/ssj

@@ -44,7 +44,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://botorch.org/docs/samplers">BoTorch</a><br><span class="software-desc">Bayesian optimization library that leverages PyTorch's (Q)MC samplers</span></td>
+  <td><a href="https://botorch.org/docs/samplers">BoTorch</a><br><span class="software-desc">Bayesian optimization library that leverages PyTorch&#x27;s (Q)MC samplers</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Meta / BoTorch developers</td>
@@ -69,6 +69,20 @@ mkdocs serve
   <td></td>
   <td><span class="status-nowrap">Mature</span></td>
   <td>Pieterjan Robbe</td>
+</tr>
+
+<tr>
+  <td><a href="https://people.cs.kuleuven.be/~dirk.nuyens/fast-cbc/">Fast CBC constructions</a><br><span class="software-desc">Matlab/Octave routines for fast component-by-component construction of rank-1 lattice rules, lattice sequences, and polynomial lattice sequences</span></td>
+  <td>MATLAB / Octave</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Dirk Nuyens</td>
+</tr>
+
+<tr>
+  <td><a href="https://www.mathworks.com/matlabcentral/fileexchange/64375-guaranteed-automatic-integration-library">GAIL</a><br><span class="software-desc">Guaranteed Automatic Integration Library for one-, multi-, and infinite-dimensional integration with rigorous error guarantees</span></td>
+  <td>MATLAB</td>
+  <td><span class="status-nowrap">Mature</span></td>
+  <td>Sou-Cheng Choi<br>Fred Hickernell<br>Yuhan Ding</td>
 </tr>
 
 <tr>
@@ -170,10 +184,17 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://github.com/QMCSoftware/QMC.jl">QMC.jl</a><br><span class="software-desc">Translation of QMCPy to Julia</span></td>
-  <td>Julia</td>
-  <td><span class="status-nowrap">Active, Pre-mature<br>Collaboration welcome</span></td>
-  <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
+  <td><a href="https://arxiv.org/abs/2307.15584">QMC Algorithms for Graphics Software</a><br><span class="software-desc">Reference with compact copy-and-paste algorithms for low-discrepancy sequences</span></td>
+  <td>C++ / CUDA-style pseudocode</td>
+  <td><span class="status-nowrap">Reference</span></td>
+  <td>Alexander Keller; Carsten Wächter; Nikolaus Binder</td>
+</tr>
+
+<tr>
+  <td><a href="https://people.cs.kuleuven.be/~dirk.nuyens/qmc4pde/">QMC4PDE</a><br><span class="software-desc">Software for constructing randomly shifted lattice rules and interlaced polynomial lattice rules for elliptic PDEs with random diffusion coefficients</span></td>
+  <td>Python / MATLAB / C++</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>Frances Y. Kuo; Dirk Nuyens</td>
 </tr>
 
 <tr>
