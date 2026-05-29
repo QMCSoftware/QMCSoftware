@@ -4,7 +4,7 @@
     - name: QMCToolsCL
       url: https://github.com/QMCSoftware/QMCToolsCL
   description: >
-    Multi-purpose library featuring various low discrepancy sequences
+    Multi-purpose library featuring various low-discrepancy sequences (LDS)
     and data-driven error estimation
   language: Python
   status: Active, Collaboration welcome
@@ -67,7 +67,7 @@
 - name: OpenTURNS
   url: https://openturns.github.io/openturns/latest/user_manual/_generated/openturns.LowDiscrepancySequence.html
   description: >
-    Open-source uncertainty quantification platform with low-discrepancy sequences including Faure, Halton, reverse Halton, Haselgrove, and Sobol sequences
+    Open-source uncertainty quantification platform with LDS including Faure, Halton, reverse Halton, Haselgrove, and Sobol sequences
   language: Python / C++
   status: Active
   contact:
@@ -97,7 +97,7 @@
 - name: TensorFlow Probability
   url: https://www.tensorflow.org/probability/api_docs/python/tfp/mcmc/sample_halton_sequence
   description: >
-    TensorFlow function for generating deterministic or randomized Halton low-discrepancy sequences
+    TensorFlow function for generating deterministic or randomized Halton LDS
   language: Python
   status: Active
   contact:
@@ -132,7 +132,7 @@
 - name: Boost Random Number Library
   url: https://www.boost.org/doc/libs/latest/doc/html/boost_random/reference.html#boost_random.reference.concepts.quasi_random_number_generator
   description: >
-    Part of the Boost C++ Libraries, offering a wide range of random number generators, including some low-discrepancy sequences
+    Part of the Boost C++ Libraries, offering a wide range of random number generators, including some LDS
   language: C++
   status: "Mature"
   contact: []
@@ -176,7 +176,7 @@
 - name: scipy.stats.qmc
   url: https://docs.scipy.org/doc/scipy/reference/stats.qmc.html
   description: >
-    Part of the SciPy library, providing low-discrepancy sequence generators and sampling methods for scientific computing in Python
+    Part of the SciPy library, providing LDS (low-discrepancy sequence) generators and sampling methods for scientific computing in Python
   language: Python
   status: "Active"
   contact: 
@@ -185,7 +185,7 @@
 - name: qrng
   url: https://cran.r-project.org/web/packages/qrng/index.html
   description: >
-    R package for generating low-discrepancy sequences, including Sobol and Halton sequences, for statistical computing and data analysis
+    R package for generating LDS, including Sobol and Halton sequences, for statistical computing and data analysis
   language: R
   status: "Active"
   contact: 
@@ -196,7 +196,7 @@
 - name: QuasiMonteCarlo.jl
   url:  https://docs.sciml.ai/QuasiMonteCarlo/stable/
   description: >
-    Julia package for generating low-discrepancy sequences and performing quasi-Monte Carlo integration, designed for high-performance scientific computing
+    Julia package for generating LDS and performing quasi-Monte Carlo integration, designed for high-performance scientific computing
   language: Julia
   status: "Active"
   contact: 
@@ -281,7 +281,7 @@
 - name: QMC Algorithms for Graphics Software
   url: https://arxiv.org/abs/2307.15584
   description: >
-    Reference  with compact copy-and-paste algorithms for low-discrepancy sequences
+    Reference with compact copy-and-paste algorithms for LDS
   language: C++ / CUDA-style pseudocode
   status: Reference
   contact:
@@ -290,7 +290,7 @@
 - name: Stochastic Simulation in Java (SSJ)
   url: https://github.com/umontreal-simul/ssj
   description: >
-    Java library for stochastic simulation, including low-discrepancy sequence generators and sampling methods
+    Java library for stochastic simulation, including LDS (low-discrepancy sequence) generators and sampling methods
   language: Java
   status: "Active"
   contact:

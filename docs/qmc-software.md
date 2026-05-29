@@ -37,7 +37,7 @@ mkdocs serve
 
 
 <tr>
-  <td><a href="https://www.boost.org/doc/libs/latest/doc/html/boost_random/reference.html#boost_random.reference.concepts.quasi_random_number_generator">Boost Random Number Library</a><br><span class="software-desc">Part of the Boost C++ Libraries, offering a wide range of random number generators, including some low-discrepancy sequences</span></td>
+  <td><a href="https://www.boost.org/doc/libs/latest/doc/html/boost_random/reference.html#boost_random.reference.concepts.quasi_random_number_generator">Boost Random Number Library</a><br><span class="software-desc">Part of the Boost C++ Libraries, offering a wide range of random number generators, including some LDS</span></td>
   <td>C++</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td></td>
@@ -156,7 +156,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://openturns.github.io/openturns/latest/user_manual/_generated/openturns.LowDiscrepancySequence.html">OpenTURNS</a><br><span class="software-desc">Open-source uncertainty quantification platform with low-discrepancy sequences including Faure, Halton, reverse Halton, Haselgrove, and Sobol sequences</span></td>
+  <td><a href="https://openturns.github.io/openturns/latest/user_manual/_generated/openturns.LowDiscrepancySequence.html">OpenTURNS</a><br><span class="software-desc">Open-source uncertainty quantification platform with LDS including Faure, Halton, reverse Halton, Haselgrove, and Sobol sequences</span></td>
   <td>Python / C++</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Michaël Baudin<br>Anne Dutfoy<br>Bertrand Iooss<br>Anne-Laure Popelin</td>
@@ -184,7 +184,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://arxiv.org/abs/2307.15584">QMC Algorithms for Graphics Software</a><br><span class="software-desc">Reference with compact copy-and-paste algorithms for low-discrepancy sequences</span></td>
+  <td><a href="https://arxiv.org/abs/2307.15584">QMC Algorithms for Graphics Software</a><br><span class="software-desc">Reference with compact copy-and-paste algorithms for LDS</span></td>
   <td>C++ / CUDA-style pseudocode</td>
   <td><span class="status-nowrap">Reference</span></td>
   <td>Alexander Keller; Carsten Wächter; Nikolaus Binder</td>
@@ -198,21 +198,21 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://qmcpy.org">QMCPy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various low discrepancy sequences and data-driven error estimation</span></td>
+  <td><a href="https://qmcpy.org">QMCPy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various low-discrepancy sequences (LDS) and data-driven error estimation</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
   <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
 </tr>
 
 <tr>
-  <td><a href="https://cran.r-project.org/web/packages/qrng/index.html">qrng</a><br><span class="software-desc">R package for generating low-discrepancy sequences, including Sobol and Halton sequences, for statistical computing and data analysis</span></td>
+  <td><a href="https://cran.r-project.org/web/packages/qrng/index.html">qrng</a><br><span class="software-desc">R package for generating LDS, including Sobol and Halton sequences, for statistical computing and data analysis</span></td>
   <td>R</td>
   <td><span class="status-nowrap">Active</span></td>
   <td><a href="mailto:mhofert@hku.hk">✉ Marius Hofert</a><br>Christiane Lemieux</td>
 </tr>
 
 <tr>
-  <td><a href="https://docs.sciml.ai/QuasiMonteCarlo/stable/">QuasiMonteCarlo.jl</a><br><span class="software-desc">Julia package for generating low-discrepancy sequences and performing quasi-Monte Carlo integration, designed for high-performance scientific computing</span></td>
+  <td><a href="https://docs.sciml.ai/QuasiMonteCarlo/stable/">QuasiMonteCarlo.jl</a><br><span class="software-desc">Julia package for generating LDS and performing quasi-Monte Carlo integration, designed for high-performance scientific computing</span></td>
   <td>Julia</td>
   <td><span class="status-nowrap">Active</span></td>
   <td><a href="https://julialang.org/slack/">Chris Rackauckas</a></td>
@@ -226,21 +226,21 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">scipy.stats.qmc</a><br><span class="software-desc">Part of the SciPy library, providing low-discrepancy sequence generators and sampling methods for scientific computing in Python</span></td>
+  <td><a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">scipy.stats.qmc</a><br><span class="software-desc">Part of the SciPy library, providing LDS (low-discrepancy sequence) generators and sampling methods for scientific computing in Python</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Pamphile Roy</td>
 </tr>
 
 <tr>
-  <td><a href="https://github.com/umontreal-simul/ssj">Stochastic Simulation in Java (SSJ)</a><br><span class="software-desc">Java library for stochastic simulation, including low-discrepancy sequence generators and sampling methods</span></td>
+  <td><a href="https://github.com/umontreal-simul/ssj">Stochastic Simulation in Java (SSJ)</a><br><span class="software-desc">Java library for stochastic simulation, including LDS (low-discrepancy sequence) generators and sampling methods</span></td>
   <td>Java</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Pierre L’Ecuyer</td>
 </tr>
 
 <tr>
-  <td><a href="https://www.tensorflow.org/probability/api_docs/python/tfp/mcmc/sample_halton_sequence">TensorFlow Probability</a><br><span class="software-desc">TensorFlow function for generating deterministic or randomized Halton low-discrepancy sequences</span></td>
+  <td><a href="https://www.tensorflow.org/probability/api_docs/python/tfp/mcmc/sample_halton_sequence">TensorFlow Probability</a><br><span class="software-desc">TensorFlow function for generating deterministic or randomized Halton LDS</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>TensorFlow Probability developers</td>
