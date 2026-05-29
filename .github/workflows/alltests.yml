@@ -1,24 +1,70 @@
 name: All Tests
-on: [push]
+
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: alltests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   #============================================================
-  # 3 Test Jobs on 3 OSes: Windows, macOS, Ubuntu
+  # Feature branches: Linux only
+  # Protected branches / PRs into develop or master: full 3-OS sweep
   #============================================================
+  select-matrix:
+    name: Select CI scope
+    runs-on: ubuntu-latest
+    outputs:
+      os-matrix: ${{ steps.scope.outputs.os-matrix }}
+      run-booktests: ${{ steps.scope.outputs.run-booktests }}
+    steps:
+      - name: Decide runner matrix and booktest scope
+        id: scope
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          full_sweep=false
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            full_sweep=true
+          elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
+            full_sweep=true
+          elif [[ "$REF_NAME" == "develop" || "$REF_NAME" == "master" ]]; then
+            full_sweep=true
+          fi
+
+          if [[ "$full_sweep" == "true" ]]; then
+            echo 'os-matrix=["windows-latest","macos-latest","ubuntu-latest"]' >> "$GITHUB_OUTPUT"
+            echo 'run-booktests=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'os-matrix=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
+            echo 'run-booktests=false' >> "$GITHUB_OUTPUT"
+          fi
+
   tests:
-    name: All Tests on ${{ matrix.os }}
+    needs: select-matrix
+    name: All Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     env:
-      RUN_BOOKTESTS: ${{ github.ref_name == 'master' || github.ref_name == 'develop' }}
+      RUN_BOOKTESTS: ${{ needs.select-matrix.outputs.run-booktests }}
     strategy:
-        matrix:  # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
-            os: ["windows-latest", "macos-latest", "ubuntu-latest"] 
+        matrix:
+            os: ${{ fromJSON(needs.select-matrix.outputs.os-matrix) }}
             python-version: ['3.13']
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
+          python-version: ${{ matrix.python-version }}
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true

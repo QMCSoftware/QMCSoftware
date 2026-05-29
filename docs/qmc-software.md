@@ -170,7 +170,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://github.com/QMCSoftware/QMC.jl">QMC.jl</a><br><span class="software-desc">Translation of QMCPy ssto Julia</span></td>
+  <td><a href="https://github.com/QMCSoftware/QMC.jl">QMC.jl</a><br><span class="software-desc">Translation of QMCPy to Julia</span></td>
   <td>Julia</td>
   <td><span class="status-nowrap">Active, Pre-mature<br>Collaboration welcome</span></td>
   <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
@@ -228,4 +228,5 @@ mkdocs serve
 </tbody>
 </table>
 </div>
+
 
