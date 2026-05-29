@@ -314,13 +314,17 @@ jobs:
       - run: make doctests_gpytorch
       - run: make doctests_botorch
       - run: make doctests_markdown
-      - name: run umbridge doctests on Linux only
+      - name: Run umbridge doctests on Linux full sweeps when Docker is available
         shell: bash -l {0}
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
+          if [ "$RUNNER_OS" == "Linux" ] && [ "$RUN_BOOKTESTS" == "true" ] && command -v docker >/dev/null 2>&1; then
             make doctests_umbridge
-          else
+          elif [ "$RUNNER_OS" != "Linux" ]; then
             echo "umbridge doctests only run on Linux"
+          elif [ "$RUN_BOOKTESTS" != "true" ]; then
+            echo "Skipping umbridge doctests outside full sweeps"
+          else
+            echo "Skipping umbridge doctests because Docker is not available on this runner"
           fi
       # -----------------------------------------------------------
       # Run unittests for Python source files
