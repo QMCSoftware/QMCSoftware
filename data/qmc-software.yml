@@ -4,7 +4,7 @@
     - name: QMCToolsCL
       url: https://github.com/QMCSoftware/QMCToolsCL
   description: >
-    Multi-purpose library featuring various low-discrepancy sequences (LDS)
+    Multi-purpose library featuring various LDS
     and data-driven error estimation
   language: Python
   status: Active, Collaboration welcome
@@ -79,7 +79,7 @@
 - name: PyDOE3
   url: https://pydoe3.readthedocs.io/en/latest/reference/low_discrepancy_sequences/
   description: >
-    Python design-of-experiments package with low-discrepancy designs including Sukharev grids, Sobol, Halton, rank-1 lattices, Korobov sequences, and Cranley-Patterson randomization
+    Python design-of-experiments package with LD designs including Sukharev grids, Sobol, Halton, rank-1 lattices, Korobov sequences, and Cranley-Patterson randomization
   language: Python
   status: Active
   contact:
@@ -106,7 +106,7 @@
 - name: LatNet Builder
   url: https://github.com/umontreal-simul/latnetbuilder
   description: >
-    Library for constructing low-discrepancy lattice rules and digital nets
+    Library for constructing LD lattice rules and digital nets
   language: C++ / Python
   status: Active, Collaboration welcome
   contact:
@@ -140,7 +140,7 @@
 - name: PyTorch Sobol Engine
   url: https://pytorch.org/docs/stable/generated/torch.quasirandom.SobolEngine.html
   description: >
-    PyTorch's implementation of the Sobol sequence for generating low-discrepancy samples in machine learning applications
+    PyTorch's implementation of the Sobol sequence for generating LD samples in machine learning applications
   language: Python
   status: "Active"
   contact: []
@@ -176,7 +176,7 @@
 - name: scipy.stats.qmc
   url: https://docs.scipy.org/doc/scipy/reference/stats.qmc.html
   description: >
-    Part of the SciPy library, providing LDS (low-discrepancy sequence) generators and sampling methods for scientific computing in Python
+    Part of the SciPy library, providing LDS generators and sampling methods for scientific computing in Python
   language: Python
   status: "Active"
   contact: 
@@ -196,7 +196,7 @@
 - name: QuasiMonteCarlo.jl
   url:  https://docs.sciml.ai/QuasiMonteCarlo/stable/
   description: >
-    Julia package for generating LDS and performing quasi-Monte Carlo integration, designed for high-performance scientific computing
+    Julia package for generating LDS and performing QMC integration, designed for high-performance scientific computing
   language: Julia
   status: "Active"
   contact: 
@@ -206,7 +206,7 @@
 - name: BRODA
   url: https://www.broda.co.uk
   description: >
-    Commercial software offering a range of quasi-Monte Carlo methods for financial modeling and risk analysis
+    Commercial software offering a range of QMC methods for financial modeling and risk analysis
   language: C++ / Fortran
   status: "Mature"
   contact: 
@@ -224,7 +224,7 @@
 - name: LDData
   url: https://github.com/QMCSoftware/LDData
   description: >
-    Database of low discrepancy generators
+    Database of LD generators
   language: plain text
   status: "Active, Collaboration welcome"
   contact: 
@@ -290,7 +290,7 @@
 - name: Stochastic Simulation in Java (SSJ)
   url: https://github.com/umontreal-simul/ssj
   description: >
-    Java library for stochastic simulation, including LDS (low-discrepancy sequence) generators and sampling methods
+    Java library for stochastic simulation, including LDS generators and sampling methods
   language: Java
   status: "Active"
   contact:

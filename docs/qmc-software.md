@@ -11,7 +11,11 @@ If you prefer not to use GitHub pull requests, you may instead email updates to 
 
 ## Updating and previewing
 
-The table below is generated from [`data/qmc-software.yml`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/data/qmc-software.yml).
+The table below is generated from [`data/qmc-software.yml`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/data/qmc-software.yml). We have used the following abbreviations:
+
+- LD: low discrepancy
+- LDS: low-discrepancy sequence
+- QMC: quasi-Monte Carlo
 
 To preview changes locally:
 
@@ -51,7 +55,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://www.broda.co.uk">BRODA</a><br><span class="software-desc">Commercial software offering a range of quasi-Monte Carlo methods for financial modeling and risk analysis</span></td>
+  <td><a href="https://www.broda.co.uk">BRODA</a><br><span class="software-desc">Commercial software offering a range of QMC methods for financial modeling and risk analysis</span></td>
   <td>C++ / Fortran</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td><a href="mailto:info@broda.co.uk">✉ Sergei Kucherenko</a></td>
@@ -107,7 +111,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://github.com/umontreal-simul/latnetbuilder">LatNet Builder</a><br><span class="software-desc">Library for constructing low-discrepancy lattice rules and digital nets</span></td>
+  <td><a href="https://github.com/umontreal-simul/latnetbuilder">LatNet Builder</a><br><span class="software-desc">Library for constructing LD lattice rules and digital nets</span></td>
   <td>C++ / Python</td>
   <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
   <td>Pierre L’Ecuyer</td>
@@ -121,7 +125,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://github.com/QMCSoftware/LDData">LDData</a><br><span class="software-desc">Database of low discrepancy generators</span></td>
+  <td><a href="https://github.com/QMCSoftware/LDData">LDData</a><br><span class="software-desc">Database of LD generators</span></td>
   <td>plain text</td>
   <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
   <td><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
@@ -170,14 +174,14 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://pydoe3.readthedocs.io/en/latest/reference/low_discrepancy_sequences/">PyDOE3</a><br><span class="software-desc">Python design-of-experiments package with low-discrepancy designs including Sukharev grids, Sobol, Halton, rank-1 lattices, Korobov sequences, and Cranley-Patterson randomization</span></td>
+  <td><a href="https://pydoe3.readthedocs.io/en/latest/reference/low_discrepancy_sequences/">PyDOE3</a><br><span class="software-desc">Python design-of-experiments package with LD designs including Sukharev grids, Sobol, Halton, rank-1 lattices, Korobov sequences, and Cranley-Patterson randomization</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>PyDOE3 developers</td>
 </tr>
 
 <tr>
-  <td><a href="https://pytorch.org/docs/stable/generated/torch.quasirandom.SobolEngine.html">PyTorch Sobol Engine</a><br><span class="software-desc">PyTorch&#x27;s implementation of the Sobol sequence for generating low-discrepancy samples in machine learning applications</span></td>
+  <td><a href="https://pytorch.org/docs/stable/generated/torch.quasirandom.SobolEngine.html">PyTorch Sobol Engine</a><br><span class="software-desc">PyTorch&#x27;s implementation of the Sobol sequence for generating LD samples in machine learning applications</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td></td>
@@ -198,7 +202,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://qmcpy.org">QMCPy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various low-discrepancy sequences (LDS) and data-driven error estimation</span></td>
+  <td><a href="https://qmcpy.org">QMCPy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various LDS and data-driven error estimation</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
   <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>
@@ -212,7 +216,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://docs.sciml.ai/QuasiMonteCarlo/stable/">QuasiMonteCarlo.jl</a><br><span class="software-desc">Julia package for generating LDS and performing quasi-Monte Carlo integration, designed for high-performance scientific computing</span></td>
+  <td><a href="https://docs.sciml.ai/QuasiMonteCarlo/stable/">QuasiMonteCarlo.jl</a><br><span class="software-desc">Julia package for generating LDS and performing QMC integration, designed for high-performance scientific computing</span></td>
   <td>Julia</td>
   <td><span class="status-nowrap">Active</span></td>
   <td><a href="https://julialang.org/slack/">Chris Rackauckas</a></td>
@@ -226,14 +230,14 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">scipy.stats.qmc</a><br><span class="software-desc">Part of the SciPy library, providing LDS (low-discrepancy sequence) generators and sampling methods for scientific computing in Python</span></td>
+  <td><a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">scipy.stats.qmc</a><br><span class="software-desc">Part of the SciPy library, providing LDS generators and sampling methods for scientific computing in Python</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Pamphile Roy</td>
 </tr>
 
 <tr>
-  <td><a href="https://github.com/umontreal-simul/ssj">Stochastic Simulation in Java (SSJ)</a><br><span class="software-desc">Java library for stochastic simulation, including LDS (low-discrepancy sequence) generators and sampling methods</span></td>
+  <td><a href="https://github.com/umontreal-simul/ssj">Stochastic Simulation in Java (SSJ)</a><br><span class="software-desc">Java library for stochastic simulation, including LDS generators and sampling methods</span></td>
   <td>Java</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>Pierre L’Ecuyer</td>
