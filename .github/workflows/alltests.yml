@@ -67,6 +67,18 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
+      - name: Pin Miniconda base Python (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: |
+          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
+          python --version
+      - name: Pin Miniconda base Python (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
+          python --version
       
       # -----------------------------------------------------------
       # Clean old coverage files
