@@ -1,7 +1,6 @@
 from .gaussian import Gaussian
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError, ParameterWarning
-import itertools
 import warnings
 import numpy as np
 from scipy.stats import norm
@@ -65,19 +64,18 @@ class BrownianMotion(Gaussian):
 
         With Brownian Bridge construction and independent replications
 
-        >>> x = BrownianMotion(DigitalNetB2(4,seed=7,replications=2),decomp_type='BrownianBridge')(4)
+        >>> x = BrownianMotion(DigitalNetB2(4,seed=7,replications=3),decomp_type='BrownianBridge')(2)
         >>> x.shape
-        (2, 4, 4)
+        (3, 2, 4)
         >>> x
-        array([[[ 0.04484101, -0.29731996, -1.04191919, -0.52563328],
-                [ 0.87558334,  1.92143976,  2.08376103,  1.11013376],
-                [-0.80997908, -0.78736531, -1.0898902 , -1.83225558],
-                [ 0.05962007, -0.468423  , -0.34412952,  0.25695731]],
+        array([[[ 0.20967731,  0.52848898, -0.03955369, -0.17751616],
+                [ 0.60733712,  0.96872916,  1.82256178,  2.21516041]],
         <BLANKLINE>
-               [[ 0.16587623,  0.21948663,  0.42804882,  0.75273167],
-                [-0.48841768, -0.399158  , -0.24069416, -1.34288222],
-                [ 0.37699251,  0.81486745,  0.49041687,  0.07723829],
-                [-0.03747174, -0.74367511, -1.0608936 , -0.41141702]]])
+               [[-0.08220913, -0.48324258,  0.03000249, -0.19149823],
+                [-0.13637543,  1.03215652,  0.59673736,  0.62971114]],
+        <BLANKLINE>
+               [[ 0.82975853,  1.10849282,  1.10891366,  1.02092441],
+                [-0.12663949, -0.23324496, -0.37900074, -0.35202342]]])
     """
 
     def __init__(
@@ -157,22 +155,25 @@ class BrownianMotion(Gaussian):
         """Build Brownian Bridge path from standard normal samples."""
         w_all = np.zeros(z.shape[:-1] + (self.d + 1,))
         w_all[..., self.d] = np.sqrt(self.t) * z[..., 0]  # bridge endpoint
-        z_idx = itertools.count(1)
-        self._bridge_helper(w_all, z, 0, self.d, z_idx)
+        nodes = []
+        self._bridge_helper(0, self.d, nodes)
+        ranked = sorted(nodes, key=lambda n: (-n[3], n[0]))
+        mid_to_dim = {n[1]: rank for rank, n in enumerate(ranked, start=1)}
+        for left, mid, right, std, alpha in nodes:
+            mean = w_all[..., left] + alpha * (w_all[..., right] - w_all[..., left])  # conditional mean
+            w_all[..., mid] = mean + std * z[..., mid_to_dim[mid]]
         return w_all[..., 1:]
 
-    def _bridge_helper(self, w_all, z, left, right, z_idx):
-        """Recursively fill in Brownian Bridge path."""
+    def _bridge_helper(self, left, right, nodes):
+        """Recursively collect bridge nodes."""
         mid = (left + right) // 2
         if mid == left:
             return
         t_left = 0.0 if left == 0 else self.time_vec[left - 1]
         t_mid = self.time_vec[mid - 1]
         t_right = self.time_vec[right - 1]
-        mean = w_all[..., left] + (t_mid - t_left) / (t_right - t_left) * (
-            w_all[..., right] - w_all[..., left]
-        )  # conditional mean
+        alpha = (t_mid - t_left) / (t_right - t_left)
         std = np.sqrt((t_mid - t_left) * (t_right - t_mid) / (t_right - t_left))  # conditional std
-        w_all[..., mid] = mean + std * z[..., next(z_idx)]
-        self._bridge_helper(w_all, z, left, mid, z_idx)
-        self._bridge_helper(w_all, z, mid, right, z_idx)
+        nodes.append((left, mid, right, std, alpha))
+        self._bridge_helper(left, mid, nodes)
+        self._bridge_helper(mid, right, nodes)
