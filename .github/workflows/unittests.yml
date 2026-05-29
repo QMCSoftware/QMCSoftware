@@ -30,8 +30,9 @@ jobs:
         with:
           miniconda-version: "latest"
           python-version: ${{ matrix.python-version }}
-          auto-activate-base: true
-          conda-remove-defaults: true
+          auto-activate: true
+          activate-environment: base
+          channels: defaults
           use-only-tar-bz2: true
 
       # -----------------------------------------------------------
