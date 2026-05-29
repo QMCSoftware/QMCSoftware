@@ -21,15 +21,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        include:
+        include:  # exclude default Python v3.13
           - os: macos-latest
             python-version: "3.5"
           - os: macos-latest
             python-version: "3.8"
           - os: macos-latest
             python-version: "3.11"
-          - os: macos-latest
-            python-version: "3.14"
           - os: ubuntu-latest
             python-version: "3.6"
           - os: ubuntu-latest
@@ -41,7 +39,7 @@ jobs:
           - os: windows-latest
             python-version: "3.10"
           - os: windows-latest
-            python-version: "3.13"
+            python-version: "3.14"
     steps:
       - uses: actions/checkout@v4
 
