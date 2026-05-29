@@ -48,6 +48,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
+          python-version: ${{ matrix.python-version }}
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true

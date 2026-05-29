@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: alltests-${{ github.event.pull_request.number || github.ref }}
+  group: alltests-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -64,6 +64,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
+          python-version: ${{ matrix.python-version }}
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
