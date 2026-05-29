@@ -19,7 +19,7 @@ There is no nightly CI schedule.
 
 - Linux is the default feedback path and runs on every push.
 - macOS and Windows in `alltests.yml` are reserved for `develop`/`master` pushes, pull requests into those branches, and manual runs.
-- `concurrency` cancels superseded runs in both workflows; in `alltests.yml`, matching `push` and `pull_request` runs share the same head-branch group, so the newer run cancels the older one.
+- `concurrency` cancels superseded runs in both workflows; in `alltests.yml`, `push` and `pull_request` use separate groups so a PR does not inherit cancelled sibling checks from a same-SHA push.
 - `alltests.yml` pins Miniconda base Python to `3.13`; `unittests.yml` still uses the base environment without explicitly passing `matrix.python-version` into `setup-miniconda`.
 - Booktests are skipped on feature-branch pushes and run only in the full sweep.
 - UMBridge doctests run only on Linux full sweeps with Docker available.
