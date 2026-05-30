@@ -131,6 +131,9 @@ harden_colab_notebook:
 		$(PYTHON_BIN) scripts/harden_colab_notebook.py --all-unclassified; \
 	fi
 
+report_colab_notebook_patterns:
+	$(PYTHON_BIN) scripts/report_colab_notebook_patterns.py
+
 check_booktests:
 	rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
 	find demos -name '*.ipynb' | while read nb; do \
