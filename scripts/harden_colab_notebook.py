@@ -21,13 +21,17 @@ from check_colab_notebooks import (
     DEFAULT_MANIFEST,
     EXTRA_PIP_DEPENDENCIES,
     REPO_ROOT,
+    as_source_list,
     badge_markup,
+    cell_source_text,
     discovered_notebooks,
     early_non_install_code_cells,
     imported_modules,
+    is_any_badge_cell,
     is_any_install_cell,
     local_module_matches,
     load_json,
+    pip_install_lines,
     validate_disabled_notebook,
     validate_enabled_notebook,
     validate_manifest,
@@ -55,28 +59,13 @@ LATEX_MARKERS = (
     "latexmk",
     "computer modern",
 )
+COLAB_BADGE_IMAGE_FRAGMENT = "colab.research.google.com/assets/colab-badge.svg"
 
 
 def dump_json(path: Path, payload: dict) -> None:
     with path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=1, ensure_ascii=False)
         handle.write("\n")
-
-
-def as_source_text(source: str | list[str]) -> str:
-    if isinstance(source, str):
-        return source
-    return "".join(source)
-
-
-def full_source(cells: list[dict], cell_types: set[str] | None = None) -> str:
-    if cell_types is None:
-        cell_types = {"code"}
-    return "\n".join(
-        as_source_text(cell.get("source", []))
-        for cell in cells
-        if cell.get("cell_type") in cell_types
-    )
 
 
 def discovered_imports(cells: list[dict]) -> set[str]:
@@ -86,7 +75,7 @@ def discovered_imports(cells: list[dict]) -> set[str]:
             continue
         modules.update(
             imported_modules(
-                as_source_text(cell.get("source", [])),
+                cell_source_text(cell),
                 location=f"cell {idx + 1}",
             )
         )
@@ -108,7 +97,11 @@ def local_repo_import_matches(
 
 
 def needs_latex_setup(cells: list[dict]) -> bool:
-    source = full_source(cells, {"code", "markdown"})
+    source = "\n".join(
+        cell_source_text(cell)
+        for cell in cells
+        if cell.get("cell_type") in {"code", "markdown"}
+    )
     return any(marker in source for marker in LATEX_MARKERS)
 
 
@@ -121,6 +114,18 @@ def extra_pip_packages(cells: list[dict]) -> list[str]:
             package = names[0]
             if package not in packages:
                 packages.append(package)
+    all_install_lines = [
+        line
+        for cell in cells
+        if cell.get("cell_type") == "code"
+        for line in pip_install_lines(cell_source_text(cell))
+    ]
+    for _, names in sorted(EXTRA_IMPORT_DEPENDENCIES.items()):
+        package = names[0]
+        if package in packages:
+            continue
+        if any(name.lower() in line for name in names for line in all_install_lines):
+            packages.append(package)
     return packages
 
 
@@ -178,7 +183,7 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
 
     if latex_setup:
         lines.append(
-            "  !apt-get update && apt-get install -y -qq --no-install-recommends texlive-latex-base texlive-fonts-recommended texlive-latex-extra cm-super dvipng\n"
+            '  !tmp=$(mktemp) && if { apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends texlive-latex-base texlive-fonts-recommended texlive-latex-extra cm-super dvipng; } >"$tmp" 2>&1; then rm -f "$tmp"; else status=$?; cat "$tmp"; rm -f "$tmp"; exit $status; fi\n'
         )
 
     if needs_repo_clone:
@@ -201,36 +206,41 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
     lines.extend(["except:\n", "  pass"])
     return lines
 
+def badge_stripped_cell(cell: dict) -> dict | None:
+    if not is_any_badge_cell(cell):
+        return cell
 
-def first_code_index(cells: list[dict]) -> int:
-    for idx, cell in enumerate(cells):
-        if cell.get("cell_type") == "code":
-            return idx
-    return len(cells)
+    kept_lines = [
+        line
+        for line in as_source_list(cell.get("source", []))
+        if COLAB_BADGE_IMAGE_FRAGMENT not in line
+    ]
+    if not "".join(kept_lines).strip():
+        return None
 
-
-def badge_exists(cells: list[dict], manifest: dict, notebook_path: Path) -> bool:
-    expected = badge_markup(
-        manifest["repo"],
-        manifest["git_ref"],
-        notebook_path.relative_to(REPO_ROOT).as_posix(),
-    )
-    return any(
-        cell.get("cell_type") == "markdown"
-        and expected in as_source_text(cell.get("source", []))
-        for cell in cells
-    )
+    cleaned_cell = copy.deepcopy(cell)
+    cleaned_cell["source"] = kept_lines
+    return cleaned_cell
 
 
 def remove_any_badge_cells(cells: list[dict]) -> list[dict]:
-    return [
-        cell
-        for cell in cells
-        if not (
-            cell.get("cell_type") == "markdown"
-            and "colab.research.google.com" in as_source_text(cell.get("source", []))
-        )
-    ]
+    cleaned_cells: list[dict] = []
+    for cell in cells:
+        cleaned_cell = badge_stripped_cell(cell)
+        if cleaned_cell is not None:
+            cleaned_cells.append(cleaned_cell)
+    return cleaned_cells
+
+
+def badge_bootstrap_insert_index(cells: list[dict]) -> int:
+    insert_at = 0
+    while insert_at < len(cells) and cells[insert_at].get("cell_type") == "markdown":
+        insert_at += 1
+    first_code_cell = next(
+        (idx for idx, cell in enumerate(cells) if cell.get("cell_type") == "code"),
+        len(cells),
+    )
+    return min(insert_at, first_code_cell)
 
 
 def remove_existing_bootstrap_cells(cells: list[dict]) -> list[dict]:
@@ -260,8 +270,7 @@ def harden_notebook(notebook_path: Path, manifest_path: Path) -> None:
         remove_existing_bootstrap_cells(list(notebook_payload.get("cells", [])))
     )
 
-    insert_at = 1 if kept_cells and kept_cells[0].get("cell_type") == "markdown" else 0
-    insert_at = min(insert_at, first_code_index(kept_cells))
+    insert_at = badge_bootstrap_insert_index(kept_cells)
 
     badge_cell = {
         "cell_type": "markdown",
@@ -327,20 +336,27 @@ def harden_notebook(notebook_path: Path, manifest_path: Path) -> None:
         raise
 
 
-def unclassified_notebooks(manifest_path: Path) -> list[Path]:
+def error_summary(exc: Exception) -> str:
+    return str(exc).splitlines()[0] if str(exc) else "unknown error"
+
+
+def validate_target_notebook(notebook_path: Path, notebook_rel: str) -> None:
+    if not notebook_path.exists():
+        raise FileNotFoundError(f"Notebook not found: {notebook_rel}")
+    if notebook_path.suffix != ".ipynb":
+        raise ValueError(f"Expected a notebook path ending in .ipynb: {notebook_rel}")
+
+
+def manifest_notebook_paths(manifest_path: Path, mode: str) -> list[Path]:
     manifest = load_json(manifest_path)
     enabled, disabled = manifest_sets(manifest)
-    unclassified = sorted(discovered_notebooks() - enabled - set(disabled))
-    notebook_paths: list[Path] = []
-    for notebook_rel in unclassified:
-        notebook_paths.append((REPO_ROOT / notebook_rel).resolve())
-    return notebook_paths
-
-
-def enabled_notebooks(manifest_path: Path) -> list[Path]:
-    manifest = load_json(manifest_path)
-    enabled, _ = manifest_sets(manifest)
-    return sorted((REPO_ROOT / notebook_rel).resolve() for notebook_rel in enabled)
+    if mode == "enabled":
+        notebook_rels = enabled
+    elif mode == "unclassified":
+        notebook_rels = discovered_notebooks() - enabled - set(disabled)
+    else:  # pragma: no cover - internal guard
+        raise ValueError(f"Unknown notebook selection mode: {mode}")
+    return sorted((REPO_ROOT / notebook_rel).resolve() for notebook_rel in notebook_rels)
 
 
 def disable_notebook(notebook_path: Path, manifest_path: Path, reason: str) -> None:
@@ -376,46 +392,29 @@ def disable_notebook(notebook_path: Path, manifest_path: Path, reason: str) -> N
         raise
 
 
-def harden_unclassified_notebooks(
+def harden_batch(
+    notebook_paths: list[Path],
     manifest_path: Path,
+    *,
+    disable_failures: bool,
 ) -> tuple[list[str], list[tuple[str, str]]]:
     successes: list[str] = []
     failures: list[tuple[str, str]] = []
 
-    for notebook_path in unclassified_notebooks(manifest_path):
+    for notebook_path in notebook_paths:
         notebook_rel = notebook_path.relative_to(REPO_ROOT).as_posix()
         try:
-            if not notebook_path.exists():
-                raise FileNotFoundError(f"Notebook not found: {notebook_rel}")
-            if notebook_path.suffix != ".ipynb":
-                raise ValueError(f"Expected a notebook path ending in .ipynb: {notebook_rel}")
+            validate_target_notebook(notebook_path, notebook_rel)
             harden_notebook(notebook_path, manifest_path)
             successes.append(notebook_rel)
         except Exception as exc:
-            summary = str(exc).splitlines()[0] if str(exc) else "unknown error"
-            disable_notebook(
-                notebook_path,
-                manifest_path,
-                f"Automatic Colab hardening failed: {summary}",
-            )
-            failures.append((notebook_rel, summary))
-
-    return successes, failures
-
-
-def harden_enabled_notebooks(
-    manifest_path: Path,
-) -> tuple[list[str], list[tuple[str, str]]]:
-    successes: list[str] = []
-    failures: list[tuple[str, str]] = []
-
-    for notebook_path in enabled_notebooks(manifest_path):
-        notebook_rel = notebook_path.relative_to(REPO_ROOT).as_posix()
-        try:
-            harden_notebook(notebook_path, manifest_path)
-            successes.append(notebook_rel)
-        except Exception as exc:
-            summary = str(exc).splitlines()[0] if str(exc) else "unknown error"
+            summary = error_summary(exc)
+            if disable_failures:
+                disable_notebook(
+                    notebook_path,
+                    manifest_path,
+                    f"Automatic Colab hardening failed: {summary}",
+                )
             failures.append((notebook_rel, summary))
 
     return successes, failures
@@ -459,10 +458,10 @@ def main() -> int:
     manifest_path = Path(args.manifest).resolve()
     if args.notebook:
         notebook_path = (REPO_ROOT / args.notebook).resolve()
-        if not notebook_path.exists():
-            raise SystemExit(f"Notebook not found: {args.notebook}")
-        if notebook_path.suffix != ".ipynb":
-            raise SystemExit(f"Expected a notebook path ending in .ipynb: {args.notebook}")
+        try:
+            validate_target_notebook(notebook_path, args.notebook)
+        except (FileNotFoundError, ValueError) as exc:
+            raise SystemExit(str(exc)) from exc
         manifest = load_json(manifest_path)
         enabled, disabled = manifest_sets(manifest)
         notebook_rel = notebook_path.relative_to(REPO_ROOT).as_posix()
@@ -479,7 +478,7 @@ def main() -> int:
             print(f"Hardened {notebook_rel} for Colab and added it to enabled.")
             return 0
         except Exception as exc:
-            summary = str(exc).splitlines()[0] if str(exc) else "unknown error"
+            summary = error_summary(exc)
             disable_notebook(
                 notebook_path,
                 manifest_path,
@@ -491,18 +490,19 @@ def main() -> int:
             print(f"Reason: {summary}")
             return 1
 
-    if args.force:
-        successes, failures = harden_enabled_notebooks(manifest_path)
-    else:
-        successes, failures = harden_unclassified_notebooks(manifest_path)
+    mode = "enabled" if args.force else "unclassified"
+    successes, failures = harden_batch(
+        manifest_notebook_paths(manifest_path, mode),
+        manifest_path,
+        disable_failures=not args.force,
+    )
     for notebook_rel in successes:
         print(f"Hardened {notebook_rel} for Colab.")
     if failures:
         print("")
         print("Not yet hardened:")
         for notebook_rel, error in failures:
-            summary = error.splitlines()[0] if error else "unknown error"
-            print(f"- {notebook_rel}: {summary}")
+            print(f"- {notebook_rel}: {error}")
     print("")
     print(
         f"Hardened {len(successes)} notebook(s); {len(failures)} notebook(s) still need manual follow-up."

@@ -29,31 +29,16 @@ except ImportError as exc:  # pragma: no cover - import guard for non-test envs
         "testbook is required for Colab smoke tests. Install test dependencies, e.g. `pip install -e .[test]`."
     ) from exc
 
-from check_colab_notebooks import python_source_for_ast
+from check_colab_notebooks import (
+    DEFAULT_MANIFEST,
+    cell_source_text,
+    is_bootstrap_cell,
+    load_json,
+    python_source_for_ast,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MANIFEST = Path(__file__).with_name("colab_notebooks_manifest.json")
-
-
-def load_json(path: Path) -> dict:
-    with path.open(encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-def as_source_text(source: str | list[str]) -> str:
-    if isinstance(source, str):
-        return source
-    return "".join(source)
-
-
-def is_colab_bootstrap_cell(cell: dict) -> bool:
-    if cell.get("cell_type") != "code":
-        return False
-    source = as_source_text(cell.get("source", []))
-    return "import google.colab" in source and "pip install" in source
-
-
 def make_prelude_cell(notebook_path: Path) -> dict:
     notebook_dir = notebook_path.parent.resolve().as_posix()
     repo_root = REPO_ROOT.resolve().as_posix()
@@ -217,7 +202,7 @@ def build_smoke_notebook(notebook_path: Path, cells_after_bootstrap: int) -> tup
         original_nb = json.load(handle)
 
     bootstrap_idx = next(
-        (idx for idx, cell in enumerate(original_nb["cells"]) if is_colab_bootstrap_cell(cell)),
+        (idx for idx, cell in enumerate(original_nb["cells"]) if is_bootstrap_cell(cell)),
         None,
     )
     if bootstrap_idx is None:
@@ -232,7 +217,7 @@ def build_smoke_notebook(notebook_path: Path, cells_after_bootstrap: int) -> tup
             continue
         if safe_code_cells >= cells_after_bootstrap:
             break
-        if not is_smoke_safe_code_cell(as_source_text(cell.get("source", ""))):
+        if not is_smoke_safe_code_cell(cell_source_text(cell)):
             break
         safe_code_cells += 1
         stop_idx = idx
@@ -244,7 +229,7 @@ def build_smoke_notebook(notebook_path: Path, cells_after_bootstrap: int) -> tup
         cloned = copy.deepcopy(cell)
         cloned["id"] = f"smoke-{idx}"
         if cloned.get("cell_type") == "code":
-            cloned["source"] = rewrite_bootstrap_source(as_source_text(cloned.get("source", "")))
+            cloned["source"] = rewrite_bootstrap_source(cell_source_text(cloned))
             cloned["execution_count"] = None
             cloned["outputs"] = []
         temp_cells.append(cloned)

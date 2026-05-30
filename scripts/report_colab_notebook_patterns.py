@@ -20,17 +20,12 @@ from check_colab_notebooks import (
     validate_manifest,
 )
 
-
-def first_badge_position(cells: list[dict]) -> int | None:
+def first_matching_cell(
+    cells: list[dict],
+    predicate,
+) -> tuple[int | None, str]:
     for idx, cell in enumerate(cells, start=1):
-        if is_any_badge_cell(cell):
-            return idx
-    return None
-
-
-def first_bootstrap_cell(cells: list[dict]) -> tuple[int | None, str]:
-    for idx, cell in enumerate(cells, start=1):
-        if is_bootstrap_cell(cell):
+        if predicate(cell):
             return idx, cell_source_text(cell)
     return None, ""
 
@@ -127,22 +122,22 @@ def run_report(manifest_path: Path) -> int:
     enabled, disabled = manifest_sets(manifest)
 
     family_groups: dict[str, list[str]] = defaultdict(list)
-    exact_groups: dict[str, list[str]] = defaultdict(list)
     placement_groups: dict[str, list[str]] = defaultdict(list)
     family_details: dict[str, dict[str, str]] = defaultdict(dict)
 
     for notebook_path in sorted(enabled):
         payload = load_json(REPO_ROOT / notebook_path)
         cells = payload.get("cells", [])
-        badge_position = first_badge_position(cells)
-        bootstrap_position, bootstrap_source = first_bootstrap_cell(cells)
+        badge_position, _ = first_matching_cell(cells, is_any_badge_cell)
+        bootstrap_position, bootstrap_source = first_matching_cell(
+            cells, is_bootstrap_cell
+        )
         family = pattern_family(bootstrap_source)
         exact = exact_variant(bootstrap_source)
         placement = placement_label(badge_position, bootstrap_position)
         extra_installs = extra_install_commands(bootstrap_source)
 
         family_groups[family].append(notebook_path)
-        exact_groups[exact].append(notebook_path)
         placement_groups[placement].append(notebook_path)
 
         if extra_installs:
@@ -165,7 +160,6 @@ def run_report(manifest_path: Path) -> int:
         family_groups,
         details=family_details,
     )
-    print_grouped_notebooks("Enabled detailed bootstrap variants", exact_groups)
     print_grouped_notebooks("Badge/bootstrap placement", placement_groups)
     print_grouped_notebooks("Disabled notebooks by reason", disabled_groups)
     return 0
