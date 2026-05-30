@@ -112,7 +112,7 @@ generate_booktests:
 	@echo "\nGenerating missing booktest files..."
 	cd test/booktests/ && python generate_test.py --check-missing
 
-check_colab_notebooks: check_colab_notebooks_smoke
+check_colab_notebooks:
 	$(PYTHON_BIN) scripts/check_colab_notebooks.py --strict
 
 check_colab_notebooks_smoke: 
