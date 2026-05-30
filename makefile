@@ -1,6 +1,9 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 PYTEST ?=
+SMOKE_CODE_CELLS ?= 2
+# Shared Python interpreter lookup for Python-based targets.
+PYTHON_BIN ?= $(shell command -v python 2>/dev/null || { [ -n "$$CONDA_PREFIX" ] && command -v "$$CONDA_PREFIX/bin/python" 2>/dev/null; } || { command -v conda >/dev/null 2>&1 && conda run -n qmcpy python -c 'import sys; print(sys.executable)' 2>/dev/null; } || command -v python3 2>/dev/null)
 
 # set environment variable for documentation
 export JUPYTER_PLATFORM_DIRS=1
@@ -94,13 +97,8 @@ doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_b
 ##########################################################
 unittests: ensure_artifacts
 	@mkdir -p $(UNIT_COV_DIR)
-	@PYTHON_BIN=$$(command -v python 2>/dev/null || { [ -n "$$CONDA_PREFIX" ] && command -v "$$CONDA_PREFIX/bin/python" 2>/dev/null; } || { command -v conda >/dev/null 2>&1 && conda run -n qmcpy python -c 'import sys; print(sys.executable)' 2>/dev/null; } || command -v python3 2>/dev/null); \
-	if [ -z "$$PYTHON_BIN" ]; then \
-		echo "No Python interpreter found (tried: python, $$CONDA_PREFIX/bin/python, python3)."; \
-		exit 127; \
-	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x \
+	$(PYTHON_BIN) -m pytest $(PYTEST_XDIST) -x \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
@@ -113,6 +111,28 @@ unittests: ensure_artifacts
 generate_booktests:
 	@echo "\nGenerating missing booktest files..."
 	cd test/booktests/ && python generate_test.py --check-missing
+
+check_colab_notebooks:
+	$(PYTHON_BIN) scripts/check_colab_notebooks.py --strict
+
+check_colab_notebooks_smoke: 
+	$(PYTHON_BIN) scripts/smoke_test_colab_notebooks.py --cells-after-bootstrap $(SMOKE_CODE_CELLS)
+
+harden_colab_notebook:
+	@if [ -n "$(NOTEBOOK)" ]; then \
+		if [ -n "$(FORCE)" ]; then \
+			$(PYTHON_BIN) scripts/harden_colab_notebook.py --notebook "$(NOTEBOOK)" --force; \
+		else \
+			$(PYTHON_BIN) scripts/harden_colab_notebook.py --notebook "$(NOTEBOOK)"; \
+		fi; \
+	elif [ -n "$(FORCE)" ]; then \
+		$(PYTHON_BIN) scripts/harden_colab_notebook.py --force; \
+	else \
+		$(PYTHON_BIN) scripts/harden_colab_notebook.py --all-unclassified; \
+	fi
+
+report_colab_notebook_patterns:
+	$(PYTHON_BIN) scripts/report_colab_notebook_patterns.py
 
 check_booktests:
 	rm -fr demos/.ipynb_checkpoints/*checkpoint.ipynb && \
@@ -129,7 +149,7 @@ check_booktests:
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
 	@echo "Total test files: $$(find test/booktests -name 'tb_*.py' | wc -l)"
 
-booktests_no_docker: check_booktests generate_booktests clean_local_only_files ensure_artifacts
+booktests_no_docker: check_colab_notebooks harden_colab_notebook check_booktests generate_booktests clean_local_only_files ensure_artifacts
 	@echo "\nNotebook tests"
 	@mkdir -p $(BOOKTEST_COV_DIR)
 	set -e && \
@@ -146,7 +166,7 @@ booktests_no_docker: check_booktests generate_booktests clean_local_only_files e
 	cd ../..
 
 # coverage is done in function run_single_test() in test/booktests/parsl_test_runner.py
-booktests_parallel_no_docker: check_booktests generate_booktests clean_local_only_files
+booktests_parallel_no_docker: check_colab_notebooks harden_colab_notebook check_booktests generate_booktests clean_local_only_files
 	@echo "\nNotebook tests with Parsl"
 	cd test/booktests/ && \
 	rm -fr *.eps *.jpg *.pdf *.png *.part *.txt *.log && rm -fr logs && rm -fr runinfo prob_failure_gp_ci_plots && \
@@ -155,7 +175,7 @@ booktests_parallel_no_docker: check_booktests generate_booktests clean_local_onl
 	cd ../.. 
 	
 # Windows-compatible parallel booktests using pytest-xdist instead of Parsl
-booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_files ensure_artifacts
+booktests_parallel_pytest: check_colab_notebooks harden_colab_notebook check_booktests generate_booktests clean_local_only_files ensure_artifacts
 	@mkdir -p $(BOOKTEST_COV_DIR)
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
@@ -178,7 +198,7 @@ tests_no_docker:
 	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
 
 # Fast test target: run doctests, unittests, booktests concurrently
-tests_fast:
+tests_fast: check_colab_notebooks harden_colab_notebook check_booktests generate_booktests clean_local_only_files ensure_artifacts
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
 	@make clean_local_only_files && \
 	set -e && \
