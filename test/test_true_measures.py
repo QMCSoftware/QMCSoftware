@@ -3,6 +3,7 @@ from qmcpy.util import *
 import numpy as np
 import scipy.stats
 import unittest
+import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
 from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
 
@@ -429,7 +430,7 @@ class TestBrownianMotion(unittest.TestCase):
         with self.assertRaises(ParameterError):
             bm._compute_decomposition()
 
-    def test_brownian_bridge_manual_replications(self):
+    def test_brownian_bridge_manual_replications_d4(self):
         """Manually construct a d=4 BrownianBridge path and compare with the automated version."""
         d, n, reps = 4, 4, 2
         t = np.linspace(1 / d, 1.0, d)
@@ -472,6 +473,48 @@ class TestBrownianMotion(unittest.TestCase):
         np.testing.assert_array_almost_equal(
             expected, automated, decimal=10,
             err_msg="Manual d=4 BrownianBridge path with replications does not match automated version."
+        )
+
+    def test_brownian_bridge_manual_replications_d3(self):
+        """Manually construct a d=3 BrownianBridge path and compare with the automated version."""
+        d, n, reps = 3, 4, 2
+        t = np.linspace(1 / d, 1.0, d)
+
+        # Automated result (suppress warning)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            automated = BrownianMotion(
+                DigitalNetB2(d, seed=self.seed, replications=reps), 
+                decomp_type="BrownianBridge"
+            ).gen_samples(n)
+
+        # Manual construction
+        u = DigitalNetB2(d, seed=self.seed, replications=reps).gen_samples(n)
+        z = scipy.stats.norm.ppf(u)
+
+        w_0 = np.zeros((reps, n, 1))
+
+        z_1 = z[..., 0:1]
+        z_2 = z[..., 1:2]
+        z_3 = z[..., 2:3]
+
+        w_3 = np.sqrt(t[2]) * z_1
+
+        mean = w_0 + (t[0] - 0.0) / (t[2] - 0.0) * (w_3 - w_0)
+        std = np.sqrt((t[0] - 0.0) * (t[2] - t[0]) / (t[2] - 0.0))
+        w_1 = mean + std * z_2
+
+        mean = w_1 + (t[1] - t[0]) / (t[2] - t[0]) * (w_3 - w_1)
+        std = np.sqrt((t[1] - t[0]) * (t[2] - t[1]) / (t[2] - t[0]))
+        w_2 = mean + std * z_3
+
+        expected = np.concatenate([w_1, w_2, w_3], axis=-1)
+
+        # Check consistency
+        self.assertEqual(automated.shape, (reps, n, d))
+        np.testing.assert_array_almost_equal(
+            expected, automated, decimal=10,
+            err_msg="Manual d=3 BrownianBridge path with replications does not match automated version."
         )
 
     def test_brownian_bridge_warning_for_non_power_of_2(self):
