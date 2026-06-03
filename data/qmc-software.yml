@@ -295,3 +295,12 @@
   status: "Active"
   contact:
     - name: Pierre L’Ecuyer
+
+- name: UM-Bridge
+  url: https://github.com/UM-Bridge/umbridge
+  description: >
+    Software framework for uncertainty quantification and modeling software packages
+  language: Multiple
+  status: "Active"
+  contact:
+    - name: UM-Bridge team
