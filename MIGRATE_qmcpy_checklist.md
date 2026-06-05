@@ -1,6 +1,6 @@
 # QMCPy.org Transition Checklist
 
-_revised 2026-05-24_
+_revised 2026-05-26_
 
 ## Goals
 
@@ -64,33 +64,80 @@ _revised 2026-05-24_
 
 ## Administrative
 
-- [ ] Create migration feature branch
-- [ ] Add this checklist to repo
-- [ ] Decide location of checklist within repo
-- [ ] Identify collaborators who may help with migration
+- [x] Create migration feature branch
+- [x] Add this checklist to repo
+- [x] Decide location of checklist within repo
+- [x] Identify collaborators who may help with migration
+
+Notes:
+
+- Migration branch: `migrate_qmcpy`
+- Checklist location: repository root, `MIGRATE_qmcpy_checklist.md`
+- Collaborators for content review: Fred J. Hickernell, Sou-Cheng Choi, Aleksei Sorokin
 
 ## Backups / Preservation
 
-- [ ] Export/download WordPress content backup
-- [ ] Export/download WordPress media/uploads
-- [ ] Preserve homepage text/content
-- [ ] Preserve important graphics/assets
-- [ ] Preserve navigation/menu structure
+- [x] Export/download WordPress content backup
+- [x] Export/download WordPress media/uploads
+- [x] Preserve homepage text/content
+- [x] Preserve important graphics/assets
+- [x] Preserve navigation/menu structure
+
+Checked backup files:
+
+- `/Users/kangjiangrui/Downloads/qmcpy.WordPress.2026-05-26.xml`
+- `/Users/kangjiangrui/Downloads/jetpack-backup-qmcpy-org-2026-05-25-20-48-57.tar.gz`
+
+Backup notes:
+
+- WordPress XML parses successfully and contains pages, posts, attachments, and navigation menu items.
+- Jetpack backup gzip check passes and includes `wp-content/uploads/`, SQL tables, plugins, themes, and `wp-config.php`.
+- WordPress homepage is exported as page ID 5, `Blog`, at `https://qmcpy.org/`.
 
 ## Content Inventory
 
-- [ ] List important existing pages
-- [ ] Identify pages already migrated
+- [x] List important existing pages
+- [x] Identify pages already migrated
 - [ ] Identify pages that can be retired
 - [ ] Identify important external URLs/backlinks
 
+Inventory draft:
+
+- `MIGRATE_qmcpy_inventory.md`
+
+Current must-preserve scope:
+
+- Home
+- Publications
+- Blogs
+- GitHub
+- Docs
+- PyPI
+
+Items outside this must-preserve list remain pending collaborator review.
+
+Inventory notes:
+
+- Already migrated candidates are listed in `MIGRATE_qmcpy_inventory.md`.
+- Retirement candidates and external URL/backlink candidates are listed for collaborator review, but are not finalized.
+- External URL/backlink candidates include preliminary importance estimates; collaborator confirmation is still needed before marking that checklist item complete.
+
 ## GitHub Pages
 
-- [ ] Verify existing GitHub Pages deployment is stable
-- [ ] Verify installation instructions
-- [ ] Verify documentation links
-- [ ] Verify PyPI links
-- [ ] Verify GitHub links
+- [x] Verify existing GitHub Pages deployment is stable
+- [x] Verify installation instructions
+- [x] Verify documentation links
+- [x] Verify PyPI links
+- [x] Verify GitHub links
+
+Verification notes:
+
+- `https://qmcsoftware.github.io/QMCSoftware/` returned HTTP 200.
+- `https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/` returned HTTP 200.
+- `https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro` redirects to the trailing-slash URL and then returns HTTP 200.
+- `https://pypi.org/project/qmcpy/` returned HTTP 200.
+- `https://github.com/QMCSoftware/QMCSoftware` returned HTTP 200.
+- `conda run -n qmcpy python -m mkdocs build` completed successfully. Existing MkDocs warnings remain and are recorded in `MIGRATE_qmcpy_inventory.md`.
 
 ---
 
