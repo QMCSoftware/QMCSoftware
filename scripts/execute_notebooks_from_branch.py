@@ -19,6 +19,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -27,6 +28,12 @@ DEFAULT_BRANCH = "develop"
 DEFAULT_CHECKOUT_DIR = Path("/content/QMCSoftware")
 DEFAULT_OUTPUT_DIR = Path("/content/qmcpy_executed_notebooks")
 DEFAULT_MANIFEST = "scripts/colab_notebooks_manifest.json"
+DISABLED_BOOTSTRAP_SOURCE = [
+    "# Colab bootstrap cell skipped by scripts/execute_notebooks_from_branch.py.\n",
+    "# The script is already running inside the selected checkout and executes\n",
+    "# with the current runtime environment.\n",
+    "pass\n",
+]
 
 
 def run(command: list[str], cwd: Path | None = None) -> None:
@@ -108,6 +115,55 @@ def install_runner_dependencies(python: str) -> None:
     run([python, "-m", "pip", "install", "-q", "nbconvert", "nbformat", "ipykernel"])
 
 
+def cell_source_text(cell: dict) -> str:
+    source = cell.get("source", [])
+    if isinstance(source, str):
+        return source
+    return "".join(source)
+
+
+def is_colab_bootstrap_cell(cell: dict) -> bool:
+    source = cell_source_text(cell)
+    return (
+        cell.get("cell_type") == "code"
+        and "import google.colab" in source
+        and "pip install" in source
+    )
+
+
+def execution_input_path(notebook_path: Path, skip_colab_bootstrap: bool) -> Path:
+    if not skip_colab_bootstrap:
+        return notebook_path
+
+    with notebook_path.open(encoding="utf-8") as handle:
+        notebook = json.load(handle)
+
+    changed = False
+    for cell in notebook.get("cells", []):
+        if not is_colab_bootstrap_cell(cell):
+            continue
+        cell["source"] = DISABLED_BOOTSTRAP_SOURCE
+        cell["execution_count"] = None
+        cell["outputs"] = []
+        changed = True
+
+    if not changed:
+        return notebook_path
+
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        suffix=".ipynb",
+        prefix=".tmp_branch_execute_",
+        dir=notebook_path.parent,
+        delete=False,
+    ) as handle:
+        temp_path = Path(handle.name)
+        json.dump(notebook, handle)
+
+    return temp_path
+
+
 def execute_notebook(
     repo_root: Path,
     notebook_rel: str,
@@ -115,6 +171,7 @@ def execute_notebook(
     timeout: int,
     kernel: str,
     allow_errors: bool,
+    skip_colab_bootstrap: bool,
 ) -> None:
     notebook_path = repo_root / notebook_rel
     if not notebook_path.exists():
@@ -122,27 +179,33 @@ def execute_notebook(
 
     output_path = output_dir / notebook_rel
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    input_path = execution_input_path(notebook_path, skip_colab_bootstrap)
 
-    command = [
-        sys.executable,
-        "-m",
-        "jupyter",
-        "nbconvert",
-        "--to",
-        "notebook",
-        "--execute",
-        str(notebook_path),
-        "--output",
-        str(output_path),
-        "--ExecutePreprocessor.timeout",
-        str(timeout),
-        "--ExecutePreprocessor.kernel_name",
-        kernel,
-    ]
-    if allow_errors:
-        command.append("--allow-errors")
+    try:
+        command = [
+            sys.executable,
+            "-m",
+            "jupyter",
+            "nbconvert",
+            "--to",
+            "notebook",
+            "--execute",
+            str(input_path),
+            "--output",
+            str(output_path),
+            "--ExecutePreprocessor.timeout",
+            str(timeout),
+            "--ExecutePreprocessor.kernel_name",
+            kernel,
+        ]
+        if allow_errors:
+            command.append("--allow-errors")
 
-    run(command, cwd=repo_root)
+        run(command, cwd=repo_root)
+    finally:
+        if input_path != notebook_path and input_path.exists():
+            input_path.unlink()
+
 
 
 def parse_args() -> argparse.Namespace:
@@ -193,6 +256,15 @@ def parse_args() -> argparse.Namespace:
         help="Install nbconvert/nbformat/ipykernel before executing notebooks.",
     )
     parser.add_argument(
+        "--execute-colab-bootstrap",
+        action="store_true",
+        help=(
+            "Execute Colab bootstrap cells unchanged. By default they are skipped "
+            "in temporary execution copies because google.colab frontend messages "
+            "can break nbconvert kernels."
+        ),
+    )
+    parser.add_argument(
         "--allow-errors",
         action="store_true",
         help="Write executed notebooks even if cells raise errors.",
@@ -226,6 +298,7 @@ def main() -> int:
                 timeout=args.timeout,
                 kernel=args.kernel,
                 allow_errors=args.allow_errors,
+                skip_colab_bootstrap=not args.execute_colab_bootstrap,
             )
         except Exception as exc:  # noqa: BLE001 - print all failures at the end
             failures.append((notebook, str(exc)))
