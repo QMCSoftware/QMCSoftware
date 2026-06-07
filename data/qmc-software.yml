@@ -149,6 +149,7 @@
   url: https://snl-dakota.github.io/docs/6.19.0/users/usingdakota/reference/method-sampling-sample_type-low_discrepancy.html
   description: >
     Software toolkit for optimization and uncertainty quantification, including support for lattices and digital nets
+  language: C++
   status: "Mature"
   contact: 
     - Pieterjan Robbe
