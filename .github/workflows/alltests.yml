@@ -260,6 +260,7 @@ jobs:
           mpm --admin --install=lmodern
           mpm --admin --install=type1cm
           mpm --admin --install=tex-gyre
+          mpm --admin --install=underscore
           latex --version
           latexmk -v
           dvipng --version
