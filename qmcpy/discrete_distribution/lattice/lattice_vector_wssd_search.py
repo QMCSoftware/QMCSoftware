@@ -2,7 +2,12 @@ import numpy as np
 
 # I am not sure where the best place to put this is, will ask Aleksi
 
-def lattice_search(N, d):
+def lattice_vector_wssd_search(N, d, kernel,coord_weights):
+    if kernel == None:
+        kernel = lambda x: x * (x - 1) + 1 / 6 # default kernel is the second Bernoulli polynomial
+    if coord_weights is None:
+        coord_weights = np.array([j**(-2) for j in range(1, d + 1)], dtype=np.float64) # default coordinate weights are j^(-2)
+
     m = np.ceil(np.log2(N)).astype(int)
 
     # ----------------------------------------------------------------------
@@ -66,11 +71,11 @@ def lattice_search(N, d):
 
     # Initial 1D case
     rowV = rowVects / 2**m
-    rowV = 1 + (rowV * (rowV - 1) + 1 / 6)
+    rowV = 1 + kernel(rowV)
     prodV = prodV * rowV[:, None]
 
     # Set up k0
-    k0 = 7 / 6
+    k0 = 1 + coord_weights[0] * kernel(0)
 
     # ----------------------------------------------------------------------
     # Begin search
@@ -80,10 +85,10 @@ def lattice_search(N, d):
     for hComp in range(2, d + 1):
         WSSD = np.zeros(2**(m - 2))
 
-        gamma = 1 / (hComp**2)
+        gamma = coord_weights[hComp - 1]
         omega = lambda x: 1 + gamma * (x * (x - 1) + 1 / 6)
 
-        k0 = k0 * (1 + gamma / 6)
+        k0 = k0 * (1 + gamma * kernel(0))
 
         curIdx2 = 0
         prodIdx1 = 0
