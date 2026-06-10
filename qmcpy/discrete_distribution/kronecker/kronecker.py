@@ -474,7 +474,10 @@ class Kronecker(AbstractLDDiscreteDistribution):
     
     def _square_periodic_discrepancies(self, n, k_tilde, gamma):
         n_array = np.arange(1, n + 1)
-        k_tilde_terms = k_tilde[0](self.gen_samples(n=n), gamma)
+        # we need the points without a random shift for the calculation, so we can't use self._gen_samples
+        i = np.arange(0, n)
+        points = (i[:,None] * self.gen_vec[:,None,:]) % 1
+        k_tilde_terms = k_tilde[0](points, gamma)
 
         left_sum = np.cumsum(k_tilde_terms[...,1:], axis=-1) * n_array[1:]
         right_sum = np.cumsum(n_array[:-1] * k_tilde_terms[...,1:], axis=-1)

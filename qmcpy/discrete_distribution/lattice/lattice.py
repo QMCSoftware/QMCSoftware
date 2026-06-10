@@ -440,7 +440,7 @@ class Lattice(AbstractLDDiscreteDistribution):
         for i in range(n_max):
             freq_mtx[:,i] = freq_mtx[:,i] * (i + 1)**(-2)
 
-        # multiply by the precomputed frequency matrix and add the constant vector
+        # multiply by the frequency matrix and add the constant vector
         discs = k_const + np.vecmat(k_sum, freq_mtx)
         return discs
 
