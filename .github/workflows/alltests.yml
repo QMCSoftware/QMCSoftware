@@ -232,6 +232,8 @@ jobs:
           $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
           # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
           initexmf --admin --set-config-value [MPM]AutoInstall=1
+          # Allow MiKTeX admin operations in the elevated GitHub Actions runner context
+          initexmf --admin --set-config-value [Core]AllowUnsafePaths=1
           # Refresh package database + upgrade base with retry
           $retries = 2
           for ($i = 1; $i -le $retries; $i++) {
@@ -252,6 +254,7 @@ jobs:
           mpm --admin --install=lmodern
           mpm --admin --install=type1cm
           mpm --admin --install=tex-gyre
+          mpm --admin --install=geometry
           latex --version
           latexmk -v
           dvipng --version
