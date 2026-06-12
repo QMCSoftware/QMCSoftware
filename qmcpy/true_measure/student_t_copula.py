@@ -1,12 +1,9 @@
-from .abstract_true_measure import AbstractTrueMeasure
 from .copula import (
-    _apply_marginal_ppfs,
-    _build_marginal_range,
+    Copula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_correlation_matrix,
     _validate_dimension,
-    _validate_marginals,
 )
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
@@ -16,7 +13,7 @@ import scipy.stats as stats
 import warnings
 
 
-class StudentTCopula(AbstractTrueMeasure):
+class StudentTCopula(Copula):
     r"""
     Student-t copula transform with user supplied univariate marginals.
 
@@ -50,9 +47,29 @@ class StudentTCopula(AbstractTrueMeasure):
             correlation     [[1.  0.6]
                              [0.6 1. ]]
             df              2^(2)
-        >>> rep_tm = StudentTCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, correlation=corr, df=4)
-        >>> rep_tm(4).shape
-        (2, 4, 2)
+        >>> rep_marginals = [stats.norm(), stats.gamma(a=3, scale=2), stats.expon()]
+        >>> rep_corr = [[1.0, 0.6, 0.3],
+        ...             [0.6, 1.0, 0.2],
+        ...             [0.3, 0.2, 1.0]]
+        >>> rep_tm = StudentTCopula(
+        ...     DigitalNetB2(3, seed=7, replications=2),
+        ...     marginals=rep_marginals,
+        ...     correlation=rep_corr,
+        ...     df=4,
+        ... )
+        >>> samples = rep_tm(4)
+        >>> samples.shape
+        (2, 4, 3)
+        >>> np.round(samples, 4)
+        array([[[-0.6854,  2.6238,  1.0318],
+                [ 0.472 ,  7.457 ,  0.7007],
+                [-0.0466,  7.4224,  0.1364],
+                [ 1.3749,  6.883 ,  2.0659]],
+        <BLANKLINE>
+               [[-0.1288,  7.989 ,  0.6921],
+                [ 0.0913,  2.2881,  0.3891],
+                [-0.7318,  3.082 ,  0.081 ],
+                [ 0.6838,  7.5547,  1.5543]]])
         >>> StudentTCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]], df=4)(4).shape
         (4, 1)
         >>> StudentTCopula(DigitalNetB2(2, seed=7), marginals=marginals, correlation=corr, df=1)(4).shape
@@ -79,16 +96,13 @@ class StudentTCopula(AbstractTrueMeasure):
             sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]):
                 A sampler or transform whose range is the unit cube.
             marginals (list): Length d list of SciPy-like univariate
-                distributions implementing ``ppf``.
+                distributions implementing a quantile function, called ``ppf``
+                in SciPy.
             correlation (np.ndarray): d x d positive definite correlation matrix.
             df (float): Positive Student-t degrees of freedom.
         """
         self.parameters = ["marginals", "correlation", "df"]
-        self.domain = np.array([[0, 1]])
-        self._parse_sampler(sampler)
-
-        self.marginals = _validate_marginals(marginals)
-        _validate_dimension(self, self.marginals)
+        super(StudentTCopula, self).__init__(sampler=sampler, marginals=marginals)
         self.correlation = _validate_correlation_matrix(correlation, self.d)
         self.df = self._parse_df(df)
 
@@ -97,18 +111,6 @@ class StudentTCopula(AbstractTrueMeasure):
             self._mvt_scipy = stats.multivariate_t(
                 loc=np.zeros(self.d), shape=self.correlation, df=self.df
             )
-        self._warned_missing_weight = False
-
-        self.range = _build_marginal_range(self.marginals)
-
-        super(StudentTCopula, self).__init__()
-        if len(self.marginals) != self.d:
-            raise DimensionError("Length of marginals must match sampler dimension.")
-        if self.correlation.shape != (self.d, self.d):
-            raise ValueError(
-                f"correlation shape {self.correlation.shape} must match sampler dimension {self.d}."
-            )
-
     def _parse_df(self, df):
         try:
             df = float(df)
@@ -169,10 +171,9 @@ class StudentTCopula(AbstractTrueMeasure):
 
         return z.reshape(*orig_shape, self.d)
 
-    def _transform(self, x):
+    def _transform_to_uniform(self, x):
         z = self._dependent_t_samples(x)
-        v = _clip_unit_interval(stats.t.cdf(z, df=self.df))
-        return _apply_marginal_ppfs(v, self.marginals)
+        return _clip_unit_interval(stats.t.cdf(z, df=self.df))
 
     def _unit_weight_with_warning(self, x):
         if not self._warned_missing_weight:

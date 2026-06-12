@@ -1,11 +1,8 @@
-from .abstract_true_measure import AbstractTrueMeasure
 from .copula import (
-    _apply_marginal_ppfs,
-    _build_marginal_range,
+    Copula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_dimension,
-    _validate_marginals,
 )
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
@@ -36,7 +33,7 @@ def _eulerian_coefficients(n):
     return np.array(coefficients, dtype=float)
 
 
-class FrankCopula(AbstractTrueMeasure):
+class FrankCopula(Copula):
     r"""
     Frank copula transform with user supplied univariate marginals.
 
@@ -47,8 +44,9 @@ class FrankCopula(AbstractTrueMeasure):
 
     The transform uses the inverse Rosenblatt construction for the Frank
     Archimedean copula. It maps independent uniforms to dependent uniforms by
-    recursively inverting conditional CDFs, then applies each marginal inverse
-    CDF.
+    recursively inverting conditional CDFs. The base ``Copula`` class then
+    applies each marginal quantile function. SciPy calls the quantile function
+    ``ppf``.
 
     Examples:
         >>> import numpy as np
@@ -67,9 +65,24 @@ class FrankCopula(AbstractTrueMeasure):
                              <...rv_continuous_frozen object at ...>
                              <...rv_continuous_frozen object at ...>]
             theta           5
-        >>> rep_tm = FrankCopula(DigitalNetB2(3, seed=7, replications=2), marginals=marginals, theta=5.0)
-        >>> rep_tm(4).shape
+        >>> rep_tm = FrankCopula(
+        ...     DigitalNetB2(3, seed=7, replications=2),
+        ...     marginals=marginals,
+        ...     theta=5.0,
+        ... )
+        >>> samples = rep_tm(4)
+        >>> samples.shape
         (2, 4, 3)
+        >>> np.round(samples, 4)
+        array([[[-0.6854,  1.1626,  0.465 ],
+                [ 0.472 ,  3.934 ,  1.1504],
+                [-0.0466,  3.6678,  0.3183],
+                [ 1.3749,  3.6027,  2.2524]],
+        <BLANKLINE>
+               [[-0.1288,  3.9085,  0.8467],
+                [ 0.0913,  1.1074,  0.1681],
+                [-0.7318,  1.4008,  0.0357],
+                [ 0.6838,  4.0288,  2.1464]]])
         >>> neg_tm = FrankCopula(DigitalNetB2(2, seed=7), marginals=[stats.uniform(), stats.uniform()], theta=-2.0)
         >>> np.round(neg_tm(4), 4)
         array([[0.7216, 0.86  ],
@@ -106,16 +119,13 @@ class FrankCopula(AbstractTrueMeasure):
             sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]):
                 A sampler or transform whose range is the unit cube.
             marginals (list): Length d list of SciPy-like univariate
-                distributions implementing ``ppf``.
+                distributions implementing a quantile function, called ``ppf``
+                in SciPy.
             theta (float): Frank dependence parameter. Must be nonzero. Negative
                 values are currently supported only for ``d=2``.
         """
         self.parameters = ["marginals", "theta"]
-        self.domain = np.array([[0, 1]])
-        self._parse_sampler(sampler)
-
-        self.marginals = _validate_marginals(marginals)
-        _validate_dimension(self, self.marginals)
+        super(FrankCopula, self).__init__(sampler=sampler, marginals=marginals)
         self.theta = self._parse_theta(theta)
 
         self._expm1_neg_theta = np.expm1(-self.theta)
@@ -123,13 +133,6 @@ class FrankCopula(AbstractTrueMeasure):
             raise ParameterError("theta is too close to 0 or too large in magnitude.")
         self._alpha = -self._expm1_neg_theta
         self._eulerian_cache = {}
-        self._warned_missing_weight = False
-
-        self.range = _build_marginal_range(self.marginals)
-
-        super(FrankCopula, self).__init__()
-        if len(self.marginals) != self.d:
-            raise DimensionError("Length of marginals must match sampler dimension.")
 
     def _parse_theta(self, theta):
         try:
@@ -206,7 +209,7 @@ class FrankCopula(AbstractTrueMeasure):
 
         return _clip_unit_interval((lo + hi) / 2.0)
 
-    def _dependent_uniforms(self, x):
+    def _transform_to_uniform(self, x):
         x = _clip_unit_interval(np.asarray(x, dtype=float))
         _validate_dimension(x.shape[-1], self.marginals)
 
@@ -223,10 +226,6 @@ class FrankCopula(AbstractTrueMeasure):
             q_product = q_product * self._q(v[..., j])
 
         return _clip_unit_interval(v)
-
-    def _transform(self, x):
-        v = self._dependent_uniforms(x)
-        return _apply_marginal_ppfs(v, self.marginals)
 
     def _unit_weight_with_warning(self, x):
         if not self._warned_missing_weight:

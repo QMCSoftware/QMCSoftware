@@ -1,12 +1,9 @@
-from .abstract_true_measure import AbstractTrueMeasure
 from .copula import (
-    _apply_marginal_ppfs,
-    _build_marginal_range,
+    Copula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_correlation_matrix,
     _validate_dimension,
-    _validate_marginals,
 )
 from .gaussian import Gaussian
 from ..util import DimensionError, ParameterError
@@ -17,7 +14,7 @@ from scipy.stats import norm
 import warnings
 
 
-class GaussianCopula(AbstractTrueMeasure):
+class GaussianCopula(Copula):
     r"""
     Gaussian copula transform with user supplied univariate marginals.
 
@@ -27,9 +24,10 @@ class GaussianCopula(AbstractTrueMeasure):
     1. map independent uniforms through ``scipy.stats.norm.ppf``;
     2. inject Gaussian dependence with a Cholesky factor of the correlation;
     3. map back to dependent uniforms with ``scipy.stats.norm.cdf``;
-    4. apply each marginal inverse CDF.
+    4. apply each marginal quantile function.
 
-    The marginal objects must expose a ``ppf`` method. If they also expose
+    SciPy calls the quantile function ``ppf``. The marginal objects must expose
+    this method. If they also expose
     ``cdf`` and ``pdf`` or ``logpdf``, then ``_weight`` computes the Gaussian
     copula joint density. Otherwise weights are treated as one with a warning.
 
@@ -51,9 +49,28 @@ class GaussianCopula(AbstractTrueMeasure):
                              <...rv_continuous_frozen object at ...>]
             correlation     [[1.  0.6]
                              [0.6 1. ]]
-        >>> rep_tm = GaussianCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, correlation=corr)
-        >>> rep_tm(4).shape
-        (2, 4, 2)
+        >>> rep_marginals = [stats.beta(a=2, b=5), stats.gamma(a=3, scale=2), stats.expon()]
+        >>> rep_corr = [[1.0, 0.6, 0.3],
+        ...             [0.6, 1.0, 0.2],
+        ...             [0.3, 0.2, 1.0]]
+        >>> rep_tm = GaussianCopula(
+        ...     DigitalNetB2(3, seed=7, replications=2),
+        ...     marginals=rep_marginals,
+        ...     correlation=rep_corr,
+        ... )
+        >>> samples = rep_tm(4)
+        >>> samples.shape
+        (2, 4, 3)
+        >>> np.round(samples, 4)
+        array([[[0.1597, 2.4664, 1.0728],
+                [0.3503, 7.6029, 0.6783],
+                [0.2565, 7.6984, 0.098 ],
+                [0.5289, 6.7287, 2.0286]],
+        <BLANKLINE>
+               [[0.2427, 8.3035, 0.6943],
+                [0.2803, 2.148 , 0.4113],
+                [0.1537, 2.9966, 0.0505],
+                [0.3913, 7.6075, 1.7143]]])
         >>> GaussianCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]])(4).shape
         (4, 1)
 
@@ -74,15 +91,12 @@ class GaussianCopula(AbstractTrueMeasure):
             sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]):
                 A sampler or transform whose range is the unit cube.
             marginals (list): Length d list of SciPy-like univariate
-                distributions implementing ``ppf``.
+                distributions implementing a quantile function, called ``ppf``
+                in SciPy.
             correlation (np.ndarray): d x d positive definite correlation matrix.
         """
         self.parameters = ["marginals", "correlation"]
-        self.domain = np.array([[0, 1]])
-        self._parse_sampler(sampler)
-
-        self.marginals = _validate_marginals(marginals)
-        _validate_dimension(self, self.marginals)
+        super(GaussianCopula, self).__init__(sampler=sampler, marginals=marginals)
         self.correlation = _validate_correlation_matrix(correlation, self.d)
 
         self._gaussian_transform = Gaussian(
@@ -97,27 +111,13 @@ class GaussianCopula(AbstractTrueMeasure):
         # already accounted for by the marginal normal transforms.
         self._corr_inv_minus_eye = np.linalg.inv(self.correlation) - np.eye(self.d)
         _, self._logdet_corr = np.linalg.slogdet(self.correlation)
-        self._warned_missing_weight = False
-
-        self.range = _build_marginal_range(self.marginals)
-
-        super(GaussianCopula, self).__init__()
-        if len(self.marginals) != self.d:
-            raise DimensionError("Length of marginals must match sampler dimension.")
-        if self.correlation.shape != (self.d, self.d):
-            raise ValueError(
-                f"correlation shape {self.correlation.shape} must match sampler dimension {self.d}."
-            )
-
-    def _transform(self, x):
+    def _transform_to_uniform(self, x):
         x = np.asarray(x, dtype=float)
         _validate_dimension(x.shape[-1], self.marginals)
 
         u = _clip_unit_interval(x)
         z_dep = self._gaussian_transform._transform(u)
-        u_dep = _clip_unit_interval(norm.cdf(z_dep))
-
-        return _apply_marginal_ppfs(u_dep, self.marginals)
+        return _clip_unit_interval(norm.cdf(z_dep))
 
     def _unit_weight_with_warning(self, x):
         if not self._warned_missing_weight:

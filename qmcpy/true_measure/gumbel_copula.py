@@ -1,11 +1,8 @@
-from .abstract_true_measure import AbstractTrueMeasure
 from .copula import (
-    _apply_marginal_ppfs,
-    _build_marginal_range,
+    Copula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_dimension,
-    _validate_marginals,
 )
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
@@ -14,14 +11,15 @@ import numpy as np
 import warnings
 
 
-class GumbelCopula(AbstractTrueMeasure):
+class GumbelCopula(Copula):
     r"""
     Gumbel copula transform with user supplied marginals.
 
     This implementation supports general dimension for ``theta >= 1``. It
     maps independent uniforms to Gumbel-dependent uniforms by numerically
-    inverting the conditional CDFs from the inverse Rosenblatt construction,
-    followed by marginal inverse CDFs.
+    inverting the conditional CDFs from the inverse Rosenblatt construction.
+    The base ``Copula`` class then applies marginal quantile functions.
+    SciPy calls the quantile function ``ppf``.
 
     Gumbel copulas have positive upper-tail dependence for ``theta > 1``.
     The boundary case ``theta = 1`` is the independent copula.
@@ -42,9 +40,25 @@ class GumbelCopula(AbstractTrueMeasure):
             marginals       [<...rv_continuous_frozen object at ...>
                              <...rv_continuous_frozen object at ...>]
             theta           2^(1)
-        >>> rep_tm = GumbelCopula(DigitalNetB2(2, seed=7, replications=2), marginals=marginals, theta=2.0)
-        >>> rep_tm(4).shape
-        (2, 4, 2)
+        >>> rep_marginals = [stats.expon(), stats.gamma(a=3), stats.beta(a=2, b=5)]
+        >>> rep_tm = GumbelCopula(
+        ...     DigitalNetB2(3, seed=7, replications=2),
+        ...     marginals=rep_marginals,
+        ...     theta=2.0,
+        ... )
+        >>> samples = rep_tm(4)
+        >>> samples.shape
+        (2, 4, 3)
+        >>> np.round(samples, 4)
+        array([[[0.2831, 1.2139, 0.2258],
+                [1.1442, 3.6968, 0.3359],
+                [0.6566, 3.4794, 0.1576],
+                [2.47  , 4.1891, 0.5075]],
+        <BLANKLINE>
+               [[0.5956, 3.6833, 0.2849],
+                [0.7686, 1.0916, 0.1253],
+                [0.2641, 1.4533, 0.0618],
+                [1.3982, 3.8564, 0.4514]]])
         >>> GumbelCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=2.0)(4).shape
         (4, 3)
         >>> independent_tm = GumbelCopula(DigitalNetB2(2, seed=7), marginals=[stats.uniform(), stats.uniform()], theta=1.0)
@@ -79,25 +93,15 @@ class GumbelCopula(AbstractTrueMeasure):
             sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]):
                 A sampler or transform whose range is the unit cube.
             marginals (list): Length d list of SciPy-like univariate
-                distributions implementing ``ppf``.
+                distributions implementing a quantile function, called ``ppf``
+                in SciPy.
             theta (float): Gumbel dependence parameter, requiring ``theta >= 1``.
         """
         self.parameters = ["marginals", "theta"]
-        self.domain = np.array([[0, 1]])
-        self._parse_sampler(sampler)
-
-        self.marginals = _validate_marginals(marginals)
-        _validate_dimension(self, self.marginals)
+        super(GumbelCopula, self).__init__(sampler=sampler, marginals=marginals)
         self.theta = self._parse_theta(theta)
         self._alpha = 1.0 / self.theta
         self._derivative_terms_cache = {}
-        self._warned_missing_weight = False
-
-        self.range = _build_marginal_range(self.marginals)
-
-        super(GumbelCopula, self).__init__()
-        if len(self.marginals) != self.d:
-            raise DimensionError("Length of marginals must match sampler dimension.")
 
     def _parse_theta(self, theta):
         try:
@@ -174,7 +178,7 @@ class GumbelCopula(AbstractTrueMeasure):
 
         return _clip_unit_interval((lo + hi) / 2.0)
 
-    def _dependent_uniforms(self, x):
+    def _transform_to_uniform(self, x):
         x = _clip_unit_interval(np.asarray(x, dtype=float))
         _validate_dimension(x.shape[-1], self.marginals)
 
@@ -194,10 +198,6 @@ class GumbelCopula(AbstractTrueMeasure):
             s_previous = s_previous + self._phi(v[..., j])
 
         return _clip_unit_interval(v)
-
-    def _transform(self, x):
-        v = self._dependent_uniforms(x)
-        return _apply_marginal_ppfs(v, self.marginals)
 
     def _unit_weight_with_warning(self, x):
         if not self._warned_missing_weight:

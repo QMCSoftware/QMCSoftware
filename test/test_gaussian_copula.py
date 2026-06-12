@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import scipy.stats as stats
 
+from qmcpy import Copula as PublicCopula
 from qmcpy import ClaytonCopula as PublicClaytonCopula
 from qmcpy import FrankCopula as PublicFrankCopula
 from qmcpy import GaussianCopula as PublicGaussianCopula
@@ -9,6 +10,7 @@ from qmcpy import GumbelCopula as PublicGumbelCopula
 from qmcpy import StudentTCopula as PublicStudentTCopula
 from qmcpy.discrete_distribution import DigitalNetB2
 from qmcpy.true_measure import (
+    Copula,
     ClaytonCopula,
     FrankCopula,
     GaussianCopula,
@@ -51,6 +53,7 @@ def _make_copula(copula_cls, dimension=2, marginals=None, correlation=None, seed
 
 
 def test_public_api_imports_and_normal_usage():
+    assert PublicCopula is Copula
     assert PublicGaussianCopula is GaussianCopula
     assert PublicStudentTCopula is StudentTCopula
     assert PublicClaytonCopula is ClaytonCopula
@@ -64,14 +67,19 @@ def test_public_api_imports_and_normal_usage():
         PublicFrankCopula,
         PublicGumbelCopula,
     ]:
+        assert issubclass(copula_cls, Copula)
+
         tm = _make_copula(copula_cls)
         x = tm(8)
         x_gen = tm.gen_samples(8)
+        v = tm.gen_copula_samples(8)
 
         assert x.shape == (8, 2)
         assert x_gen.shape == (8, 2)
+        assert v.shape == (8, 2)
         assert np.all(np.isfinite(x))
         assert np.all(np.isfinite(x_gen))
+        assert np.all((0 <= v) & (v <= 1))
 
 
 @pytest.mark.parametrize(
