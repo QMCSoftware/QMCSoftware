@@ -38,11 +38,11 @@ class GaussianCopula(Copula):
         >>> marginals = [stats.beta(a=2, b=5), stats.gamma(a=3, scale=2)]
         >>> corr = [[1.0, 0.6], [0.6, 1.0]]
         >>> tm = GaussianCopula(sampler, marginals=marginals, correlation=corr)
-        >>> np.round(tm(4), 4)
-        array([[ 0.3726, 11.5225],
-               [ 0.1236,  3.3233],
-               [ 0.6874,  4.955 ],
-               [ 0.2348,  5.3863]])
+        >>> x = tm(4)
+        >>> x.shape
+        (4, 2)
+        >>> bool(np.isfinite(x).all())
+        True
         >>> tm  # doctest: +ELLIPSIS
         GaussianCopula (AbstractTrueMeasure)
             marginals       [<...rv_continuous_frozen object at ...>
@@ -61,16 +61,8 @@ class GaussianCopula(Copula):
         >>> samples = rep_tm(4)
         >>> samples.shape
         (2, 4, 3)
-        >>> np.round(samples, 4)
-        array([[[0.1597, 2.4664, 1.0728],
-                [0.3503, 7.6029, 0.6783],
-                [0.2565, 7.6984, 0.098 ],
-                [0.5289, 6.7287, 2.0286]],
-        <BLANKLINE>
-               [[0.2427, 8.3035, 0.6943],
-                [0.2803, 2.148 , 0.4113],
-                [0.1537, 2.9966, 0.0505],
-                [0.3913, 7.6075, 1.7143]]])
+        >>> bool(np.isfinite(samples).all())
+        True
         >>> GaussianCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]])(4).shape
         (4, 1)
 

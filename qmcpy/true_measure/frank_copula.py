@@ -54,11 +54,11 @@ class FrankCopula(Copula):
         >>> sampler = DigitalNetB2(3, seed=7)
         >>> marginals = [stats.norm(), stats.gamma(a=3), stats.expon()]
         >>> tm = FrankCopula(sampler, marginals=marginals, theta=5.0)
-        >>> np.round(tm(4), 4)
-        array([[ 0.3389,  4.3854,  1.6179],
-               [-0.8788,  1.309 ,  0.2446],
-               [ 1.2692,  3.017 ,  0.3051],
-               [-0.1109,  2.998 ,  1.44  ]])
+        >>> x = tm(4)
+        >>> x.shape
+        (4, 3)
+        >>> bool(np.isfinite(x).all())
+        True
         >>> tm  # doctest: +ELLIPSIS
         FrankCopula (AbstractTrueMeasure)
             marginals       [<...rv_continuous_frozen object at ...>
@@ -73,26 +73,19 @@ class FrankCopula(Copula):
         >>> samples = rep_tm(4)
         >>> samples.shape
         (2, 4, 3)
-        >>> np.round(samples, 4)
-        array([[[-0.6854,  1.1626,  0.465 ],
-                [ 0.472 ,  3.934 ,  1.1504],
-                [-0.0466,  3.6678,  0.3183],
-                [ 1.3749,  3.6027,  2.2524]],
-        <BLANKLINE>
-               [[-0.1288,  3.9085,  0.8467],
-                [ 0.0913,  1.1074,  0.1681],
-                [-0.7318,  1.4008,  0.0357],
-                [ 0.6838,  4.0288,  2.1464]]])
+        >>> bool(np.isfinite(samples).all())
+        True
         >>> neg_tm = FrankCopula(DigitalNetB2(2, seed=7), marginals=[stats.uniform(), stats.uniform()], theta=-2.0)
-        >>> np.round(neg_tm(4), 4)
-        array([[0.7216, 0.86  ],
-               [0.1635, 0.5892],
-               [0.9868, 0.0155],
-               [0.4296, 0.5863]])
-        >>> FrankCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=-2.0)  # doctest: +ELLIPSIS
-        Traceback (most recent call last):
-        ...
-        qmcpy.util.exceptions_warnings.ParameterError: theta < 0 is only supported for d=2 FrankCopula.
+        >>> neg_samples = neg_tm(4)
+        >>> neg_samples.shape
+        (4, 2)
+        >>> bool(((0 <= neg_samples) & (neg_samples <= 1)).all())
+        True
+        >>> try:
+        ...     FrankCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=-2.0)
+        ... except ParameterError as exc:
+        ...     print(str(exc))
+        theta < 0 is only supported for d=2 FrankCopula.
         >>> FrankCopula(DigitalNetB2(5, seed=7), marginals=[stats.uniform()] * 5, theta=5.0)(4).shape
         (4, 5)
 

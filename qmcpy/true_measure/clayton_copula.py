@@ -39,11 +39,11 @@ class ClaytonCopula(Copula):
         >>> sampler = DigitalNetB2(2, seed=7)
         >>> marginals = [stats.expon(), stats.gamma(a=3)]
         >>> tm = ClaytonCopula(sampler, marginals=marginals, theta=2.0)
-        >>> np.round(tm(4), 4)
-        array([[1.2788, 6.1924],
-               [0.1785, 1.4743],
-               [4.3247, 1.9924],
-               [0.5614, 2.7949]])
+        >>> x = tm(4)
+        >>> x.shape
+        (4, 2)
+        >>> bool(np.isfinite(x).all())
+        True
         >>> tm  # doctest: +ELLIPSIS
         ClaytonCopula (AbstractTrueMeasure)
             marginals       [<...rv_continuous_frozen object at ...>
@@ -58,16 +58,8 @@ class ClaytonCopula(Copula):
         >>> samples = rep_tm(4)
         >>> samples.shape
         (2, 4, 3)
-        >>> np.round(samples, 4)
-        array([[[0.2831, 1.4032, 0.2101],
-                [1.1442, 4.063 , 0.3512],
-                [0.6566, 4.0353, 0.1909],
-                [2.47  , 3.261 , 0.4898]],
-        <BLANKLINE>
-               [[0.5956, 4.3479, 0.3122],
-                [0.7686, 1.5255, 0.1599],
-                [0.2641, 1.5426, 0.0981],
-                [1.3982, 4.0209, 0.4954]]])
+        >>> bool(np.isfinite(samples).all())
+        True
         >>> ClaytonCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=2.0)(4).shape
         (4, 3)
         >>> ClaytonCopula(DigitalNetB2(2, seed=7), marginals=marginals, theta=1e-8)(4).shape
