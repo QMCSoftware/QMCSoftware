@@ -5,7 +5,7 @@ import scipy.stats as stats
 from qmcpy.discrete_distribution import DigitalNetB2
 from qmcpy.true_measure import SciPyWrapper, ZeroInflatedExpUniform, StudentT
 from qmcpy.true_measure.triangular import TriangularDistribution
-
+from qmcpy.util import ParameterError, DimensionError
 
 def test_mvn_dependence_correlation_and_moment():
     """
@@ -70,6 +70,22 @@ def test_zero_inflated_zero_rate():
     assert samples.shape == (n, 1)
     assert abs(zero_rate - p_zero) < 0.05
 
+def test_zero_inflated_parameter_checks():
+    sampler = DigitalNetB2(1, seed=17)
+
+    with pytest.raises(ParameterError):
+        ZeroInflatedExpUniform(sampler, p_zero=0.0, lam=1.5)
+
+    with pytest.raises(ParameterError):
+        ZeroInflatedExpUniform(sampler, p_zero=0.4, lam=0.0)
+
+
+def test_zero_inflated_dimension_check():
+    sampler = DigitalNetB2(1, seed=17)
+    tm = ZeroInflatedExpUniform(sampler, p_zero=0.4, lam=1.5)
+
+    with pytest.raises(DimensionError):
+        tm._joint.transform(np.zeros((4, 2)))
 
 def test_student_t_marginals_shape():
     tm = SciPyWrapper(
