@@ -53,21 +53,21 @@ def test_triangular_custom_marginal_range_and_shape():
     emp_mean = x.mean()
     assert abs(emp_mean - true_mean) < 0.05
 
-
 def test_zero_inflated_zero_rate():
     """
-    Check that the zero inflated joint distribution preserves the
+    Check that the zero inflated exponential distribution preserves the
     specified probability mass at X = 0.
     """
     p_zero = 0.4
-    sampler = DigitalNetB2(2, seed=17)
-    tm = ZeroInflatedExpUniform(sampler, p_zero=p_zero, lam=1.5, y_split=0.5)
+    sampler = DigitalNetB2(1, seed=17)
+    tm = ZeroInflatedExpUniform(sampler, p_zero=p_zero, lam=1.5)
 
     n = 4096
     samples = tm(n)
-    x = samples[:, 0]
+    x = samples.ravel()
     zero_rate = np.mean(x == 0.0)
 
+    assert samples.shape == (n, 1)
     assert abs(zero_rate - p_zero) < 0.05
 
 
