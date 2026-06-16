@@ -106,7 +106,7 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 
 ### 5. Impact
 
-**Lead:** Joshua Herman
+**Lead:** TBD
 
 #### Key Responsibilities
 - **Visual Identity**: Lead the design and implementation of a professional QMCPy logo incorporating the package name.
