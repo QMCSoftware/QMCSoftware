@@ -129,8 +129,8 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 ## Cross-Cutting Principles and Expectations
 
 ### Time Commitment
-- While individual tasks require only a few minutes, diligence and attention to detail are essential. 
-- Attend bi-weekly team meetings and quarterly leadership meetings as scheduled.
+- While individual tasks require only a few minutes, diligence and attention to detail are essential.
+- Attend team meetings every two weeks and quarterly leadership meetings as scheduled.
 - Releases typically occur a few times per year, with preparatory work distributed across the release cycle.
 
 ### Collaboration and Communication
