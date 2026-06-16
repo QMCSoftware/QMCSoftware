@@ -287,6 +287,7 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
 	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
 	@cp docs/assets/logos/qmcpy_logo.png docs/favicon.ico
+	@cp QMCPy_Shared_Leadership.md docs/
 
 runmkdocserve:
 	@PORT=$${MKDOCS_PORT:-8000}; \
