@@ -1,4 +1,8 @@
 from types import SimpleNamespace
+from io import BytesIO
+import os
+import sys
+from urllib.request import urlopen
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from qmcpy.util import ParameterError
 from tqdm import tqdm
@@ -68,13 +72,17 @@ class MPMC(AbstractLDDiscreteDistribution):
         nbatch=1,
         loss_fn='L2star',
         weights=None,
+        use_pretrained=True,
+        pretrained_local_dir=None,
+        pretrained_base_url='https://raw.githubusercontent.com/QMCSoftware/LDData/tree/main/mpmc',
+        prompt_on_missing=True,
     ):
         self.mimics = 'StdUniform'
         self.low_discrepancy = True
 
         self.parameters = [
             'dim', 'randomize', 'loss_fn', 'epochs', 'lr', 'nlayers', 'nhid',
-            'weight_decay', 'radius', 'nbatch'
+            'weight_decay', 'radius', 'nbatch', 'use_pretrained'
         ]
 
         # core config
@@ -89,6 +97,12 @@ class MPMC(AbstractLDDiscreteDistribution):
         self.loss_fn = str(loss_fn)
         self.nbatch = int(nbatch) if nbatch is not None else int(replications)
         self.d_max = self.dim  # kept for compat
+        self.use_pretrained = bool(use_pretrained)
+        self.pretrained_local_dir = pretrained_local_dir
+        self.pretrained_base_url = str(pretrained_base_url).rstrip('/')
+        self.prompt_on_missing = bool(prompt_on_missing)
+        self._pretrained_n_values = {16, 32, 64, 128, 256, 512, 1024}
+        self._pretrained_d_values = {2, 3, 5, 8, 10}
 
         self.torch_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -137,38 +151,100 @@ class MPMC(AbstractLDDiscreteDistribution):
     # --------------------------
     def _gen_samples(self, n_min, n_max, return_binary, warn, return_unrandomized=False):
         assert n_min==0, "MPMC requires n_min=0 as it does not support indexing subsequencing"
-        assert return_binary is False, "MPMC requires return_binary=True"
+        assert return_binary is False, "MPMC requires return_binary=False"
         n = int(n_max-n_min)
-        # training config
-        args = SimpleNamespace(
-            lr=self.lr,
-            nlayers=self.nlayers,
-            weight_decay=self.weight_decay,
-            nhid=self.nhid,
-            nbatch=self.nbatch,
-            epochs=self.epochs,
-            start_reduce=self.start_reduce,
-            radius=self.radius,
-            nsamples=n,
-            dim=self.dim,
-            loss_fn=self.loss_fn,
-            weights=self.weights,
-        )
-
-        x = self._train(args)  # (nbatch, n, d)
+        x = self._try_load_pretrained(n)
+        if x is None:
+            # training config
+            args = SimpleNamespace(
+                lr=self.lr,
+                nlayers=self.nlayers,
+                weight_decay=self.weight_decay,
+                nhid=self.nhid,
+                nbatch=self.nbatch,
+                epochs=self.epochs,
+                start_reduce=self.start_reduce,
+                radius=self.radius,
+                nsamples=n,
+                dim=self.dim,
+                loss_fn=self.loss_fn,
+                weights=self.weights,
+            )
+            x = self._train(args)  # (nbatch, n, d)
 
         if self.randomize == 'FALSE':
-            if self.nbatch == 1:
-                return x[0]
             return x
 
         xr = (x + self.shift[:, None, :]) % 1.0
 
-        if self.nbatch == 1:
-            xr0, x0 = xr[0], x[0]
-            return (xr0, x0) if return_unrandomized else xr0
-
         return (xr, x) if return_unrandomized else xr
+
+    def _pretrained_filename(self, n):
+        return f"d{self.dim}_n{n}_{self.loss_fn}.npy"
+
+    def _ask_train_from_scratch(self):
+        base_msg = "Pre-trained configuration not found; please train from scratch"
+        prompt = base_msg + ". Continue training? [Y/N]: "
+        try:
+            if not self.prompt_on_missing:
+                print(base_msg)
+                return True
+            if not hasattr(sys, 'stdin') or sys.stdin is None or not sys.stdin.isatty():
+                print(base_msg)
+                return True
+            answer = input(prompt).strip().lower()
+            if answer in ('y', 'yes', ''):
+                return True
+            if answer in ('n', 'no'):
+                return False
+            print("Unrecognized response; defaulting to training from scratch.")
+            return True
+        except Exception:
+            print(base_msg)
+            return True
+
+    def _load_pretrained_array(self, n):
+        fname = self._pretrained_filename(n)
+        if self.pretrained_local_dir:
+            local_path = os.path.join(self.pretrained_local_dir, fname)
+            if os.path.isfile(local_path):
+                return np.load(local_path)
+
+        url = f"{self.pretrained_base_url}/{fname}"
+        with urlopen(url, timeout=10) as resp:
+            return np.load(BytesIO(resp.read()))
+
+    def _try_load_pretrained(self, n):
+        if not self.use_pretrained:
+            return None
+        if self.dim not in self._pretrained_d_values or n not in self._pretrained_n_values:
+            return None
+
+        try:
+            pts = self._load_pretrained_array(n)
+        except Exception:
+            should_train = self._ask_train_from_scratch()
+            if not should_train:
+                raise RuntimeError("Pre-trained configuration not found and training declined by user.")
+            return None
+
+        pts = np.asarray(pts, dtype=float)
+        if pts.shape != (n, self.dim):
+            warnings.warn(
+                f"Pre-trained file has shape {pts.shape}, expected {(n, self.dim)}; training from scratch.",
+                stacklevel=1,
+            )
+            return None
+
+        print("Pre-trained configuration already available; loading points.")
+        if self.nbatch == 1:
+            return pts[None, :, :]
+
+        warnings.warn(
+            "Using the same pre-trained point set for each batch replication.",
+            stacklevel=1,
+        )
+        return np.repeat(pts[None, :, :], self.nbatch, axis=0)
 
     def __repr__(self):
         out = f"{self.__class__.__name__} Generator Object\n"
@@ -193,6 +269,10 @@ class MPMC(AbstractLDDiscreteDistribution):
             radius=self.radius,
             loss_fn=self.loss_fn,
             weights=self.weights.detach().cpu().tolist() if self.weights is not None else None,
+            use_pretrained=self.use_pretrained,
+            pretrained_local_dir=self.pretrained_local_dir,
+            pretrained_base_url=self.pretrained_base_url,
+            prompt_on_missing=self.prompt_on_missing,
         )
 
     # --------------------------
