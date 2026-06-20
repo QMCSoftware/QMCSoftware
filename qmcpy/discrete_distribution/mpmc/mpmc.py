@@ -180,7 +180,7 @@ class MPMC(AbstractLDDiscreteDistribution):
         return (xr, x) if return_unrandomized else xr
 
     def _pretrained_filename(self, n):
-        return f"d{self.dim}_n{n}_{self.loss_fn}.npy"
+        return f"mpmc_d{self.dim}_n{n}_{self.loss_fn}.npy"
 
     def _ask_train_from_scratch(self):
         base_msg = "Pre-trained configuration not found; please train from scratch"

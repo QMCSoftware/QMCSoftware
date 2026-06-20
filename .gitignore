@@ -1,4 +1,5 @@
 # General Python
+.cache/
 PATH
 .pdm-python
 .pytest_cache/
