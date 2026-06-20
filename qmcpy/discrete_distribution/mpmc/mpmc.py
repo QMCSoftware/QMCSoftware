@@ -150,8 +150,10 @@ class MPMC(AbstractLDDiscreteDistribution):
     # Core API
     # --------------------------
     def _gen_samples(self, n_min, n_max, return_binary, warn, return_unrandomized=False):
-        assert n_min==0, "MPMC requires n_min=0 as it does not support indexing subsequencing"
-        assert return_binary is False, "MPMC requires return_binary=False"
+        if n_min != 0:
+            raise ParameterError("MPMC requires n_min=0 as it does not support indexing subsequencing")
+        if return_binary is not False:
+            raise ParameterError("MPMC requires return_binary=False")
         n = int(n_max-n_min)
         x = self._try_load_pretrained(n)
         if x is None:

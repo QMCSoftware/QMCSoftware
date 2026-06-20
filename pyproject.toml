@@ -66,8 +66,10 @@ umbridge = [
     "umbridge >= 1.2.1",
     ]
 mpmc = [
+    "torch >= 2.2.0",
+    "torch-scatter >= 2.1.2",
     "torch-cluster >= 1.6.3",
-    "torch-geometric >= 2.6.1", 
+    "torch-geometric >= 2.6.1",
 ]
 test = [
     "pytest == 8.3.5",
@@ -102,6 +104,8 @@ test_umbridge = [
     "umbridge >= 1.2.4",
     ]
 test_mpmc = [
+    "torch >= 2.2.0",
+    "torch-scatter >= 2.1.2",
     "torch-cluster >= 1.6.3",
     "torch-geometric >= 2.6.1",
     ]

@@ -1,8 +1,4 @@
 import torch
-import math
-from itertools import combinations
-import numpy as np
-from itertools import product 
 
 def _check_inputs(x, gamma=None):
     """
