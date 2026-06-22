@@ -1,1 +1,1 @@
-Over 7,328 downloads from 2025-12-16 to 2026-06-14 (PyPI, including automated installs)
+Over 7,466 downloads from 2025-12-23 to 2026-06-21 (PyPI, including automated installs)
