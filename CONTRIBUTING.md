@@ -55,7 +55,7 @@ pip install -e ".[class,dev]"
 
 ### For Main Repository Collaborators
 
-Create your branch directly inside the `QMCSoftware/` repository. This allows other team members to easily review your work by checking out your branch with
+Branch directly from `develop` inside the `QMCSoftware/` repository.. This allows other team members to easily review your work by checking out your branch with
 
 ```bash
 git fetch origin
@@ -64,27 +64,27 @@ git checkout <branch-name>
 
 ### For External Contributors (Forks)
 
-Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to checkout to the `develop` branch on the `git@github.com:alegresor/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `alegresor-fork` and call the branch name `alegresor-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this
+Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to checkout to the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this
 
 ```bash 
 # Add the fork as a remote source
-git remote add alegresor-fork git@github.com:alegresor/QMCSoftware.git
+git remote add MyGitHubUsername-fork git@github.com:MyGitHubUsername/QMCSoftware.git
 
 # Download the fork's branch data
-git fetch alegresor-fork
+git fetch MyGitHubUsername-fork
 
 # Create your local branch tracking the fork's branch
-git checkout -b alegresor-develop alegresor-fork/develop
+git checkout -b MyGitHubUsername-develop MyGitHubUsername-fork/develop
 ```
 
-When new changes are pushed to the `develop` branch on the fork `git@github.com:alegresor/QMCSoftware.git`, the main repo collaborator may then run
+When new changes are pushed to the `develop` branch on the fork `git@github.com:MyGitHubUsername/QMCSoftware.git`, the main repo collaborator may then run
 
 ```bash 
 # 1. Switch to the local branch tracking your fork
-git checkout alegresor-develop
+git checkout MyGitHubUsername-develop
 
 # 2. Pull the new changes directly from your fork's branch
-git pull alegresor-fork develop
+git pull MyGitHubUsername-fork develop
 ```
 
 ## Tests
