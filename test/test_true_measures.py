@@ -478,7 +478,7 @@ class TestBrownianMotion(unittest.TestCase):
     def test_brownian_bridge_manual_replications_d3(self):
         """Manually construct a d=3 BrownianBridge path and compare with the automated version."""
         d, n, reps = 3, 4, 2
-        t = np.linspace(1 / d, 1.0, d)
+        # default sampling order is van der Corput [1, 1/2, 1/4]
 
         # Automated result (suppress warning)
         with warnings.catch_warnings():
@@ -498,15 +498,15 @@ class TestBrownianMotion(unittest.TestCase):
         z_2 = z[..., 1:2]
         z_3 = z[..., 2:3]
 
-        w_3 = np.sqrt(t[2]) * z_1
+        w_3 = np.sqrt(1.0) * z_1
 
-        mean = w_0 + (t[0] - 0.0) / (t[2] - 0.0) * (w_3 - w_0)
-        std = np.sqrt((t[0] - 0.0) * (t[2] - t[0]) / (t[2] - 0.0))
-        w_1 = mean + std * z_2
+        mean = w_0 + (0.5 - 0.0) / (1.0 - 0.0) * (w_3 - w_0)
+        std = np.sqrt((0.5 - 0.0) * (1.0 - 0.5) / (1.0 - 0.0))
+        w_2 = mean + std * z_2
 
-        mean = w_1 + (t[1] - t[0]) / (t[2] - t[0]) * (w_3 - w_1)
-        std = np.sqrt((t[1] - t[0]) * (t[2] - t[1]) / (t[2] - t[0]))
-        w_2 = mean + std * z_3
+        mean = w_0 + (0.25 - 0.0) / (0.5 - 0.0) * (w_2 - w_0)
+        std = np.sqrt((0.25 - 0.0) * (0.5 - 0.25) / (0.5 - 0.0))
+        w_1 = mean + std * z_3
 
         expected = np.concatenate([w_1, w_2, w_3], axis=-1)
 
@@ -515,6 +515,53 @@ class TestBrownianMotion(unittest.TestCase):
         np.testing.assert_array_almost_equal(
             expected, automated, decimal=10,
             err_msg="Manual d=3 BrownianBridge path with replications does not match automated version."
+        )
+
+    def test_brownian_bridge_custom_monitoring_times(self):
+        """Manually construct a BrownianBridge path with custom monitoring times and compare with the automated version."""
+        d, n, reps = 4, 4, 2
+        # times in an order that hits all four anchor cases 
+        times = [0.6, 1.0, 0.3, 0.8]
+
+        automated = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed, replications=reps),
+            decomp_type="BrownianBridge", monitoring_times=times
+        )
+        samples = automated.gen_samples(n)
+
+        np.testing.assert_array_almost_equal(
+            automated.time_vec, [0.3, 0.6, 0.8, 1.0],
+            err_msg="time_vec should be sorted into increasing order"
+        )
+
+        u = DigitalNetB2(d, seed=self.seed, replications=reps).gen_samples(n)
+        z = scipy.stats.norm.ppf(u)
+
+        w_0 = np.zeros((reps, n, 1))
+
+        z_1 = z[..., 0:1]
+        z_2 = z[..., 1:2]
+        z_3 = z[..., 2:3]
+        z_4 = z[..., 3:4]
+
+        w_2 = np.sqrt(0.6) * z_1
+
+        w_4 = w_2 + np.sqrt(1.0 - 0.6) * z_2
+
+        mean = w_0 + (0.3 - 0.0) / (0.6 - 0.0) * (w_2 - w_0)
+        std = np.sqrt((0.3 - 0.0) * (0.6 - 0.3) / (0.6 - 0.0))
+        w_1 = mean + std * z_3
+
+        mean = w_2 + (0.8 - 0.6) / (1.0 - 0.6) * (w_4 - w_2)
+        std = np.sqrt((0.8 - 0.6) * (1.0 - 0.8) / (1.0 - 0.6))
+        w_3 = mean + std * z_4
+
+        expected = np.concatenate([w_1, w_2, w_3, w_4], axis=-1)
+
+        self.assertEqual(samples.shape, (reps, n, d))
+        np.testing.assert_array_almost_equal(
+            expected, samples, decimal=10,
+            err_msg="Manual BrownianBridge path with custom monitoring times does not match automated version."
         )
 
     def test_brownian_bridge_warning_for_non_power_of_2(self):

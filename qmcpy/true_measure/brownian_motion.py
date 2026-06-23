@@ -76,6 +76,15 @@ class BrownianMotion(Gaussian):
         <BLANKLINE>
                [[ 0.82975853,  1.10849282,  1.10891366,  1.02092441],
                 [-0.12663949, -0.23324496, -0.37900074, -0.35202342]]])
+
+        With a custom monitoring times order that reaches all four cases (first point, left anchor, right anchor, both anchors)
+
+        >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8])
+        >>> true_measure.time_vec
+        array([0.3, 0.6, 0.8, 1. ])
+        >>> true_measure(2)
+        array([[-0.42678211,  0.23976687,  0.19961117,  0.56330283],
+               [-0.31994843, -1.22738085, -1.29415239, -1.73713917]])
     """
 
     def __init__(
@@ -87,6 +96,7 @@ class BrownianMotion(Gaussian):
         diffusion=1,
         decomp_type="PCA",
         lazy_decomp=True,
+        monitoring_times=None,
     ):
         r"""
         Args:
@@ -104,6 +114,8 @@ class BrownianMotion(Gaussian):
                 - `'Cholesky'` for cholesky decomposition, or
                 - `'BrownianBridge'` for brownian bridge construction.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
+            monitoring_times (Union[np.ndarray, list]): Optional sampling times for `'BrownianBridge'` 
+                with length d. The given order is the insertion order.
         """
         self.parameters = ["time_vec", "drift", "mean", "covariance", "decomp_type"]
         # default to transform from standard uniform
@@ -113,7 +125,8 @@ class BrownianMotion(Gaussian):
         self.initial_value = initial_value
         self.drift = drift
         self.diffusion = diffusion
-        self.time_vec = np.linspace(self.t / self.d, self.t, self.d)  # evenly spaced
+        self._bridge_times = self._get_monitoring_times(monitoring_times, decomp_type)
+        self.time_vec = np.sort(self._bridge_times)
         self.diffused_sigma_bm = self.diffusion * np.minimum.outer(
             self.time_vec, self.time_vec
         )
@@ -130,6 +143,8 @@ class BrownianMotion(Gaussian):
             raise ParameterError(
                 f"decomp_type must be 'PCA', 'Cholesky', or 'BrownianBridge'. Got '{decomp_type}'."
             )
+        if self.decomp_type == "BROWNIANBRIDGE":
+            self._setup_bridge()  # precompute bridge parameters
         if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
             warnings.warn(
                 f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.", 
@@ -151,29 +166,85 @@ class BrownianMotion(Gaussian):
             return self.drift_time_vec_plus_init + np.sqrt(self.diffusion) * w
         return super()._transform(x)
 
-    def _bridge_transform(self, z):
-        """Build Brownian Bridge path from standard normal samples."""
-        w_all = np.zeros(z.shape[:-1] + (self.d + 1,))
-        w_all[..., self.d] = np.sqrt(self.t) * z[..., 0]  # bridge endpoint
-        nodes = []
-        self._bridge_helper(0, self.d, nodes)
-        ranked = sorted(nodes, key=lambda n: (-n[3], n[0]))
-        mid_to_dim = {n[1]: rank for rank, n in enumerate(ranked, start=1)}
-        for left, mid, right, std, alpha in nodes:
-            mean = w_all[..., left] + alpha * (w_all[..., right] - w_all[..., left])  # conditional mean
-            w_all[..., mid] = mean + std * z[..., mid_to_dim[mid]]
-        return w_all[..., 1:]
+    def _get_monitoring_times(self, monitoring_times, decomp_type):
+        """Return d monitoring times"""
+        if decomp_type.upper() != "BROWNIANBRIDGE":
+            if monitoring_times is not None:
+                raise ParameterError("monitoring_times is only valid with decomp_type='BrownianBridge'.")
+            return np.linspace(self.t / self.d, self.t, self.d)  # evenly spaced
+        if monitoring_times is None:
+            return self._van_der_corput(self.d, self.t)  # default bridge ordering
+        s = np.asarray(monitoring_times, dtype=float).flatten()
+        if s.shape != (self.d,):
+            raise ParameterError(f"monitoring_times must have length d={self.d}. Got length {s.shape[0]}.")
+        if (s <= 0).any():
+            raise ParameterError("monitoring_times must be positive.")
+        if np.unique(s).size != self.d:
+            raise ParameterError("monitoring_times must be distinct.")
+        return s
+    
+    @staticmethod
+    def _van_der_corput(d, t_final):
+        """First d van der Corput points multiplied by t_final."""
+        times = np.empty(d)
+        for i in range(d):
+            value, increment, n = 0.0, 0.5, i
+            while n:
+                value += (n & 1) * increment
+                increment *= 0.5
+                n >>= 1
+            times[i] = value
+        times[0] = 1.0
+        return t_final * times
+    
+    def _setup_bridge(self):
+        """Precompute parameters (Owen Algorithm 6.1)"""
+        s = self._bridge_times
+        d = self.d
+        left = np.full(d, -1, dtype=int)
+        right = np.full(d, -1, dtype=int)
+        a = np.zeros(d)
+        b = np.zeros(d)
+        w = np.zeros(d)
+        for j in range(d):
+            for k in range(j):
+                if s[k] < s[j] and (left[j] == -1 or s[k] > s[left[j]]):
+                    left[j] = k
+                elif s[k] > s[j] and (right[j] == -1 or s[k] < s[right[j]]):
+                    right[j] = k
+            if left[j] >= 0 and right[j] >= 0:  # both anchors
+                s_left, s_right = s[left[j]], s[right[j]]
+                a[j] = (s_right - s[j]) / (s_right - s_left)
+                b[j] = (s[j] - s_left) / (s_right - s_left)
+                w[j] = np.sqrt((s[j] - s_left) * (s_right - s[j]) / (s_right - s_left))
+            elif left[j] >= 0:  # left anchor
+                a[j] = 1.0
+                w[j] = np.sqrt(s[j] - s[left[j]])
+            elif right[j] >= 0:  # right anchor
+                s_right = s[right[j]]
+                b[j] = s[j] / s_right
+                w[j] = np.sqrt(s[j] * (s_right - s[j]) / s_right)
+            else:  # first point
+                w[j] = np.sqrt(s[j])
+        self._bridge_left = left
+        self._bridge_right = right
+        self._bridge_a = a
+        self._bridge_b = b
+        self._bridge_w = w
+        self._bridge_order = np.argsort(s)  # increasing time 
 
-    def _bridge_helper(self, left, right, nodes):
-        """Recursively collect bridge nodes."""
-        mid = (left + right) // 2
-        if mid == left:
-            return
-        t_left = 0.0 if left == 0 else self.time_vec[left - 1]
-        t_mid = self.time_vec[mid - 1]
-        t_right = self.time_vec[right - 1]
-        alpha = (t_mid - t_left) / (t_right - t_left)
-        std = np.sqrt((t_mid - t_left) * (t_right - t_mid) / (t_right - t_left))  # conditional std
-        nodes.append((left, mid, right, std, alpha))
-        self._bridge_helper(left, mid, nodes)
-        self._bridge_helper(mid, right, nodes)
+    def _bridge_transform(self, z):
+        """Build Brownian Motion paths (Owen Algorithm 6.2)"""
+        left = self._bridge_left
+        right = self._bridge_right
+        a = self._bridge_a
+        b = self._bridge_b
+        w = self._bridge_w
+        paths = np.empty(z.shape[:-1] + (self.d,))
+        for j in range(self.d):
+            paths[..., j] = w[j] * z[..., j]
+            if left[j] >= 0:
+                paths[..., j] += a[j] * paths[..., left[j]]
+            if right[j] >= 0:
+                paths[..., j] += b[j] * paths[..., right[j]]
+        return paths[..., self._bridge_order]
