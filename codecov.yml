@@ -1,0 +1,18 @@
+coverage:
+  status:
+    patch:
+      default:
+        # Compare to parent; allow patch coverage to sit up to 10 %
+        # below the parent patch coverage without failing the check.
+        target: auto
+        threshold: 10%
+    project:
+      default:
+        # Require overall project coverage to stay within 2 % of the parent.
+        target: auto
+        threshold: 2%
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: false

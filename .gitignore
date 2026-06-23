@@ -1,7 +1,9 @@
 # General Python
 .pdm-python
-*raw.githubusercontent.com*
+.pytest_cache/
+raw.githubusercontent.com/*
 packages.svg
+classes.svg
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
@@ -23,9 +25,10 @@ qmcpy.egg-info/
 *.pyc
 *.vrb
 *.npy
+*.pkl
+*.gz
 .DS_Store
 .idea/
-.pytest_cache/'raw.githubusercontent.com/*'
 demos/.jupyter
 demos/prob_failure_gp_ci_plots/
 demos/fgpr_figs/
@@ -67,6 +70,7 @@ coverage-data/*
 docs/_site
 docs/Gemfile.lock
 site/
+/.cache
 
 # Sphinx
 sphinx/_build/
@@ -112,3 +116,8 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
+
+/qmc-software.html
+/qmc-software_files/
+/.quarto-watch-logs/

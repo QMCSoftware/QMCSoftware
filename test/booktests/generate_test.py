@@ -48,6 +48,7 @@ def generate_test_file(notebook_path, output_dir=None):
             rel_path = str(notebook_path)
     except Exception:
         rel_path = str(notebook_path)
+    rel_path = Path(rel_path).as_posix()
 
     # Generate the test file content
     test_content = f"""import unittest
