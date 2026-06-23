@@ -66,13 +66,13 @@ umbridge = [
     "umbridge >= 1.2.1",
     ]
 test = [
-    "pytest >= 8.3.5",
+    "pytest >= 9.0.3",
     "pytest-cov >= 6.1.1",
     "phmutest >= 1.0.1",
     "pytest-accept >= 0.1.10",
     "testbook >= 0.4.2",
     "psutil >= 5.9.5",
-    "parsl >= 2025.7.28",
+    "parsl >= 2026.01.05",
     "seaborn >= 0.8",
     "scikit-learn >= 1.0.0",
     "scikit-optimize",
@@ -100,6 +100,7 @@ test_umbridge = [
 docs = [
     "nbval >= 0.10.0",
     "attrs >= 21.0.0",
+    "pyyaml >= 6.0",
     "mkdocs >= 1.5.0, < 2.0",
     "mkdocs-material >= 9.6.12",
     "mkdocs-jupyter >= 0.25.0",

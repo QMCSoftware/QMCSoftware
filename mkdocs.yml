@@ -1,9 +1,13 @@
 site_name: "QMCPy"
 nav:
   - Quasi Monte Carlo Software: README.md
+  - Community Resources:
+    - QMC Software Packages: qmc-software.md
+    - PyPI Download Statistics: stats/pypi_downloads.md
   - Components: components.md
   - Contributing: CONTRIBUTING.md
   - Community: community.md
+  - Leadership: QMCPy_Shared_Leadership.md
   - Package Reference:
     - Discrete Distributions: api/discrete_distributions.md
     - True Measures: api/true_measures.md
@@ -90,7 +94,8 @@ nav:
   - For Developers:
     - Release Manual: RELEASE.md
     - Testing Guidelines: 
-      - Doc tests and unit tests on `qmcpy`: tests.md
+      - Local doc tests and unit tests on `qmcpy`: tests.md
+      - CI testing and cost control: ci-testing.md
       - Unit tests on Jupyter Notebooks: booktests.md
     - JOSS 2026 Paper: paper/paper.md
   
