@@ -10,7 +10,7 @@ For planned releases, open related PRs with enough lead time so review can begin
 
 For complex or mathematical contributions, schedule at least one PR review meeting before merging. 
 
-If you develop a new component, please consider writing a blog for the[qmcpy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
+If you develop a new component, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
 
 Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
 
@@ -35,9 +35,7 @@ pip install -e ".[dev]"
 
 ## 📚 Using `qmcpy` in courses (`class` extra)
 
-`qmcpy` provides a `class` optional dependency group that installs a
-complete teaching environment (JupyterLab, plotting, statistics, and utilities)
-in addition to `qmcpy` itself.
+`qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
 
 For a typical course setup, you can do:
 ```bash
