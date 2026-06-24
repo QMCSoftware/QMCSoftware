@@ -24,11 +24,6 @@ class _ZeroInflatedExpUniformAdapter:
 
         u1 = u[..., 0]
         x = np.zeros_like(u1, dtype=float)
-<<<<<<< Updated upstream
-
-        mask_exp = u1 > self.p_zero
-=======
->>>>>>> Stashed changes
 
         mask_exp = u1 > self.p_zero
         if np.any(mask_exp):
@@ -40,12 +35,6 @@ class _ZeroInflatedExpUniformAdapter:
 
 
 class ZeroInflatedExpUniform(SciPyWrapper):
-<<<<<<< Updated upstream
-    def __init__(self, sampler, p_zero=0.4, lam=1.5):
-        super().__init__(
-            sampler=sampler,
-            scipy_distribs=_ZeroInflatedExpUniformAdapter(p_zero, lam),
-=======
     """
     One-dimensional zero-inflated exponential true measure.
 
@@ -69,5 +58,4 @@ class ZeroInflatedExpUniform(SciPyWrapper):
                 p_zero=p_zero,
                 lam=lam,
             ),
->>>>>>> Stashed changes
         )
