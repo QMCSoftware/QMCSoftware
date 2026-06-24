@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from .abstract_true_measure import AbstractTrueMeasure
@@ -80,6 +82,19 @@ class Copula(AbstractTrueMeasure):
     def _transform(self, x) -> np.ndarray:
         v = self._transform_to_uniform(x)
         return self._apply_marginal_quantiles(v)
+
+    def _unit_weight_with_warning(self, x):
+        if not self._warned_missing_weight:
+            message = getattr(
+                self,
+                "_missing_weight_warning_message",
+                f"{type(self).__name__} marginals must implement 'cdf' and "
+                "'pdf' or 'logpdf' to compute density weights. "
+                "Weights will be treated as 1.",
+            )
+            warnings.warn(message, UserWarning)
+            self._warned_missing_weight = True
+        return np.ones(x.shape[:-1], dtype=float)
 
 
 def _clip_unit_interval(u):

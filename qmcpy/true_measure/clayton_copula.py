@@ -8,7 +8,6 @@ from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 
 import numpy as np
-import warnings
 
 
 class ClaytonCopula(Copula):
@@ -142,15 +141,6 @@ class ClaytonCopula(Copula):
 
         return _clip_unit_interval(v)
 
-    def _unit_weight_with_warning(self, x):
-        if not self._warned_missing_weight:
-            warnings.warn(
-                "ClaytonCopula marginals must implement 'cdf' and 'pdf' or 'logpdf' "
-                "to compute density weights. Weights will be treated as 1.",
-                UserWarning,
-            )
-            self._warned_missing_weight = True
-        return np.ones(x.shape[:-1], dtype=float)
 
     def _weight(self, x):
         x = np.asarray(x, dtype=float)

@@ -10,7 +10,6 @@ from ..discrete_distribution import DigitalNetB2
 
 import numpy as np
 import scipy.stats as stats
-import warnings
 
 
 class StudentTCopula(Copula):
@@ -81,6 +80,12 @@ class StudentTCopula(Copula):
         The Annals of Mathematical Statistics 23(3), 470-472, 1952.
         [doi:10.1214/aoms/1177729394](https://doi.org/10.1214/aoms/1177729394).
     """
+
+    _missing_weight_warning_message = (
+        "StudentTCopula needs scipy.stats.multivariate_t and marginals with "
+        "'cdf' and 'pdf' or 'logpdf' to compute density weights. "
+        "Weights will be treated as 1."
+    )
 
     def __init__(self, sampler, marginals, correlation, df):
         r"""
@@ -167,16 +172,6 @@ class StudentTCopula(Copula):
         z = self._dependent_t_samples(x)
         return _clip_unit_interval(stats.t.cdf(z, df=self.df))
 
-    def _unit_weight_with_warning(self, x):
-        if not self._warned_missing_weight:
-            warnings.warn(
-                "StudentTCopula needs scipy.stats.multivariate_t and marginals with "
-                "'cdf' and 'pdf' or 'logpdf' to compute density weights. "
-                "Weights will be treated as 1.",
-                UserWarning,
-            )
-            self._warned_missing_weight = True
-        return np.ones(x.shape[:-1], dtype=float)
 
     def _weight(self, x):
         x = np.asarray(x, dtype=float)

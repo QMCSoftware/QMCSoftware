@@ -14,6 +14,7 @@ from qmcpy.true_measure import (
     StudentTCopula,
 )
 from qmcpy.true_measure.copula import (
+    Copula as ModuleCopula,
     _apply_marginal_ppfs,
     _build_marginal_range,
     _clip_unit_interval,
@@ -89,6 +90,10 @@ def _make_copula(copula_cls, dimension=2, marginals=None):
     if copula_cls is FrankCopula:
         return copula_cls(sampler, marginals=marginals, theta=4.0)
     raise TypeError("unsupported copula class")
+
+
+def test_copula_is_importable_from_public_module_path():
+    assert ModuleCopula is Copula
 
 
 def test_base_copula_rejects_unimplemented_transform():
@@ -206,8 +211,18 @@ def test_copula_weight_fallback_warns_once_when_density_methods_are_missing(
         marginals=[PPFOnlyMarginal(), PPFOnlyMarginal()],
     )
     x = np.full((4, 2), 0.5)
+    expected_message = getattr(
+        tm,
+        "_missing_weight_warning_message",
+        f"{copula_cls.__name__} marginals must implement 'cdf' and "
+        "'pdf' or 'logpdf' to compute density weights. "
+        "Weights will be treated as 1.",
+    )
 
-    with pytest.warns(UserWarning, match="Weights will be treated as 1"):
+    assert "_unit_weight_with_warning" not in copula_cls.__dict__
+    assert tm._unit_weight_with_warning.__func__ is Copula._unit_weight_with_warning
+
+    with pytest.warns(UserWarning) as warning_info:
         weights = tm._weight(x)
 
     with warnings.catch_warnings(record=True) as caught:
@@ -216,6 +231,7 @@ def test_copula_weight_fallback_warns_once_when_density_methods_are_missing(
 
     np.testing.assert_allclose(weights, np.ones(4))
     np.testing.assert_allclose(second_weights, np.ones(4))
+    assert str(warning_info[0].message) == expected_message
     assert caught == []
 
 

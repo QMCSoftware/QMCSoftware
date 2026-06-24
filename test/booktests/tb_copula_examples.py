@@ -6,7 +6,7 @@ class NotebookTests(BaseNotebookTest):
 
     def test_copula_examples_notebook(self):
         notebook_path, _ = self.locate_notebook(
-            "../../demos/copula_examples/copula_examples.ipynb"
+            "../../demos/copula_examples.ipynb"
         )
         replacements = {
             "fig.savefig": "# fig.savefig",
