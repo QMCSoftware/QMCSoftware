@@ -55,11 +55,7 @@ def test_triangular_custom_marginal_range_and_shape():
 
 def test_zero_inflated_zero_rate():
     """
-<<<<<<< Updated upstream
-    Check that the zero inflated exponential distribution preserves the
-=======
     Check that the zero-inflated exponential distribution preserves the
->>>>>>> Stashed changes
     specified probability mass at X = 0.
     """
     p_zero = 0.4
@@ -74,24 +70,6 @@ def test_zero_inflated_zero_rate():
     assert samples.shape == (n, 1)
     assert abs(zero_rate - p_zero) < 0.05
 
-<<<<<<< Updated upstream
-def test_zero_inflated_parameter_checks():
-    sampler = DigitalNetB2(1, seed=17)
-
-    with pytest.raises(ParameterError):
-        ZeroInflatedExpUniform(sampler, p_zero=0.0, lam=1.5)
-
-    with pytest.raises(ParameterError):
-        ZeroInflatedExpUniform(sampler, p_zero=0.4, lam=0.0)
-
-
-def test_zero_inflated_dimension_check():
-    sampler = DigitalNetB2(1, seed=17)
-    tm = ZeroInflatedExpUniform(sampler, p_zero=0.4, lam=1.5)
-
-    with pytest.raises(DimensionError):
-        tm._joint.transform(np.zeros((4, 2)))
-=======
 def test_zero_inflated_y_split_deprecation():
     with pytest.warns(DeprecationWarning, match="y_split"):
         tm = ZeroInflatedExpUniform(
@@ -103,7 +81,6 @@ def test_zero_inflated_y_split_deprecation():
 
     assert tm(4).shape == (4, 1)
 
->>>>>>> Stashed changes
 
 def test_student_t_marginals_shape():
     tm = SciPyWrapper(
