@@ -137,7 +137,7 @@ class BrownianMotion(Gaussian):
             self.drift_time_vec_plus_init,
             self.diffused_sigma_bm,
             decomp_type,
-            lazy_decomp,
+            lazy_decomp if decomp_type.upper() != "BROWNIANBRIDGE" else True,
         )
         if self.decomp_type not in ("PCA", "CHOLESKY", "BROWNIANBRIDGE"):
             raise ParameterError(
@@ -155,8 +155,18 @@ class BrownianMotion(Gaussian):
         super(Gaussian, self).__init__()
 
     def _spawn(self, sampler, dimension):
+        monitoring_times = None
+        if self.decomp_type == "BROWNIANBRIDGE" and dimension == self.d:
+            monitoring_times = self._bridge_times
         return BrownianMotion(
-            sampler, t_final=self.t, drift=self.drift, decomp_type=self.decomp_type
+            sampler,
+            t_final=self.t, 
+            initial_value=self.initial_value,
+            drift=self.drift, 
+            diffusion=self.diffusion,
+            decomp_type=self.decomp_type,
+            lazy_decomp=self.lazy_decomp,
+            monitoring_times=monitoring_times,
         )
 
     def _transform(self, x):
