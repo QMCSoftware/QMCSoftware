@@ -87,8 +87,8 @@ ok
 [20/32] tb_ray_tracing: PASSED
 tb_ray_tracing ...     Memory used: 0.10 GB.  Test time: 17.14 s
 ok
-[21/32] tb_acm_toms_sorokin_2025: PASSED
-tb_acm_toms_sorokin_2025 ...     Memory used: 0.10 GB.  Test time: 1.27 s
+[21/32] tb_JCAM_Sorokin_2026: PASSED
+tb_JCAM_Sorokin_2026 ...     Memory used: 0.10 GB.  Test time: 1.27 s
 ok
 [22/32] tb_some_true_measures: PASSED
 tb_some_true_measures ...     Memory used: 0.10 GB.  Test time: 4.06 s
