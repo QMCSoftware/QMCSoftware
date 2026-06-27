@@ -1,18 +1,33 @@
 # Contributing
 
-Thank you for your interest in contributing to the QMCPy package!
+Thank you for your interest in contributing to the QMCPy library!  This library is the products of many hours of labor from many contributors.  Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
 
-Please submit **pull requests (PRs)** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
+## Good practices
 
-After a feature branch has been successfully merged, it is best practice to delete it. This action keeps the repository tidy and prevents the accumulation of stale branches.
+To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs.  Please read [this document]() to acquaint yourself with them.
 
-For planned releases, open related PRs with enough lead time so review can begin at least one week before the release date.
+### Issues 
 
-For complex or mathematical contributions, schedule at least one PR review meeting before merging. 
+All improvements to QMCPy should be connected to an **issues** using a template from `.github/ISSUE_TEMPLATE/`.  
 
-If you develop a new component, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
+- If you are looking for a way to contribute, search the issues and contact the person who started the issue, if you would like to help.
 
-Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
+- If you identify an improvement that is not in an issue, you may submit an issue yourself.
+
+### Feature branches
+
+If you have not yet installed the QMCPy library, see [Installation](#installation) below.
+
+You should do all your work on a feature branch that is created from the `develop` branch, see [Branches](#branches) below. Once you have something ready, submit a **pull requests (PRs)** to the `develop` branch, and request reviews from at least two members of our team plus copilot.  It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.  
+
+After a feature branch has been approved by two code reviewers, you may merge it into `develop`.  After a successful merge, it is best practice to delete your feature branch on Github. This action keeps the repository tidy and prevents the accumulation of stale branches.
+
+We periodically release the contents of `develop` to `master`.  Contact the team for the next release date.  Plan to submit your pull request to `develop` at least one week before the release date.  If your contribution does not make it into the next release, we hope that it will make it in the one after than.
+
+### Blogs
+
+If you develop a new feature, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
+
 
 ## Installation
 
@@ -49,7 +64,7 @@ or for a heavy-duty version
 pip install -e ".[class,dev]"
 ```
 
-## Branches
+## Branches 
 
 ### For Main Repository Collaborators
 
