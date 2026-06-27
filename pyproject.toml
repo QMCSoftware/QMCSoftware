@@ -66,7 +66,7 @@ umbridge = [
     "umbridge >= 1.2.1",
     ]
 test = [
-    "pytest == 8.3.5",
+    "pytest == 9.0.3",
     "pytest-cov == 6.1.1",
     "phmutest == 1.0.1",
     "pytest-accept == 0.1.10",
