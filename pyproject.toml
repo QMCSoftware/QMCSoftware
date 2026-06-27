@@ -72,7 +72,7 @@ test = [
     "pytest-accept == 0.1.10",
     "testbook == 0.4.2",
     "psutil == 5.9.5",
-    "parsl == 2025.7.28",
+    "parsl == 2026.1.5",
     "seaborn >= 0.8",
     "scikit-learn >= 1.0.0",
     "scikit-optimize",
