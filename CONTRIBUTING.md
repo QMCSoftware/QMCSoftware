@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to the QMCPy library!  This library is the products of many hours of labor from many contributors.  Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
+Thank you for your interest in contributing to the QMCPy library! This library is the product of many hours of labor from many contributors. Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com).
 
 ## Good practices
 
@@ -8,7 +8,7 @@ To preserve the integrity of this library, we have instituted some good practice
 
 ### Issues 
 
-All improvements to QMCPy should be connected to an **issues** using a template from `.github/ISSUE_TEMPLATE/`.  
+All improvements to QMCPy should be connected to an **issue** using a template from `.github/ISSUE_TEMPLATE/`.
 
 - If you are looking for a way to contribute, search the issues and contact the person who started the issue, if you would like to help.
 
@@ -18,11 +18,11 @@ All improvements to QMCPy should be connected to an **issues** using a template 
 
 If you have not yet installed the QMCPy library, see [Installation](#installation) below.
 
-You should do all your work on a feature branch that is created from the `develop` branch, see [Branches](#branches) below. Once you have something ready, submit a **pull requests (PRs)** to the `develop` branch, and request reviews from at least two members of our team plus copilot.  It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.  
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two members of our team plus GitHub Copilot. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
 
-After a feature branch has been approved by two code reviewers, you may merge it into `develop`.  After a successful merge, it is best practice to delete your feature branch on Github. This action keeps the repository tidy and prevents the accumulation of stale branches.
+After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
 
-We periodically release the contents of `develop` to `master`.  Contact the team for the next release date.  Plan to submit your pull request to `develop` at least one week before the release date.  If your contribution does not make it into the next release, we hope that it will make it in the one after than.
+We periodically release the contents of `develop` to `master`. Contact the team for the next release date. Plan to submit your pull request to `develop` at least one week before the release date. If your contribution does not make it into the next release, we hope that it will make it into the one after that.
 
 ### Blogs
 
@@ -68,7 +68,7 @@ pip install -e ".[class,dev]"
 
 ### For Main Repository Collaborators
 
-Branch directly from `develop` inside the `QMCSoftware/` repository.. This allows other team members to easily review your work by checking out your branch with
+Branch directly from `develop` inside the `QMCSoftware/` repository. This allows other team members to easily review your work by checking out your branch with
 
 ```bash
 git fetch origin
@@ -77,7 +77,7 @@ git checkout <branch-name>
 
 ### For External Contributors (Forks)
 
-Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to checkout to the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this
+Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to check out the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this.
 
 ```bash 
 # Add the fork as a remote source
@@ -102,7 +102,7 @@ git pull MyGitHubUsername-fork develop
 
 ## Tests
 
-Doctests and unittests take a few minute to run with
+Doctests and unittests take a few minutes to run with
 
 ~~~bash
 pip install -e ".[dev,docs,test]"
