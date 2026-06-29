@@ -525,7 +525,7 @@ class TestBrownianMotion(unittest.TestCase):
 
         automated = BrownianMotion(
             DigitalNetB2(d, seed=self.seed, replications=reps),
-            decomp_type="BrownianBridge", monitoring_times=times
+            decomp_type="BrownianBridge", monitoring_times=times, vdc_ordering=False
         )
         samples = automated.gen_samples(n)
 
@@ -564,6 +564,24 @@ class TestBrownianMotion(unittest.TestCase):
             err_msg="Manual BrownianBridge path with custom monitoring times does not match automated version."
         )
 
+    def test_brownian_bridge_vdc_ordering_matches_default(self):
+        """4 evenly spaced custom times set to match van der Corput ordering should match default"""
+        d, n = 4, 4
+
+        default = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed), decomp_type='BrownianBridge'
+        ).gen_samples(n)
+
+        reordered = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed),
+            decomp_type='BrownianBridge', monitoring_times=np.linspace(1/d, 1.0, d)
+        ).gen_samples(n)
+
+        np.testing.assert_almost_equal(
+            default, reordered, decimal=10,
+            err_msg="van der Corput reordering of 4 evenly spaced custom times should match default"
+        )
+
     def test_brownian_bridge_warning_for_non_power_of_2(self):
         """BrownianBridge issues ParameterWarning for suboptimal d but still produces valid output."""
         from qmcpy.util import ParameterWarning
@@ -572,7 +590,6 @@ class TestBrownianMotion(unittest.TestCase):
         samples = bm.gen_samples(4)
         self.assertEqual(samples.shape, (4, 6))
         self.assertEqual(samples.dtype, np.float64)
-
 
 class TestGeometricBrownianMotion(unittest.TestCase):
     def setUp(self):
