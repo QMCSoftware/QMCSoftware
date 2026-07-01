@@ -72,6 +72,13 @@ docs/Gemfile.lock
 site/
 /.cache
 
+# Local Codex/agent guidance
+AGENTS.md
+**/AGENTS.md
+MIGRATE_qmcpy_plan_prompt.md
+.codex/
+.agents/
+
 # Sphinx
 sphinx/_build/
 sphinx/_static/
