@@ -250,6 +250,7 @@ Build result:
 ## Immediate Follow-Up Questions
 
 - Which published WordPress pages are mandatory to preserve before MCQMC 2026?
-- Should `Publications`, `Videos`, `Dev Tools`, and `Donation` become GitHub Pages content, redirects, or retired pages?
+- Should `Videos`, `Dev Tools`, and `Donation` become GitHub Pages content,
+  redirects, or retired pages?
 - Are the WordPress draft posts/pages intentionally unpublished, and can they be retired?
 - Which external URLs/backlinks are known to be important outside the WordPress export?
