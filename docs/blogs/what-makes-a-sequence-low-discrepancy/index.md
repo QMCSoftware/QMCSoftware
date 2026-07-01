@@ -1,3 +1,7 @@
+<!--
+Source WordPress URL: https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/
+-->
+
 # What Makes a Sequence Low Discrepancy?
 
 --8<-- "snippets/blog-authors/what-makes-a-sequence-low-discrepancy.md"

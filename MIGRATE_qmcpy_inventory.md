@@ -24,14 +24,65 @@ Confirmed by Kang Jiangrui on 2026-05-26:
 
 | Item | Preserve? | Current/new location | Status |
 |---|---|---|---|
-| Home | Yes | `README.md` | Existing GitHub Pages homepage candidate; needs final content review |
-| Publications | Yes | TBD | Must be preserved; no GitHub Pages target identified yet |
-| Blogs | Yes | `docs/blogs/` and `mkdocs.yml` Blogs navigation | Migrated blog set exists; old news/event posts still need collaborator review |
+| Home | Yes | `README.md` | Existing GitHub Pages homepage candidate with first-pass professionalized entry points; still needs final content review |
+| Publications | Yes | `docs/publications.md` and `mkdocs.yml` Community Resources navigation | Must-preserve page migrated from current WordPress Publications page |
+| Blogs | Yes | `docs/blogs/`, `docs/blogs/index.md`, and `mkdocs.yml` Blogs navigation | Migrated blog set and index exist; old news/event posts still need collaborator review |
 | GitHub | Yes | `https://github.com/QMCSoftware/QMCSoftware` | Link present in README and WordPress nav export |
 | Docs | Yes | `https://qmcsoftware.github.io/QMCSoftware/` | Link present in README and WordPress nav export |
 | PyPI | Yes | `https://pypi.org/project/qmcpy/` | Link present in README and WordPress nav export |
 
 Other WordPress pages and posts remain pending review with Fred J. Hickernell, Sou-Cheng Choi, and Aleksei Sorokin.
+
+## Clear Old URL Mappings
+
+This section records clear targets that can be documented independently. It is
+not a final redirect plan and does not assign redirect priority.
+
+### Confirmed Clear Targets
+
+| Old source or WordPress nav item | Current/new target | Scope note |
+|---|---|---|
+| `https://qmcpy.org/` | `README.md` | Must-preserve homepage target; content has been professionalized but may still receive final review |
+| `https://qmcpy.org/publications/` | `docs/publications.md` | Must-preserve Publications page migrated from the current WordPress page |
+| WordPress nav item: GitHub | `https://github.com/QMCSoftware/QMCSoftware` | Preserved external project link |
+| WordPress nav item: Docs | `https://qmcsoftware.github.io/QMCSoftware/` | Preserved documentation/site target |
+| WordPress nav item: PyPI | `https://pypi.org/project/qmcpy/` | Preserved package-index target |
+
+### Confirmed Migrated Blog Posts
+
+| Old URL | Current/new target |
+|---|---|
+| `https://qmcpy.org/2020/06/25/why_add_q_to_mc/` | `docs/blogs/why-add-q-to-mc/index.md` |
+| `https://qmcpy.org/2020/07/06/a-qmcpy-quick-start/` | `docs/blogs/a-qmcpy-quick-start/index.md` |
+| `https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/` | `docs/blogs/what-makes-a-sequence-low-discrepancy/index.md` |
+| `https://qmcpy.org/2020/07/19/qei-with-qmcpy/` | `docs/blogs/qei-with-qmcpy/index.md` |
+| `https://qmcpy.org/2020/08/31/safe-handling-of-qmc-points/` | `docs/blogs/safe-handling-of-qmc-points/index.md` |
+| `https://qmcpy.org/2021/02/25/speeding-up-qmcpy-with-distributable-c-code/` | `docs/blogs/speeding-up-qmcpy-with-distributable-c-code/index.md` |
+| `https://qmcpy.org/2021/02/25/visualizing-the-internals-of-object-classes-in-qmcpy/` | `docs/blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md` |
+| `https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/` | `docs/blogs/digital-sequences-the-niederreiter-construction/index.md` |
+| `https://qmcpy.org/2022/05/19/bayesian-stopping-criteria/` | `docs/blogs/bayesian-stopping-criteria/index.md` |
+| `https://qmcpy.org/2023/04/07/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/` | `docs/blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/index.md` |
+| `https://qmcpy.org/2023/05/16/random-lattice-generators-are-not-bad/` | `docs/blogs/random-lattice-generators-are-not-bad/index.md` |
+| `https://qmcpy.org/2025/07/15/analysis-of-quasi-monte-carlo-efficiency-for-asian-option-pricing/` | `docs/blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/index.md` |
+| `https://qmcpy.org/2025/09/29/linear-matrix-scrambling-and-digital-shift-for-halton/` | `docs/blogs/linear-matrix-scrambling-and-digital-shift-for-halton/index.md` |
+| `https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/` | `docs/blogs/gbm-qmcpy/index.md` |
+| `https://qmcpy.org/2025/11/29/parsl-accelerated-qmcpy-notebook-tests/` | `docs/blogs/accelerating-qmcpy-notebook-tests-with-parsl/index.md` |
+| `https://qmcpy.org/2026/02/25/cubmccltvec-vectorizing-the-cubmcclt-algorithm/` | `docs/blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md` |
+| `https://qmcpy.org/2026/02/25/visualizing-the-generated-samples-helps/` | `docs/blogs/visualizing-the-generated-samples-helps/index.md` |
+| `https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/` | `docs/blogs/scipywrapper/index.md` |
+
+### Candidate Targets Needing Manual Verification
+
+| Old URL | Candidate target | Reason not confirmed |
+|---|---|---|
+| `https://qmcpy.org/contributors-2/` | `community.md` | Existing community page may cover contributors, but it still references the old contributors URL |
+| `https://qmcpy.org/contributors/` | `community.md` | Existing community page may cover contributors, but it still references the old contributors URL |
+
+### Collaborator-Dependent Or Deferred Content
+
+Donation, Videos, Dev Tools, WordPress drafts, old news/event/announcement
+posts, external backlink importance, and redirect priority remain deferred for
+collaborator or later migration decisions.
 
 ## Working Classification Summary
 
@@ -58,9 +109,11 @@ The following WordPress posts have clear GitHub Pages targets in `docs/blogs/`:
 - Visualizing the Generated Samples Helps
 - Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions
 
+`docs/blogs/index.md` lists these already-migrated blog posts in newest-first
+order for the GitHub Pages site.
+
 ### Preservation Gaps
 
-- `https://qmcpy.org/publications/` is marked must-preserve and needs a future GitHub Pages target.
 - `https://qmcpy.org/` maps to the current GitHub Pages homepage candidate, `README.md`, but still needs final content review.
 
 ### Pending Retirement Candidates
@@ -138,11 +191,11 @@ Build result:
 
 | Old URL | Title | Status | Current/new location | Inventory note |
 |---|---|---|---|---|
-| https://qmcpy.org/ | Blog | publish | README.md | Must preserve: existing GitHub Pages homepage candidate; needs final content review |
+| https://qmcpy.org/ | Blog | publish | README.md | Must preserve: existing GitHub Pages homepage candidate with first-pass professionalized entry points; needs final content review |
 | https://qmcpy.org/blog/donation/ | Donation | publish |  | needs inventory decision |
 | https://qmcpy.org/contributors-2/ | Contributors | publish | community.md | candidate existing page, needs manual verification |
 | https://qmcpy.org/contributors/ | Contributors | publish | community.md | candidate existing page, needs manual verification |
-| https://qmcpy.org/publications/ | Publications | publish | TBD | Must preserve: new GitHub Pages target needed |
+| https://qmcpy.org/publications/ | Publications | publish | publications.md | Must preserve: migrated from current WordPress Publications page |
 | https://qmcpy.org/references-for-python-and-mathematical-software-development/ | Dev Tools | publish |  | needs inventory decision |
 | https://qmcpy.org/videos/ | Videos | publish |  | needs inventory decision |
 | https://qmcpy.org/?page_id=689 | Tools | draft |  | draft in WordPress export; likely retire unless user says otherwise |
@@ -153,7 +206,7 @@ Build result:
 |---|---|---|---|---|
 | https://qmcpy.org/2020/06/25/why_add_q_to_mc/ | Why Add Q to MC? | publish | blogs/why-add-q-to-mc/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2020/07/06/a-qmcpy-quick-start/ | A QMCPy Quick Start | publish | blogs/a-qmcpy-quick-start/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/ | What Makes a Sequence "Low Discrepancy"? | publish | blogs/what-makes-a-sequence-low-discrepancy/index.md | already migrated: title/slug match; Source WordPress URL metadata missing |
+| https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/ | What Makes a Sequence "Low Discrepancy"? | publish | blogs/what-makes-a-sequence-low-discrepancy/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2020/07/19/qei-with-qmcpy/ | qEI with QMCPy | publish | blogs/qei-with-qmcpy/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2020/08/31/safe-handling-of-qmc-points/ | Safe Handling of QMC Points | publish | blogs/safe-handling-of-qmc-points/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2020/09/03/mcqmc-2020-tutorial/ | A Tutorial at MCQMC 2020 | publish |  | needs inventory decision |
@@ -186,11 +239,11 @@ Build result:
 | https://qmcpy.org/2024/10/20/aleksei-secures-doe-research-fellowship/ | Aleksei Sorokin Awarded Prestigious DOE Research Fellowship | publish |  | needs inventory decision |
 | https://qmcpy.org/2025/07/15/analysis-of-quasi-monte-carlo-efficiency-for-asian-option-pricing/ | Analysis of Quasi-Monte Carlo Efficiency for Asian Option Pricing | publish | blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2025/09/29/linear-matrix-scrambling-and-digital-shift-for-halton/ | Linear Matrix Scrambling and Digital Shift for Halton | publish | blogs/linear-matrix-scrambling-and-digital-shift-for-halton/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/ | Highly Efficient Geometric Brownian Motion Modeling with QMCPy | publish | blogs/gbm-qmcpy/index.md | already migrated: title/date match; Source WordPress URL metadata missing |
-| https://qmcpy.org/2025/11/29/parsl-accelerated-qmcpy-notebook-tests/ | Parsl Accelerated QMCPy Notebook Tests | publish | blogs/accelerating-qmcpy-notebook-tests-with-parsl/index.md | already migrated: title/date match; Source WordPress URL metadata missing |
+| https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/ | Highly Efficient Geometric Brownian Motion Modeling with QMCPy | publish | blogs/gbm-qmcpy/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2025/11/29/parsl-accelerated-qmcpy-notebook-tests/ | Parsl Accelerated QMCPy Notebook Tests | publish | blogs/accelerating-qmcpy-notebook-tests-with-parsl/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2026/02/25/cubmccltvec-vectorizing-the-cubmcclt-algorithm/ | CubMCCLTVec: Vectorizing the CubMCCLT Algorithm | publish | blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2026/02/25/visualizing-the-generated-samples-helps/ | Visualizing the Generated Samples Helps | publish | blogs/visualizing-the-generated-samples-helps/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/ | Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions | publish | blogs/scipywrapper/index.md | already migrated: title/date match; Source WordPress URL metadata missing |
+| https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/ | Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions | publish | blogs/scipywrapper/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/?p=1670 | Visualizing Discrete Distributions and True Measures: Unveiling Insights with QMCPy Plot Projections | draft |  | draft in WordPress export; likely retire unless user says otherwise |
 | https://qmcpy.org/?p=1710 | Visualizing Discrete Distributions and True Measure Objects with QMCPy Plot Projections: Enhancing Understanding Through Graphical Representation | draft |  | draft in WordPress export; likely retire unless user says otherwise |
 

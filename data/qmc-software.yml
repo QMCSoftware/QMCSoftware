@@ -1,5 +1,5 @@
 - name: QMCPy
-  url: https://qmcpy.org
+  url: https://qmcsoftware.github.io/QMCSoftware/
   related:
     - name: QMCToolsCL
       url: https://github.com/QMCSoftware/QMCToolsCL
@@ -86,7 +86,7 @@
     - Christiane Lemieux
 
 - name: QuasiMonteCarlo.jl
-  url:  https://docs.sciml.ai/QuasiMonteCarlo/stable/
+  url: https://docs.sciml.ai/QuasiMonteCarlo/stable/
   description: >
     Julia package for generating low-discrepancy sequences and performing quasi-Monte Carlo integration, designed for high-performance scientific computing
   language: Julia

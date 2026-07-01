@@ -145,29 +145,60 @@ Verification notes:
 
 ## Homepage
 
-- [ ] Decide minimum viable homepage
-- [ ] Improve landing page professionalism
-- [ ] Add/verify:
-  - [ ] Installation link
-  - [ ] Documentation link
-  - [ ] GitHub link
-  - [ ] PyPI link
-  - [ ] Citation information
-  - [ ] Publications/references
-  - [ ] Contributors/collaborators
-  - [ ] QMC software ecosystem table
+- [x] Decide minimum viable homepage
+- [x] Improve landing page professionalism
+- [x] Add/verify:
+  - [x] Installation link
+  - [x] Documentation link
+  - [x] GitHub link
+  - [x] PyPI link
+  - [x] Citation information
+  - [x] Publications/references
+  - [x] Contributors/collaborators
+  - [x] QMC software ecosystem table
+
+Notes:
+
+- First independent homepage pass added public links for documentation, GitHub,
+  PyPI, migrated blogs, the QMC software ecosystem table, community, and
+  citation information.
+- Follow-up homepage pass tightened the entry points into a `Start Here`
+  section for users, developers, project background, and citation.
+- `https://qmcpy.org/publications/` has been migrated to `docs/publications.md`
+  and added to the published navigation.
 
 ## Navigation
 
-- [ ] Review navbar structure
-- [ ] Simplify navigation if needed
+- [x] Review navbar structure
+- [x] Simplify navigation if needed
 - [ ] Remove obsolete WordPress-era structure
+
+Notes:
+
+- Added a visible migrated blog index to the Blogs navigation.
+- Added the migrated Publications page to Community Resources.
+- Completed a conservative navigation label/group cleanup: the homepage label
+  is `Home`, and Blogs now separates notebook/demo posts from migrated
+  WordPress posts without deleting pages or changing paths.
+- Obsolete WordPress-era structure has not been removed; any retirement or
+  deletion decision remains collaborator-dependent.
 
 ## URL Preservation
 
-- [ ] Inventory important old WordPress URLs
-- [ ] Map old URLs to new locations
+- [x] Inventory important old WordPress URLs
+- [x] Map old URLs to new locations
 - [ ] Decide which redirects are worth preserving
+
+Notes:
+
+- Added exact source URL metadata to the four already-migrated blog posts that
+  were listed as metadata gaps in the inventory.
+- Mapped `https://qmcpy.org/publications/` to `publications.md`.
+- Added a `Clear Old URL Mappings` inventory section for Home, Publications,
+  migrated blog posts, and preserved GitHub/Docs/PyPI navigation targets.
+- Mapping completion is limited to entries with clear targets. Redirect scope,
+  redirect priority, and collaborator-dependent old content decisions remain
+  open.
 
 ---
 
