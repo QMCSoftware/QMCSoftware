@@ -19,14 +19,26 @@ assignees: ''
  - Installed using virtualenv? pip? conda?: 
  - GCC or Windows C Compiler version: 
 
-**Describe the problem** A clear and concise description of what the bug is.
+**Describe the problem** 
 
-**Logs / Any other info** Provide logs and any other information
+A clear and concise description of what the bug is.
 
-**To Reproduce** Steps to reproduce the behavior:
+**Logs / Any other info** 
 
-**Expected behavior** A clear and concise description of what you expected to happen.
+Provide logs and any other information
 
-**Screenshots** If applicable, add screenshots to help explain your problem.
+**To Reproduce** 
 
-**Additional context** Add any other context about the problem here.
+Steps to reproduce the behavior:
+
+**Expected behavior** 
+
+A clear and concise description of what you expected to happen.
+
+**Screenshots** 
+
+If applicable, add screenshots to help explain your problem.
+
+**Additional context** 
+
+Add any other context about the problem here.
