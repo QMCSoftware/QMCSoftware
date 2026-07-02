@@ -288,15 +288,6 @@ jobs:
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
-      - name: Cache MiKTeX (Windows)
-        if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
-        uses: actions/cache@v4
-        with:
-          path: C:\Program Files\MiKTeX
-          key: ${{ runner.os }}-miktex-${{ hashFiles('.github/workflows/alltests.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-miktex-
-          
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
@@ -414,11 +405,12 @@ jobs:
         shell: bash -l {0}
         run: |
           make booktests_parallel_no_docker    # Parsl not supported on Windows
-      - name: Run booktests (parallel) on Windows
+      - name: Run booktests (serial) on Windows
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
         run: |
-          make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
+          # Serial execution is slower but much more stable on Windows notebooks.
+          make booktests_parallel_pytest PYTEST_XDIST="" PYTEST="-m 'not slow'"
 
       # -----------------------------------------------------------
       # Upload coverage to Codecov
