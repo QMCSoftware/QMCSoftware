@@ -58,9 +58,7 @@ This makes sure Python will use your updated `SciPyWrapper` instead of any pip i
     ```bash
     pytest test/test_scipy_wrapper_custom.py
     ```
-You should see all tests pass.
-A warning about the zero inflated joint distribution not having logpdf is expected.
-That example is only used for sampling and visualisation so weights are intentionally treated as 1.
+You should see all tests pass. A warning about the zero inflated joint distribution not having logpdf is expected. That example is only used for sampling and visualisation so weights are intentionally treated as 1.
 
 3. Open the notebook
 
@@ -68,8 +66,7 @@ That example is only used for sampling and visualisation so weights are intentio
     cd demos/scipywrapper_dependence_custom
     jupyter notebook scipywrapper_demo.ipynb
     ```
-Run all cells from top to bottom.
-You will see:
+Run all cells from top to bottom. You will see:
 - a side by side scatter plot for independent normals and a correlated multivariate normal,
 - histograms and scatter plots for the zero inflated exponential plus uniform joint,
 - acceptance rejection clouds for iid MC and QMC on the same triangular target,
@@ -112,8 +109,7 @@ tm = SciPyWrapper(sampler, tri)
 x = tm(4096)        # samples from the triangular distribution
 ```
 
-The wrapper will run a quick sanity check on your `ppf` and `pdf`.
-If it sees that the CDF is not increasing or the density does not look normalised, it will raise a `UserWarning` instead of failing silently.
+The wrapper will run a quick sanity check on your `ppf` and `pdf`. If it sees that the CDF is not increasing or the density does not look normalised, it will raise a `UserWarning` instead of failing silently.
 
 ---
 
