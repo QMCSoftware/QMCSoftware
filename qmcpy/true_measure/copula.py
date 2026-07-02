@@ -13,16 +13,16 @@ class Copula(AbstractTrueMeasure):
     A copula layer maps independent uniform input points to dependent uniform
     points on the unit cube:
 
-    .. math::
-
-        U \in [0,1]^d \mapsto V = T(U) \in [0,1]^d.
+    $$
+    U \in [0,1]^d \mapsto V = T(U) \in [0,1]^d.
+    $$
 
     The base class then applies marginal quantile functions to obtain final
     target samples,
 
-    .. math::
-
-        X_j = F_j^{-1}(V_j).
+    $$
+    X_j = F_j^{-1}(V_j).
+    $$
 
     SciPy calls the quantile function ``ppf``. Concrete subclasses implement
     ``_transform_to_uniform`` for the family-specific copula sampling transform.

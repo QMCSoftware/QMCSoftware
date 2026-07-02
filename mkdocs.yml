@@ -127,7 +127,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [.]  # resolve the local qmcpy package from the repository root
+          paths: [qmcpy]
           options:
             members_order: source
             show_root_toc_entry: false

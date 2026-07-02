@@ -1,15 +1,11 @@
+import warnings
+
 import numpy as np
 import pytest
 import scipy.stats as stats
 
-from qmcpy import Copula as PublicCopula
-from qmcpy import ClaytonCopula as PublicClaytonCopula
-from qmcpy import FrankCopula as PublicFrankCopula
-from qmcpy import GaussianCopula as PublicGaussianCopula
-from qmcpy import GumbelCopula as PublicGumbelCopula
-from qmcpy import StudentTCopula as PublicStudentTCopula
-from qmcpy.discrete_distribution import DigitalNetB2
-from qmcpy.true_measure import (
+from qmcpy import (
+    DigitalNetB2,
     Copula,
     ClaytonCopula,
     FrankCopula,
@@ -17,7 +13,52 @@ from qmcpy.true_measure import (
     GumbelCopula,
     StudentTCopula,
 )
-from qmcpy.util import DimensionError, ParameterError
+from qmcpy.true_measure.copula import (
+    Copula as ModuleCopula,
+    _apply_marginal_ppfs,
+    _build_marginal_range,
+    _clip_unit_interval,
+    _marginal_cdfs_and_logpdf,
+    _validate_correlation_matrix,
+    _validate_dimension,
+    _validate_marginals,
+)
+from qmcpy.util import DimensionError, MethodImplementationError, ParameterError
+
+
+class PPFOnlyMarginal:
+    def ppf(self, u):
+        return np.asarray(u, dtype=float)
+
+
+class NonCallablePPFMarginal:
+    ppf = 1.0
+
+
+class UnitPDFMarginal:
+    def ppf(self, u):
+        return np.asarray(u, dtype=float)
+
+    def cdf(self, x):
+        return np.asarray(x, dtype=float)
+
+    def pdf(self, x):
+        return np.ones_like(np.asarray(x, dtype=float))
+
+
+class CDFOnlyMarginal(PPFOnlyMarginal):
+    def cdf(self, x):
+        return np.asarray(x, dtype=float)
+
+
+class BadIntervalMarginal(PPFOnlyMarginal):
+    def interval(self, confidence):
+        raise ValueError("interval unavailable")
+
+
+class BadRangeMarginal:
+    def ppf(self, u):
+        raise ValueError("ppf unavailable")
 
 
 def _equicorrelation(d, rho):
@@ -52,20 +93,20 @@ def _make_copula(copula_cls, dimension=2, marginals=None, correlation=None, seed
     return copula_cls(correlation=correlation, **common)
 
 
-def test_public_api_imports_and_normal_usage():
-    assert PublicCopula is Copula
-    assert PublicGaussianCopula is GaussianCopula
-    assert PublicStudentTCopula is StudentTCopula
-    assert PublicClaytonCopula is ClaytonCopula
-    assert PublicFrankCopula is FrankCopula
-    assert PublicGumbelCopula is GumbelCopula
+# Base Copula and helper tests
 
+
+def test_copula_is_importable_from_public_module_path():
+    assert ModuleCopula is Copula
+
+
+def test_public_api_imports_and_normal_usage():
     for copula_cls in [
-        PublicGaussianCopula,
-        PublicStudentTCopula,
-        PublicClaytonCopula,
-        PublicFrankCopula,
-        PublicGumbelCopula,
+        GaussianCopula,
+        StudentTCopula,
+        ClaytonCopula,
+        FrankCopula,
+        GumbelCopula,
     ]:
         assert issubclass(copula_cls, Copula)
 
@@ -80,6 +121,108 @@ def test_public_api_imports_and_normal_usage():
         assert np.all(np.isfinite(x))
         assert np.all(np.isfinite(x_gen))
         assert np.all((0 <= v) & (v <= 1))
+
+
+def test_base_copula_rejects_unimplemented_transform():
+    tm = Copula(DigitalNetB2(2, seed=101), marginals=[stats.uniform(), stats.uniform()])
+
+    with pytest.raises(MethodImplementationError):
+        tm.copula_transform(np.full((3, 2), 0.5))
+
+
+def test_base_copula_rejects_invalid_sampler():
+    with pytest.raises(ParameterError, match="sampler"):
+        Copula(object(), marginals=[stats.uniform()])
+
+
+def test_validate_marginals_error_branches():
+    with pytest.raises(ParameterError, match="marginals"):
+        _validate_marginals(None)
+
+    with pytest.raises(ParameterError, match="at least one"):
+        _validate_marginals([])
+
+    with pytest.raises(ParameterError, match="ppf"):
+        _validate_marginals([NonCallablePPFMarginal()])
+
+
+def test_validate_dimension_error_branches():
+    with pytest.raises(DimensionError, match="integer dimension"):
+        _validate_dimension(object(), [stats.uniform()])
+
+    with pytest.raises(DimensionError, match="marginals"):
+        _validate_dimension(3, [stats.uniform(), stats.uniform()])
+
+
+def test_apply_marginal_ppfs_clips_endpoints_and_checks_dimension():
+    transformed = _apply_marginal_ppfs(
+        np.array([[0.0, 1.0], [1.0, 0.0]]),
+        [stats.norm(), stats.norm()],
+    )
+
+    assert transformed.shape == (2, 2)
+    assert np.all(np.isfinite(transformed))
+
+    with pytest.raises(DimensionError, match="marginals"):
+        _apply_marginal_ppfs(np.full((2, 3), 0.5), [stats.uniform(), stats.uniform()])
+
+
+def test_marginal_range_falls_back_when_interval_or_ppf_fails():
+    ranges = _build_marginal_range([BadIntervalMarginal(), BadRangeMarginal()])
+
+    assert ranges.shape == (2, 2)
+    assert np.all(np.isfinite(ranges[0]))
+    np.testing.assert_allclose(ranges[1], [-np.inf, np.inf])
+
+
+def test_marginal_cdfs_and_logpdf_pdf_branch_and_errors():
+    x = np.array([[0.25, 0.75], [0.4, 0.6]])
+    u, log_density = _marginal_cdfs_and_logpdf(
+        x,
+        [UnitPDFMarginal(), UnitPDFMarginal()],
+    )
+
+    np.testing.assert_allclose(u, x)
+    np.testing.assert_allclose(log_density, np.zeros(2))
+
+    with pytest.raises(ParameterError, match="cdf"):
+        _marginal_cdfs_and_logpdf(x, [PPFOnlyMarginal(), UnitPDFMarginal()])
+
+    with pytest.raises(ParameterError, match="pdf"):
+        _marginal_cdfs_and_logpdf(x, [CDFOnlyMarginal(), UnitPDFMarginal()])
+
+
+def test_validate_correlation_matrix_rejects_nonfinite_values():
+    with pytest.raises(ValueError, match="finite"):
+        _validate_correlation_matrix([[1.0, np.nan], [np.nan, 1.0]], 2)
+
+
+def test_clip_unit_interval_uses_machine_epsilon():
+    clipped = _clip_unit_interval(np.array([0.0, 0.5, 1.0]))
+    eps = np.finfo(float).eps
+
+    np.testing.assert_allclose(clipped, [eps, 0.5, 1.0 - eps])
+
+
+@pytest.mark.parametrize(
+    "copula_cls",
+    [GaussianCopula, StudentTCopula, ClaytonCopula, GumbelCopula, FrankCopula],
+)
+def test_copula_transform_outputs_dependent_uniforms_in_unit_cube(copula_cls):
+    tm = _make_copula(copula_cls, dimension=3)
+    u = np.array(
+        [
+            [0.1, 0.3, 0.7],
+            [0.5, 0.5, 0.5],
+            [0.9, 0.8, 0.2],
+        ]
+    )
+
+    v = tm.copula_transform(u)
+
+    assert v.shape == u.shape
+    assert np.all(np.isfinite(v))
+    assert np.all((0.0 <= v) & (v <= 1.0))
 
 
 @pytest.mark.parametrize(
@@ -105,6 +248,9 @@ def test_copula_sample_shapes_are_preserved(copula_cls, dimension):
     assert np.all(np.isfinite(one))
     assert np.all(np.isfinite(many))
     assert np.all(np.isfinite(batched_transform))
+
+
+# Elliptical copulas
 
 
 def test_output_shape_with_nonnormal_marginals():
@@ -527,6 +673,9 @@ def test_student_t_copula_marginal_without_ppf_raises_clear_error():
             correlation=[[1.0]],
             df=4,
         )
+
+
+# Archimedean copulas
 
 
 def test_clayton_copula_output_shape_and_finite_values():
@@ -1065,3 +1214,141 @@ def test_gumbel_copula_has_stronger_upper_tail_than_gaussian_copula():
     gaussian_tail = upper_tail_rate(x_gaussian)
 
     assert gumbel_tail > gaussian_tail + 0.15
+
+
+# Weights, fallback behavior, spawn, and edge cases
+
+
+@pytest.mark.parametrize(
+    "copula_cls",
+    [GaussianCopula, StudentTCopula, ClaytonCopula, GumbelCopula, FrankCopula],
+)
+def test_copula_weight_fallback_warns_once_when_density_methods_are_missing(
+    copula_cls,
+):
+    tm = _make_copula(
+        copula_cls,
+        dimension=2,
+        marginals=[PPFOnlyMarginal(), PPFOnlyMarginal()],
+    )
+    x = np.full((4, 2), 0.5)
+    expected_message = getattr(
+        tm,
+        "_missing_weight_warning_message",
+        f"{copula_cls.__name__} marginals must implement 'cdf' and "
+        "'pdf' or 'logpdf' to compute density weights. "
+        "Weights will be treated as 1.",
+    )
+
+    assert "_unit_weight_with_warning" not in copula_cls.__dict__
+    assert tm._unit_weight_with_warning.__func__ is Copula._unit_weight_with_warning
+
+    with pytest.warns(UserWarning) as warning_info:
+        weights = tm._weight(x)
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        second_weights = tm._weight(x)
+
+    np.testing.assert_allclose(weights, np.ones(4))
+    np.testing.assert_allclose(second_weights, np.ones(4))
+    assert str(warning_info[0].message) == expected_message
+    assert caught == []
+
+
+def test_student_t_weight_falls_back_when_multivariate_t_is_unavailable():
+    tm = StudentTCopula(
+        DigitalNetB2(2, seed=115),
+        marginals=[stats.norm(), stats.norm()],
+        correlation=np.eye(2),
+        df=4,
+    )
+    tm._mvt_scipy = None
+
+    with pytest.warns(UserWarning, match="Weights will be treated as 1"):
+        weights = tm._weight(np.full((3, 2), 0.25))
+
+    np.testing.assert_allclose(weights, np.ones(3))
+
+
+def test_gaussian_weight_uses_pdf_branch_when_logpdf_is_unavailable():
+    tm = GaussianCopula(
+        DigitalNetB2(2, seed=117),
+        marginals=[UnitPDFMarginal(), UnitPDFMarginal()],
+        correlation=[[1.0, 0.4], [0.4, 1.0]],
+    )
+
+    weights = tm._weight(np.array([[0.25, 0.5], [0.75, 0.5]]))
+
+    assert weights.shape == (2,)
+    assert np.all(np.isfinite(weights))
+    assert np.all(weights > 0.0)
+
+
+def test_gumbel_theta_one_weight_is_independent_marginal_density():
+    tm = GumbelCopula(
+        DigitalNetB2(2, seed=119),
+        marginals=[stats.gamma(a=2.0), stats.expon()],
+        theta=1.0,
+    )
+    x = np.array([[1.0, 0.5], [2.0, 1.5]])
+    expected = stats.gamma(a=2.0).pdf(x[:, 0]) * stats.expon().pdf(x[:, 1])
+
+    weights = tm._weight(x)
+
+    np.testing.assert_allclose(weights, expected)
+
+
+def test_gen_copula_samples_composed_transform_branch():
+    inner = GaussianCopula(
+        DigitalNetB2(2, seed=121),
+        marginals=[stats.uniform(), stats.uniform()],
+        correlation=[[1.0, 0.3], [0.3, 1.0]],
+    )
+    outer = ClaytonCopula(inner, marginals=[stats.uniform(), stats.uniform()], theta=1.5)
+
+    v = outer.gen_copula_samples(n_min=4, n_max=8)
+
+    assert v.shape == (4, 2)
+    assert np.all(np.isfinite(v))
+    assert np.all((0.0 <= v) & (v <= 1.0))
+
+
+@pytest.mark.parametrize(
+    "copula_cls",
+    [GaussianCopula, StudentTCopula, ClaytonCopula, GumbelCopula, FrankCopula],
+)
+def test_copula_spawn_same_dimension_and_reject_different_dimension(copula_cls):
+    tm = _make_copula(copula_cls, dimension=2)
+
+    spawned = tm.spawn(s=1, dimensions=[2])
+    assert len(spawned) == 1
+    assert isinstance(spawned[0], copula_cls)
+    assert spawned[0](4).shape == (4, 2)
+
+    with pytest.raises(DimensionError):
+        tm._spawn(DigitalNetB2(3, seed=123), 3)
+
+
+def test_frank_one_dimensional_weight_covers_zero_order_eulerian_term():
+    tm = FrankCopula(
+        DigitalNetB2(1, seed=125),
+        marginals=[UnitPDFMarginal()],
+        theta=3.0,
+    )
+
+    weights = tm._weight(np.array([[0.25], [0.75]]))
+
+    assert weights.shape == (2,)
+    assert np.all(np.isfinite(weights))
+    assert np.all(weights > 0.0)
+
+
+def test_frank_rejects_large_negative_theta_when_exponential_overflows():
+    with np.errstate(over="ignore"):
+        with pytest.raises(ParameterError, match="too close to 0 or too large"):
+            FrankCopula(
+                DigitalNetB2(2, seed=127),
+                marginals=[stats.uniform(), stats.uniform()],
+                theta=-1000.0,
+            )

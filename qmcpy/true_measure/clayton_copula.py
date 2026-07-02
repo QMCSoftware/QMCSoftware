@@ -19,10 +19,10 @@ class ClaytonCopula(Copula):
     inverse / inverse Rosenblatt transform. For coordinate ``j`` after
     observing the previous ``m = j - 1`` coordinates, the conditional inverse is
 
-    .. math::
-
-        v = \left(1 + A
-            \left(w^{-\theta/(1 + m \theta)} - 1\right)\right)^{-1/\theta},
+    $$
+    v = \left(1 + A
+        \left(w^{-\theta/(1 + m \theta)} - 1\right)\right)^{-1/\theta},
+    $$
 
     where ``A = 1 + sum(phi(u_i))`` over previous coordinates and
     ``phi(u) = u^{-theta} - 1``.
