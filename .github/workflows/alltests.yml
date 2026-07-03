@@ -281,13 +281,31 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super
+          
       - name: Install minimal LaTeX (macOS)
         if: runner.os == 'macOS' && env.RUN_BOOKTESTS == 'true'
         run: |
-          brew install --cask basictex
+          retry_cmd () {
+            local max_attempts="$1"
+            shift
+            local attempt=1
+            until "$@"; do
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "Command failed after ${max_attempts} attempts: $*"
+                return 1
+              fi
+              echo "Attempt ${attempt}/${max_attempts} failed for: $*"
+              echo "Retrying in 20s..."
+              sleep 20
+              attempt=$((attempt + 1))
+            done
+          }
+
+          retry_cmd 3 brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
-          sudo tlmgr update --self
-          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+          retry_cmd 3 sudo tlmgr update --self
+          retry_cmd 3 sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
