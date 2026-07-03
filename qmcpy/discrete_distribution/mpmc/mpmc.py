@@ -3,8 +3,8 @@ from io import BytesIO
 import os
 import sys
 from urllib.request import urlopen
-from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
-from qmcpy.util import ParameterError
+from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from ...util import ParameterError
 from tqdm import tqdm
 import numpy as np
 import torch
