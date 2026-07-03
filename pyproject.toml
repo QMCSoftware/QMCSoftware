@@ -43,7 +43,7 @@ keywords=[
     "sobol",
     "lattice",
     ]
-license = "Apache-2.0"
+license = {file = "LICENSE"}
 dynamic = ["version"]
 requires-python = ">= 3.5"
 dependencies = [
