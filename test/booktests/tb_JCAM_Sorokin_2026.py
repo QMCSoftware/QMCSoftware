@@ -15,11 +15,11 @@ class NotebookTests(BaseNotebookTest):
         os.makedirs("outputs", exist_ok=True)
 
     @testbook(
-        "../../demos/talk_paper_demos/JCAM_Sorokin_2026/JCAM_Sorokin_2026.ipynb",
+        "../../demos/talk_paper_demos/JCMDS_Sorokin_2026/JCMDS_Sorokin_2026.ipynb",
         execute=False,
         timeout=TB_TIMEOUT,
     )
-    def test_JCAM_Sorokin_2026_notebook(self, tb):
+    def test_JCMDS_Sorokin_2026_notebook(self, tb):
         pass
 
 
