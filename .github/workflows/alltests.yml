@@ -366,6 +366,7 @@ jobs:
           files: >-
             ./artifacts/coverage/unit/coverage.json,
             ./artifacts/coverage/doctests/minimal/coverage.json,
+            ./artifacts/coverage/doctests/mpmc/coverage.json,
             ./artifacts/coverage/doctests/torch/coverage.json,
             ./artifacts/coverage/doctests/gpytorch/coverage.json,
             ./artifacts/coverage/doctests/botorch/coverage.json

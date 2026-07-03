@@ -21,25 +21,34 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        include:  # exclude default Python v3.13
+        include:  
           - os: macos-latest
             python-version: "3.5"
+            run-mpmc: false
           - os: macos-latest
             python-version: "3.8"
+            run-mpmc: false
           - os: macos-latest
-            python-version: "3.11"
+            python-version: "3.12"
+            run-mpmc: true
           - os: ubuntu-latest
             python-version: "3.6"
+            run-mpmc: false
           - os: ubuntu-latest
             python-version: "3.9"
-          - os: ubuntu-latest
-            python-version: "3.12"
+            run-mpmc: false
+          - os: macos-latest
+            python-version: "3.13"
+            run-mpmc: true
           - os: windows-latest
             python-version: "3.7"
+            run-mpmc: false
           - os: windows-latest
             python-version: "3.10"
+            run-mpmc: false
           - os: windows-latest
             python-version: "3.14"
+            run-mpmc: true
     steps:
       - uses: actions/checkout@v4
 
@@ -49,6 +58,20 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
+
+      - name: Pin Miniconda base Python (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: |
+          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
+          python --version
+
+      - name: Pin Miniconda base Python (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
+          python --version
 
       - name: Remove old coverage data (Unix)
         if: runner.os != 'Windows'
@@ -219,10 +242,24 @@ jobs:
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
 
+      - name: Install MPMC dependencies
+        if: matrix.run-mpmc
+        run: |
+          python scripts/install_mpmc_pyg.py
+
+      - name: Validate MPMC dependencies
+        if: matrix.run-mpmc
+        run: |
+          python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
+
       - name: Show Python version
         run: |
           python --version
           python -m pip --version
+
+      - name: Run MPMC doctests
+        if: matrix.run-mpmc
+        run: make doctests_mpmc
 
       - name: Run unittests (parallel)
         run: make unittests
