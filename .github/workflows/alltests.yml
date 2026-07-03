@@ -30,13 +30,13 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          REF_NAME: ${{ github.ref_name }}
+          REF_NAME: ${{ github.ref_name }}  # branch name
           BASE_REF: ${{ github.base_ref }}
         run: |
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             full_sweep=true
-          elif [[ "$REF_NAME" == mcpmc_os_choi* ]]; then
+          elif [[ "$REF_NAME" == mcpmc* ]]; then  
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
