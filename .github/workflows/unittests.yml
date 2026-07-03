@@ -65,6 +65,7 @@ jobs:
         if: runner.os != 'Windows' && matrix.run-mpmc
         shell: bash -el {0}
         run: |
+          conda remove -n base -y --force conda-anaconda-tos || true
           conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
           python --version
 
@@ -72,6 +73,7 @@ jobs:
         if: runner.os == 'Windows' && matrix.run-mpmc
         shell: pwsh
         run: |
+          conda remove -n base -y --force conda-anaconda-tos
           conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
           python --version
 
