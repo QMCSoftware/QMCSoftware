@@ -1,6 +1,8 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 PYTEST ?=
+WITH_MPMC ?= 0
+HAS_MPMC ?= $(shell python -c "import importlib.util; mods=('torch','pyg_lib','torch_geometric'); print(int(all(importlib.util.find_spec(m) is not None for m in mods)))" 2>/dev/null || echo 0)
 
 # set environment variable for documentation
 export JUPYTER_PLATFORM_DIRS=1
@@ -191,8 +193,7 @@ tests:
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
-	@OS_NAME=$$(uname -s 2>/dev/null || echo Unknown) && \
-	if [ "$$OS_NAME" = "Linux" ]; then \
+	@if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
 		DOCTESTS_TARGET=doctests_no_docker; \
 		UNITTESTS_ARGS=""; \
 	else \
@@ -205,8 +206,7 @@ tests_no_docker:
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
 	@make clean_local_only_files && \
-	OS_NAME=$$(uname -s 2>/dev/null || echo Unknown) && \
-	if [ "$$OS_NAME" = "Linux" ]; then \
+	if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
 		DOCTESTS_TARGET=doctests_no_docker; \
 		UNITTESTS_ARGS=""; \
 	else \

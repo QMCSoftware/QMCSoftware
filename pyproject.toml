@@ -67,8 +67,7 @@ umbridge = [
     ]
 mpmc = [
     "torch >= 2.2.0",
-    "torch-scatter >= 2.1.2",
-    "torch-cluster >= 1.6.3",
+    "pyg_lib >= 0.6.0",
     "torch-geometric >= 2.6.1",
 ]
 test = [
@@ -105,8 +104,7 @@ test_umbridge = [
     ]
 test_mpmc = [
     "torch >= 2.2.0",
-    "torch-scatter >= 2.1.2",
-    "torch-cluster >= 1.6.3",
+    "pyg_lib >= 0.6.0",
     "torch-geometric >= 2.6.1",
     ]
 dev_no_mpmc = [ # brew install weasyprint
