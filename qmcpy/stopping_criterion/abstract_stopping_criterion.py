@@ -21,12 +21,9 @@ if TYPE_CHECKING:
     import pandas
 
 
-# Optional diagnostic hook for resume-aware stopping criteria.
-IS_PRINT_DIAGNOSTIC = False
-
-
 class AbstractStoppingCriterion(object):
     _RESUME_FORMAT_VERSION = 1  # Increment when checkpoint format changes in a non-backwards-compatible way
+    _ITERATION_LOG_VIEWS = ("all", "current", "without_resume", "stage_last")
 
     def __init__(self, allowed_distribs, allow_vectorized_integrals):
         """Initialize a stopping criterion base class.
@@ -125,7 +122,12 @@ class AbstractStoppingCriterion(object):
                 delattr(self, "_trace_print_iterations")
 
     def get_iteration_log(
-        self, history=None, printed_only=True, drop_empty_columns=True, formatted=True
+        self,
+        history=None,
+        printed_only=True,
+        drop_empty_columns=True,
+        formatted=True,
+        view="all",
     ) -> "pandas.DataFrame":
         """Return the latest iteration log as a pandas DataFrame.
 
@@ -137,11 +139,23 @@ class AbstractStoppingCriterion(object):
             drop_empty_columns (bool): If ``True``, drop columns with no values.
             formatted (bool): If ``True``, return formatted display values when
                 available.
+            view (str): Which log view to return. ``"all"`` and ``"current"``
+                both return the full current log, ``"without_resume"`` removes
+                ``RESUME`` rows, and ``"stage_last"`` returns one stop row per
+                stage by taking the last non-``RESUME`` row available for that
+                stage.
 
         Returns:
             pandas.DataFrame: DataFrame representation of the iteration log.
         """
-        use_cache = history is None and printed_only and drop_empty_columns and formatted
+        self._validate_iteration_log_view(view)
+        use_cache = (
+            history is None
+            and printed_only
+            and drop_empty_columns
+            and formatted
+            and view in ("all", "current")
+        )
         if use_cache:
             cached_history_df = getattr(self, "history_df", None)
             if cached_history_df is not None:
@@ -152,9 +166,12 @@ class AbstractStoppingCriterion(object):
             history,
             stopping_criterion=self,
             printed_only=printed_only,
-            drop_empty_columns=drop_empty_columns,
+            drop_empty_columns=False,
             formatted=formatted,
         )
+        result = self._apply_iteration_log_view(result, view)
+        if drop_empty_columns and not result.empty:
+            result = result.dropna(axis=1, how="all")
         if use_cache:
             # Cache for future calls and populate the last data object so that
             # data.history_df is available after calling get_iteration_log().
@@ -163,6 +180,29 @@ class AbstractStoppingCriterion(object):
             if last_data is not None:
                 last_data.history_df = result
         return result
+
+    @classmethod
+    def _validate_iteration_log_view(cls, view):
+        if view not in cls._ITERATION_LOG_VIEWS:
+            raise ParameterError(
+                "get_iteration_log view must be one of %s"
+                % (cls._ITERATION_LOG_VIEWS,)
+            )
+
+    @staticmethod
+    def _apply_iteration_log_view(log_df, view):
+        if view in ("all", "current") or log_df.empty or "stage" not in log_df.columns:
+            return log_df.reset_index(drop=True)
+        if view == "without_resume":
+            return log_df.loc[log_df["stage"] != "RESUME"].reset_index(drop=True)
+        non_resume_indices = log_df.index[log_df["stage"] != "RESUME"].to_numpy()
+        if len(non_resume_indices) == 0:
+            return log_df.iloc[0:0].reset_index(drop=True)
+        stage_end_indices = log_df.index[log_df["stage"] == "RESUME"].tolist()
+        stage_end_indices.append(log_df.index[-1])
+        positions = np.searchsorted(non_resume_indices, stage_end_indices, side="right") - 1
+        positions = positions[positions >= 0]
+        return log_df.loc[non_resume_indices[positions]].reset_index(drop=True)
 
     def format_iteration_log(self, history=None, printed_only=True, include_header=True) -> str:
         """Return the iteration log as formatted text.
@@ -382,7 +422,7 @@ class AbstractStoppingCriterion(object):
             return str(current) == str(saved)
         try:
             is_equal = current == saved
-        except Exception:
+        except (TypeError, ValueError, NotImplementedError):
             is_equal = str(current) == str(saved)
         if isinstance(is_equal, np.ndarray):
             return bool(np.all(is_equal))
@@ -462,8 +502,8 @@ class AbstractStoppingCriterion(object):
         )
         try:
             resume_format_version = int(resume_format_version)
-        except (TypeError, ValueError):
-            raise ParameterError("resume data has invalid _resume_format_version.")
+        except (TypeError, ValueError) as exc:
+            raise ParameterError("resume data has invalid _resume_format_version.") from exc
         if resume_format_version != self._RESUME_FORMAT_VERSION:
             raise ParameterError(
                 "resume data uses checkpoint format version %d; expected %d."
