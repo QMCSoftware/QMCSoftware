@@ -3,8 +3,8 @@ from io import BytesIO
 import os
 import sys
 from urllib.request import urlopen
-from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
-from qmcpy.util import ParameterError
+from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from ...util import ParameterError
 from tqdm import tqdm
 import numpy as np
 import torch
@@ -32,7 +32,7 @@ class MPMC(AbstractLDDiscreteDistribution):
     Requires PyTorch and PyTorch Geometric. Install with:
     
         pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-        pip install torch-geometric torch-scatter torch-cluster
+        pip install pyg_lib torch-geometric
     
     For GPU support or platform-specific details, see https://pytorch.org/get-started/locally/
     

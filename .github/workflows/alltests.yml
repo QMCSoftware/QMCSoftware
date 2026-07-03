@@ -30,11 +30,13 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          REF_NAME: ${{ github.ref_name }}
+          REF_NAME: ${{ github.ref_name }}  # branch name
           BASE_REF: ${{ github.base_ref }}
         run: |
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            full_sweep=true
+          elif [[ "$REF_NAME" == mcpmc* ]]; then  
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
@@ -255,6 +257,12 @@ jobs:
         shell: pwsh
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
+      - name: Install MPMC dependencies
+        run: |
+          python scripts/install_mpmc_pyg.py
+      - name: Validate MPMC dependencies
+        run: |
+          python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
       # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
@@ -337,16 +345,8 @@ jobs:
           else
             echo "Skipping umbridge doctests because Docker is not available on this runner"
           fi
-      - name: run MPMC doctests on Linux only
-        shell: bash -l {0}
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            python -m pip install pdm-backend
-            python -m pip install --no-build-isolation -e .[test_mpmc]
-            make doctests_mpmc
-          else
-            echo "MPMC doctests only run on Linux"
-          fi
+      - name: Run MPMC doctests
+        run: make doctests_mpmc
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
@@ -366,6 +366,7 @@ jobs:
           files: >-
             ./artifacts/coverage/unit/coverage.json,
             ./artifacts/coverage/doctests/minimal/coverage.json,
+            ./artifacts/coverage/doctests/mpmc/coverage.json,
             ./artifacts/coverage/doctests/torch/coverage.json,
             ./artifacts/coverage/doctests/gpytorch/coverage.json,
             ./artifacts/coverage/doctests/botorch/coverage.json

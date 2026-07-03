@@ -6,6 +6,7 @@ PATH
 raw.githubusercontent.com/*
 packages.svg
 classes.svg
+*.dot
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/

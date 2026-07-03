@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 torch = pytest.importorskip("torch")
-pytest.importorskip("torch_cluster")
+pytest.importorskip("pyg_lib")
 pytest.importorskip("torch_geometric")
 
 from qmcpy.discrete_distribution.mpmc import utils as mpmc_utils
