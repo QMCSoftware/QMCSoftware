@@ -6,7 +6,6 @@ on:
     branches:
       - develop
       - master
-      - mpmc_os_choi  # temporary
   workflow_dispatch:
 
 concurrency:
@@ -36,6 +35,8 @@ jobs:
         run: |
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            full_sweep=true
+          elif [[ "$REF_NAME" == mcpmc_os_choi* ]]; then
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
@@ -346,8 +347,6 @@ jobs:
           fi
       - name: Run MPMC doctests
         run: make doctests_mpmc
-      - name: Run MPMC unit tests
-        run: python -m pytest -x test/test_dd_mpmc.py
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
