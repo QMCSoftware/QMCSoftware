@@ -273,6 +273,15 @@ jobs:
           else
             echo "umbridge doctests only run on Linux"
           fi
+      - name: run MPMC doctests on Linux only
+        shell: bash -l {0}
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            pip install --no-build-isolation -e .[test_mpmc]
+            make doctests_mpmc
+          else
+            echo "MPMC doctests only run on Linux"
+          fi
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   

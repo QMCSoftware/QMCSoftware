@@ -337,12 +337,12 @@ class TestDigitalNetB2(unittest.TestCase):
                 for alpha in [1,2]:
                     replications = 3 if randomize!="FALSE" else 1
                     dnb2 = DigitalNetB2(dimension=5,replications=replications,randomize=randomize,order=order,alpha=alpha)
-                    x_full = dnb2(16) 
+                    x_full = dnb2(16, warn=False)
                     self.assertEqual(x_full.shape,(replications, 16, 5))
-                    self.assertTrue((x_full[:,:4,:]==dnb2(0,4)).all())
-                    self.assertTrue((x_full[:,4:8,:]==dnb2(4,8)).all())
-                    self.assertTrue((x_full[:,8:16,:]==dnb2(8,16)).all())
-                    self.assertTrue((x_full[:,4:16,:]==dnb2(4,16)).all())
+                    self.assertTrue((x_full[:,:4,:]==dnb2(0,4, warn=False)).all())
+                    self.assertTrue((x_full[:,4:8,:]==dnb2(4,8, warn=False)).all())
+                    self.assertTrue((x_full[:,8:16,:]==dnb2(8,16, warn=False)).all())
+                    self.assertTrue((x_full[:,4:16,:]==dnb2(4,16, warn=False)).all())
 
 
 

@@ -111,7 +111,7 @@ unittests: ensure_artifacts
 		exit 127; \
 	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x \
+	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x $(PYTEST_EXTRA_ARGS) \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
@@ -190,15 +190,31 @@ tests:
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
-	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
+	@OS_NAME=$$(uname -s 2>/dev/null || echo Unknown) && \
+	if [ "$$OS_NAME" = "Linux" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
+	set -e && $(MAKE) $$DOCTESTS_TARGET && $(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS"
 
 # Fast test target: run doctests, unittests, booktests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
 	@make clean_local_only_files && \
+	OS_NAME=$$(uname -s 2>/dev/null || echo Unknown) && \
+	if [ "$$OS_NAME" = "Linux" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
 	set -e && \
-	$(MAKE) doctests_no_docker & \
-	$(MAKE) unittests & \
+	$(MAKE) $$DOCTESTS_TARGET & \
+	$(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS" & \
 	$(MAKE) booktests_parallel_no_docker  & \
 	wait
 	$(MAKE) coverage
