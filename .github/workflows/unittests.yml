@@ -29,17 +29,19 @@ jobs:
             python-version: "3.8"
             run-mpmc: false
           - os: macos-latest
-            python-version: "3.12"
+            python-version: "3.11"
             run-mpmc: true
+
           - os: ubuntu-latest
             python-version: "3.6"
             run-mpmc: false
           - os: ubuntu-latest
             python-version: "3.9"
             run-mpmc: false
-          - os: macos-latest
-            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.12"
             run-mpmc: true
+            
           - os: windows-latest
             python-version: "3.7"
             run-mpmc: false
@@ -60,14 +62,14 @@ jobs:
           use-only-tar-bz2: true
 
       - name: Pin Miniconda base Python (Unix)
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && matrix.run-mpmc
         shell: bash -el {0}
         run: |
           conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
           python --version
 
       - name: Pin Miniconda base Python (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.run-mpmc
         shell: pwsh
         run: |
           conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
