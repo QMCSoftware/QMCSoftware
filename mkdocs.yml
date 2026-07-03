@@ -126,7 +126,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [qmcpy]  # search packages in the src folder
+          paths: [.]  # project root must be on sys.path for `import qmcpy` to work under the `mkdocs` entrypoint
           options:
             members_order: source
             show_root_toc_entry: false
