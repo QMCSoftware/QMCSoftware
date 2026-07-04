@@ -95,6 +95,7 @@ nav:
     - Testing Guidelines: 
       - Local doc tests and unit tests on `qmcpy`: tests.md
       - CI testing and cost control: ci-testing.md
+      - QMCPy MPMC compatibility matrix: mpmc-compatibility.md
       - Unit tests on Jupyter Notebooks: booktests.md
     - JOSS 2026 Paper: paper/paper.md
   
@@ -126,7 +127,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [qmcpy]  # search packages in the src folder
+          paths: [.]  # project root must be on sys.path for `import qmcpy` to work under the `mkdocs` entrypoint
           options:
             members_order: source
             show_root_toc_entry: false

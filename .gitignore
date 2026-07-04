@@ -1,9 +1,12 @@
 # General Python
+.cache/
+PATH
 .pdm-python
 .pytest_cache/
 raw.githubusercontent.com/*
 packages.svg
 classes.svg
+*.dot
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
