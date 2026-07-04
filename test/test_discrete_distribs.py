@@ -48,7 +48,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             IIDStdUniform(d, seed=7),
             Lattice(d, seed=7),
             DigitalNetB2(d, seed=7),
-            Halton(d, seed=7),
+            Halton(d, seed=7, warn=False),
         ]:
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
@@ -346,7 +346,6 @@ class TestDigitalNetB2(unittest.TestCase):
 
 
 
-
 class TestHalton(unittest.TestCase):
     """Unit test for Halton DiscreteDistribution."""
 
@@ -358,7 +357,7 @@ class TestHalton(unittest.TestCase):
         self.assertTrue((x0123[5:7, [1, 3]] == x13).all())
 
     def test_unrandomized(self):
-        x_ur = Halton(dimension=2, randomize=False).gen_samples(4, warn=False)
+        x_ur = Halton(dimension=2, randomize=False, warn=False).gen_samples(4, warn=False)
         x_true = np.array(
             [[0, 0], [1.0 / 2, 1.0 / 3], [1.0 / 4, 2.0 / 3], [3.0 / 4, 1.0 / 9]]
         )

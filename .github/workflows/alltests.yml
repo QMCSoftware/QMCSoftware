@@ -18,40 +18,6 @@ jobs:
   # Feature branches: Linux only
   # Protected branches / PRs into develop or master: full 3-OS sweep
   #============================================================
-  select-matrix:
-    name: Select CI scope
-    runs-on: ubuntu-latest
-    outputs:
-      os-matrix: ${{ steps.scope.outputs.os-matrix }}
-      run-booktests: ${{ steps.scope.outputs.run-booktests }}
-    steps:
-      - name: Decide runner matrix and booktest scope
-        id: scope
-        shell: bash
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          REF_NAME: ${{ github.ref_name }}  # branch name
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          full_sweep=false
-          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
-            full_sweep=true
-          elif [[ "$REF_NAME" == mcpmc* ]]; then  
-            full_sweep=true
-          elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
-            full_sweep=true
-          elif [[ "$REF_NAME" == "develop" || "$REF_NAME" == "master" ]]; then
-            full_sweep=true
-          fi
-
-          if [[ "$full_sweep" == "true" ]]; then
-            echo 'os-matrix=["windows-latest","macos-latest","ubuntu-latest"]' >> "$GITHUB_OUTPUT"
-            echo 'run-booktests=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'os-matrix=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
-            echo 'run-booktests=false' >> "$GITHUB_OUTPUT"
-          fi
-
   tests:
     needs: select-matrix
     name: All Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
@@ -70,18 +36,6 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-      - name: Pin Miniconda base Python (Unix)
-        if: runner.os != 'Windows'
-        shell: bash -el {0}
-        run: |
-          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
-          python --version
-      - name: Pin Miniconda base Python (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
-          python --version
       
       # -----------------------------------------------------------
       # Clean old coverage files
@@ -271,15 +225,32 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super
+          
       - name: Install minimal LaTeX (macOS)
         if: runner.os == 'macOS' && env.RUN_BOOKTESTS == 'true'
         run: |
-          brew install --cask basictex
+          retry_cmd () {
+            local max_attempts="$1"
+            shift
+            local attempt=1
+            until "$@"; do
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "Command failed after ${max_attempts} attempts: $*"
+                return 1
+              fi
+              echo "Attempt ${attempt}/${max_attempts} failed for: $*"
+              echo "Retrying in 20s..."
+              sleep 20
+              attempt=$((attempt + 1))
+            done
+          }
+
+          retry_cmd 3 brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
       - name: Cache MiKTeX (Windows)
-        if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
+        if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
           path: C:\Program Files\MiKTeX
@@ -291,35 +262,40 @@ jobs:
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
         run: |
-          $ErrorActionPreference = "Continue"
-          choco install miktex -y --no-progress --execution-timeout=600
-          choco install strawberryperl -y --no-progress
+          $ErrorActionPreference = "Stop"
+
+          function Invoke-WithRetry {
+            param(
+              [scriptblock]$Script,
+              [int]$MaxAttempts = 3,
+              [int]$DelaySeconds = 20
+            )
+            for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+              try {
+                & $Script
+                return
+              } catch {
+                if ($attempt -eq $MaxAttempts) { throw }
+                Write-Host "Attempt $attempt/$MaxAttempts failed. Retrying in $DelaySeconds seconds..."
+                Start-Sleep -Seconds $DelaySeconds
+              }
+            }
+          }
+
+          Invoke-WithRetry -Script { choco install miktex -y --no-progress --execution-timeout=600 }
+          Invoke-WithRetry -Script { choco install strawberryperl -y --no-progress }
           # Put MiKTeX on PATH for all subsequent steps
           echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # Refresh PATH in current session
           $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
           # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
-          initexmf --admin --set-config-value [MPM]AutoInstall=1
-          # Refresh package database + upgrade base with retry
-          $retries = 2
-          for ($i = 1; $i -le $retries; $i++) {
-            try {
-              mpm --admin --update-db
-              mpm --admin --upgrade
-              break
-            } catch {
-              if ($i -eq $retries) { throw }
-              Write-Host "Retry $i/$retries failed, waiting 10s..."
-              Start-Sleep -Seconds 10
-            }
+          Invoke-WithRetry -Script { initexmf --admin --set-config-value [MPM]AutoInstall=1 }
+          # Keep setup lightweight and stable: refresh db, install only required packages.
+          Invoke-WithRetry -Script { mpm --admin --update-db }
+          $packages = @('latexmk','dvipng','cm-super','lmodern','type1cm','tex-gyre')
+          foreach ($pkg in $packages) {
+            Invoke-WithRetry -Script { mpm --admin --install=$pkg }
           }
-          # Install a few common "baseline" MiKTeX packages explicitly
-          mpm --admin --install=latexmk
-          mpm --admin --install=dvipng
-          mpm --admin --install=cm-super
-          mpm --admin --install=lmodern
-          mpm --admin --install=type1cm
-          mpm --admin --install=tex-gyre
           latex --version
           latexmk -v
           dvipng --version
@@ -403,10 +379,11 @@ jobs:
         run: |
           make booktests_parallel_no_docker    # Parsl not supported on Windows
       - name: Run booktests (parallel) on Windows
-        if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
+          # Serial execution is slower but much more stable on Windows notebooks.
+          make booktests_parallel_pytest PYTEST_XDIST="" PYTEST="-m 'not slow'"
 
       # -----------------------------------------------------------
       # Upload coverage to Codecov
