@@ -43,7 +43,7 @@ keywords=[
     "sobol",
     "lattice",
     ]
-license = "Apache-2.0"
+license = {file = "LICENSE"}
 dynamic = ["version"]
 requires-python = ">= 3.5"
 dependencies = [
@@ -65,6 +65,11 @@ botorch = [
 umbridge = [
     "umbridge >= 1.2.1",
     ]
+mpmc = [
+    "torch >= 2.2.0",
+    "pyg_lib >= 0.6.0",
+    "torch-geometric >= 2.6.1",
+]
 test = [
     "pytest >= 9.0.3",
     "pytest-cov >= 6.1.1",
@@ -97,7 +102,13 @@ test_botorch = [
 test_umbridge = [
     "umbridge >= 1.2.4",
     ]
-docs = [
+test_mpmc = [
+    "torch >= 2.2.0",
+    "pyg_lib >= 0.6.0",
+    "torch-geometric >= 2.6.1",
+    ]
+dev_no_mpmc = [ # brew install weasyprint
+    "qmcpy[test,test_torch,test_gpytorch,test_botorch,test_umbridge]",
     "nbval >= 0.10.0",
     "attrs >= 21.0.0",
     "pyyaml >= 6.0",

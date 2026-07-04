@@ -30,11 +30,13 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          REF_NAME: ${{ github.ref_name }}
+          REF_NAME: ${{ github.ref_name }}  # branch name
           BASE_REF: ${{ github.base_ref }}
         run: |
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            full_sweep=true
+          elif [[ "$REF_NAME" == mcpmc* ]]; then  
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
@@ -68,36 +70,6 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-      - name: Pin Miniconda base Python (Unix)
-        if: runner.os != 'Windows'
-        shell: bash -el {0}
-        run: |
-          for i in 1 2 3; do
-            conda install -n base -y -c conda-forge python=${{ matrix.python-version }} && break
-            if [ "$i" -eq 3 ]; then
-              echo "Conda Python pin failed after 3 attempts"
-              exit 1
-            fi
-            echo "Conda Python pin attempt $i failed; retrying in 20s..."
-            sleep 20
-          done
-          python --version
-      - name: Pin Miniconda base Python (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          for ($i = 1; $i -le 3; $i++) {
-            try {
-              conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
-              break
-            } catch {
-              if ($i -eq 3) { throw }
-              Write-Host "Conda Python pin attempt $i/3 failed; retrying in 20s..."
-              Start-Sleep -Seconds 20
-            }
-          }
-          python --version
       
       # -----------------------------------------------------------
       # Clean old coverage files
@@ -273,6 +245,12 @@ jobs:
         shell: pwsh
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
+      - name: Install MPMC dependencies
+        run: |
+          python scripts/install_mpmc_pyg.py
+      - name: Validate MPMC dependencies
+        run: |
+          python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
       # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
@@ -303,9 +281,17 @@ jobs:
 
           retry_cmd 3 brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
-          retry_cmd 3 sudo tlmgr update --self
-          retry_cmd 3 sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
-
+          sudo tlmgr update --self
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+      - name: Cache MiKTeX (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: C:\Program Files\MiKTeX
+          key: ${{ runner.os }}-miktex-${{ hashFiles('.github/workflows/alltests.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-miktex-
+          
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
@@ -369,6 +355,8 @@ jobs:
           else
             echo "Skipping umbridge doctests because Docker is not available on this runner"
           fi
+      - name: Run MPMC doctests
+        run: make doctests_mpmc
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
@@ -388,6 +376,7 @@ jobs:
           files: >-
             ./artifacts/coverage/unit/coverage.json,
             ./artifacts/coverage/doctests/minimal/coverage.json,
+            ./artifacts/coverage/doctests/mpmc/coverage.json,
             ./artifacts/coverage/doctests/torch/coverage.json,
             ./artifacts/coverage/doctests/gpytorch/coverage.json,
             ./artifacts/coverage/doctests/botorch/coverage.json
@@ -423,8 +412,8 @@ jobs:
         shell: bash -l {0}
         run: |
           make booktests_parallel_no_docker    # Parsl not supported on Windows
-      - name: Run booktests (serial) on Windows
-        if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
+      - name: Run booktests (parallel) on Windows
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           # Serial execution is slower but much more stable on Windows notebooks.
