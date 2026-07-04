@@ -30,7 +30,7 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - uses: ts-graphviz/setup-graphviz@v2
-      - run: pip install -e .[docs]
+      - run: pip install -e ".[dev_no_mpmc]"
       - run: make uml
       - run: make copydocs
       - run: mkdocs gh-deploy --force
