@@ -313,3 +313,11 @@ update_pep8_badge:
 	@mkdir -p $(LOG_DIR) docs/assets
 	@make check_pep8 > $(LOG_DIR)/pylint.out
 	@python3 scripts/update_pep8_badge.py $(LOG_DIR)/pylint.out docs/assets/pep8-badge.json docs/assets/pep8-badge.svg
+
+
+##########################################################
+# Formatting
+##########################################################
+
+markdown-unwrap:
+	$(PYTHON) scripts/unwrap_markdown.py "$(MARKDOWN_UNWRAP_PATH)"
