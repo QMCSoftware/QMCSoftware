@@ -1,5 +1,8 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
+PYTEST ?=
+WITH_MPMC ?= 0
+HAS_MPMC ?= $(shell python -c "import importlib.util; mods=('torch','pyg_lib','torch_geometric'); print(int(all(importlib.util.find_spec(m) is not None for m in mods)))" 2>/dev/null || echo 0)
 
 # set environment variable for documentation
 export JUPYTER_PLATFORM_DIRS=1
@@ -111,7 +114,7 @@ unittests: ensure_artifacts
 		exit 127; \
 	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x \
+	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x $(PYTEST_EXTRA_ARGS) \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
@@ -175,7 +178,7 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	COVERAGE_FILE=../../$(BOOKTEST_COV_DIR)/.coverage \
-	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py \
+	python -W ignore -m pytest $(PYTEST_XDIST) $(PYTEST) -v tb_*.py \
 		--cov=qmcpy \
 		--cov-append \
 		--cov-report=term \
@@ -190,15 +193,29 @@ tests:
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
-	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
+	@if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
+	set -e && $(MAKE) $$DOCTESTS_TARGET && $(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS"
 
 # Fast test target: run doctests, unittests, booktests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
 	@make clean_local_only_files && \
+	if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
 	set -e && \
-	$(MAKE) doctests_no_docker & \
-	$(MAKE) unittests & \
+	$(MAKE) $$DOCTESTS_TARGET & \
+	$(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS" & \
 	$(MAKE) booktests_parallel_no_docker  & \
 	wait
 	$(MAKE) coverage
@@ -283,20 +300,26 @@ uml:
 # run ` mkdocs build -v` to debug
 ##########################################################
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
-	@cp -r paper docs/paper
+	@rm -rf docs/paper docs/demos
 	@cp README.md docs/README.md 
 	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
+	@perl -0pi -e 's!\(docs/qmc-software\.md\)!\(qmc-software.md\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
 	@cp community.md docs/community.md 
 	@cp -r demos docs
+	@find docs/demos -mindepth 2 -name README.md -delete
 	@cp -r paper docs
+	@rm -f docs/paper/README.md
+	@./scripts/render_paper_for_mkdocs.sh
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
+	@python scripts/make_qmc_software_page.py
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
 	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
 	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
 	@cp docs/assets/logos/qmcpy_logo.png docs/favicon.ico
+	@cp QMCPy_Shared_Leadership.md docs/
 
 runmkdocserve:
 	@PORT=$${MKDOCS_PORT:-8000}; \
@@ -304,7 +327,7 @@ runmkdocserve:
 		PORT=$$((PORT+1)); \
 	done; \
 	echo "Starting mkdocs on http://127.0.0.1:$$PORT"; \
-	JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
+	NO_MKDOCS_2_WARNING=1 JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
 	
 doc: uml copydocs runmkdocserve
 

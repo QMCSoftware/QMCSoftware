@@ -3,8 +3,8 @@ from io import BytesIO
 import os
 import sys
 from urllib.request import urlopen
-from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
-from qmcpy.util import ParameterError
+from ..abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from ...util import ParameterError
 from tqdm import tqdm
 import numpy as np
 import torch
@@ -32,7 +32,7 @@ class MPMC(AbstractLDDiscreteDistribution):
     Requires PyTorch and PyTorch Geometric. Install with:
     
         pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-        pip install torch-geometric torch-scatter torch-cluster
+        pip install pyg_lib torch-geometric
     
     For GPU support or platform-specific details, see https://pytorch.org/get-started/locally/
     
@@ -257,6 +257,14 @@ class MPMC(AbstractLDDiscreteDistribution):
 
     def _spawn(self, child_seed, dimension):
         """Spawn a child generator with same config (QMCPy hook)."""
+        child_weights = None
+        if self.weights is not None:
+            child_weights = self.weights.detach().cpu().tolist()
+            if dimension < len(child_weights):
+                child_weights = child_weights[:dimension]
+            elif dimension > len(child_weights):
+                child_weights = child_weights + [child_weights[-1]] * (dimension - len(child_weights))
+
         return MPMC(
             randomize=self.randomize,
             seed=child_seed,
@@ -270,7 +278,7 @@ class MPMC(AbstractLDDiscreteDistribution):
             start_reduce=self.start_reduce,
             radius=self.radius,
             loss_fn=self.loss_fn,
-            weights=self.weights.detach().cpu().tolist() if self.weights is not None else None,
+            weights=child_weights,
             use_pretrained=self.use_pretrained,
             pretrained_local_dir=self.pretrained_local_dir,
             pretrained_base_url=self.pretrained_base_url,

@@ -1,7 +1,6 @@
 import torch
 from torch import nn
-from torch_cluster import radius_graph
-from torch_geometric.nn import MessagePassing, InstanceNorm
+from torch_geometric.nn import MessagePassing, InstanceNorm, radius_graph
 
 from .utils import (
     L2star, L2ctr, L2ext, L2per, L2sym, L2mix,

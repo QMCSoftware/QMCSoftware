@@ -5,6 +5,8 @@ PATH
 .pytest_cache/
 raw.githubusercontent.com/*
 packages.svg
+classes.svg
+*.dot
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
@@ -71,6 +73,7 @@ coverage-data/*
 docs/_site
 docs/Gemfile.lock
 site/
+/.cache
 
 # Sphinx
 sphinx/_build/
@@ -116,3 +119,8 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
+
+/qmc-software.html
+/qmc-software_files/
+/.quarto-watch-logs/
