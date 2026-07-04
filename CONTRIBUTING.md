@@ -35,9 +35,7 @@ pip install -e ".[dev]"
 
 ### 📚 Using `qmcpy` in courses (`class` extra)
 
-`qmcpy` provides a `class` optional dependency group that installs a
-complete teaching environment (JupyterLab, plotting, statistics, and utilities)
-in addition to `qmcpy` itself.
+`qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
 
 For a typical course setup, you can do:
 ```bash
