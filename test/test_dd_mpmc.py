@@ -208,7 +208,7 @@ class TestDiscreteDistributionMPMC(unittest.TestCase):
             randomize="shift",
             seed=11,
             nbatch=2,
-            loss_fn="L2star",
+            loss_fn="L2star_weighted",
             weights=[0.2, 0.8],
             use_pretrained=False,
         )
