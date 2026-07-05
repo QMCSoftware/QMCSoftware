@@ -49,8 +49,8 @@ class BrownianMotion(Gaussian):
 
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge')
         >>> true_measure(2)
-        array([[-0.29376184,  0.41054648,  0.13428456,  0.3095377 ],
-               [-0.32948661, -1.19527027, -1.17959535, -1.58454187]])
+        array([[-0.02048429,  0.41054648, -0.13899299,  0.3095377 ],
+               [-0.38732442, -1.19527027, -1.12175754, -1.58454187]])
         >>> true_measure
         BrownianMotion (AbstractTrueMeasure)
             time_vec        [0.25 0.5  0.75 1.  ]
@@ -68,14 +68,14 @@ class BrownianMotion(Gaussian):
         >>> x.shape
         (3, 2, 4)
         >>> x
-        array([[[ 0.20967731,  0.52848898, -0.03955369, -0.17751616],
-                [ 0.60733712,  0.96872916,  1.82256178,  2.21516041]],
+        array([[[ 0.04920439,  0.52848898,  0.12091923, -0.17751616],
+                [ 0.71498158,  0.96872916,  1.71491732,  2.21516041]],
         <BLANKLINE>
-               [[-0.08220913, -0.48324258,  0.03000249, -0.19149823],
-                [-0.13637543,  1.03215652,  0.59673736,  0.62971114]],
+               [[ 0.12575161, -0.48324258, -0.17795825, -0.19149823],
+                [ 0.28188179,  1.03215652,  0.17848014,  0.62971114]],
         <BLANKLINE>
-               [[ 0.82975853,  1.10849282,  1.10891366,  1.02092441],
-                [-0.12663949, -0.23324496, -0.37900074, -0.35202342]]])
+               [[ 0.59845146,  1.10849282,  1.34022073,  1.02092441],
+                [-0.20298903, -0.23324496, -0.3026512 , -0.35202342]]])
 
         With custom monitoring times and passing vdc_ordering=False (reaches all four cases)
 
@@ -92,8 +92,8 @@ class BrownianMotion(Gaussian):
         >>> true_measure.time_vec
         array([0.3, 0.6, 0.8, 1. ])
         >>> true_measure(2)
-        array([[-0.3284993 ,  0.4363325 ,  0.17101142,  0.3095377 ],
-               [-0.37904911, -1.34558221, -1.27695442, -1.58454187]])
+        array([[-0.02913874,  0.4363325 , -0.07341545,  0.3095377 ],
+               [-0.44240726, -1.34558221, -1.22522271, -1.58454187]])
 
         **References:**
 
@@ -220,14 +220,7 @@ class BrownianMotion(Gaussian):
     @staticmethod
     def _van_der_corput(d, t_final):
         """First d van der Corput points multiplied by t_final."""
-        times = np.empty(d)
-        for i in range(d):
-            value, increment, n = 0.0, 0.5, i
-            while n:
-                value += (n & 1) * increment
-                increment *= 0.5
-                n >>= 1
-            times[i] = value
+        times = DigitalNetB2(1, randomize=False, order='GRAY')(d, warn=False).flatten()
         times[0] = 1.0
         return t_final * times
     

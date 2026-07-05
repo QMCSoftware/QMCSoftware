@@ -403,8 +403,8 @@ class TestBrownianMotion(unittest.TestCase):
         # Expected output based on fixed seed
         expected_samples = np.array(
             [
-                [-0.29376184, 0.41054648, 0.13428456, 0.3095377],
-                [-0.32948661, -1.19527027, -1.17959535, -1.58454187],
+                [-0.02048429,  0.41054648, -0.13899299,  0.3095377 ],
+                [-0.38732442, -1.19527027, -1.12175754, -1.58454187],
             ]
         )
 
@@ -460,11 +460,11 @@ class TestBrownianMotion(unittest.TestCase):
 
         mean = w_0 + (t[0] - 0.0) / (t[1] - 0.0) * (w_2 - w_0)
         std  = np.sqrt((t[0] - 0.0) * (t[1] - t[0]) / (t[1] - 0.0))
-        w_1  = mean + std * z_3
+        w_1  = mean + std * z_4
 
         mean = w_2 + (t[2] - t[1]) / (t[3] - t[1]) * (w_4 - w_2)
         std  = np.sqrt((t[2] - t[1]) * (t[3] - t[2]) / (t[3] - t[1]))
-        w_3  = mean + std * z_4
+        w_3  = mean + std * z_3
 
         expected = np.concatenate([w_1, w_2, w_3, w_4], axis=-1)
 
@@ -478,7 +478,7 @@ class TestBrownianMotion(unittest.TestCase):
     def test_brownian_bridge_manual_replications_d3(self):
         """Manually construct a d=3 BrownianBridge path and compare with the automated version."""
         d, n, reps = 3, 4, 2
-        # default sampling order is van der Corput [1, 1/2, 1/4]
+        # default sampling order is van der Corput [1, 1/2, 3/4]
 
         # Automated result (suppress warning)
         with warnings.catch_warnings():
@@ -502,11 +502,11 @@ class TestBrownianMotion(unittest.TestCase):
 
         mean = w_0 + (0.5 - 0.0) / (1.0 - 0.0) * (w_3 - w_0)
         std = np.sqrt((0.5 - 0.0) * (1.0 - 0.5) / (1.0 - 0.0))
-        w_2 = mean + std * z_2
+        w_1 = mean + std * z_2
 
-        mean = w_0 + (0.25 - 0.0) / (0.5 - 0.0) * (w_2 - w_0)
-        std = np.sqrt((0.25 - 0.0) * (0.5 - 0.25) / (0.5 - 0.0))
-        w_1 = mean + std * z_3
+        mean = w_1 + (0.75 - 0.5) / (1.0 - 0.5) * (w_3 - w_1)
+        std = np.sqrt((0.75 - 0.5) * (1.0 - 0.75) / (1.0 - 0.5))
+        w_2 = mean + std * z_3
 
         expected = np.concatenate([w_1, w_2, w_3], axis=-1)
 
