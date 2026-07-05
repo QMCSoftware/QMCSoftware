@@ -129,13 +129,15 @@ class BrownianMotion(Gaussian):
 
                 - `'PCA'` for principal component analysis,
                 - `'Cholesky'` for cholesky decomposition, or
-                - `'BrownianBridge'` for brownian bridge construction.
+                - `'BrownianBridge'` or `'Bridge'` for brownian bridge construction.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
             monitoring_times (Union[np.ndarray, list]): Optional sampling times for `'BrownianBridge'` 
                 with length d. The given order is the insertion order.
             vdc_ordering (bool): For `'BrownianBridge'` when monitoring_times is specified. If True, 
             monitoring_times is sorted and inserted in van der Corput order. 
         """
+        if str(decomp_type).upper() == "BRIDGE":
+            decomp_type = "BrownianBridge"
         self.parameters = ["time_vec", "drift", "mean", "covariance", "decomp_type"]
         # default to transform from standard uniform
         self.domain = np.array([[0, 1]])
