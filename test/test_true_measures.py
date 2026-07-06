@@ -525,7 +525,7 @@ class TestBrownianMotion(unittest.TestCase):
 
         automated = BrownianMotion(
             DigitalNetB2(d, seed=self.seed, replications=reps),
-            decomp_type="BrownianBridge", monitoring_times=times, vdc_ordering=False
+            decomp_type="BrownianBridge", monitoring_times=times, bridge_vdc_gray_ordering=False
         )
         samples = automated.gen_samples(n)
 

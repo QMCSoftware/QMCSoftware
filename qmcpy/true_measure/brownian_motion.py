@@ -77,9 +77,9 @@ class BrownianMotion(Gaussian):
                [[ 0.59845146,  1.10849282,  1.34022073,  1.02092441],
                 [-0.20298903, -0.23324496, -0.3026512 , -0.35202342]]])
 
-        With custom monitoring times and passing vdc_ordering=False (reaches all four cases)
+        With custom monitoring times and passing bridge_vdc_gray_ordering=False (reaches all four cases)
 
-        >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8],vdc_ordering=False)        
+        >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8],bridge_vdc_gray_ordering=False)        
         >>> true_measure.time_vec
         array([0.3, 0.6, 0.8, 1. ])
         >>> true_measure(2)
@@ -113,7 +113,7 @@ class BrownianMotion(Gaussian):
         decomp_type="PCA",
         lazy_decomp=True,
         monitoring_times=None,
-        vdc_ordering=True,
+        bridge_vdc_gray_ordering=True,
     ):
         r"""
         Args:
@@ -133,7 +133,7 @@ class BrownianMotion(Gaussian):
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
             monitoring_times (Union[np.ndarray, list]): Optional sampling times for `'BrownianBridge'` 
                 with length d. The given order is the insertion order.
-            vdc_ordering (bool): For `'BrownianBridge'` when monitoring_times is specified. If True, 
+            bridge_vdc_gray_ordering (bool): For `'BrownianBridge'` when monitoring_times is specified. If True, 
             monitoring_times is sorted and inserted in van der Corput order. 
         """
         if str(decomp_type).upper() == "BRIDGE":
@@ -146,8 +146,8 @@ class BrownianMotion(Gaussian):
         self.initial_value = initial_value
         self.drift = drift
         self.diffusion = diffusion
-        self.vdc_ordering = vdc_ordering
-        self._bridge_times = self._get_monitoring_times(monitoring_times, decomp_type, vdc_ordering)
+        self.bridge_vdc_gray_ordering = bridge_vdc_gray_ordering
+        self._bridge_times = self._get_monitoring_times(monitoring_times, decomp_type, bridge_vdc_gray_ordering)
         self.time_vec = np.sort(self._bridge_times)
         self.diffused_sigma_bm = self.diffusion * np.minimum.outer(
             self.time_vec, self.time_vec
@@ -189,7 +189,7 @@ class BrownianMotion(Gaussian):
             decomp_type=self.decomp_type,
             lazy_decomp=self.lazy_decomp,
             monitoring_times=monitoring_times,
-            vdc_ordering=False,
+            bridge_vdc_gray_ordering=False,
         )
 
     def _transform(self, x):
@@ -199,7 +199,7 @@ class BrownianMotion(Gaussian):
             return self.drift_time_vec_plus_init + np.sqrt(self.diffusion) * w
         return super()._transform(x)
 
-    def _get_monitoring_times(self, monitoring_times, decomp_type, vdc_ordering):
+    def _get_monitoring_times(self, monitoring_times, decomp_type, bridge_vdc_gray_ordering):
         """Return d monitoring times"""
         if decomp_type.upper() != "BROWNIANBRIDGE":
             if monitoring_times is not None:
@@ -214,7 +214,7 @@ class BrownianMotion(Gaussian):
             raise ParameterError("monitoring_times must be positive.")
         if np.unique(s).size != self.d:
             raise ParameterError("monitoring_times must be distinct.")
-        if vdc_ordering:
+        if bridge_vdc_gray_ordering:
             ranks = np.argsort(np.argsort(self._van_der_corput(self.d, self.t)))
             return np.sort(s)[ranks]
         return s
