@@ -1,6 +1,6 @@
 # Good Practices for Contributors
 
-This page collects the contribution expectations that help QMCPy stay numerically correct, reproducible, and reviewable. Use it together with the [contributing guide](CONTRIBUTING.md), the [test targets guide](tests.md), and the [notebook test guide](booktests.md).
+This page collects the contribution expectations that help QMCPy stay numerically correct, reproducible, and reviewable. Use it together with the [contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/), the [test targets guide](tests.md), and the [notebook test guide](booktests.md).
 
 ## Start from an issue and keep the scope clear
 
