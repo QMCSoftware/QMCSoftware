@@ -273,6 +273,8 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
 	@perl -0pi -e 's!\(docs/qmc-software\.md\)!\(qmc-software.md\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
+	@# Rewrite repo-root-relative link for the copied MkDocs page.
+	@perl -0pi -e 's!\(docs/good_practices\.md\)!\(good_practices.md\)!g' docs/CONTRIBUTING.md
 	@cp community.md docs/community.md 
 	@cp -r demos docs
 	@find docs/demos -mindepth 2 -name README.md -delete
