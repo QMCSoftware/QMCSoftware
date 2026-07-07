@@ -13,7 +13,7 @@
 To execute an individual testbook file, e.g., `tb_JSC_Sorokin_2026.py`, run the following command in a terminal:
 
 ```{bash}
-    cd test/booktests && python -m pytest tb__Sorokin_2026.py -v
+    cd test/booktests && python -m pytest tb_JSC_Sorokin_2026.py -v
 ```
 
 To execute all testbook files sequentially, run the following command in a terminal:
