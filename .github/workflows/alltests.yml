@@ -266,10 +266,24 @@ jobs:
       - name: Install minimal LaTeX (macOS)
         if: runner.os == 'macOS' && env.RUN_BOOKTESTS == 'true'
         run: |
+          retry_cmd () {
+            local retries="$1"
+            shift
+            local attempt=1
+            until "$@"; do
+              if [ "$attempt" -ge "$retries" ]; then
+                return 1
+              fi
+              echo "Retry $attempt/$retries failed, waiting 15s..."
+              sleep 15
+              attempt=$((attempt+1))
+            done
+          }
+          texlive_repo="https://mirror.ctan.org/systems/texlive/tlnet"
           brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
-          sudo tlmgr update --self
-          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+          retry_cmd 3 sudo tlmgr --repository "$texlive_repo" update --self
+          retry_cmd 3 sudo tlmgr --repository "$texlive_repo" install latexmk dvipng collection-fontsrecommended type1cm
       - name: Cache MiKTeX (Windows)
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         uses: actions/cache@v4
