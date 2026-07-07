@@ -27,7 +27,7 @@ jobs:
 
       - name: Install project with lint dependencies
         run: |
-          python -m pip install -e ".[docs]"
+          python -m pip install -e . "pylint>=4.0.5"
       - name: Run check_pep8
         run: |
           set -o pipefail
