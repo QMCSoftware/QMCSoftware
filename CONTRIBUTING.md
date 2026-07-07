@@ -4,6 +4,8 @@ Thank you for your interest in contributing to the QMCPy package!
 
 Please submit **pull requests (PRs)** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
 
+After a feature branch has been successfully merged, it is best practice to delete it. This action keeps the repository tidy and prevents the accumulation of stale branches.
+
 For planned releases, open related PRs with enough lead time so review can begin at least one week before the release date.
 
 For complex or mathematical contributions, schedule at least one PR review meeting before merging. 
@@ -33,9 +35,7 @@ pip install -e ".[dev]"
 
 ### 📚 Using `qmcpy` in courses (`class` extra)
 
-`qmcpy` provides a `class` optional dependency group that installs a
-complete teaching environment (JupyterLab, plotting, statistics, and utilities)
-in addition to `qmcpy` itself.
+`qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
 
 For a typical course setup, you can do:
 ```bash
