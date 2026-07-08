@@ -2,9 +2,13 @@
 
 Thank you for your interest in contributing to the QMCPy library! This library is the product of many hours of labor from many contributors. Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com).
 
-## Good practices
+## Good Practices
 
 To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](https://qmcsoftware.github.io/QMCSoftware/good_practices/) to acquaint yourself with them.
+
+### AI-Assisted Contributions
+
+QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI substantively affects your code, tests, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
 
 ### Issues 
 
@@ -14,7 +18,7 @@ All improvements to QMCPy should be connected to an **issue** using a template f
 
 - If you identify an improvement that is not in an issue, you may submit an issue yourself.
 
-### Feature branches
+### Feature Branches
 
 If you have not yet installed the QMCPy library, see [Installation](#installation) below.
 
@@ -48,7 +52,7 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
-## 📚 Using `qmcpy` in courses (`class` extra)
+## 📚 Using `qmcpy` In Courses (`class` Extra)
 
 `qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
 
@@ -119,7 +123,7 @@ Please see the targets in the makefile for more granular control over tests.
 
 ## Documentation
 
-### Ensure `pyreverse` is on your PATH
+### Ensure `pyreverse` Is On Your PATH
 
 `pyreverse` must be available as a command-line tool. If it is not, verify your PATH as below.
 
@@ -159,7 +163,7 @@ python -m site --user-base
 
 You can update PATH via System settings or in your PowerShell profile (`$PROFILE`).
 
-### Build the documentation
+### Build the Documentation
 
 On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `make`):
 
@@ -167,7 +171,7 @@ On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `mak
 make doc
 ~~~
 
-### Download PDF documentation
+### Download PDF Documentation
 
 In the built HTML documentation:
 

@@ -1,6 +1,6 @@
 # Good Practices for Contributors
 
-This page collects the shared contribution expectations that help QMCPy stay scientifically correct, reproducible, and reviewable. Use it together with the [contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/), which covers repository workflow and local setup, plus the [test targets guide](tests.md) and the [notebook test guide](booktests.md).
+This page collects the shared contribution expectations that help QMCPy stay scientifically correct, reproducible, and reviewable. Use it together with the [contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/), which covers repository workflow and local setup, plus the [AI-assisted contributions policy](ai-assisted-contributions.md), the [test targets guide](tests.md), and the [notebook test guide](booktests.md).
 
 ## Start from an Issue and Keep the Scope Clear
 
@@ -95,6 +95,7 @@ Request review when the contribution is ready for technical evaluation, not whil
 
 - Open a **draft PR** if you want early feedback on design, mathematics, or scope.
 - Request formal review only after the relevant tests pass locally and the required docstrings, docs, and notebooks are in place.
+- If AI tools substantively affected the change, disclose that use in the PR description and summarize what you independently verified.
 - Summarize the numerical goal, API impact, issue link, and commands you ran in the PR description.
 - If you changed CI, dependency pins, notebook runtime, or external data references, explain that scope explicitly in the PR description.
 - Call out any remaining risks, approximations, or open questions explicitly.
