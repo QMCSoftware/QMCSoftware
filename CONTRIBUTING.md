@@ -8,7 +8,7 @@ To preserve the integrity of this library, we have instituted some good practice
 
 ### AI-Assisted Contributions
 
-QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI substantively affects your code, tests, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
+QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI affects your code, tests, demos, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
 
 ### Issues 
 
@@ -22,7 +22,7 @@ All improvements to QMCPy should be connected to an **issue** using a template f
 
 If you have not yet installed the QMCPy library, see [Installation](#installation) below.
 
-You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two members of our team plus GitHub Copilot. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two members of our team. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
 
 After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
 

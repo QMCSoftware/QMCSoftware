@@ -12,7 +12,6 @@ QMCPy welcomes AI assistance for drafting, refactoring, editing, test scaffoldin
 
 - Do not commit unverified AI-generated citations, equations, benchmark claims, or other technical assertions.
 - Do not paste secrets, credentials, private datasets, unpublished manuscripts, reviewer-confidential material, or other nonpublic information into external AI tools without prior approval from the maintainers ([qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)).
-- If a PR contains code, documentation, figures, or other content intended for a publication whose review rules prohibit AI use by reviewers, the PR creator must state that restriction clearly in the PR, and reviewers of that PR must not use AI tools.
 
 ## Required Pull Request Disclosure
 
@@ -34,7 +33,6 @@ The template gives reviewers a fast summary of scope, verification, and AI use. 
 | `Commands run` | The exact checks you ran locally | `pytest test/fasttests/test_halton.py -q` |
 | `AI tools and affected areas` | The tool and the parts of the PR it influenced | Copilot suggested a refactor in `qmcpy/stopping_criterion/foo.py` and a test skeleton in `test/foo/test_bar.py` |
 | `Independent verification performed` | What you personally checked instead of trusting the AI output | Reviewed the refactor line by line, re-checked the equation against the cited paper, and ran the fast tests |
-| `Publication-related AI review restriction` | Whether associated publication rules prohibit AI-assisted review | None — or: supports a manuscript under double-blind review at venue X; please review without AI tools |
 
 If no substantive AI assistance was used, check the first box in the `AI Assistance` section and leave the rest blank or write `None`.
 
