@@ -4,6 +4,8 @@ on:
     branches:
       - master
       # - develop
+  workflow_dispatch:
+    
 permissions:
   contents: write
 jobs:
@@ -30,7 +32,7 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - uses: ts-graphviz/setup-graphviz@v2
-      - run: pip install -e .[docs]
+      - run: pip install -e ".[docs]"
       - run: make uml
       - run: make copydocs
       - run: mkdocs gh-deploy --force

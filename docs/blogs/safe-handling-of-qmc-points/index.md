@@ -27,12 +27,7 @@ singularities and to support uncertainty quantification.
 
 ## Introduction
 
-This note arose from a discussion of quasi-Monte Carlo (QMC) and
-randomized quasi-Monte Carlo (RQMC) software during and following the
-plenary tutorial at MCQMC 2020 by Fred Hickernell. Common ways of
-handling IID points can fail to work for (R)QMC points. A longer
-discussion of this point is available at
-[arXiv:2008.08051](https://arxiv.org/abs/2008.08051).
+This note arose from a discussion of quasi-Monte Carlo (QMC) and randomized quasi-Monte Carlo (RQMC) software during and following the plenary tutorial at MCQMC 2020 by Fred Hickernell. Common ways of handling IID points can fail to work for (R)QMC points. A longer discussion of this point is available at [arXiv:2008.08051](https://arxiv.org/abs/2008.08051).
 
 QMC sampling methods provide a set of $n$ points in $[0,1]^d$ that we
 can use instead of a sample of $\mathcal{U}[0,1]^d$ points. We can apply
@@ -95,9 +90,7 @@ $$
 
 and $f$ is measurable.
 
-Because (R)QMC points look so similar to plain IID points, many users
-and software implementations handle (R)QMC points in inefficient or even
-unsafe ways that would be no problem for IID points.
+Because (R)QMC points look so similar to plain IID points, many users and software implementations handle (R)QMC points in inefficient or even unsafe ways that would be no problem for IID points.
 
 ## Sample Sizes
 
@@ -147,9 +140,7 @@ values in $[0,1/2)$ and values in $[1/2,1)$. Taking every second point
 would ignore half of the domain. The first component of a Sobol'
 sequence is ordinarily the van der Corput sequence.
 
-Thinning (R)QMC points can be extremely dangerous. It should not be done
-without some very careful mathematical explanation of why it might be ok
-in some special setting.
+Thinning (R)QMC points can be extremely dangerous. It should not be done without some very careful mathematical explanation of why it might be ok in some special setting.
 
 ## van der Corput Sequences
 
@@ -186,8 +177,4 @@ are no especially good ranges. It may even be advantageous to use a very
 large burn-in for the Halton sequence because the initial points for
 large $d$ have unpleasant striping artifacts.
 
-It is however safer to randomize the Halton sequence. Scrambling the
-Halton sequence counters those striping artifacts more surely than a
-burn-in would. It also moves the point at the origin to a uniformly
-distributed random point. This is another instance where RQMC is safer
-and more effective than plain QMC.
+It is however safer to randomize the Halton sequence. Scrambling the Halton sequence counters those striping artifacts more surely than a burn-in would. It also moves the point at the origin to a uniformly distributed random point. This is another instance where RQMC is safer and more effective than plain QMC.

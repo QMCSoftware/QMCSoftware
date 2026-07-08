@@ -30,11 +30,13 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          REF_NAME: ${{ github.ref_name }}
+          REF_NAME: ${{ github.ref_name }}  # branch name
           BASE_REF: ${{ github.base_ref }}
         run: |
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            full_sweep=true
+          elif [[ "$REF_NAME" == mcpmc* ]]; then  
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
@@ -68,18 +70,6 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-      - name: Pin Miniconda base Python (Unix)
-        if: runner.os != 'Windows'
-        shell: bash -el {0}
-        run: |
-          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
-          python --version
-      - name: Pin Miniconda base Python (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
-          python --version
       
       # -----------------------------------------------------------
       # Clean old coverage files
@@ -255,6 +245,12 @@ jobs:
         shell: pwsh
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
+      - name: Install MPMC dependencies
+        run: |
+          python scripts/install_mpmc_pyg.py
+      - name: Validate MPMC dependencies
+        run: |
+          python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
       # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
@@ -263,69 +259,129 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y texlive-latex-base texlive-latex-extra texlive-latex-recommended latexmk dvipng cm-super
+          
       - name: Install minimal LaTeX (macOS)
         if: runner.os == 'macOS' && env.RUN_BOOKTESTS == 'true'
         run: |
           retry_cmd () {
-            local retries="$1"
+            local max_attempts="$1"
             shift
             local attempt=1
             until "$@"; do
-              if [ "$attempt" -ge "$retries" ]; then
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "Command failed after ${max_attempts} attempts: $*"
                 return 1
               fi
-              echo "Retry $attempt/$retries failed, waiting 15s..."
-              sleep 15
-              attempt=$((attempt+1))
+              echo "Attempt ${attempt}/${max_attempts} failed for: $*"
+              echo "Retrying in 20s..."
+              sleep 20
+              attempt=$((attempt + 1))
             done
           }
-          texlive_repo="https://mirror.ctan.org/systems/texlive/tlnet"
-          brew install --cask basictex
+
+          retry_cmd 3 brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
-          retry_cmd 3 sudo tlmgr --repository "$texlive_repo" update --self
-          retry_cmd 3 sudo tlmgr --repository "$texlive_repo" install latexmk dvipng collection-fontsrecommended type1cm
+          sudo tlmgr update --self
+          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
       - name: Cache MiKTeX (Windows)
-        if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
+        id: cache-miktex
+        if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
-          path: C:\Program Files\MiKTeX
-          key: ${{ runner.os }}-miktex-${{ hashFiles('.github/workflows/alltests.yml') }}
+          path: |
+            C:\Program Files\MiKTeX
+            C:\ProgramData\MiKTeX
+          key: ${{ runner.os }}-miktex-v2-${{ hashFiles('.github/workflows/alltests.yml') }}
           restore-keys: |
-            ${{ runner.os }}-miktex-
+            ${{ runner.os }}-miktex-v2-
           
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
         run: |
-          $ErrorActionPreference = "Continue"
-          choco install miktex -y --no-progress --execution-timeout=600
-          choco install strawberryperl -y --no-progress
-          # Put MiKTeX on PATH for all subsequent steps
-          echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          # Refresh PATH in current session
-          $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
-          # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
-          initexmf --admin --set-config-value [MPM]AutoInstall=1
-          # Refresh package database + upgrade base with retry
-          $retries = 2
-          for ($i = 1; $i -le $retries; $i++) {
-            try {
-              mpm --admin --update-db
-              mpm --admin --upgrade
-              break
-            } catch {
-              if ($i -eq $retries) { throw }
-              Write-Host "Retry $i/$retries failed, waiting 10s..."
-              Start-Sleep -Seconds 10
+          $ErrorActionPreference = "Stop"
+          $MiKTeXBin = "C:\Program Files\MiKTeX\miktex\bin\x64"
+          $MiKTeXAdminData = "C:\ProgramData\MiKTeX"
+          $HasExactMiKTeXCache = '${{ steps.cache-miktex.outputs.cache-hit }}' -eq 'true'
+
+          function Invoke-WithRetry {
+            param(
+              [scriptblock]$Script,
+              [string]$Description,
+              [int]$MaxAttempts = 3,
+              [int]$DelaySeconds = 20
+            )
+            for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+              $global:LASTEXITCODE = 0
+              try {
+                & $Script
+                if ($LASTEXITCODE -eq 0) {
+                  return
+                }
+                throw "Exit code $LASTEXITCODE"
+              } catch {
+                if ($attempt -eq $MaxAttempts) {
+                  throw "Command failed after $MaxAttempts attempts: $Description`n$($_.Exception.Message)"
+                }
+                Write-Host "Attempt $attempt/$MaxAttempts failed for: $Description"
+                Write-Host $_.Exception.Message
+                Write-Host "Retrying in $DelaySeconds seconds..."
+                Start-Sleep -Seconds $DelaySeconds
+              }
             }
           }
-          # Install a few common "baseline" MiKTeX packages explicitly
-          mpm --admin --install=latexmk
-          mpm --admin --install=dvipng
-          mpm --admin --install=cm-super
-          mpm --admin --install=lmodern
-          mpm --admin --install=type1cm
-          mpm --admin --install=tex-gyre
+
+          $HasMiKTeXTree =
+            (Test-Path (Join-Path $MiKTeXBin 'latex.exe')) -and
+            (Test-Path (Join-Path $MiKTeXBin 'latexmk.exe')) -and
+            (Test-Path (Join-Path $MiKTeXBin 'dvipng.exe')) -and
+            (Test-Path $MiKTeXAdminData)
+          $NeedsPackageBootstrap = (-not $HasExactMiKTeXCache) -or (-not $HasMiKTeXTree)
+
+          if (-not $HasMiKTeXTree) {
+            Invoke-WithRetry -Description "Install MiKTeX via Chocolatey" -Script {
+              choco install miktex -y --no-progress --execution-timeout=1800
+            }
+          } else {
+            Write-Host "Using cached MiKTeX installation."
+          }
+
+          if (-not (Get-Command perl.exe -ErrorAction SilentlyContinue)) {
+            Invoke-WithRetry -Description "Install Strawberry Perl via Chocolatey" -Script {
+              choco install strawberryperl -y --no-progress
+            }
+          }
+
+          # Put MiKTeX on PATH for all subsequent steps
+          echo $MiKTeXBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # Refresh PATH in current session
+          $env:PATH = "$MiKTeXBin;$env:PATH"
+
+          if (-not (Test-Path (Join-Path $MiKTeXBin 'latex.exe'))) {
+            throw "MiKTeX install did not produce latex.exe in $MiKTeXBin"
+          }
+
+          # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
+          Invoke-WithRetry -Description "Configure MiKTeX package auto-install" -Script {
+            initexmf --admin --set-config-value [MPM]AutoInstall=1
+          }
+
+          if ($NeedsPackageBootstrap) {
+            # Fresh or repaired installs need a package DB refresh before the binaries are safe to use.
+            Invoke-WithRetry -Description "Refresh MiKTeX package database" -Script {
+              mpm --admin --update-db
+            }
+            $packages = @('latexmk','dvipng','cm-super','lmodern','type1cm','tex-gyre')
+            foreach ($pkg in $packages) {
+              Invoke-WithRetry -Description "Install MiKTeX package $pkg" -Script {
+                mpm --admin --install=$pkg
+              }
+            }
+          }
+
+          Invoke-WithRetry -Description "Refresh MiKTeX filename database" -Script {
+            initexmf --admin --update-fndb
+          }
           latex --version
           latexmk -v
           dvipng --version
@@ -351,6 +407,8 @@ jobs:
           else
             echo "Skipping umbridge doctests because Docker is not available on this runner"
           fi
+      - name: Run MPMC doctests
+        run: make doctests_mpmc
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------   
@@ -370,6 +428,7 @@ jobs:
           files: >-
             ./artifacts/coverage/unit/coverage.json,
             ./artifacts/coverage/doctests/minimal/coverage.json,
+            ./artifacts/coverage/doctests/mpmc/coverage.json,
             ./artifacts/coverage/doctests/torch/coverage.json,
             ./artifacts/coverage/doctests/gpytorch/coverage.json,
             ./artifacts/coverage/doctests/botorch/coverage.json
@@ -406,10 +465,11 @@ jobs:
         run: |
           make booktests_parallel_no_docker    # Parsl not supported on Windows
       - name: Run booktests (parallel) on Windows
-        if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          make booktests_parallel_pytest PYTEST_XDIST="-n 4" PYTEST="-m 'not slow'"
+          # Serial execution is slower but much more stable on Windows notebooks.
+          make booktests_parallel_pytest PYTEST_XDIST="" PYTEST="-m 'not slow'"
 
       # -----------------------------------------------------------
       # Upload coverage to Codecov
