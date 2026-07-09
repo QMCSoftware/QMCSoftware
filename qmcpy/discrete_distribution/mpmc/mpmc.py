@@ -41,7 +41,7 @@ class MPMC(AbstractLDDiscreteDistribution):
         ...     dimension=2,
         ...     randomize='false',
         ...     seed=7,
-        ...     epochs=5,
+        ...     epochs=100,
         ...     use_pretrained=False,
         ...     prompt_on_missing=False,
         ... )
@@ -53,7 +53,7 @@ class MPMC(AbstractLDDiscreteDistribution):
             dim             2
             randomize       FALSE
             loss_fn         L2star
-            epochs          5
+            epochs          100
             lr              0.001
             nlayers         3
             nhid            32

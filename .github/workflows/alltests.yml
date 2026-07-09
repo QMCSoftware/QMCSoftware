@@ -284,51 +284,103 @@ jobs:
           sudo tlmgr update --self
           sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
       - name: Cache MiKTeX (Windows)
+        id: cache-miktex
         if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
-          path: C:\Program Files\MiKTeX
-          key: ${{ runner.os }}-miktex-${{ hashFiles('.github/workflows/alltests.yml') }}
+          path: |
+            C:\Program Files\MiKTeX
+            C:\ProgramData\MiKTeX
+          key: ${{ runner.os }}-miktex-v2-${{ hashFiles('.github/workflows/alltests.yml') }}
           restore-keys: |
-            ${{ runner.os }}-miktex-
+            ${{ runner.os }}-miktex-v2-
           
       - name: Install minimal LaTeX (Windows)
         if: runner.os == 'Windows' && env.RUN_BOOKTESTS == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
+          $MiKTeXBin = "C:\Program Files\MiKTeX\miktex\bin\x64"
+          $MiKTeXAdminData = "C:\ProgramData\MiKTeX"
+          $HasExactMiKTeXCache = '${{ steps.cache-miktex.outputs.cache-hit }}' -eq 'true'
 
           function Invoke-WithRetry {
             param(
               [scriptblock]$Script,
+              [string]$Description,
               [int]$MaxAttempts = 3,
               [int]$DelaySeconds = 20
             )
             for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+              $global:LASTEXITCODE = 0
               try {
                 & $Script
-                return
+                if ($LASTEXITCODE -eq 0) {
+                  return
+                }
+                throw "Exit code $LASTEXITCODE"
               } catch {
-                if ($attempt -eq $MaxAttempts) { throw }
-                Write-Host "Attempt $attempt/$MaxAttempts failed. Retrying in $DelaySeconds seconds..."
+                if ($attempt -eq $MaxAttempts) {
+                  throw "Command failed after $MaxAttempts attempts: $Description`n$($_.Exception.Message)"
+                }
+                Write-Host "Attempt $attempt/$MaxAttempts failed for: $Description"
+                Write-Host $_.Exception.Message
+                Write-Host "Retrying in $DelaySeconds seconds..."
                 Start-Sleep -Seconds $DelaySeconds
               }
             }
           }
 
-          Invoke-WithRetry -Script { choco install miktex -y --no-progress --execution-timeout=600 }
-          Invoke-WithRetry -Script { choco install strawberryperl -y --no-progress }
+          $HasMiKTeXTree =
+            (Test-Path (Join-Path $MiKTeXBin 'latex.exe')) -and
+            (Test-Path (Join-Path $MiKTeXBin 'latexmk.exe')) -and
+            (Test-Path (Join-Path $MiKTeXBin 'dvipng.exe')) -and
+            (Test-Path $MiKTeXAdminData)
+          $NeedsPackageBootstrap = (-not $HasExactMiKTeXCache) -or (-not $HasMiKTeXTree)
+
+          if (-not $HasMiKTeXTree) {
+            Invoke-WithRetry -Description "Install MiKTeX via Chocolatey" -Script {
+              choco install miktex -y --no-progress --execution-timeout=1800
+            }
+          } else {
+            Write-Host "Using cached MiKTeX installation."
+          }
+
+          if (-not (Get-Command perl.exe -ErrorAction SilentlyContinue)) {
+            Invoke-WithRetry -Description "Install Strawberry Perl via Chocolatey" -Script {
+              choco install strawberryperl -y --no-progress
+            }
+          }
+
           # Put MiKTeX on PATH for all subsequent steps
-          echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo $MiKTeXBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # Refresh PATH in current session
-          $env:PATH = "C:\Program Files\MiKTeX\miktex\bin\x64;$env:PATH"
+          $env:PATH = "$MiKTeXBin;$env:PATH"
+
+          if (-not (Test-Path (Join-Path $MiKTeXBin 'latex.exe'))) {
+            throw "MiKTeX install did not produce latex.exe in $MiKTeXBin"
+          }
+
           # Enable auto-install of missing packages (MiKTeX "just enough TeX" approach)
-          Invoke-WithRetry -Script { initexmf --admin --set-config-value [MPM]AutoInstall=1 }
-          # Keep setup lightweight and stable: refresh db, install only required packages.
-          Invoke-WithRetry -Script { mpm --admin --update-db }
-          $packages = @('latexmk','dvipng','cm-super','lmodern','type1cm','tex-gyre')
-          foreach ($pkg in $packages) {
-            Invoke-WithRetry -Script { mpm --admin --install=$pkg }
+          Invoke-WithRetry -Description "Configure MiKTeX package auto-install" -Script {
+            initexmf --admin --set-config-value [MPM]AutoInstall=1
+          }
+
+          if ($NeedsPackageBootstrap) {
+            # Fresh or repaired installs need a package DB refresh before the binaries are safe to use.
+            Invoke-WithRetry -Description "Refresh MiKTeX package database" -Script {
+              mpm --admin --update-db
+            }
+            $packages = @('latexmk','dvipng','cm-super','lmodern','type1cm','tex-gyre')
+            foreach ($pkg in $packages) {
+              Invoke-WithRetry -Description "Install MiKTeX package $pkg" -Script {
+                mpm --admin --install=$pkg
+              }
+            }
+          }
+
+          Invoke-WithRetry -Description "Refresh MiKTeX filename database" -Script {
+            initexmf --admin --update-fndb
           }
           latex --version
           latexmk -v
