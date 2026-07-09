@@ -36,9 +36,9 @@ jobs:
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             full_sweep=true
-          elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" || "$REF_NAME" == "*_choi") ]]; then
+          elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" || "$REF_NAME" == *_choi) ]]; then
             full_sweep=true
-          elif [[ "$REF_NAME" == "develop" || "$REF_NAME" == "master" || "$REF_NAME" == "*_choi" ]]; then
+          elif [[ "$REF_NAME" == "develop" || "$REF_NAME" == "master" || "$REF_NAME" == *_choi ]]; then
             full_sweep=true
           fi
 
