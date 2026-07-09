@@ -6,7 +6,7 @@ import scipy.stats as stats
 
 from qmcpy import (
     DigitalNetB2,
-    Copula,
+    AbstractCopula,
     ClaytonCopula,
     FrankCopula,
     GaussianCopula,
@@ -14,7 +14,7 @@ from qmcpy import (
     StudentTCopula,
 )
 from qmcpy.true_measure.copula import (
-    Copula as ModuleCopula,
+    AbstractCopula as ModuleAbstractCopula,
     _apply_marginal_ppfs,
     _build_marginal_range,
     _clip_unit_interval,
@@ -93,11 +93,11 @@ def _make_copula(copula_cls, dimension=2, marginals=None, correlation=None, seed
     return copula_cls(correlation=correlation, **common)
 
 
-# Base Copula and helper tests
+# Base AbstractCopula and helper tests
 
 
-def test_copula_is_importable_from_public_module_path():
-    assert ModuleCopula is Copula
+def test_abstract_copula_is_importable_from_public_module_path():
+    assert ModuleAbstractCopula is AbstractCopula
 
 
 def test_public_api_imports_and_normal_usage():
@@ -108,7 +108,7 @@ def test_public_api_imports_and_normal_usage():
         FrankCopula,
         GumbelCopula,
     ]:
-        assert issubclass(copula_cls, Copula)
+        assert issubclass(copula_cls, AbstractCopula)
 
         tm = _make_copula(copula_cls)
         x = tm(8)
@@ -123,16 +123,19 @@ def test_public_api_imports_and_normal_usage():
         assert np.all((0 <= v) & (v <= 1))
 
 
-def test_base_copula_rejects_unimplemented_transform():
-    tm = Copula(DigitalNetB2(2, seed=101), marginals=[stats.uniform(), stats.uniform()])
+def test_abstract_copula_rejects_unimplemented_transform():
+    tm = AbstractCopula(
+        DigitalNetB2(2, seed=101),
+        marginals=[stats.uniform(), stats.uniform()],
+    )
 
     with pytest.raises(MethodImplementationError):
         tm.copula_transform(np.full((3, 2), 0.5))
 
 
-def test_base_copula_rejects_invalid_sampler():
+def test_abstract_copula_rejects_invalid_sampler():
     with pytest.raises(ParameterError, match="sampler"):
-        Copula(object(), marginals=[stats.uniform()])
+        AbstractCopula(object(), marginals=[stats.uniform()])
 
 
 def test_validate_marginals_error_branches():
@@ -1241,7 +1244,10 @@ def test_copula_weight_fallback_warns_once_when_density_methods_are_missing(
     )
 
     assert "_unit_weight_with_warning" not in copula_cls.__dict__
-    assert tm._unit_weight_with_warning.__func__ is Copula._unit_weight_with_warning
+    assert (
+        tm._unit_weight_with_warning.__func__
+        is AbstractCopula._unit_weight_with_warning
+    )
 
     with pytest.warns(UserWarning) as warning_info:
         weights = tm._weight(x)

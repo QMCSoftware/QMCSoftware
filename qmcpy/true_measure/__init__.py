@@ -1,6 +1,6 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from .brownian_motion import BrownianMotion
-from .copula import Copula
+from .copula import AbstractCopula
 from .clayton_copula import ClaytonCopula
 from .frank_copula import FrankCopula
 from .geometric_brownian_motion import GeometricBrownianMotion

@@ -1,5 +1,5 @@
 from .copula import (
-    Copula,
+    AbstractCopula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_dimension,
@@ -10,7 +10,7 @@ from ..discrete_distribution import DigitalNetB2
 import numpy as np
 
 
-class ClaytonCopula(Copula):
+class ClaytonCopula(AbstractCopula):
     r"""
     Clayton copula transform with user supplied marginals.
 
@@ -27,7 +27,7 @@ class ClaytonCopula(Copula):
     where ``A = 1 + sum(phi(u_i))`` over previous coordinates and
     ``phi(u) = u^{-theta} - 1``.
 
-    The base ``Copula`` class then applies each marginal quantile function.
+    The base ``AbstractCopula`` class then applies each marginal quantile function.
     SciPy calls the quantile function ``ppf``.
 
     Clayton copulas have positive lower-tail dependence for ``theta > 0``.

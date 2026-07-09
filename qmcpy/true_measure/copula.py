@@ -6,9 +6,9 @@ from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, MethodImplementationError, ParameterError
 
 
-class Copula(AbstractTrueMeasure):
+class AbstractCopula(AbstractTrueMeasure):
     r"""
-    Base class for copula TrueMeasures.
+    Abstract base class for copula TrueMeasures.
 
     A copula layer maps independent uniform input points to dependent uniform
     points on the unit cube:
@@ -37,7 +37,7 @@ class Copula(AbstractTrueMeasure):
         self.range = _build_marginal_range(self.marginals)
         self._warned_missing_weight = False
 
-        super(Copula, self).__init__()
+        super(AbstractCopula, self).__init__()
 
     def _transform_to_uniform(self, x) -> np.ndarray:
         r"""

@@ -20,9 +20,9 @@ jupyter:
 
 ::: qmcpy.true_measure.scipy_wrapper.SciPyWrapper
 
-## `Copula`
+## `AbstractCopula`
 
-::: qmcpy.true_measure.copula.Copula
+::: qmcpy.true_measure.copula.AbstractCopula
 
 ## `GaussianCopula`
 

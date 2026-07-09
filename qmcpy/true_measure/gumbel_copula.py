@@ -1,5 +1,5 @@
 from .copula import (
-    Copula,
+    AbstractCopula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_dimension,
@@ -10,14 +10,14 @@ from ..discrete_distribution import DigitalNetB2
 import numpy as np
 
 
-class GumbelCopula(Copula):
+class GumbelCopula(AbstractCopula):
     r"""
     Gumbel copula transform with user supplied marginals.
 
     This implementation supports general dimension for ``theta >= 1``. It
     maps independent uniforms to Gumbel-dependent uniforms by numerically
     inverting the conditional CDFs from the inverse Rosenblatt construction.
-    The base ``Copula`` class then applies marginal quantile functions.
+    The base ``AbstractCopula`` class then applies marginal quantile functions.
     SciPy calls the quantile function ``ppf``.
 
     Gumbel copulas have positive upper-tail dependence for ``theta > 1``.

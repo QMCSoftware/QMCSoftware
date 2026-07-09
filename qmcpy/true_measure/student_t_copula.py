@@ -1,5 +1,5 @@
 from .copula import (
-    Copula,
+    AbstractCopula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_correlation_matrix,
@@ -12,7 +12,7 @@ import numpy as np
 import scipy.stats as stats
 
 
-class StudentTCopula(Copula):
+class StudentTCopula(AbstractCopula):
     r"""
     Student-t copula transform with user supplied univariate marginals.
 

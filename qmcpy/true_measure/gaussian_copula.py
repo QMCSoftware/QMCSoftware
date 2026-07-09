@@ -1,5 +1,5 @@
 from .copula import (
-    Copula,
+    AbstractCopula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_correlation_matrix,
@@ -13,7 +13,7 @@ import numpy as np
 from scipy.stats import norm
 
 
-class GaussianCopula(Copula):
+class GaussianCopula(AbstractCopula):
     r"""
     Gaussian copula transform with user supplied univariate marginals.
 

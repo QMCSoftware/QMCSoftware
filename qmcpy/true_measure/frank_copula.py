@@ -1,5 +1,5 @@
 from .copula import (
-    Copula,
+    AbstractCopula,
     _clip_unit_interval,
     _marginal_cdfs_and_logpdf,
     _validate_dimension,
@@ -32,7 +32,7 @@ def _eulerian_coefficients(n):
     return np.array(coefficients, dtype=float)
 
 
-class FrankCopula(Copula):
+class FrankCopula(AbstractCopula):
     r"""
     Frank copula transform with user supplied univariate marginals.
 
@@ -43,7 +43,7 @@ class FrankCopula(Copula):
 
     The transform uses the inverse Rosenblatt construction for the Frank
     Archimedean copula. It maps independent uniforms to dependent uniforms by
-    recursively inverting conditional CDFs. The base ``Copula`` class then
+    recursively inverting conditional CDFs. The base ``AbstractCopula`` class then
     applies each marginal quantile function. SciPy calls the quantile function
     ``ppf``.
 
