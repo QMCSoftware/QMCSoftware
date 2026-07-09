@@ -70,7 +70,7 @@ mkdocs serve
 
 <tr>
   <td><a href="https://snl-dakota.github.io/docs/6.19.0/users/usingdakota/reference/method-sampling-sample_type-low_discrepancy.html">Dakota</a><br><span class="software-desc">Software toolkit for optimization and uncertainty quantification, including support for lattices and digital nets</span></td>
-  <td></td>
+  <td>C++</td>
   <td><span class="status-nowrap">Mature</span></td>
   <td>Pieterjan Robbe</td>
 </tr>
@@ -248,6 +248,13 @@ mkdocs serve
   <td>Python</td>
   <td><span class="status-nowrap">Active</span></td>
   <td>TensorFlow Probability developers</td>
+</tr>
+
+<tr>
+  <td><a href="https://github.com/UM-Bridge/umbridge">UM-Bridge</a><br><span class="software-desc">Software framework for uncertainty quantification and modeling software packages</span></td>
+  <td>Multiple</td>
+  <td><span class="status-nowrap">Active</span></td>
+  <td>UM-Bridge team</td>
 </tr>
 
 </tbody>

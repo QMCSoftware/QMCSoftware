@@ -7,6 +7,7 @@ nav:
   - Components: components.md
   - Contributing: CONTRIBUTING.md
   - Community: community.md
+  - Leadership: QMCPy_Shared_Leadership.md
   - Package Reference:
     - Discrete Distributions: api/discrete_distributions.md
     - True Measures: api/true_measures.md
@@ -23,9 +24,9 @@ nav:
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
     - Resume Feature: demos/demo_resume_data/resume_examples.ipynb
     - Publication Notebooks:
+      - 2026 JSC Paper: demos/talk_paper_demos/JSC_Sorokin_2026/JSC_Sorokin_2026.ipynb
       - 2026 JOSS Paper: demos/talk_paper_demos/JOSS2026/joss2026.ipynb
       - 2025 Sorokin Thesis: demos/talk_paper_demos/SorokinThesis2025/sorokin_thesis_2025.ipynb
-      - 2025 ACM-TOMS Paper: demos/talk_paper_demos/ACMTOMS_Sorokin_2025/acm_toms_sorokin_2025.ipynb
       - 2025 ParslFest:
         - Parallel Implementation: demos/talk_paper_demos/Parslfest_2025/02_parallel.ipynb
         - Sequential Implementation: demos/talk_paper_demos/Parslfest_2025/01_sequential.ipynb
@@ -94,6 +95,7 @@ nav:
     - Testing Guidelines: 
       - Local doc tests and unit tests on `qmcpy`: tests.md
       - CI testing and cost control: ci-testing.md
+      - QMCPy MPMC compatibility matrix: mpmc-compatibility.md
       - Unit tests on Jupyter Notebooks: booktests.md
     - JOSS 2026 Paper: paper/paper.md
   
@@ -125,7 +127,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [qmcpy]  # search packages in the src folder
+          paths: [.]  # project root must be on sys.path for `import qmcpy` to work under the `mkdocs` entrypoint
           options:
             members_order: source
             show_root_toc_entry: false

@@ -12,19 +12,7 @@ May 16, 2023
 
 This post discusses random lattice generating vectors in QMCPy and compares mean, median, and randomly shifted lattice rules.
 
-Generating vectors are used by lattice generators to compute point
-sets. Previous works [1, 2, 3, 4] commonly applied greedy
-component-by-component (CBC) algorithms to construct generating
-vectors. However, this process is dependent on weight vectors and the
-decay of Fourier coefficients. To this end, Takashi Goda and Pierre
-L'Ecuyer suggested in their work [5] that generating vectors do not
-require a predetermined weight vector and a measure of the decay of
-Fourier coefficients to reach high precision; instead, random
-generators can also achieve desirable results. Recently, we implemented
-random generating vectors into QMCPy, and the results were quite
-promising. This blog explores the usage of random generating vectors in
-QMCPy through code examples. Before that, however, we shall consider
-some mathematics behind generating vectors.
+Generating vectors are used by lattice generators to compute point sets. Previous works [1, 2, 3, 4] commonly applied greedy component-by-component (CBC) algorithms to construct generating vectors. However, this process is dependent on weight vectors and the decay of Fourier coefficients. To this end, Takashi Goda and Pierre L'Ecuyer suggested in their work [5] that generating vectors do not require a predetermined weight vector and a measure of the decay of Fourier coefficients to reach high precision; instead, random generators can also achieve desirable results. Recently, we implemented random generating vectors into QMCPy, and the results were quite promising. This blog explores the usage of random generating vectors in QMCPy through code examples. Before that, however, we shall consider some mathematics behind generating vectors.
 
 ## Mathematics of Generating Vectors
 
@@ -70,28 +58,21 @@ of the efficiency of both rules.
 
 ## Code Examples
 
-In this section, we will explore the basic features of the `Lattice`
-class and the `gen_samples` method. For further documentation, see the
-[QMCPy Lattice documentation](https://qmcpy.readthedocs.io/en/latest/algorithms.html#module-qmcpy.discrete_distribution.lattice.lattice).
+In this section, we will explore the basic features of the `Lattice` class and the `gen_samples` method. For further documentation, see the [QMCPy Lattice documentation](https://qmcpy.readthedocs.io/en/latest/algorithms.html#module-qmcpy.discrete_distribution.lattice.lattice).
 
-The generating vector is the core of the `Lattice` object. Currently,
-QMCPy enables the following types of cubature schemes:
+The generating vector is the core of the `Lattice` object. Currently, QMCPy enables the following types of cubature schemes:
 
 1. A hard-coded $d$-dimensional array.
 2. A file that contains a hard-coded generating vector.
 3. A totally random generator produced by integer input.
 
-We will focus on the recently developed third type of generating vector
-because it is a direct application of the mathematics discussed above.
+We will focus on the recently developed third type of generating vector because it is a direct application of the mathematics discussed above.
 
 ## Lattice Declaration and the `gen_samples` Function
 
-A `Lattice` object in QMCPy requires the dimension and the generating
-vector of choice. Other arguments such as `randomize` or `seed` are
-optional.
+A `Lattice` object in QMCPy requires the dimension and the generating vector of choice. Other arguments such as `randomize` or `seed` are optional.
 
-The following code is a short example used to illustrate the declaration
-of a `Lattice` object and the `gen_samples` function.
+The following code is a short example used to illustrate the declaration of a `Lattice` object and the `gen_samples` function.
 
 ```python
 import qmcpy as qp
@@ -217,31 +198,19 @@ Keister integral over each sample size using each type of lattice
 generator. To reduce sampling variance, we repeated the trials $25$
 times and computed the averaged result.
 
-As shown in the plot, the mean of random shifts (green) outperforms the
-random generator using median rules (blue), which in turn outperforms
-the random generator using mean rules (orange). These results support
-findings in [5]. More numerical experiments under different
-circumstances should be conducted before making a conclusion, but
-current work suggests that random lattice generators have a lot of
-potential.
+As shown in the plot, the mean of random shifts (green) outperforms the random generator using median rules (blue), which in turn outperforms the random generator using mean rules (orange). These results support findings in [5]. More numerical experiments under different circumstances should be conducted before making a conclusion, but current work suggests that random lattice generators have a lot of potential.
 
 ## References
 
 1. Korobov, N. M. The approximate computation of multiple integrals.
    *Doklady Akademii Nauk SSSR* 124, 1207-1210 (1959).
 2. Sloan, I. H. QMC integration: beating intractability by weighting
-   the coordinate directions. In *Monte Carlo and Quasi-Monte Carlo
-   Methods 2000* (eds. Fang, K. T., Hickernell, F. J., & Niederreiter,
-   H.) 103-123 (Springer-Verlag, Berlin, 2002).
+the coordinate directions. In *Monte Carlo and Quasi-Monte Carlo Methods 2000* (eds. Fang, K. T., Hickernell, F. J., & Niederreiter, H.) 103-123 (Springer-Verlag, Berlin, 2002).
 3. Kuo, F. Y. Component-by-component constructions achieve the optimal
-   rate of convergence for multivariate integration in weighted Korobov
-   and Sobolev spaces. *Journal of Complexity* 19, 301-320 (2003).
+rate of convergence for multivariate integration in weighted Korobov and Sobolev spaces. *Journal of Complexity* 19, 301-320 (2003).
 4. Nuyens, D. & Cools, R. Fast component-by-component construction. In
-   *Monte Carlo and Quasi-Monte Carlo Methods 2004* (eds. Niederreiter,
-   H. & Talay, D.) 373-387 (Springer-Verlag, Berlin, 2006).
+*Monte Carlo and Quasi-Monte Carlo Methods 2004* (eds. Niederreiter, H. & Talay, D.) 373-387 (Springer-Verlag, Berlin, 2006).
 5. Goda, T. & L'Ecuyer, P. Construction-free median quasi-Monte Carlo
-   rules for function spaces with unspecified smoothness and general
-   weights. *SIAM Journal on Scientific Computing* 44, A2765-A2788
-   (2022). [https://doi.org/10.1137/22M1473625](https://doi.org/10.1137/22M1473625)
+rules for function spaces with unspecified smoothness and general weights. *SIAM Journal on Scientific Computing* 44, A2765-A2788 (2022). [https://doi.org/10.1137/22M1473625](https://doi.org/10.1137/22M1473625)
 6. Keister, B. D. Multidimensional quadrature algorithms. *Computers in
    Physics* 10, 119-122 (1996).
