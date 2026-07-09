@@ -84,6 +84,15 @@ class ProductMeasure(AbstractTrueMeasure):
             )
 
         self.parameters = ["children"]
+        # ProductMeasure uses only the sampler passed directly to ProductMeasure to generate product samples.
+
+        # The child true measures also contain samplers because QMCPy's current
+        # AbstractTrueMeasure interface requires true measures to be constructed with
+        # an attached discrete distribution. Inside ProductMeasure, those child
+        # samplers are not sampled. The children are used for their dimension, range, transform, and weight behavior.
+
+        # A future design could allow samplerless/template child true measures, but
+        # that would require a broader AbstractTrueMeasure API decision
         self.children = list(children)
 
         # Store each child dimension. These dimensions determine where the
