@@ -95,6 +95,15 @@ class BrownianMotion(Gaussian):
         array([[-0.02913874,  0.4363325 , -0.07341545,  0.3095377 ],
                [-0.44240726, -1.34558221, -1.22522271, -1.58454187]])
 
+        With custom output order
+
+        >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8],bridge_output_order='input')
+        >>> true_measure.time_vec
+        array([0.3, 0.6, 0.8, 1. ])
+        >>> true_measure(2)
+        array([[ 0.4363325 ,  0.3095377 , -0.02913874, -0.07341545],
+               [-1.34558221, -1.58454187, -0.44240726, -1.22522271]])
+
         **References:**
 
         1.  Art B. Owen. 
@@ -114,6 +123,7 @@ class BrownianMotion(Gaussian):
         lazy_decomp=True,
         monitoring_times=None,
         bridge_vdc_gray_ordering=True,
+        bridge_output_order='increasing',
     ):
         r"""
         Args:
@@ -131,10 +141,13 @@ class BrownianMotion(Gaussian):
                 - `'Cholesky'` for cholesky decomposition, or
                 - `'BrownianBridge'` or `'Bridge'` for brownian bridge construction.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
-            monitoring_times (Union[np.ndarray, list]): Optional sampling times for `'BrownianBridge'` 
-                with length d. The given order is the insertion order.
+            monitoring_times (Union[np.ndarray, list]): Optional custom sampling times for `'BrownianBridge'` 
+                with length d. The given order is the insertion order if `'bridge_vdc_gray_ordering'` is False.
             bridge_vdc_gray_ordering (bool): For `'BrownianBridge'` when monitoring_times is specified. If True, 
-            monitoring_times is sorted and inserted in van der Corput order. 
+                monitoring_times is sorted to match van der Corput ordering. 
+            bridge_output_order (str): If `'increasing'`, output is returned in increasing order. If `'input'`, 
+                output matches the order given in `'monitoring_times'`. If a custom monitoring times is not given,
+                the output is given in increasing order.
         """
         if str(decomp_type).upper() == "BRIDGE":
             decomp_type = "BrownianBridge"
@@ -147,8 +160,12 @@ class BrownianMotion(Gaussian):
         self.drift = drift
         self.diffusion = diffusion
         self.bridge_vdc_gray_ordering = bridge_vdc_gray_ordering
-        self._bridge_times = self._get_monitoring_times(monitoring_times, decomp_type, bridge_vdc_gray_ordering)
-        self.time_vec = np.sort(self._bridge_times)
+        if str(bridge_output_order).lower() not in ("increasing", "input"):
+            raise ParameterError("bridge_output_order must be 'increasing' or 'input'.")
+        self.bridge_output_order = str(bridge_output_order).lower()
+        self.monitoring_times = monitoring_times
+        self._construction_times = self._get_construction_times(monitoring_times, decomp_type, bridge_vdc_gray_ordering)
+        self.time_vec = np.sort(self._construction_times)
         self.diffused_sigma_bm = self.diffusion * np.minimum.outer(
             self.time_vec, self.time_vec
         )
@@ -167,6 +184,7 @@ class BrownianMotion(Gaussian):
             )
         if self.decomp_type == "BROWNIANBRIDGE":
             self._setup_bridge()  # precompute bridge parameters
+            self._output_order = self._get_output_order()
         if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
             warnings.warn(
                 f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.", 
@@ -179,7 +197,7 @@ class BrownianMotion(Gaussian):
     def _spawn(self, sampler, dimension):
         monitoring_times = None
         if self.decomp_type == "BROWNIANBRIDGE" and dimension == self.d:
-            monitoring_times = self._bridge_times
+            monitoring_times = self.monitoring_times
         return BrownianMotion(
             sampler,
             t_final=self.t, 
@@ -189,18 +207,20 @@ class BrownianMotion(Gaussian):
             decomp_type=self.decomp_type,
             lazy_decomp=self.lazy_decomp,
             monitoring_times=monitoring_times,
-            bridge_vdc_gray_ordering=False,
+            bridge_vdc_gray_ordering=self.bridge_vdc_gray_ordering,
+            bridge_output_order=self.bridge_output_order,
         )
 
     def _transform(self, x):
         if self.decomp_type == "BROWNIANBRIDGE":
             z = norm.ppf(x)
             w = self._bridge_transform(z)
-            return self.drift_time_vec_plus_init + np.sqrt(self.diffusion) * w
+            paths = self.drift_time_vec_plus_init + np.sqrt(self.diffusion) * w
+            return paths[..., self._output_order]
         return super()._transform(x)
 
-    def _get_monitoring_times(self, monitoring_times, decomp_type, bridge_vdc_gray_ordering):
-        """Return d monitoring times"""
+    def _get_construction_times(self, monitoring_times, decomp_type, bridge_vdc_gray_ordering):
+        """Return d construction times"""
         if decomp_type.upper() != "BROWNIANBRIDGE":
             if monitoring_times is not None:
                 raise ParameterError("monitoring_times is only valid with decomp_type='BrownianBridge'.")
@@ -219,6 +239,13 @@ class BrownianMotion(Gaussian):
             return np.sort(s)[ranks]
         return s
     
+    def _get_output_order(self):
+        """Return array for output order"""
+        if self.bridge_output_order == "increasing" or self.monitoring_times is None:
+            return np.arange(self.d)
+        target = np.asarray(self.monitoring_times, dtype=float).flatten()
+        return np.argsort(np.argsort(target))
+    
     @staticmethod
     def _van_der_corput(d, t_final):
         """First d van der Corput points multiplied by t_final."""
@@ -228,7 +255,7 @@ class BrownianMotion(Gaussian):
     
     def _setup_bridge(self):
         """Precompute parameters (Owen Algorithm 6.1)"""
-        s = self._bridge_times
+        s = self._construction_times
         d = self.d
         left = np.full(d, -1, dtype=int)
         right = np.full(d, -1, dtype=int)
@@ -260,7 +287,7 @@ class BrownianMotion(Gaussian):
         self._bridge_a = a
         self._bridge_b = b
         self._bridge_w = w
-        self._bridge_order = np.argsort(s)  # increasing time 
+        self._increasing_order = np.argsort(s)  # increasing time 
 
     def _bridge_transform(self, z):
         """Build Brownian Motion paths (Owen Algorithm 6.2)"""
@@ -276,4 +303,4 @@ class BrownianMotion(Gaussian):
                 paths[..., j] += a[j] * paths[..., left[j]]
             if right[j] >= 0:
                 paths[..., j] += b[j] * paths[..., right[j]]
-        return paths[..., self._bridge_order]
+        return paths[..., self._increasing_order]

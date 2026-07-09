@@ -565,7 +565,7 @@ class TestBrownianMotion(unittest.TestCase):
         )
 
     def test_brownian_bridge_vdc_ordering_matches_default(self):
-        """4 evenly spaced custom times set to match van der Corput ordering should match default"""
+        """Use 4 evenly spaced custom times and compare to van der Corput ordering"""
         d, n = 4, 4
 
         default = BrownianMotion(
@@ -579,7 +579,24 @@ class TestBrownianMotion(unittest.TestCase):
 
         np.testing.assert_almost_equal(
             default, reordered, decimal=10,
-            err_msg="van der Corput reordering of 4 evenly spaced custom times should match default"
+            err_msg="4 evenly spaced custom times should match van der Corput ordering"
+        )
+
+    def test_brownian_bridge_output_order(self):
+        """Test that custom ordered output matches given input and contains same values as increasing output"""
+        times = [0.6, 1.0, 0.3, 0.8]
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            increasing_output = BrownianMotion(DigitalNetB2(4, seed=self.seed),
+                decomp_type="BrownianBridge", monitoring_times=times).gen_samples(8)
+            custom_output = BrownianMotion(DigitalNetB2(4, seed=self.seed),
+                decomp_type="BrownianBridge", monitoring_times=times,
+                bridge_output_order="input").gen_samples(8)
+            
+        np.testing.assert_allclose(
+            custom_output[..., np.argsort(times)], increasing_output,
+            err_msg="custom ordered output should match given input and contain equivalent values to increasing output"
         )
 
     def test_brownian_bridge_warning_for_non_power_of_2(self):
@@ -590,6 +607,36 @@ class TestBrownianMotion(unittest.TestCase):
         samples = bm.gen_samples(4)
         self.assertEqual(samples.shape, (4, 6))
         self.assertEqual(samples.dtype, np.float64)
+
+    def test_brownian_bridge_lazy_decomp_false(self):
+        """BrownianBridge proceeds with lazy_decomp=False"""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            bm = BrownianMotion(DigitalNetB2(6, seed=self.seed),
+                decomp_type="BrownianBridge", lazy_decomp=False
+            )
+            samples = bm.gen_samples(4)
+        self.assertEqual(samples.shape, (4,6))
+
+    def test_brownian_bridge_spawn_matches_parent(self):
+        """Spawn must match parent"""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            bm = BrownianMotion(
+                DigitalNetB2(4, seed=self.seed),
+                decomp_type="BrownianBridge",
+                initial_value=2, drift=3, diffusion=4,
+                monitoring_times=[0.6, 1.0, 0.3, 0.8],
+                bridge_vdc_gray_ordering=True,
+                bridge_output_order="input",
+            )
+            child = bm._spawn(DigitalNetB2(4, seed=self.seed), 4)
+            parent_samples = bm.gen_samples(8)
+            child_samples = child.gen_samples(8)
+        np.testing.assert_array_equal(
+            parent_samples, child_samples,
+            err_msg="samples of a same dimension spawn should match parent samples"
+        )
 
 class TestGeometricBrownianMotion(unittest.TestCase):
     def setUp(self):
