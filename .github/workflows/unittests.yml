@@ -20,26 +20,28 @@ jobs:
     name: Unit Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        include:  # exclude default Python v3.13
-          - os: macos-latest
-            python-version: "3.5"
-          - os: macos-latest
-            python-version: "3.8"
-          - os: macos-latest
-            python-version: "3.11"
-          - os: ubuntu-latest
-            python-version: "3.6"
-          - os: ubuntu-latest
-            python-version: "3.9"
-          - os: ubuntu-latest
-            python-version: "3.12"
-          - os: windows-latest
-            python-version: "3.7"
-          - os: windows-latest
-            python-version: "3.10"
-          - os: windows-latest
-            python-version: "3.14"
+        matrix:
+            include:
+              - os: macos-latest
+                python-version: '3.5'
+              - os: macos-latest
+                python-version: '3.8'
+              - os: macos-latest
+                python-version: '3.11'
+              - os: macos-latest
+                python-version: '3.14'
+              - os: ubuntu-latest
+                python-version: '3.6'
+              - os: ubuntu-latest
+                python-version: '3.9'
+              - os: ubuntu-latest
+                python-version: '3.12'
+              - os: windows-latest
+                python-version: '3.7'
+              - os: windows-latest
+                python-version: '3.10'
+              - os: windows-latest
+                python-version: '3.13'
     steps:
       - uses: actions/checkout@v4
 
@@ -49,7 +51,10 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-
+      
+      # -----------------------------------------------------------
+      # Clean old coverage files
+      # -----------------------------------------------------------
       - name: Remove old coverage data (Unix)
         if: runner.os != 'Windows'
         run: |
@@ -218,11 +223,9 @@ jobs:
         shell: pwsh
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
-
-      - name: Show Python version
-        run: |
-          python --version
-          python -m pip --version
-
+      
+      # -----------------------------------------------------------
+      # Run unittests for Python source files
+      # -----------------------------------------------------------   
       - name: Run unittests (parallel)
         run: make unittests
