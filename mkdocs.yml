@@ -92,6 +92,8 @@ nav:
     - Why Add Q to MC?: blogs/why-add-q-to-mc/index.md
   - For Developers:
     - Release Manual: RELEASE.md
+    - Contribution Good Practices: good_practices.md
+    - AI-Assisted Contributions: ai-assisted-contributions.md
     - Testing Guidelines: 
       - Local doc tests and unit tests on `qmcpy`: tests.md
       - CI testing and cost control: ci-testing.md
