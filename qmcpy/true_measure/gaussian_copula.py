@@ -102,6 +102,8 @@ class GaussianCopula(AbstractCopula):
         # already accounted for by the marginal normal transforms.
         self._corr_inv_minus_eye = np.linalg.inv(self.correlation) - np.eye(self.d)
         _, self._logdet_corr = np.linalg.slogdet(self.correlation)
+
+        
     def _transform_to_uniform(self, x):
         x = np.asarray(x, dtype=float)
         _validate_dimension(x.shape[-1], self.marginals)

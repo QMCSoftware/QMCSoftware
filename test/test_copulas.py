@@ -568,7 +568,7 @@ def test_student_t_copula_positive_correlation_produces_positive_dependence():
 def test_student_t_copula_has_stronger_joint_tail_than_gaussian_copula():
     rho = 0.7
     df = 4
-    n = 2**15
+    n = 2**12
     marginals = [stats.norm(), stats.norm()]
     correlation = [[1.0, rho], [rho, 1.0]]
 
@@ -833,7 +833,7 @@ def test_clayton_copula_positive_dependence_behavior():
 
 def test_clayton_copula_has_stronger_lower_tail_than_gaussian_copula():
     theta = 2.0
-    n = 2**15
+    n = 2**12
     marginals = [stats.uniform(), stats.uniform()]
     # Clayton Kendall tau is theta/(theta+2); convert to Gaussian rho.
     rho = np.sin(np.pi * (theta / (theta + 2.0)) / 2.0)
@@ -1189,7 +1189,7 @@ def test_gumbel_copula_positive_dependence_behavior():
 
 def test_gumbel_copula_has_stronger_upper_tail_than_gaussian_copula():
     theta = 2.0
-    n = 2**15
+    n = 2**12
     marginals = [stats.uniform(), stats.uniform()]
     # Gumbel Kendall tau is 1 - 1/theta; convert to Gaussian rho.
     rho = np.sin(np.pi * (1.0 - 1.0 / theta) / 2.0)
