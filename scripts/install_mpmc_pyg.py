@@ -56,7 +56,12 @@ def main() -> None:
         except subprocess.CalledProcessError as exc:
             last_error = exc
 
-    raise RuntimeError("Unable to install pyg_lib for the current torch build") from last_error
+    raise RuntimeError(
+        "Unable to install pyg_lib for the current torch build. "
+        "PyG wheels at data.pyg.org may not yet support this torch release. "
+        "Pin torch to a supported version listed in the PyG wheel index "
+        "(https://data.pyg.org/whl/), for example, < 2.13, and retry."
+    ) from last_error
 
 
 if __name__ == "__main__":

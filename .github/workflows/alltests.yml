@@ -30,13 +30,14 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          REF_NAME: ${{ github.ref_name }}  # branch name
+          REF_NAME: ${{ github.ref_name }}  # push: branch name; pull_request: <pr-number>/merge
+          HEAD_REF: ${{ github.head_ref || github.ref_name }}  # source branch on both push and pull_request
           BASE_REF: ${{ github.base_ref }}
         run: |
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             full_sweep=true
-          elif [[ "$REF_NAME" == mcpmc* ]]; then  
+          elif [[ "$REF_NAME" == *choi ]]; then   
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
@@ -281,8 +282,11 @@ jobs:
 
           retry_cmd 3 brew install --cask basictex
           eval "$(/usr/libexec/path_helper)"
-          sudo tlmgr update --self
-          sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
+          # tlmgr re-resolves the CTAN redirector on every invocation, so a flaky/stale
+          # mirror can be picked for one call even though a prior call succeeded.
+          # Retry each tlmgr call so a bad mirror pick gets re-resolved on the next attempt.
+          retry_cmd 3 sudo tlmgr update --self
+          retry_cmd 3 sudo tlmgr install latexmk dvipng collection-fontsrecommended type1cm
       - name: Cache MiKTeX (Windows)
         id: cache-miktex
         if: runner.os == 'Windows'

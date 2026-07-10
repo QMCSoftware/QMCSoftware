@@ -1,18 +1,37 @@
 # Contributing
 
-Thank you for your interest in contributing to the QMCPy package!
+Thank you for your interest in contributing to the QMCPy library! This library is the product of many hours of labor from many contributors. Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com).
 
-Please submit **pull requests (PRs)** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
+## Good Practices
 
-After a feature branch has been successfully merged, it is best practice to delete it. This action keeps the repository tidy and prevents the accumulation of stale branches.
+To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](docs/good_practices.md) to acquaint yourself with them.
 
-For planned releases, open related PRs with enough lead time so review can begin at least one week before the release date.
+### AI-Assisted Contributions
 
-For complex or mathematical contributions, schedule at least one PR review meeting before merging. 
+QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI affects your code, tests, demos, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
 
-If you develop a new component, please consider writing a blog for the[qmcpy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
+### Issues
 
-Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
+All improvements to QMCPy should be connected to an **issue** using a template from `.github/ISSUE_TEMPLATE/`.
+
+- If you are looking for a way to contribute, search the issues and contact the person who started the issue, if you would like to help.
+
+- If you identify an improvement that is not in an issue, you may submit an issue yourself.
+
+### Feature Branches
+
+If you have not yet installed the QMCPy library, see [Installation](#installation) below.
+
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
+
+After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
+
+We periodically release the contents of `develop` to `master`. Contact the team for the next release date. Plan to submit your pull request to `develop` at least one week before the release date. If your contribution does not make it into the next release, we hope that it will make it into the one after that.
+
+### Blogs
+
+If you develop a new feature, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key evidence (tests, benchmarks, or references), and examples.
+
 
 ## Installation
 
@@ -33,7 +52,7 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
-### 📚 Using `qmcpy` in courses (`class` extra)
+## 📚 Using `qmcpy` In Courses (`class` Extra)
 
 `qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
 
@@ -49,9 +68,45 @@ or for a heavy-duty version
 pip install -e ".[class,dev]"
 ```
 
+## Branches
+
+### For Main Repository Collaborators
+
+Branch directly from `develop` inside the `QMCSoftware/` repository. This allows other team members to easily review your work by checking out your branch with
+
+```bash
+git fetch origin
+git checkout <branch-name>
+```
+
+### For External Contributors (Forks)
+
+Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to check out the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this.
+
+```bash
+# Add the fork as a remote source
+git remote add MyGitHubUsername-fork git@github.com:MyGitHubUsername/QMCSoftware.git
+
+# Download the fork's branch data
+git fetch MyGitHubUsername-fork
+
+# Create your local branch tracking the fork's branch
+git checkout -b MyGitHubUsername-develop MyGitHubUsername-fork/develop
+```
+
+When new changes are pushed to the `develop` branch on the fork `git@github.com:MyGitHubUsername/QMCSoftware.git`, the main repo collaborator may then run
+
+```bash
+# 1. Switch to the local branch tracking your fork
+git checkout MyGitHubUsername-develop
+
+# 2. Pull the new changes directly from your fork's branch
+git pull MyGitHubUsername-fork develop
+```
+
 ## Tests
 
-Doctests and unittests take a few minute to run with
+Doctests and unittests take a few minutes to run with
 
 ~~~bash
 pip install -e ".[dev,docs,test]"
@@ -68,7 +123,7 @@ Please see the targets in the makefile for more granular control over tests.
 
 ## Documentation
 
-### Ensure `pyreverse` is on your PATH
+### Ensure `pyreverse` Is On Your PATH
 
 `pyreverse` must be available as a command-line tool. If it is not, verify your PATH as below.
 
@@ -108,7 +163,7 @@ python -m site --user-base
 
 You can update PATH via System settings or in your PowerShell profile (`$PROFILE`).
 
-### Build the documentation
+### Build the Documentation
 
 On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `make`):
 
@@ -116,7 +171,7 @@ On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `mak
 make doc
 ~~~
 
-### Download PDF documentation
+### Download PDF Documentation
 
 In the built HTML documentation:
 
