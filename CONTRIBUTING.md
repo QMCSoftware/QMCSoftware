@@ -4,7 +4,7 @@ Thank you for your interest in contributing to the QMCPy library! This library i
 
 ## Good Practices
 
-To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](https://qmcsoftware.github.io/QMCSoftware/good_practices/) to acquaint yourself with them.
+To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](docs/good_practices.md) to acquaint yourself with them.
 
 ### AI-Assisted Contributions
 
