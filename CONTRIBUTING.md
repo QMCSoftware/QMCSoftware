@@ -10,7 +10,7 @@ To preserve the integrity of this library, we have instituted some good practice
 
 QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI affects your code, tests, demos, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
 
-### Issues 
+### Issues
 
 All improvements to QMCPy should be connected to an **issue** using a template from `.github/ISSUE_TEMPLATE/`.
 
@@ -68,7 +68,7 @@ or for a heavy-duty version
 pip install -e ".[class,dev]"
 ```
 
-## Branches 
+## Branches
 
 ### For Main Repository Collaborators
 
@@ -83,7 +83,7 @@ git checkout <branch-name>
 
 Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to check out the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this.
 
-```bash 
+```bash
 # Add the fork as a remote source
 git remote add MyGitHubUsername-fork git@github.com:MyGitHubUsername/QMCSoftware.git
 
@@ -96,7 +96,7 @@ git checkout -b MyGitHubUsername-develop MyGitHubUsername-fork/develop
 
 When new changes are pushed to the `develop` branch on the fork `git@github.com:MyGitHubUsername/QMCSoftware.git`, the main repo collaborator may then run
 
-```bash 
+```bash
 # 1. Switch to the local branch tracking your fork
 git checkout MyGitHubUsername-develop
 
