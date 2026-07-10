@@ -108,6 +108,7 @@ class StudentTCopula(AbstractCopula):
             self._mvt_scipy = stats.multivariate_t(
                 loc=np.zeros(self.d), shape=self.correlation, df=self.df
             )
+
     def _parse_df(self, df):
         try:
             df = float(df)
