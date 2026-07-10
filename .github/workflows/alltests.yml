@@ -37,7 +37,7 @@ jobs:
           full_sweep=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             full_sweep=true
-          elif [[ "$REF_NAME" == mcpmc* ]]; then  
+          elif [[ "$REF_NAME" == *choi ]]; then   
             full_sweep=true
           elif [[ "$EVENT_NAME" == "pull_request" && ( "$BASE_REF" == "develop" || "$BASE_REF" == "master" ) ]]; then
             full_sweep=true
