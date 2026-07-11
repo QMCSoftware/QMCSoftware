@@ -4,13 +4,13 @@ Thank you for your interest in contributing to the QMCPy library! This library i
 
 ## Good Practices
 
-To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](https://qmcsoftware.github.io/QMCSoftware/good_practices/) to acquaint yourself with them.
+To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](docs/good_practices.md) to acquaint yourself with them.
 
 ### AI-Assisted Contributions
 
 QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI affects your code, tests, demos, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
 
-### Issues 
+### Issues
 
 All improvements to QMCPy should be connected to an **issue** using a template from `.github/ISSUE_TEMPLATE/`.
 
@@ -22,7 +22,7 @@ All improvements to QMCPy should be connected to an **issue** using a template f
 
 If you have not yet installed the QMCPy library, see [Installation](#installation) below.
 
-You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two members of our team. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
 
 After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
 
@@ -30,7 +30,7 @@ We periodically release the contents of `develop` to `master`. Contact the team 
 
 ### Blogs
 
-If you develop a new feature, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key assumptions,  validation evidence (tests, benchmarks, or references), and examples.
+If you develop a new feature, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key evidence (tests, benchmarks, or references), and examples.
 
 
 ## Installation
@@ -68,7 +68,7 @@ or for a heavy-duty version
 pip install -e ".[class,dev]"
 ```
 
-## Branches 
+## Branches
 
 ### For Main Repository Collaborators
 
@@ -83,7 +83,7 @@ git checkout <branch-name>
 
 Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to check out the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this.
 
-```bash 
+```bash
 # Add the fork as a remote source
 git remote add MyGitHubUsername-fork git@github.com:MyGitHubUsername/QMCSoftware.git
 
@@ -96,7 +96,7 @@ git checkout -b MyGitHubUsername-develop MyGitHubUsername-fork/develop
 
 When new changes are pushed to the `develop` branch on the fork `git@github.com:MyGitHubUsername/QMCSoftware.git`, the main repo collaborator may then run
 
-```bash 
+```bash
 # 1. Switch to the local branch tracking your fork
 git checkout MyGitHubUsername-develop
 

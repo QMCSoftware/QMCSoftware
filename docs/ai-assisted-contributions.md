@@ -17,7 +17,7 @@ QMCPy welcomes AI assistance for drafting, refactoring, editing, test scaffoldin
 
 If AI assistance substantively influenced code, tests, documentation, mathematical exposition, benchmarks, or the PR text itself:
 
-- Disclose that use in the PR description via the pull request template checklist.
+- Disclose that use in the PR description via the PR template checklist.
 - Briefly summarize which parts were AI-assisted and what you independently verified.
 
 Routine autocomplete and spelling or grammar fixes do not require disclosure.

@@ -1,7 +1,7 @@
 ## Summary
 
 - Issue:
-- Numerical or API impact:
+- Algorithmic or API impact:
 - Commands run:
 
 ## AI Assistance

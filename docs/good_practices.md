@@ -17,7 +17,7 @@ We expect tests for every change that affects behavior, documentation, or user w
 - Add or update **unit tests** in `test/` for new logic, bug fixes, edge cases, invalid inputs, shapes, finite outputs, and meaningful invariants.
 - Add or update **doctests** when public docstrings, examples, or usage patterns change.
 - Add or update **notebook tests** when a demo or blog notebook changes.
-  
+
 ### Keep Tests Stable and Meaningful
 
 - Use deterministic seeds or deterministic generators in tests and examples.
@@ -62,24 +62,24 @@ Several reviews focused on avoidable cleanup that is easy to catch before reques
 - Verify external URLs, raw data links, and referenced file paths before opening a PR.
 - Keep public names exact across code, docs, nav labels, notebooks, PR titles, and data files, especially for package names, publication years, and schema keys.
 - Use concrete metadata values when possible. For example, prefer specific supported languages over vague labels such as "Multiple".
-  
+
 ### Build Pipeline and Generated Artifacts
 
 - Avoid committing generated outputs, copied raw data, or other bulky artifacts when a source URL or regeneration step is sufficient.
 - Keep CI and dependency changes as narrow as possible, and explain in the PR description why each new extra, workflow step, or version pin is needed.
 - If you add generated documentation, data-driven tables, or helper scripts, keep the source files, generator, committed outputs, and docs build pipeline in sync. If regeneration is manual, document the exact command and commit the refreshed output together with the source change.
-  
+
 ### Docs and Assets
 
 - If you add custom HTML or CSS to the docs, verify that it renders correctly in both Material light and dark themes and on narrow screens without depending on missing third-party assets.
 - Prefer shell-friendly filenames without spaces for assets that may be referenced from scripts, CI, or command lines.
 - For large binary artifacts such as slides, prefer reproducible source materials plus a short README, and use Git LFS or external hosting when normal git history would become heavy.
 - In docs, prefer unambiguous wording and stable statuses over tentative or ambiguous phrases.
-  
- ### Code Hygiene
 
-  - Remove unused imports, trailing whitespace, and other style-only churn before requesting review.
-  - Use explicit runtime exceptions such as `ParameterError` for invalid user inputs instead of relying on `assert` statements in production code.
+### Code Hygiene
+
+- Remove unused imports, trailing whitespace, and other style-only churn before requesting review.
+- Use explicit runtime exceptions such as `ParameterError` for invalid user inputs instead of relying on `assert` statements in production code.
 
 ## Add Demos or Blogs as Notebooks
 
