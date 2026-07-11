@@ -1,6 +1,8 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
 PYTEST ?=
+WITH_MPMC ?= 0
+HAS_MPMC ?= $(shell python -c "import importlib.util; mods=('torch','pyg_lib','torch_geometric'); print(int(all(importlib.util.find_spec(m) is not None for m in mods)))" 2>/dev/null || echo 0)
 
 # set environment variable for documentation
 export JUPYTER_PLATFORM_DIRS=1
@@ -53,6 +55,7 @@ doctests_minimal: ensure_artifacts
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
 		--ignore qmcpy/integrand/hartmann6d.py \
+		--ignore qmcpy/discrete_distribution/mpmc/ \
 
 doctests_torch: ensure_artifacts
 	@mkdir -p $(DOCTEST_COV_DIR)/torch
@@ -75,6 +78,12 @@ doctests_botorch: ensure_artifacts
 	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/botorch/coverage.json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
+doctests_mpmc:
+	@mkdir -p $(DOCTEST_COV_DIR)/mpmc
+	COVERAGE_FILE=$(DOCTEST_COV_DIR)/mpmc/.coverage \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/mpmc/coverage.json --no-header --cov-append \
+		--doctest-modules qmcpy/discrete_distribution/mpmc/*.py \
+
 doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issues/96
 	@mkdir -p $(DOCTEST_COV_DIR)/umbridge
 	@docker --version
@@ -85,9 +94,14 @@ doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issu
 doctests_markdown:
 	@phmutest docs/*.md --replmode --log -c
 
-doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
-doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+doctests_no_docker_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+
+doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_mpmc
+
+doctests_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+
+doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge doctests_mpmc
 
 ##########################################################
 # Unit Tests in `test/` folder (OFFICIAL coverage)
@@ -100,12 +114,14 @@ unittests: ensure_artifacts
 		exit 127; \
 	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x \
+	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x $(PYTEST_EXTRA_ARGS) \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
 		--no-header \
 		test/ -W ignore::DeprecationWarning
+
+tests_no_docker_no_mpmc: doctests_no_docker_no_mpmc unittests coverage
 
 ##########################################################
 # Unit Tests for `*.ipynb` in `demos/` folder
@@ -128,6 +144,8 @@ check_booktests:
 	done
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
 	@echo "Total test files: $$(find test/booktests -name 'tb_*.py' | wc -l)"
+
+tests_no_mpmc: doctests_no_mpmc unittests coverage
 
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files ensure_artifacts
 	@echo "\nNotebook tests"
@@ -175,15 +193,29 @@ tests:
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
-	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
+	@if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
+	set -e && $(MAKE) $$DOCTESTS_TARGET && $(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS"
 
 # Fast test target: run doctests, unittests, booktests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
 	@make clean_local_only_files && \
+	if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
 	set -e && \
-	$(MAKE) doctests_no_docker & \
-	$(MAKE) unittests & \
+	$(MAKE) $$DOCTESTS_TARGET & \
+	$(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS" & \
 	$(MAKE) booktests_parallel_no_docker  & \
 	wait
 	$(MAKE) coverage
@@ -273,6 +305,9 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
 	@perl -0pi -e 's!\(docs/qmc-software\.md\)!\(qmc-software.md\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
+	@# Rewrite repo-root-relative link for the copied MkDocs page.
+	@perl -0pi -e 's!\(docs/good_practices\.md\)!\(good_practices.md\)!g' docs/CONTRIBUTING.md
+	@perl -0pi -e 's!\(docs/ai-assisted-contributions\.md\)!\(ai-assisted-contributions.md\)!g' docs/CONTRIBUTING.md
 	@cp community.md docs/community.md 
 	@cp -r demos docs
 	@find docs/demos -mindepth 2 -name README.md -delete
@@ -296,6 +331,7 @@ runmkdocserve:
 	done; \
 	echo "Starting mkdocs on http://127.0.0.1:$$PORT"; \
 	NO_MKDOCS_2_WARNING=1 JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
+	NO_MKDOCS_2_WARNING=1 JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
 	
 doc: uml copydocs runmkdocserve
 
@@ -313,3 +349,11 @@ update_pep8_badge:
 	@mkdir -p $(LOG_DIR) docs/assets
 	@make check_pep8 > $(LOG_DIR)/pylint.out
 	@python3 scripts/update_pep8_badge.py $(LOG_DIR)/pylint.out docs/assets/pep8-badge.json docs/assets/pep8-badge.svg
+
+
+##########################################################
+# Formatting
+##########################################################
+
+markdown-unwrap:
+	$(PYTHON) scripts/unwrap_markdown.py "$(MARKDOWN_UNWRAP_PATH)"

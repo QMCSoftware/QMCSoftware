@@ -1,7 +1,4 @@
----
-title: QMCPy Shared Leadership Roles and Responsibilities
-
----
+# QMCPy Shared Leadership Roles and Responsibilities
 
 This document outlines the leadership structure for QMCPy open-source software development and the responsibilities associated with each lead role. These positions are designed to distribute oversight across key areas of the project while fostering collaboration and sustainable growth.
 

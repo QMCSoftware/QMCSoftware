@@ -44,6 +44,19 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
 
+## `MPMC: Message Passing Monte Carlo`
+
+MPMC requires PyTorch and PyTorch Geometric. Install with:
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install pyg_lib torch-geometric
+```
+
+For GPU support or platform-specific wheels, see the [PyTorch installation guide](https://pytorch.org/get-started/locally/) and the [PyTorch Geometric installation guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html).
+
+::: qmcpy.discrete_distribution.mpmc.mpmc.MPMC
+
 ## UML Specific
 
 ![](./umls/discrete_distribution_specific.svg)
