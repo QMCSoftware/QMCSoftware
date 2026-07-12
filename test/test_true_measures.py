@@ -134,6 +134,27 @@ class TestMatern(unittest.TestCase):
         cov2 = 0.01 * kernel2.__call__(points) + 1e-6 * np.eye(m2.covariance.shape[-1])
         assert np.allclose(cov2, m2.covariance)
 
+
+class TestUniform(unittest.TestCase):
+    def test_mean_and_variance_with_scalar_bounds(self):
+        uniform = Uniform(
+            DigitalNetB2(3, seed=7), lower_bound=-2, upper_bound=4
+        )
+
+        np.testing.assert_allclose(uniform.mean(), [1.0, 1.0, 1.0])
+        np.testing.assert_allclose(uniform.var(), [3.0, 3.0, 3.0])
+
+    def test_mean_and_variance_with_vector_bounds(self):
+        uniform = Uniform(
+            DigitalNetB2(2, seed=7),
+            lower_bound=[-2, 1],
+            upper_bound=[4, 10],
+        )
+
+        np.testing.assert_allclose(uniform.mean(), [1.0, 5.5])
+        np.testing.assert_allclose(uniform.var(), [3.0, 6.75])
+
+
 class TestUniformTriangle(unittest.TestCase):
     """Tests for UniformTriangle and _UniformTriangleAdapter."""
 
