@@ -91,3 +91,9 @@ class Uniform(AbstractTrueMeasure):
                 )
             spawn = Uniform(sampler, lower_bound=l, upper_bound=u)
         return spawn
+    
+    def mean(self):
+        return (self.a + self.b) / 2
+
+    def var(self):
+        return self.delta**2 / 12
