@@ -136,23 +136,29 @@ class TestMatern(unittest.TestCase):
 
 
 class TestUniform(unittest.TestCase):
-    def test_mean_and_variance_with_scalar_bounds(self):
+    def test_mean_and_covariance_with_scalar_bounds(self):
         uniform = Uniform(
             DigitalNetB2(3, seed=7), lower_bound=-2, upper_bound=4
         )
 
-        np.testing.assert_allclose(uniform.mean(), [1.0, 1.0, 1.0])
-        np.testing.assert_allclose(uniform.var(), [3.0, 3.0, 3.0])
+        np.testing.assert_allclose(uniform.mean, [1.0, 1.0, 1.0])
+        np.testing.assert_allclose(
+            uniform.covariance,
+            np.diag([3.0, 3.0, 3.0]),
+        )
 
-    def test_mean_and_variance_with_vector_bounds(self):
+    def test_mean_and_covariance_with_vector_bounds(self):
         uniform = Uniform(
             DigitalNetB2(2, seed=7),
             lower_bound=[-2, 1],
             upper_bound=[4, 10],
         )
 
-        np.testing.assert_allclose(uniform.mean(), [1.0, 5.5])
-        np.testing.assert_allclose(uniform.var(), [3.0, 6.75])
+        np.testing.assert_allclose(uniform.mean, [1.0, 5.5])
+        np.testing.assert_allclose(
+            uniform.covariance,
+            np.diag([3.0, 6.75]),
+        )
 
 
 class TestUniformTriangle(unittest.TestCase):

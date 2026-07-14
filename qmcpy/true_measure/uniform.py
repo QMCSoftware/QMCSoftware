@@ -63,6 +63,8 @@ class Uniform(AbstractTrueMeasure):
                 "upper bound and lower bound must be of length dimension"
             )
         self.delta = self.b - self.a
+        self.mean = (self.a + self.b) / 2
+        self.covariance = np.diag(self.delta**2 / 12)
         self.inv_delta_prod = 1 / self.delta.prod()
         self.range = np.hstack(
             (self.a.reshape((self.d, 1)), self.b.reshape((self.d, 1)))
@@ -91,9 +93,3 @@ class Uniform(AbstractTrueMeasure):
                 )
             spawn = Uniform(sampler, lower_bound=l, upper_bound=u)
         return spawn
-    
-    def mean(self):
-        return (self.a + self.b) / 2
-
-    def var(self):
-        return self.delta**2 / 12
