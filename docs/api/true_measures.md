@@ -20,6 +20,30 @@ jupyter:
 
 ::: qmcpy.true_measure.scipy_wrapper.SciPyWrapper
 
+## `AbstractCopula`
+
+::: qmcpy.true_measure.copula.AbstractCopula
+
+## `GaussianCopula`
+
+::: qmcpy.true_measure.gaussian_copula.GaussianCopula
+
+## `StudentTCopula`
+
+::: qmcpy.true_measure.student_t_copula.StudentTCopula
+
+## `ClaytonCopula`
+
+::: qmcpy.true_measure.clayton_copula.ClaytonCopula
+
+## `GumbelCopula`
+
+::: qmcpy.true_measure.gumbel_copula.GumbelCopula
+
+## `FrankCopula`
+
+::: qmcpy.true_measure.frank_copula.FrankCopula
+
 ## `Uniform`
 
 ::: qmcpy.true_measure.uniform.Uniform

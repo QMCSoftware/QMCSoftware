@@ -70,9 +70,12 @@ nav:
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
         - ProductMeasure: demos/product_measure.ipynb
         - Acceptance-Rejection Sampling: demos/acceptance_rejection.ipynb
+        - Copula TrueMeasure Examples: demos/copula_examples.ipynb
   - Blogs: 
     - Iteration Log: demos/demo_resume_data/Iteration_Log_Tolerance_Demo.ipynb
     - Resume Feature: demos/demo_resume_data/accuracy_and_resume.ipynb
+  # - Papers: 
+  #   - JOSS: paper/paper.md
     - SciPyWrapper: blogs/scipywrapper/index.md
     - Visualizing the Generated Samples Helps: blogs/visualizing-the-generated-samples-helps/index.md
     - "CubMCCLTVec: Vectorizing the CubMCCLT Algorithm": blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md
@@ -93,6 +96,8 @@ nav:
     - Why Add Q to MC?: blogs/why-add-q-to-mc/index.md
   - For Developers:
     - Release Manual: RELEASE.md
+    - Contribution Good Practices: good_practices.md
+    - AI-Assisted Contributions: ai-assisted-contributions.md
     - Testing Guidelines: 
       - Local doc tests and unit tests on `qmcpy`: tests.md
       - CI testing and cost control: ci-testing.md
