@@ -20,6 +20,8 @@ class Sin1d(AbstractIntegrand):
             lower_bound     0
             upper_bound     6.283
             mean            3.142
+            variance        3.290
+            standard_deviation 1.814
             covariance      3.290
 
         With independent replications

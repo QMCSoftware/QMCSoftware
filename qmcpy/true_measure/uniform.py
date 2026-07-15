@@ -20,6 +20,8 @@ class Uniform(AbstractTrueMeasure):
             lower_bound     [0.  0.5]
             upper_bound     [2 3]
             mean            [1.   1.75]
+            variance        [0.333 0.521]
+            standard_deviation [0.577 0.722]
             covariance      [[0.333 0.   ]
                              [0.    0.521]]
 
@@ -50,7 +52,7 @@ class Uniform(AbstractTrueMeasure):
             lower_bound (Union[float, np.ndarray]): Lower bound.
             upper_bound (Union[float, np.ndarray]): Upper bound.
         """
-        self.parameters = ["lower_bound", "upper_bound", "mean", "covariance"]
+        self.parameters = ["lower_bound", "upper_bound", "mean", "variance", "standard_deviation", "covariance"]
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
         self.lower_bound = lower_bound
@@ -67,7 +69,9 @@ class Uniform(AbstractTrueMeasure):
             )
         self.delta = self.b - self.a
         self.mean = (self.a + self.b) / 2
-        self.covariance = np.diag(self.delta**2 / 12)
+        self.variance = self.delta**2 / 12
+        self.standard_deviation = self.delta / np.sqrt(12)
+        self.covariance = np.diag(self.variance)
         self.inv_delta_prod = 1 / self.delta.prod()
         self.range = np.hstack(
             (self.a.reshape((self.d, 1)), self.b.reshape((self.d, 1)))

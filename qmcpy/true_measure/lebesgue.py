@@ -23,6 +23,8 @@ class Lebesgue(AbstractTrueMeasure):
                                 lower_bound     0
                                 upper_bound     1
                                 mean            [0.5 0.5]
+                                variance        [0.083 0.083]
+                                standard_deviation [0.289 0.289]
                                 covariance      [[0.083 0.   ]
                                                  [0.    0.083]]
     """

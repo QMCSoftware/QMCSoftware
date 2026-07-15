@@ -20,6 +20,8 @@ class Multimodal2d(AbstractIntegrand):
             lower_bound     [-4 -3]
             upper_bound     [7 8]
             mean            [1.5 2.5]
+            variance        [10.083 10.083]
+            standard_deviation [3.175 3.175]
             covariance      [[10.083  0.   ]
                              [ 0.    10.083]]
 

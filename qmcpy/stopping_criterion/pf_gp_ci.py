@@ -121,6 +121,8 @@ class PFGPCI(AbstractStoppingCriterion):
             lower_bound     -3.142
             upper_bound     3.142
             mean            [0. 0. 0.]
+            variance        [3.29 3.29 3.29]
+            standard_deviation [1.814 1.814 1.814]
             covariance      [[3.29 0.   0.  ]
                              [0.   3.29 0.  ]
                              [0.   0.   3.29]]
