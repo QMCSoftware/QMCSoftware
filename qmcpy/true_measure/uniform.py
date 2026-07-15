@@ -19,6 +19,9 @@ class Uniform(AbstractTrueMeasure):
         Uniform (AbstractTrueMeasure)
             lower_bound     [0.  0.5]
             upper_bound     [2 3]
+            mean            [1.   1.75]
+            covariance      [[0.333 0.   ]
+                             [0.    0.521]]
 
         With independent replications
 
@@ -47,7 +50,7 @@ class Uniform(AbstractTrueMeasure):
             lower_bound (Union[float, np.ndarray]): Lower bound.
             upper_bound (Union[float, np.ndarray]): Upper bound.
         """
-        self.parameters = ["lower_bound", "upper_bound"]
+        self.parameters = ["lower_bound", "upper_bound", "mean", "covariance"]
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
         self.lower_bound = lower_bound

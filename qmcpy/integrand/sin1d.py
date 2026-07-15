@@ -19,6 +19,8 @@ class Sin1d(AbstractIntegrand):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     6.283
+            mean            3.142
+            covariance      3.290
 
         With independent replications
 

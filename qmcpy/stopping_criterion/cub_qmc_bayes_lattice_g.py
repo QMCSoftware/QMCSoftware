@@ -79,6 +79,10 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            covariance      [[0.083 0.    0.   ]
+                             [0.    0.083 0.   ]
+                             [0.    0.    0.083]]
         Lattice (AbstractLDDiscreteDistribution)
             d               3
             replications    1
@@ -132,6 +136,10 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            covariance      [[0.083 0.    0.   ]
+                             [0.    0.083 0.   ]
+                             [0.    0.    0.083]]
         Lattice (AbstractLDDiscreteDistribution)
             d               3
             replications    1

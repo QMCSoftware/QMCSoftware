@@ -84,6 +84,10 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            covariance      [[0.083 0.    0.   ]
+                             [0.    0.083 0.   ]
+                             [0.    0.    0.083]]
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
@@ -139,6 +143,10 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            covariance      [[0.083 0.    0.   ]
+                             [0.    0.083 0.   ]
+                             [0.    0.    0.083]]
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1

@@ -17,7 +17,14 @@ class Hartmann6d(AbstractIntegrand):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
-
+            mean            [0.5 0.5 0.5 0.5 0.5 0.5]
+            covariance      [[0.083 0.    0.    0.    0.    0.   ]
+                             [0.    0.083 0.    0.    0.    0.   ]
+                             [0.    0.    0.083 0.    0.    0.   ]
+                             [0.    0.    0.    0.083 0.    0.   ]
+                             [0.    0.    0.    0.    0.083 0.   ]
+                             [0.    0.    0.    0.    0.    0.083]]
+                             
         With independent replications
 
         >>> integrand = Hartmann6d(DigitalNetB2(6,seed=7,replications=2**4))

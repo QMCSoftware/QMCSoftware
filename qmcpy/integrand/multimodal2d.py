@@ -19,6 +19,9 @@ class Multimodal2d(AbstractIntegrand):
         Uniform (AbstractTrueMeasure)
             lower_bound     [-4 -3]
             upper_bound     [7 8]
+            mean            [1.5 2.5]
+            covariance      [[10.083  0.   ]
+                             [ 0.    10.083]]
 
         With independent replications
 
