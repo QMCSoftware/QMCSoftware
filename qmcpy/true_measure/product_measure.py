@@ -34,12 +34,67 @@ class ProductMeasure(AbstractTrueMeasure):
     coordinates. The first two coordinates come from the Gaussian block, and
     the third coordinate comes from the zero-inflated exponential block.
 
+    The child true measures still have their own samplers because QMCPy's
+    current ``AbstractTrueMeasure`` API requires every true measure to be
+    constructed with one. Inside ``ProductMeasure``, those child samplers are
+    construction placeholders: they are not sampled directly when product
+    samples are generated. The children provide dimension, range, transform,
+    and weight behavior.
+
     Notes
     -----
     Exact product weights are supported for direct child true measures. For
     recursively composed child measures, sampling is supported through
     QMCPy's recursive transform helper, but exact final-space product weights
     are not currently implemented here.
+
+    Examples
+    --------
+    Combine two one-dimensional uniform true measures:
+
+    >>> from qmcpy.discrete_distribution import DigitalNetB2
+    >>> from qmcpy.true_measure import ProductMeasure, Uniform
+    >>> def dummy_child_sampler(d):
+    ...     return DigitalNetB2(d, seed=0)
+    >>> children = [
+    ...     Uniform(dummy_child_sampler(1), lower_bound=0, upper_bound=2),
+    ...     Uniform(dummy_child_sampler(1), lower_bound=10, upper_bound=12),
+    ... ]
+    >>> pm = ProductMeasure(sampler=DigitalNetB2(2, seed=9), children=children)
+    >>> x = pm(4)
+    >>> x.shape
+    (4, 2)
+    >>> bool(((0 <= x[:, 0]) & (x[:, 0] <= 2)).all())
+    True
+
+    The outer sampler controls replications:
+
+    >>> pm = ProductMeasure(
+    ...     sampler=DigitalNetB2(2, seed=9, replications=3),
+    ...     children=children,
+    ... )
+    >>> pm(4).shape
+    (3, 4, 2)
+
+    The dummy child samplers are only construction placeholders required by
+    the current ``AbstractTrueMeasure`` interface. ``ProductMeasure`` samples
+    from its own outer sampler.
+
+    Children may have different dimensions:
+
+    >>> import numpy as np
+    >>> from qmcpy.true_measure import Gaussian
+    >>> children = [
+    ...     Gaussian(
+    ...         dummy_child_sampler(2),
+    ...         mean=[0, 0],
+    ...         covariance=np.eye(2),
+    ...     ),
+    ...     Uniform(dummy_child_sampler(1), lower_bound=10, upper_bound=12),
+    ... ]
+    >>> pm = ProductMeasure(sampler=DigitalNetB2(3, seed=12), children=children)
+    >>> pm(4).shape
+    (4, 3)
     """
 
     def __init__(self, sampler, children):
@@ -84,12 +139,14 @@ class ProductMeasure(AbstractTrueMeasure):
             )
 
         self.parameters = ["children"]
-        # ProductMeasure uses only the sampler passed directly to ProductMeasure to generate product samples.
+        # ProductMeasure uses only the sampler passed directly to ProductMeasure
+        # to generate product samples.
 
         # The child true measures also contain samplers because QMCPy's current
-        # AbstractTrueMeasure interface requires true measures to be constructed with
-        # an attached discrete distribution. Inside ProductMeasure, those child
-        # samplers are not sampled. The children are used for their dimension, range, transform, and weight behavior.
+        # AbstractTrueMeasure interface requires true measures to be constructed
+        # with an attached discrete distribution. Inside ProductMeasure, those
+        # child samplers are not sampled. The children are used for their
+        # dimension, range, transform, and weight behavior.
 
         # A future design could allow samplerless/template child true measures, but
         # that would require a broader AbstractTrueMeasure API decision
