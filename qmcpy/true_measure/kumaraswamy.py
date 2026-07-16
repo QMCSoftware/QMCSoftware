@@ -1,6 +1,7 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
+from scipy.special import beta as beta_function
 import numpy as np
 
 
@@ -19,6 +20,11 @@ class Kumaraswamy(AbstractTrueMeasure):
         Kumaraswamy (AbstractTrueMeasure)
             a               [1 2]
             b               [3 4]
+            mean            [0.25  0.406]
+            variance        [0.038 0.035]
+            standard_deviation [0.194 0.187]
+            covariance      [[0.038 0.   ]
+                             [0.    0.035]]
 
         With independent replications
 
@@ -47,7 +53,7 @@ class Kumaraswamy(AbstractTrueMeasure):
             a (Union[float, np.ndarray]): First parameter $\alpha > 0$.
             b (Union[float, np.ndarray]): Second parameter $\beta > 0$.
         """
-        self.parameters = ["a", "b"]
+        self.parameters = ["a", "b", "mean", "variance", "standard_deviation", "covariance"]
         self.domain = np.array([[0, 1]])
         self.range = np.array([[0, 1]])
         self._parse_sampler(sampler)
@@ -66,6 +72,11 @@ class Kumaraswamy(AbstractTrueMeasure):
             )
         if not ((self.alpha > 0).all() and (self.beta > 0).all()):
             raise ParameterError("Kumaraswamy requires a,b>0.")
+        self.mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
+        second_moment = self.beta * beta_function(1 + 2 / self.alpha, self.beta)
+        self.variance = second_moment - self.mean**2
+        self.standard_deviation = np.sqrt(self.variance)
+        self.covariance = np.diag(self.variance)
         super(Kumaraswamy, self).__init__()
         assert self.alpha.shape == (self.d,) and self.beta.shape == (self.d,)
 
