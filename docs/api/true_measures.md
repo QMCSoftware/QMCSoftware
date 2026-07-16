@@ -20,6 +20,10 @@ jupyter:
 
 ::: qmcpy.true_measure.scipy_wrapper.SciPyWrapper
 
+## `ProductMeasure`
+
+::: qmcpy.true_measure.product_measure.ProductMeasure
+
 ## `AbstractCopula`
 
 ::: qmcpy.true_measure.copula.AbstractCopula
