@@ -59,7 +59,8 @@ def main() -> None:
     raise RuntimeError(
         "Unable to install pyg_lib for the current torch build. "
         "PyG wheels at data.pyg.org may not yet support this torch release. "
-        "Pin torch to a supported version (for example, < 2.13) and retry."
+        "Pin torch to a supported version listed in the PyG wheel index "
+        "(https://data.pyg.org/whl/), for example, < 2.13, and retry."
     ) from last_error
 
 
