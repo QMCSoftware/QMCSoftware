@@ -94,3 +94,20 @@ These states are intentionally reported separately:
 Post-MCQMC work may begin from this evidence baseline. It must separately plan
 and review homepage changes, navigation, Publications and Blogs indexes,
 old-to-new URL targets, redirect implementation, and final hosting actions.
+
+## Latest Develop Synchronization
+
+On 2026-07-16, `origin/develop` at `a1ab9969` was merged into
+`migrate_qmcpy` without conflicts.
+
+- All Before-MCQMC documents, decisions, and source metadata were preserved.
+- The export-to-inventory check remains 50/50 and the blog metadata check
+  remains 18/18.
+- No reverted Post-MCQMC homepage, navigation, Publications, or Blogs index
+  artifact was restored.
+- The direct MkDocs build succeeded after the merge in approximately 60
+  seconds.
+- `make copydocs` remains unavailable because `pandoc` is missing.
+- The merged `develop` baseline adds a non-blocking warning because
+  `QMCPy_Shared_Leadership.md` is referenced by `mkdocs.yml` but is not copied
+  into `docs/` by the current documentation workflow.

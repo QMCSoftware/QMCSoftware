@@ -274,12 +274,30 @@ Build result:
 | Message class | Count | Classification | Before-MCQMC impact |
 |---|---:|---|---|
 | Missing UML SVG link targets | 10 | Existing generated-asset gap in API documentation | Non-blocking; unrelated to the migration inventory and source metadata changes |
+| Missing `QMCPy_Shared_Leadership.md` navigation target | 1 | Latest `develop` references a root document that `copydocs` does not place in `docs/` | Non-blocking for the merge; current `develop` documentation workflow gap |
 | Untracked `AGENTS.md` pages omitted from navigation | 2 | Local-worktree information message | Non-blocking; files are untracked and not part of the branch |
 | Black or Ruff unavailable for signature formatting | 1 | Optional mkdocstrings formatting information | Non-blocking; API documentation still builds |
 | Material for MkDocs 2.0 advisory | 1 | Upstream compatibility announcement | Non-blocking for the current MkDocs 1.6.1 build |
 | Missing `pandoc` in `make copydocs` | 1 | Local environment limitation | Does not block the successful direct MkDocs build; must be resolved before requiring the full copy workflow |
 
 No warning was introduced by the four `Source WordPress URL` metadata changes.
+
+### Latest Develop Synchronization Verification
+
+Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
+
+- The merge completed without conflicts.
+- The 50 exported page/post URLs still match the 50 inventory entries exactly.
+- All 18 migrated blog targets and Source WordPress URL metadata still match.
+- Relative to `origin/develop`, the migration branch adds only the three
+  Before-MCQMC migration documents and four blog metadata changes.
+- `conda run -n qmcpy make copydocs` still stops because `pandoc` is missing and
+  produces no tracked file changes.
+- `conda run -n qmcpy python -m mkdocs build` completed successfully in
+  approximately 60 seconds.
+- The latest `develop` adds one non-blocking navigation warning for
+  `QMCPy_Shared_Leadership.md`, in addition to the previously classified
+  baseline messages.
 
 ## Pages
 
