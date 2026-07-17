@@ -67,7 +67,7 @@ class Gaussian(AbstractTrueMeasure):
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
         self._parse_gaussian_params(mean, covariance, decomp_type)
-        self.mean = self.mu.copy()
+        self.mean = self.mu.astype(float, copy=True)
         self.covariance = self.sigma.copy()
         self.variance = np.diag(self.sigma).copy()
         self.standard_deviation = np.sqrt(self.variance)
