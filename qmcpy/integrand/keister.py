@@ -18,8 +18,11 @@ class Keister(AbstractIntegrand):
         1.8080
         >>> integrand.true_measure
         Gaussian (AbstractTrueMeasure)
-            mean            0
-            covariance      2^(-1)
+            mean            [0. 0.]
+            variance        [0.5 0.5]
+            standard_deviation [0.707 0.707]
+            covariance      [[0.5 0. ]
+                             [0.  0.5]]
             decomp_type     PCA
 
         With independent replications

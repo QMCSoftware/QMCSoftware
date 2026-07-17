@@ -41,8 +41,11 @@ class CubQMCBayesNetG(AbstractCubBayesLDG):
             order           1
         Keister (AbstractIntegrand)
         Gaussian (AbstractTrueMeasure)
-            mean            0
-            covariance      2^(-1)
+            mean            [0. 0.]
+            variance        [0.5 0.5]
+            standard_deviation [0.707 0.707]
+            covariance      [[0.5 0. ]
+                             [0.  0.5]]
             decomp_type     PCA
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               2^(1)

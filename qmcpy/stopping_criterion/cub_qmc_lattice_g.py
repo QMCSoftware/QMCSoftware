@@ -38,6 +38,8 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
         Keister (AbstractIntegrand)
         Gaussian (AbstractTrueMeasure)
             mean            0
+            variance        2^(-1)
+            standard_deviation 0.707
             covariance      2^(-1)
             decomp_type     PCA
         Lattice (AbstractLDDiscreteDistribution)
