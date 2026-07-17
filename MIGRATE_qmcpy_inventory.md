@@ -4,8 +4,8 @@ _Generated from `/Users/kangjiangrui/Downloads/qmcpy.WordPress.2026-05-26.xml` o
 
 This file supports the **Content Inventory** section of
 `MIGRATE_qmcpy_checklist.md`. It records the Before-MCQMC preservation,
-retirement, and backlink-importance decisions. Old-to-new URL mapping and
-redirect implementation remain Post-MCQMC work.
+retirement, and backlink-importance decisions and the Post-MCQMC old-to-new
+mapping implemented on `migrate_qmcpy`.
 
 ## Backup Sources Checked
 
@@ -63,6 +63,9 @@ Checked on 2026-07-16 with structured XML parsing:
 - All 18 migrated blog targets listed below exist in `docs/blogs/`.
 - All 18 migrated blog files now contain an exact `Source WordPress URL`
   metadata match.
+- Post-MCQMC verification on 2026-07-17 confirmed the 18 selected blog targets
+  and exact source URL metadata after the five extra post candidates were
+  removed from the current migration scope.
 
 ## Current Must-Preserve Scope
 
@@ -72,20 +75,23 @@ sole collaborator, on 2026-07-16.
 
 | Item | Preserve? | Current/new location | Status |
 |---|---|---|---|
-| Home | Yes | `README.md` | Existing GitHub Pages homepage candidate; needs final content review |
-| Publications | Yes | TBD | Must be preserved; no GitHub Pages target identified yet |
-| Blogs | Yes | `docs/blogs/` and `mkdocs.yml` Blogs navigation | Preserve the 18 already-migrated posts; retire unmatched old news, event, and announcement posts |
+| Home | Yes | `README.md` | Minimum viable homepage completed and locally verified |
+| Publications | Yes | `docs/publications.md` | Stable GitHub Pages target added and locally verified |
+| Blogs | Yes | `docs/blogs/index.md` and `docs/blogs/` | Index added; 18 existing migrated posts preserved |
+| Contributors | Yes | `community.md` | Both old contributor paths map to the current Community page |
 | GitHub | Yes | `https://github.com/QMCSoftware/QMCSoftware` | Link present in README and WordPress nav export |
 | Docs | Yes | `https://qmcsoftware.github.io/QMCSoftware/` | Link present in README and WordPress nav export |
 | PyPI | Yes | `https://pypi.org/project/qmcpy/` | Link present in README and WordPress nav export |
 
 Standalone Donation, Videos, and Dev Tools pages and unpublished drafts are
-confirmed for retirement. Contributor content remains preserved; its final URL
-mapping is deferred to Post-MCQMC work.
+confirmed for retirement. Contributor content is preserved in `community.md`,
+with both old contributor paths included in the redirect manifest.
 
 ## Before-MCQMC Preservation Policies
 
-Confirmed by the project owner and sole collaborator on 2026-07-16.
+Confirmed by the project owner and sole collaborator on 2026-07-16. Updated by
+the project owner on 2026-07-17 to remove the five extra post candidates from
+the current migration scope.
 
 ### Retirement Policy
 
@@ -99,7 +105,7 @@ confirmed preservation reason or an existing current target:
 - Preserve contributor content for later mapping to an appropriate current
   page.
 - Preserve all 18 already-migrated blogs.
-- Preserve five additional published posts for Post-MCQMC target selection:
+- Do not migrate the five extra published post candidates previously selected:
   the MCQMC 2020 tutorial, QMCPy v1.0 announcement, QMC software article,
   elliptic PDE demo, and UM-Bridge article.
 - A retirement decision means that migration is not required. It does not
@@ -132,12 +138,13 @@ IIT Undergraduate Research Journal request timed out after 30 seconds. These
 results indicate access-control or availability uncertainty, not confirmed
 content removal, so the approved preservation requirements remain unchanged.
 
-This policy defines preservation requirements only. Exact targets, redirect
-mechanisms, and live redirect verification remain Post-MCQMC work.
+This policy defines preservation requirements only. Exact targets and the
+redirect mechanism are recorded in the Post-MCQMC sections below; live
+verification remains Final Hosting Migration work.
 
 ## Working Classification Summary
 
-### Already Migrated Content
+### Before-MCQMC Migrated Content
 
 The following WordPress posts have clear GitHub Pages targets in `docs/blogs/`:
 
@@ -160,10 +167,17 @@ The following WordPress posts have clear GitHub Pages targets in `docs/blogs/`:
 - Visualizing the Generated Samples Helps
 - Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions
 
-### Preservation Gaps
+### Post-MCQMC Mapping Completion
 
-- `https://qmcpy.org/publications/` is marked must-preserve and needs a future GitHub Pages target.
-- `https://qmcpy.org/` maps to the current GitHub Pages homepage candidate, `README.md`, but still needs final content review.
+- `https://qmcpy.org/publications/` maps to `docs/publications.md`.
+- `https://qmcpy.org/` maps to the reviewed minimum viable homepage in
+  `README.md`.
+- `https://qmcpy.org/contributors/` and
+  `https://qmcpy.org/contributors-2/` map to `community.md`.
+- The 18 previously migrated posts have stable targets under `docs/blogs/` and
+  path-exact redirect entries in `data/redirects.yml`.
+- The five extra post candidates are intentionally excluded from the current
+  migration scope.
 
 ### Confirmed Retirement Decisions
 
@@ -178,8 +192,8 @@ Confirmed by the project owner and sole collaborator on 2026-07-16:
   - Dev Tools
   - Videos
 - Old news/event/announcement posts not currently matched to GitHub Pages content.
-- Preserve contributor content. Evaluate `community.md` as the target during
-  Post-MCQMC URL mapping.
+- Preserve contributor content. `community.md` was selected as the target
+  during Post-MCQMC URL mapping.
 
 ### Confirmed External URLs / Backlinks
 
@@ -282,6 +296,23 @@ Build result:
 
 No warning was introduced by the four `Source WordPress URL` metadata changes.
 
+### Post-MCQMC Local Implementation Verification
+
+Checked on `migrate_qmcpy` on 2026-07-17:
+
+- `docs/blogs/index.md` links all 18 preserved posts.
+- `docs/publications.md` preserves the old publication list and adds the
+  current QMCPy software paper from repository-visible sources.
+- `data/redirects.yml` contains 20 unique old paths and no missing targets.
+- `scripts/make_redirect_pages.py` generated all 20 path-exact pages.
+- The full copy, UML, and MkDocs build workflows completed successfully; the
+  final build reported no warnings or unresolved relative links.
+- Browser checks covered desktop and mobile layouts and the required old "Why
+  Add Q to MC?" path.
+- No GitHub Pages setting, DNS record, WordPress setting, or live site was
+  changed. Live URL checks remain pending publication and Final Hosting
+  Migration.
+
 ### Latest Develop Synchronization Verification
 
 Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
@@ -303,11 +334,11 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 
 | Old URL | Title | Status | Current/new location | Inventory note |
 |---|---|---|---|---|
-| https://qmcpy.org/ | Blog | publish | README.md | Must preserve: existing GitHub Pages homepage candidate; needs final content review |
+| https://qmcpy.org/ | Blog | publish | README.md | preserved: minimum viable homepage completed and locally verified |
 | https://qmcpy.org/blog/donation/ | Donation | publish |  | retire: standalone page is outside the must-preserve scope |
-| https://qmcpy.org/contributors-2/ | Contributors | publish | community.md | preserve contributor content; confirm URL mapping during Post-MCQMC work |
-| https://qmcpy.org/contributors/ | Contributors | publish | community.md | preserve contributor content; confirm URL mapping during Post-MCQMC work |
-| https://qmcpy.org/publications/ | Publications | publish | TBD | Must preserve: new GitHub Pages target needed |
+| https://qmcpy.org/contributors-2/ | Contributors | publish | community.md | preserved: path-exact redirect maps to the Community page |
+| https://qmcpy.org/contributors/ | Contributors | publish | community.md | preserved: path-exact redirect maps to the Community page |
+| https://qmcpy.org/publications/ | Publications | publish | publications.md | preserved: stable Publications page added |
 | https://qmcpy.org/references-for-python-and-mathematical-software-development/ | Dev Tools | publish |  | retire: standalone page is outside the must-preserve scope |
 | https://qmcpy.org/videos/ | Videos | publish |  | retire: standalone page is outside the must-preserve scope |
 | https://qmcpy.org/?page_id=689 | Tools | draft |  | retire: unpublished WordPress draft |
@@ -321,11 +352,11 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 | https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/ | What Makes a Sequence "Low Discrepancy"? | publish | blogs/what-makes-a-sequence-low-discrepancy/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2020/07/19/qei-with-qmcpy/ | qEI with QMCPy | publish | blogs/qei-with-qmcpy/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2020/08/31/safe-handling-of-qmc-points/ | Safe Handling of QMC Points | publish | blogs/safe-handling-of-qmc-points/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2020/09/03/mcqmc-2020-tutorial/ | A Tutorial at MCQMC 2020 | publish |  | preserve; identify the current target during Post-MCQMC URL mapping |
+| https://qmcpy.org/2020/09/03/mcqmc-2020-tutorial/ | A Tutorial at MCQMC 2020 | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2020/09/03/posters/ | A Collection of QMCPy Posters | publish |  | retire: no confirmed current target |
 | https://qmcpy.org/2020/09/03/pydata-chicago-talk/ | A Seminar at PyData Chicago | publish |  | retire: no confirmed current target |
-| https://qmcpy.org/2021/02/12/qmcpy-version-1-0/ | QMCPy Version 1.0 | publish |  | preserve; identify the current target during Post-MCQMC URL mapping |
-| https://qmcpy.org/2021/02/25/quasi-monte-carlo-software-article/ | Quasi-Monte Carlo Software Article | publish |  | preserve; identify the current target during Post-MCQMC URL mapping |
+| https://qmcpy.org/2021/02/12/qmcpy-version-1-0/ | QMCPy Version 1.0 | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
+| https://qmcpy.org/2021/02/25/quasi-monte-carlo-software-article/ | Quasi-Monte Carlo Software Article | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2021/02/25/speeding-up-qmcpy-with-distributable-c-code/ | Speeding up QMCPy with Distributable C Code | publish | blogs/speeding-up-qmcpy-with-distributable-c-code/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2021/02/25/visualizing-the-internals-of-object-classes-in-qmcpy/ | Visualizing the Internals of Object Classes in QMCPy | publish | blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2021/03/11/monte-carlo-methods-2021/ | Monte Carlo Methods 2021 | publish |  | retire: old event post without a confirmed current target |
@@ -333,7 +364,7 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 | https://qmcpy.org/2021/04/27/a-talk-at-the-chicago-area-siam-student-conference/ | A Talk at the Chicago Area SIAM Student Conference | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2021/04/27/a-talk-at-the-great-lakes-siam-conference/ | A Talk at the Great Lakes SIAM Conference | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/ | Digital Sequences, the Niederreiter Construction | publish | blogs/digital-sequences-the-niederreiter-construction/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2021/06/04/elliptic-pde-demo/ | Elliptic PDE Demo | publish |  | preserve; identify the current target during Post-MCQMC URL mapping |
+| https://qmcpy.org/2021/06/04/elliptic-pde-demo/ | Elliptic PDE Demo | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2022/02/22/qmcpy-events-coming-soon/ | QMCPy Events Coming Soon | publish |  | retire: old event announcement without a confirmed current target |
 | https://qmcpy.org/2022/05/19/bayesian-stopping-criteria/ | Bayesian Stopping Criteria | publish | blogs/bayesian-stopping-criteria/index.md | already migrated: exact Source WordPress URL match |
 | https://qmcpy.org/2023/04/07/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/ | Accelerating Rare-event Reliability Simulations for CERN's Large Hadron Collider using QMCPy | publish | blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/index.md | already migrated: exact Source WordPress URL match |
@@ -345,7 +376,7 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 | https://qmcpy.org/2023/07/05/qmcpy-talks-at-the-14th-international-conference-on-monte-carlo-methods-and-applications/ | QMCPY talks at the 14th International Conference on Monte Carlo Methods and Applications | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2023/08/06/innovative-investment-tool-qualifies-students-for-international-hackathon/ | Innovative Investment Tool Qualifies Students for International Hackathon | publish |  | retire: old news post without a confirmed current target |
 | https://qmcpy.org/2023/08/28/from-speedy-simulations-to-trustworthy-ai-undergraduates-take-on-research-challenges-at-illinois-tech-for-the-summer/ | From Speedy Simulations to Trustworthy AI: Undergraduates Take on Research Challenges at Illinois Tech for the Summer | publish |  | retire: old news post without a confirmed current target |
-| https://qmcpy.org/2023/10/04/simplifying-uncertainty-modeling-by-handing-the-backend-modeling-with-um-bridge/ | Simplifying and Improving Uncertainty Quantification with UM-Bridge | publish |  | preserve; identify the current target during Post-MCQMC URL mapping |
+| https://qmcpy.org/2023/10/04/simplifying-uncertainty-modeling-by-handing-the-backend-modeling-with-um-bridge/ | Simplifying and Improving Uncertainty Quantification with UM-Bridge | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2024/05/13/exploring-the-frontiers-the-15th-international-conference-on-monte-carlo-methods-and-applications-mcm-2025-at-illinois-institute-of-technology/ | Exploring the Frontiers: The 15th International Conference on Monte Carlo Methods and Applications (MCM 2025) at Illinois Institute of Technology | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2024/05/13/karl-menger-graduate-teaching-assistant-award/ | Karl Menger Graduate Teaching Assistant Award | publish |  | retire: old news post without a confirmed current target |
 | https://qmcpy.org/2024/10/20/aleksei-secures-doe-research-fellowship/ | Aleksei Sorokin Awarded Prestigious DOE Research Fellowship | publish |  | retire: old news post without a confirmed current target |
@@ -362,10 +393,13 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 ## Confirmed Before-MCQMC Decisions
 
 - Preserve Home, Publications, Blogs, GitHub, Docs, PyPI, contributor content,
-  and the five additional published posts marked `preserve` above.
+  and the 18 already migrated blog posts.
+- Do not migrate the five extra published post candidates removed from the
+  current scope on 2026-07-17.
 - Retire Donation, Videos, Dev Tools, unpublished drafts, and unmatched old
   news, event, and announcement posts.
 - Apply the tiered external backlink policy above; the recorded Illinois Tech
   Elevate deep link requires preservation of the old "Why Add Q to MC?" path.
-- Exact target selection, redirect scope, and implementation remain
-  Post-MCQMC work.
+- Exact targets and redirect scope are implemented in `data/redirects.yml` and
+  generated by `scripts/make_redirect_pages.py`; live deployment verification
+  remains Final Hosting Migration work.

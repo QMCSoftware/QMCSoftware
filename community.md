@@ -60,7 +60,9 @@ The contributors to our GitHub are:
   <img src="https://contrib.rocks/image?repo=QMCSoftware/QMCSoftware" width=600/>
 </a>
 
-For a list of contributors to [QMCPY.org](https://qmcpy.org), please refer to [https://qmcpy.org/contributors/](https://qmcpy.org/contributors/).
+Website and documentation contributions are preserved in the
+[repository history](https://github.com/QMCSoftware/QMCSoftware/commits/master/)
+and attributed on individual pages where applicable.
 
 ## Sponsors
 

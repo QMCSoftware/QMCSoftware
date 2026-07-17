@@ -16,7 +16,7 @@ As a software library grows, so does its complexity. This comment certainly appl
 
 ## Overview of QMCPy Classes
 
-First, we overview the relationships between the five main abstract classes in [QMCPy version 1.0](https://qmcpy.org/2021/02/12/qmcpy-version-1-0/):
+First, we overview the relationships between the five main abstract classes in QMCPy version 1.0:
 
 - `Integrand`,
 - `TrueMeasure`,

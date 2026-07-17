@@ -208,29 +208,62 @@ Verification notes:
 
 ## Homepage
 
-- [ ] Decide minimum viable homepage
-- [ ] Improve landing page professionalism
-- [ ] Add/verify:
-  - [ ] Installation link
-  - [ ] Documentation link
-  - [ ] GitHub link
-  - [ ] PyPI link
-  - [ ] Citation information
-  - [ ] Publications/references
-  - [ ] Contributors/collaborators
-  - [ ] QMC software ecosystem table
+- [x] Decide minimum viable homepage
+- [x] Improve landing page professionalism
+- [x] Add/verify:
+  - [x] Installation link
+  - [x] Documentation link
+  - [x] GitHub link
+  - [x] PyPI link
+  - [x] Citation information
+  - [x] Publications/references
+  - [x] Contributors/collaborators
+  - [x] QMC software ecosystem table
 
 ## Navigation
 
-- [ ] Review navbar structure
-- [ ] Simplify navigation if needed
-- [ ] Remove obsolete WordPress-era structure
+- [x] Review navbar structure
+- [x] Simplify navigation if needed
+- [x] Remove obsolete WordPress-era structure
 
 ## URL Preservation
 
-- [ ] Inventory important old WordPress URLs
-- [ ] Map old URLs to new locations
-- [ ] Decide which redirects are worth preserving
+- [x] Inventory important old WordPress URLs
+- [x] Map old URLs to new locations
+- [x] Decide which redirects are worth preserving
+
+## Implementation Evidence
+
+Completed on `migrate_qmcpy` on 2026-07-17:
+
+- Reworked `README.md` into the minimum viable homepage with direct entry
+  points for installation, documentation, demos, blogs, publications,
+  citation, community, GitHub, PyPI, and the QMC software ecosystem.
+- Added `docs/blogs/index.md` and `docs/publications.md` as stable public index
+  targets.
+- Kept the preserved blog archive at the 18 already migrated posts after the
+  2026-07-17 owner instruction to remove the five extra post candidates from
+  the current scope.
+- Reorganized `mkdocs.yml` into Getting Started, API Reference, Demos, Blogs,
+  Research and Community, and For Developers sections.
+- Recorded 20 required old paths in `data/redirects.yml`. The generated pages
+  preserve two contributor URLs and the old paths for all 18 migrated posts.
+- `scripts/make_redirect_pages.py` creates path-exact redirect pages without
+  depending on a new MkDocs plugin. It validates paths, targets, duplicates,
+  and ownership before writing files.
+- `conda run -n qmcpy make copydocs` completed after adding Pandoc to the local
+  `qmcpy` environment. `conda run -n qmcpy make uml` also completed after
+  adding Graphviz.
+- `conda run -n qmcpy python -m mkdocs build --clean` completed in about 53
+  seconds with no warnings or unresolved relative links.
+- Generated-output validation found all 20 redirect pages and all 20 targets,
+  with no missing files or redirect markup.
+- Browser validation confirmed 18 indexed blog posts, the Publications page,
+  the high-priority "Why Add Q to MC?" redirect, desktop layout, and a 390 px
+  mobile layout without horizontal overflow or console errors.
+
+These checks validate the branch implementation only. Live `qmcpy.org`
+verification remains part of Final Hosting Migration after publication.
 
 ---
 
