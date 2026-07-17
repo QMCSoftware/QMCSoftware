@@ -391,7 +391,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
             if not (self.dvec.max() < len(gen_vec)):
                 if warn:
                     warnings.warn(
-                        f"CBC generating vector only supports dimension <= {len(CBC)}; falling back to Richtmyer.",
+                        f"ANDERS_CBC generating vector only supports dimension <= {len(ANDERS_CBC)}; falling back to Richtmyer.",
                         RuntimeWarning,
                     )
                 self.gen_vec_source = "RICHTMYER"
