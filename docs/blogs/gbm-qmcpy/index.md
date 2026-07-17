@@ -1,3 +1,7 @@
+<!--
+Source WordPress URL: https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/
+-->
+
 # Highly Efficient Geometric Brownian Motion Modeling with QMCPy
 
 --8<-- "snippets/blog-authors/gbm-qmcpy.md"

@@ -1,5 +1,6 @@
 <!--
 Source TeX file: docs/blogs/parslTestbookQMCblog.tex
+Source WordPress URL: https://qmcpy.org/2025/11/29/parsl-accelerated-qmcpy-notebook-tests/
 Original metadata: Joshua Jay Herman, Brandon Sharp, and Sou-Cheng Choi; September 2025.
 Image handling: TeX image references were replaced with local image files.
 -->
