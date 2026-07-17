@@ -136,18 +136,22 @@ class TestMatern(unittest.TestCase):
 
 
 class TestUniform(unittest.TestCase):
-    def test_mean_and_covariance_with_scalar_bounds(self):
+    def test_moment_attributes_with_scalar_bounds(self):
         uniform = Uniform(
             DigitalNetB2(3, seed=7), lower_bound=-2, upper_bound=4
         )
 
         np.testing.assert_allclose(uniform.mean, [1.0, 1.0, 1.0])
+        np.testing.assert_allclose(uniform.variance, [3.0, 3.0, 3.0])
+        np.testing.assert_allclose(
+            uniform.standard_deviation, np.sqrt([3.0, 3.0, 3.0])
+        )
         np.testing.assert_allclose(
             uniform.covariance,
             np.diag([3.0, 3.0, 3.0]),
         )
 
-    def test_mean_and_covariance_with_vector_bounds(self):
+    def test_moment_attributes_with_vector_bounds(self):
         uniform = Uniform(
             DigitalNetB2(2, seed=7),
             lower_bound=[-2, 1],
@@ -155,9 +159,47 @@ class TestUniform(unittest.TestCase):
         )
 
         np.testing.assert_allclose(uniform.mean, [1.0, 5.5])
+        np.testing.assert_allclose(uniform.variance, [3.0, 6.75])
+        np.testing.assert_allclose(
+            uniform.standard_deviation, np.sqrt([3.0, 6.75])
+        )
         np.testing.assert_allclose(
             uniform.covariance,
             np.diag([3.0, 6.75]),
+        )
+
+
+class TestKumaraswamy(unittest.TestCase):
+    def test_moment_attributes_with_scalar_parameters(self):
+        kumaraswamy = Kumaraswamy(DigitalNetB2(3, seed=7), a=1, b=3)
+        expected_mean = np.full(3, 0.25)
+        expected_variance = np.full(3, 0.0375)
+
+        np.testing.assert_allclose(kumaraswamy.mean, expected_mean)
+        np.testing.assert_allclose(kumaraswamy.variance, expected_variance)
+        np.testing.assert_allclose(
+            kumaraswamy.standard_deviation, np.sqrt(expected_variance)
+        )
+        np.testing.assert_allclose(
+            kumaraswamy.covariance, np.diag(expected_variance)
+        )
+
+    def test_moment_attributes_with_vector_parameters(self):
+        kumaraswamy = Kumaraswamy(
+            DigitalNetB2(2, seed=7), a=[1, 2], b=[3, 4]
+        )
+        expected_mean = np.array([0.25, 128 / 315])
+        expected_variance = np.array(
+            [0.0375, 0.2 - (128 / 315) ** 2]
+        )
+
+        np.testing.assert_allclose(kumaraswamy.mean, expected_mean)
+        np.testing.assert_allclose(kumaraswamy.variance, expected_variance)
+        np.testing.assert_allclose(
+            kumaraswamy.standard_deviation, np.sqrt(expected_variance)
+        )
+        np.testing.assert_allclose(
+            kumaraswamy.covariance, np.diag(expected_variance)
         )
 
 
@@ -344,12 +386,20 @@ class TestGaussian(unittest.TestCase):
         """Test that Gaussian maintains correct mean and covariance properties."""
         custom_mean = np.array([1.0, -1.0, 2.0])
         custom_cov = np.array([[2.0, 0.5, 0.0], [0.5, 1.5, -0.3], [0.0, -0.3, 3.0]])
+        expected_variance = np.array([2.0, 1.5, 3.0])
 
         gaussian = Gaussian(
             Lattice(3, seed=self.seed), mean=custom_mean, covariance=custom_cov
         )
 
-        # Verify mean is stored correctly
+        np.testing.assert_allclose(gaussian.mean, custom_mean)
+        np.testing.assert_allclose(gaussian.variance, expected_variance)
+        np.testing.assert_allclose(
+            gaussian.standard_deviation, np.sqrt(expected_variance)
+        )
+        np.testing.assert_allclose(gaussian.covariance, custom_cov)
+
+        # Verify the internal mean and decomposition remain consistent.
         np.testing.assert_array_almost_equal(
             gaussian.mu,
             custom_mean,
@@ -369,6 +419,13 @@ class TestGaussian(unittest.TestCase):
     def test_gaussian_scalar_parameters(self):
         """Test Gaussian with scalar mean and covariance parameters."""
         gaussian = Gaussian(Lattice(3, seed=self.seed), mean=2.5, covariance=1.5)
+
+        np.testing.assert_allclose(gaussian.mean, np.full(3, 2.5))
+        np.testing.assert_allclose(gaussian.variance, np.full(3, 1.5))
+        np.testing.assert_allclose(
+            gaussian.standard_deviation, np.full(3, np.sqrt(1.5))
+        )
+        np.testing.assert_allclose(gaussian.covariance, 1.5 * np.eye(3))
 
         samples = gaussian.gen_samples(2)
 
