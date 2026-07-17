@@ -24,7 +24,9 @@ class MaternGP(Gaussian):
         >>> true_measure
         MaternGP (AbstractTrueMeasure)
             mean            [0.3 0.4 0.5]
-            covariance      [[0.01  0.01  0.01 ]
+            variance        [0.01 0.01 0.01]
+            standard_deviation [0.1 0.1 0.1]
+            covariance      [[0.01  0.01  0.009 ]
                              [0.01  0.01  0.01 ]
                              [0.009 0.01  0.01 ]]
             decomp_type     PCA
