@@ -341,7 +341,7 @@ docnouml: copydocs runmkdocserve
 # PEP8
 ##########################################################
 check_pep8:
-	@pylint qmcpy --exit-zero --disable=R,C,E0401
+	@pylint qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
 
 pep8: update_pep8_badge
 
