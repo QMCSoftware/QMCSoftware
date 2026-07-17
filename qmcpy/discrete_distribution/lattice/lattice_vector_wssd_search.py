@@ -3,7 +3,7 @@ import numpy as np
 # I am not sure where the best place to put this is, will ask Aleksi
 
 def lattice_vector_wssd_search(N, d, kernel,coord_weights):
-    if kernel == None:
+    if kernel is None:
         kernel = lambda x: x * (x - 1) + 1 / 6 # default kernel is the second Bernoulli polynomial
     if coord_weights is None:
         coord_weights = np.array([j**(-2) for j in range(1, d + 1)], dtype=np.float64) # default coordinate weights are j^(-2)
