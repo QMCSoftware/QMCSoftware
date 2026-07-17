@@ -24,11 +24,11 @@ class Gaussian(AbstractTrueMeasure):
                [ 0.61222205,  1.48402653]])
         >>> true_measure
         Gaussian (AbstractTrueMeasure)
-            mean            [1 2]
-            variance        [9 5]
+            mean            [1. 2.]
+            variance        [9. 5.]
             standard_deviation [3.    2.236]
-            covariance      [[9 4]
-                             [4 5]]
+            covariance      [[9. 4.]
+                             [4. 5.]]
             decomp_type     PCA
 
         With independent replications

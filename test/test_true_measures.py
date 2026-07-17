@@ -113,6 +113,49 @@ class TestTrueMeasure(unittest.TestCase):
                     all(spawn.transform != tm.transform for spawn in spawns)
                 )
 
+    def test_moment_attributes_are_public_and_consistent(self):
+        measures = [
+            Uniform(
+                DigitalNetB2(2, seed=7),
+                lower_bound=[-1, 2],
+                upper_bound=[3, 8],
+            ),
+            Kumaraswamy(
+                DigitalNetB2(2, seed=7), a=[1, 2], b=[3, 4]
+            ),
+            Gaussian(
+                DigitalNetB2(2, seed=7),
+                mean=[1, -1],
+                covariance=[[4, 1], [1, 9]],
+            ),
+        ]
+        moment_parameters = [
+            "mean",
+            "variance",
+            "standard_deviation",
+            "covariance",
+        ]
+
+        for measure in measures:
+            with self.subTest(measure=type(measure).__name__):
+                for parameter in moment_parameters:
+                    self.assertIn(parameter, measure.parameters)
+                    self.assertIn(parameter, str(measure))
+                self.assertEqual(measure.mean.shape, (measure.d,))
+                self.assertEqual(measure.variance.shape, (measure.d,))
+                self.assertEqual(
+                    measure.standard_deviation.shape, (measure.d,)
+                )
+                self.assertEqual(
+                    measure.covariance.shape, (measure.d, measure.d)
+                )
+                np.testing.assert_allclose(
+                    measure.standard_deviation**2, measure.variance
+                )
+                np.testing.assert_allclose(
+                    np.diag(measure.covariance), measure.variance
+                )
+
 
 class TestMatern(unittest.TestCase):
     def test_sklearn_equivalence(self):
@@ -168,6 +211,19 @@ class TestUniform(unittest.TestCase):
             np.diag([3.0, 6.75]),
         )
 
+    def test_spawn_recomputes_moment_attributes(self):
+        uniform = Uniform(
+            DigitalNetB2(2, seed=7), lower_bound=-2, upper_bound=4
+        )
+        spawn = uniform.spawn(1, dimensions=4)[0]
+
+        np.testing.assert_allclose(spawn.mean, np.full(4, 1.0))
+        np.testing.assert_allclose(spawn.variance, np.full(4, 3.0))
+        np.testing.assert_allclose(
+            spawn.standard_deviation, np.full(4, np.sqrt(3.0))
+        )
+        np.testing.assert_allclose(spawn.covariance, 3.0 * np.eye(4))
+
 
 class TestKumaraswamy(unittest.TestCase):
     def test_moment_attributes_with_scalar_parameters(self):
@@ -200,6 +256,37 @@ class TestKumaraswamy(unittest.TestCase):
         )
         np.testing.assert_allclose(
             kumaraswamy.covariance, np.diag(expected_variance)
+        )
+
+    def test_uniform_special_case(self):
+        kumaraswamy = Kumaraswamy(
+            DigitalNetB2(2, seed=7), a=1, b=1
+        )
+        expected_variance = np.full(2, 1 / 12)
+
+        np.testing.assert_allclose(kumaraswamy.mean, np.full(2, 0.5))
+        np.testing.assert_allclose(kumaraswamy.variance, expected_variance)
+        np.testing.assert_allclose(
+            kumaraswamy.standard_deviation, np.sqrt(expected_variance)
+        )
+        np.testing.assert_allclose(
+            kumaraswamy.covariance, np.diag(expected_variance)
+        )
+
+    def test_spawn_recomputes_moment_attributes(self):
+        kumaraswamy = Kumaraswamy(
+            DigitalNetB2(2, seed=7), a=1, b=3
+        )
+        spawn = kumaraswamy.spawn(1, dimensions=4)[0]
+        expected_variance = np.full(4, 0.0375)
+
+        np.testing.assert_allclose(spawn.mean, np.full(4, 0.25))
+        np.testing.assert_allclose(spawn.variance, expected_variance)
+        np.testing.assert_allclose(
+            spawn.standard_deviation, np.sqrt(expected_variance)
+        )
+        np.testing.assert_allclose(
+            spawn.covariance, np.diag(expected_variance)
         )
 
 
@@ -440,6 +527,35 @@ class TestGaussian(unittest.TestCase):
             decimal=6,
             err_msg="Gaussian with scalar parameters output changed unexpectedly",
         )
+
+    def test_moment_attributes_with_diagonal_covariance_vector(self):
+        gaussian = Gaussian(
+            Lattice(3, seed=self.seed),
+            mean=[-1, 0, 1],
+            covariance=[1, 4, 9],
+        )
+
+        np.testing.assert_allclose(gaussian.mean, [-1, 0, 1])
+        np.testing.assert_allclose(gaussian.variance, [1, 4, 9])
+        np.testing.assert_allclose(
+            gaussian.standard_deviation, [1, 2, 3]
+        )
+        np.testing.assert_allclose(
+            gaussian.covariance, np.diag([1, 4, 9])
+        )
+
+    def test_spawn_recomputes_moment_attributes(self):
+        gaussian = Gaussian(
+            Lattice(2, seed=self.seed), mean=2.5, covariance=1.5
+        )
+        spawn = gaussian.spawn(1, dimensions=4)[0]
+
+        np.testing.assert_allclose(spawn.mean, np.full(4, 2.5))
+        np.testing.assert_allclose(spawn.variance, np.full(4, 1.5))
+        np.testing.assert_allclose(
+            spawn.standard_deviation, np.full(4, np.sqrt(1.5))
+        )
+        np.testing.assert_allclose(spawn.covariance, 1.5 * np.eye(4))
 
 
 class TestBrownianMotion(unittest.TestCase):
