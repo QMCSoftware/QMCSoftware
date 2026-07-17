@@ -1,6 +1,5 @@
 import numpy as np
 from sympy import gcdex, primerange, prime
-import time
 #np.set_printoptions(precision=17)
 #https://github.com/sympy/sympy/releases
 
