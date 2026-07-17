@@ -523,7 +523,7 @@ class TestCubQMCBayesLatticeG(unittest.TestCase):
         with self.assertRaises(ParameterError):
             CubQMCBayesLatticeG(
                 Keister(
-                    Lattice(dimension=2, seed=7, order="NATURAL")
+                    Lattice(dimension=2, seed=7, order="LINEAR")
                 )
             )
 

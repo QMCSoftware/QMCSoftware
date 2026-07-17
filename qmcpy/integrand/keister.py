@@ -82,8 +82,9 @@ class Keister(AbstractIntegrand):
         cosinteg[0] = np.sqrt(np.pi) / (2 * np.exp(1 / 4))
         sininteg = np.zeros(shape=(d))
         sininteg[0] = 4.244363835020225e-01
-        cosinteg[1] = (1 - sininteg[0]) / 2
-        sininteg[1] = cosinteg[0] / 2
+        if d > 1:
+            cosinteg[1] = (1 - sininteg[0]) / 2
+            sininteg[1] = cosinteg[0] / 2
         for j in range(2, d):
             cosinteg[j] = ((j - 1) * cosinteg[j - 2] - sininteg[j - 1]) / 2
             sininteg[j] = ((j - 1) * sininteg[j - 2] + cosinteg[j - 1]) / 2
