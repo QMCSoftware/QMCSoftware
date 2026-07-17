@@ -1,6 +1,6 @@
 # QMCPy.org Transition Checklist
 
-_revised 2026-05-26_
+_revised 2026-07-16_
 
 ## Goals
 
@@ -98,8 +98,8 @@ Backup notes:
 
 - [x] List important existing pages
 - [x] Identify pages already migrated
-- [ ] Identify pages that can be retired
-- [ ] Identify important external URLs/backlinks
+- [x] Identify pages that can be retired
+- [x] Identify important external URLs/backlinks
 
 Inventory draft:
 
@@ -114,13 +114,22 @@ Current must-preserve scope:
 - Docs
 - PyPI
 
-Items outside this must-preserve list remain pending collaborator review.
+Collaborator decisions confirmed by Kang Jiangrui on 2026-07-16:
+
+- Preserve contributor content; evaluate the existing `community.md` target
+  during Post-MCQMC URL mapping.
+- Retire the standalone Donation, Videos, and Dev Tools pages.
+- Retire unpublished WordPress drafts.
+- Retire old news, event, and announcement posts without a confirmed current
+  target.
 
 Inventory notes:
 
-- Already migrated candidates are listed in `MIGRATE_qmcpy_inventory.md`.
-- Retirement candidates and external URL/backlink candidates are listed for collaborator review, but are not finalized.
-- External URL/backlink candidates include preliminary importance estimates; collaborator confirmation is still needed before marking that checklist item complete.
+- Already migrated content and confirmed retirement decisions are listed in
+  `MIGRATE_qmcpy_inventory.md`.
+- External URL/backlink importance has been confirmed for the current
+  inventory. Exact old-to-new mappings and redirect implementation remain
+  Post-MCQMC work.
 
 ## GitHub Pages
 
@@ -226,3 +235,4 @@ Expected GitHub records:
 185.199.109.153
 185.199.110.153
 185.199.111.153
+```
