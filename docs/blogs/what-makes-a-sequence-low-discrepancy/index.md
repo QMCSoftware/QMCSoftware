@@ -10,10 +10,7 @@ July 8, 2020
 
 This post introduces discrepancy as a way to measure uniformity and explains why low-discrepancy sequences improve QMC integration.
 
-The first blog post, [Why Add Q to MC?](../why-add-q-to-mc/index.md),
-introduced the concept of evenly spread points, which are commonly
-referred to as *low discrepancy* (LD) points. This is in contrast to
-independent and identically distributed (IID) points.
+The first blog post, [Why Add Q to MC?](../why-add-q-to-mc/index.md), introduced the concept of evenly spread points, which are commonly referred to as *low discrepancy* (LD) points. This is in contrast to independent and identically distributed (IID) points.
 
 Consider two sequences,
 
@@ -212,10 +209,8 @@ construct certain popular LD sequences [4, 5].
 2. Hickernell, F. J. A generalized discrepancy and quadrature error
    bound. *Mathematics of Computation*, 67, 299-322 (1998).
 3. Winker, P., & Fang, K. T. Application of threshold accepting to the
-   evaluation of the discrepancy of a set of points. *SIAM Journal on
-   Numerical Analysis*, 34, 2028-2042 (1997).
+evaluation of the discrepancy of a set of points. *SIAM Journal on Numerical Analysis*, 34, 2028-2042 (1997).
 4. Dick, J., & Pillichshammer, F. *Digital Nets and Sequences:
-   Discrepancy Theory and Quasi-Monte Carlo Integration*. Cambridge
-   University Press, Cambridge (2010).
+Discrepancy Theory and Quasi-Monte Carlo Integration*. Cambridge University Press, Cambridge (2010).
 5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo
    Methods*. SIAM, Philadelphia (1992).

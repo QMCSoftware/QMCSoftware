@@ -44,7 +44,7 @@ TEST_RUNTIMES_FALLBACK = {
     "tb_qmcpy_intro": 4.01,
     "tb_quickstart": 3.81,
     "tb_gbm_demo": 1.82,
-    "tb_acm_toms_sorokin_2025": 1.76,
+    "tb_Sorokin_random_LD_seq_QMC_fast_kernel_methods_2026": 1.76,
     "tb_umbridge": 0.85,
     # Skipped tests (assigned small default time)
     "tb_Argonne_2023_Talk_Figures": 1.0,
