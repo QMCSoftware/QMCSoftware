@@ -638,6 +638,17 @@ class TestBrownianMotion(unittest.TestCase):
             err_msg="samples of a same dimension spawn should match parent samples"
         )
 
+    def test_brownian_bridge_invalid_decomp_lazy_false(self):
+        with self.assertRaises(ParameterError) as context:
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="invalid", lazy_decomp=False)
+        self.assertIn("BrownianBridge", str(context.exception))
+
+    def test_brownian_bridge_monitoring_times_exceed_t_final(self):
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
+                           decomp_type="BrownianBridge", 
+                           monitoring_times=[0.1, 0.2, 0.3, 5.0])
+
 class TestGeometricBrownianMotion(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures with fixed seeds for reproducibility."""

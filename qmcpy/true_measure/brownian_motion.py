@@ -172,16 +172,16 @@ class BrownianMotion(Gaussian):
         self.drift_time_vec_plus_init = (
             self.drift * self.time_vec + self.initial_value
         )  # mean
+        if str(decomp_type).upper() not in ("PCA", "CHOLESKY", "BROWNIANBRIDGE"):
+            raise ParameterError(
+                f"decomp_type must be 'PCA', 'Cholesky', or 'BrownianBridge'. Got '{decomp_type}'."
+            )
         self._parse_gaussian_params(
             self.drift_time_vec_plus_init,
             self.diffused_sigma_bm,
             decomp_type,
             lazy_decomp if decomp_type.upper() != "BROWNIANBRIDGE" else True,
         )
-        if self.decomp_type not in ("PCA", "CHOLESKY", "BROWNIANBRIDGE"):
-            raise ParameterError(
-                f"decomp_type must be 'PCA', 'Cholesky', or 'BrownianBridge'. Got '{decomp_type}'."
-            )
         if self.decomp_type == "BROWNIANBRIDGE":
             self._setup_bridge()  # precompute bridge parameters
             self._output_order = self._get_output_order()
@@ -232,6 +232,8 @@ class BrownianMotion(Gaussian):
             raise ParameterError(f"monitoring_times must have length d={self.d}. Got length {s.shape[0]}.")
         if (s <= 0).any():
             raise ParameterError("monitoring_times must be positive.")
+        if (s > self.t).any():
+            raise ParameterError(f"maximum value in monitoring_times must not exceed t_final={self.t}. Got max {s.max()}.")
         if np.unique(s).size != self.d:
             raise ParameterError("monitoring_times must be distinct.")
         if bridge_vdc_gray_ordering:
