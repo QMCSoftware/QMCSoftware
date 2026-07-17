@@ -24,6 +24,10 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.lattice.Lattice
 
+## `lattice_vector_wssd_search`
+
+::: qmcpy.discrete_distribution.lattice.lattice_vector_wssd_search.lattice_vector_wssd_search
+
 ## `Halton`
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.halton.Halton
@@ -39,6 +43,10 @@ jupyter:
 ## `Kronecker`
 
 ::: qmcpy.discrete_distribution.kronecker.Kronecker
+
+## `kronecker_search_march_2026`
+
+::: qmcpy.discrete_distribution.kronecker.kronecker_search_methods.kronecker_search_march_2026
 
 ## `IIDStdUniform`
 
