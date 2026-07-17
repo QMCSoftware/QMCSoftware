@@ -26,7 +26,7 @@ class MaternGP(Gaussian):
             mean            [0.3 0.4 0.5]
             variance        [0.01 0.01 0.01]
             standard_deviation [0.1 0.1 0.1]
-            covariance      [[0.01  0.01  0.009 ]
+            covariance      [[0.01  0.01  0.009]
                              [0.01  0.01  0.01 ]
                              [0.009 0.01  0.01 ]]
             decomp_type     PCA

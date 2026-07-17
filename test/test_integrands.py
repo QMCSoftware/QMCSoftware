@@ -200,6 +200,9 @@ class TestIntegrandExamples(unittest.TestCase):
         expected_1d = np.sqrt(np.pi) * np.exp(-0.25)
         self.assertAlmostEqual(Keister.get_exact_value(1), expected_1d)
         self.assertAlmostEqual(ig.exact_integ(1), expected_1d)
+        expected_2d = 1.808186429263620
+        self.assertAlmostEqual(Keister.get_exact_value(2), expected_2d)
+        self.assertAlmostEqual(ig.exact_integ(2), expected_2d)
 
         spawned = ig.spawn(levels=0)[0]
         self.assertIsInstance(spawned, Keister)
