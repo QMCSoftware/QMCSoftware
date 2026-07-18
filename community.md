@@ -72,7 +72,7 @@ Website and documentation contributions are preserved in the [repository history
 
   <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/logos/kamakura-corporation-vector-logo.png?raw=true" width="300" height="150"/>
 
-- **[SigOpt, Inc.](https://sigopt.com)**
+- **SigOpt, Inc.**
 
   <img src="https://raw.githubusercontent.com/QMCSoftware/QMCSoftware/refs/heads/gh-pages/assets/logos/SigOpt_Logo_Files/Horz/Blue/SigoOpt-Horz-Blue.jpg?raw=true" width="300" height="100"/>
 
