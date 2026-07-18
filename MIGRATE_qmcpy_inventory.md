@@ -2,10 +2,7 @@
 
 _Generated from `/Users/kangjiangrui/Downloads/qmcpy.WordPress.2026-05-26.xml` on 2026-05-26._
 
-This file supports the **Content Inventory** section of
-`MIGRATE_qmcpy_checklist.md`. It records the Before-MCQMC preservation,
-retirement, and backlink-importance decisions and the Post-MCQMC old-to-new
-mapping implemented on `migrate_qmcpy`.
+This file supports the **Content Inventory** section of `MIGRATE_qmcpy_checklist.md`. It records the Before-MCQMC preservation, retirement, and backlink-importance decisions and the Post-MCQMC old-to-new mapping implemented on `migrate_qmcpy`.
 
 ## Backup Sources Checked
 
@@ -15,8 +12,7 @@ mapping implemented on `migrate_qmcpy`.
 
 ### Backup Integrity Evidence
 
-Checked on 2026-07-16 without extracting the archive or reading configuration
-or database contents:
+Checked on 2026-07-16 without extracting the archive or reading configuration or database contents:
 
 | Backup | Size | Local modification time | SHA-256 | Validation |
 |---|---:|---|---|---|
@@ -33,13 +29,9 @@ Jetpack archive structure:
 Minimum recovery procedure:
 
 1. Work from copies of both backups and verify the recorded SHA-256 digests.
-2. Restore only into an isolated WordPress test installation, never directly
-   over the public site.
-3. Import the WXR file for pages, posts, attachments, and menu metadata; use
-   `wp-content/uploads/` from the Jetpack archive for media recovery.
-4. Use the SQL and configuration files only for a separately approved full
-   restore, after reviewing and sanitizing credentials and environment-specific
-   values.
+2. Restore only into an isolated WordPress test installation, never directly over the public site.
+3. Import the WXR file for pages, posts, attachments, and menu metadata; use `wp-content/uploads/` from the Jetpack archive for media recovery.
+4. Use the SQL and configuration files only for a separately approved full restore, after reviewing and sanitizing credentials and environment-specific values.
 5. Keep both backups local; do not commit them or any extracted secrets.
 
 ## Summary
@@ -54,24 +46,16 @@ Minimum recovery procedure:
 
 Checked on 2026-07-16 with structured XML parsing:
 
-- Export status counts: 7 published pages, 1 draft page, 40 published posts,
-  and 2 draft posts.
-- The export contains 50 unique page/post URLs; the inventory contains the same
-  50 unique URLs, with no missing or extra entries.
-- The export also contains 93 attachments and 12 navigation menu items,
-  matching the summary above.
+- Export status counts: 7 published pages, 1 draft page, 40 published posts, and 2 draft posts.
+- The export contains 50 unique page/post URLs; the inventory contains the same 50 unique URLs, with no missing or extra entries.
+- The export also contains 93 attachments and 12 navigation menu items, matching the summary above.
 - All 18 migrated blog targets listed below exist in `docs/blogs/`.
-- All 18 migrated blog files now contain an exact `Source WordPress URL`
-  metadata match.
-- Post-MCQMC verification on 2026-07-17 confirmed the 18 selected blog targets
-  and exact source URL metadata after the five extra post candidates were
-  removed from the current migration scope.
+- All 18 migrated blog files now contain an exact `Source WordPress URL` metadata match.
+- Post-MCQMC verification on 2026-07-17 confirmed the 18 selected blog targets and exact source URL metadata after the five extra post candidates were removed from the current migration scope.
 
 ## Current Must-Preserve Scope
 
-Must-preserve scope confirmed by Kang Jiangrui on 2026-05-26. Retirement and
-backlink-importance decisions confirmed by Kang Jiangrui, the project owner and
-sole collaborator, on 2026-07-16.
+Must-preserve scope confirmed by Kang Jiangrui on 2026-05-26. Retirement and backlink-importance decisions confirmed by Kang Jiangrui, the project owner and sole collaborator, on 2026-07-16.
 
 | Item | Preserve? | Current/new location | Status |
 |---|---|---|---|
@@ -83,64 +67,38 @@ sole collaborator, on 2026-07-16.
 | Docs | Yes | `https://qmcsoftware.github.io/QMCSoftware/` | Link present in README and WordPress nav export |
 | PyPI | Yes | `https://pypi.org/project/qmcpy/` | Link present in README and WordPress nav export |
 
-Standalone Donation, Videos, and Dev Tools pages and unpublished drafts are
-confirmed for retirement. Contributor content is preserved in `community.md`,
-with both old contributor paths included in the redirect manifest.
+Standalone Donation, Videos, and Dev Tools pages and unpublished drafts are confirmed for retirement. Contributor content is preserved in `community.md`, with both old contributor paths included in the redirect manifest.
 
 ## Before-MCQMC Preservation Policies
 
-Confirmed by the project owner and sole collaborator on 2026-07-16. Updated by
-the project owner on 2026-07-17 to remove the five extra post candidates from
-the current migration scope.
+Confirmed by the project owner and sole collaborator on 2026-07-16. Updated by the project owner on 2026-07-17 to remove the five extra post candidates from the current migration scope.
 
 ### Retirement Policy
 
-Use a conservative classification based on whether public content has a
-confirmed preservation reason or an existing current target:
+Use a conservative classification based on whether public content has a confirmed preservation reason or an existing current target:
 
 - Retire the standalone Donation, Videos, and Dev Tools pages.
 - Retire the three unpublished WordPress drafts.
-- Retire published news, event, announcement, poster, and talk posts that have
-  no confirmed current target or preservation exception.
-- Preserve contributor content for later mapping to an appropriate current
-  page.
+- Retire published news, event, announcement, poster, and talk posts that have no confirmed current target or preservation exception.
+- Preserve contributor content for later mapping to an appropriate current page.
 - Preserve all 18 already-migrated blogs.
-- Do not migrate the five extra published post candidates previously selected:
-  the MCQMC 2020 tutorial, QMCPy v1.0 announcement, QMC software article,
-  elliptic PDE demo, and UM-Bridge article.
-- A retirement decision means that migration is not required. It does not
-  delete source material or backups during the Before-MCQMC stage.
+- Do not migrate the five extra published post candidates previously selected: the MCQMC 2020 tutorial, QMCPy v1.0 announcement, QMC software article, elliptic PDE demo, and UM-Bridge article.
+- A retirement decision means that migration is not required. It does not delete source material or backups during the Before-MCQMC stage.
 
 ### External Backlink Preservation Policy
 
-Apply the following tiered requirements to the external references recorded
-below:
+Apply the following tiered requirements to the external references recorded below:
 
-- **High:** preserve access through the `qmcpy.org` main domain. If the external
-  source cites a specific old path, preserve that path during Post-MCQMC URL
-  mapping.
-- **Medium:** preserve main-domain access. Preserve a specific old path only
-  when the external source explicitly cites that path.
-- **Low:** retain the reference as inventory evidence; no migration action is
-  required.
+- **High:** preserve access through the `qmcpy.org` main domain. If the external source cites a specific old path, preserve that path during Post-MCQMC URL mapping.
+- **Medium:** preserve main-domain access. Preserve a specific old path only when the external source explicitly cites that path.
+- **Low:** retain the reference as inventory evidence; no migration action is required.
 - Low-value directory and SEO results require no preservation work.
 
-Based on the current inventory, the Illinois Tech Elevate reference is the
-recorded high-importance source that explicitly identifies the "Why Add Q to
-MC?" blog. Its old path must therefore be included in Post-MCQMC mapping. All
-other high- and medium-importance references currently recorded cite the main
-domain or general project resources.
+Based on the current inventory, the Illinois Tech Elevate reference is the recorded high-importance source that explicitly identifies the "Why Add Q to MC?" blog. Its old path must therefore be included in Post-MCQMC mapping. All other high- and medium-importance references currently recorded cite the main domain or general project resources.
 
-Read-only HTTP checks on 2026-07-16 returned HTTP 200 for 9 of the 13 recorded
-external sources. Four automated checks were inconclusive: ResearchGate and
-FNAL returned HTTP 403, LinkedIn returned HTTP 405 to a HEAD request, and the
-IIT Undergraduate Research Journal request timed out after 30 seconds. These
-results indicate access-control or availability uncertainty, not confirmed
-content removal, so the approved preservation requirements remain unchanged.
+Read-only HTTP checks on 2026-07-16 returned HTTP 200 for 9 of the 13 recorded external sources. Four automated checks were inconclusive: ResearchGate and FNAL returned HTTP 403, LinkedIn returned HTTP 405 to a HEAD request, and the IIT Undergraduate Research Journal request timed out after 30 seconds. These results indicate access-control or availability uncertainty, not confirmed content removal, so the approved preservation requirements remain unchanged.
 
-This policy defines preservation requirements only. Exact targets and the
-redirect mechanism are recorded in the Post-MCQMC sections below; live
-verification remains Final Hosting Migration work.
+This policy defines preservation requirements only. Exact targets and the redirect mechanism are recorded in the Post-MCQMC sections below; live verification remains Final Hosting Migration work.
 
 ## Working Classification Summary
 
@@ -170,14 +128,10 @@ The following WordPress posts have clear GitHub Pages targets in `docs/blogs/`:
 ### Post-MCQMC Mapping Completion
 
 - `https://qmcpy.org/publications/` maps to `docs/publications.md`.
-- `https://qmcpy.org/` maps to the reviewed minimum viable homepage in
-  `README.md`.
-- `https://qmcpy.org/contributors/` and
-  `https://qmcpy.org/contributors-2/` map to `community.md`.
-- The 18 previously migrated posts have stable targets under `docs/blogs/` and
-  path-exact redirect entries in `data/redirects.yml`.
-- The five extra post candidates are intentionally excluded from the current
-  migration scope.
+- `https://qmcpy.org/` maps to the reviewed minimum viable homepage in `README.md`.
+- `https://qmcpy.org/contributors/` and `https://qmcpy.org/contributors-2/` map to `community.md`.
+- The 18 previously migrated posts have stable targets under `docs/blogs/` and path-exact redirect entries in `data/redirects.yml`.
+- The five extra post candidates are intentionally excluded from the current migration scope.
 
 ### Confirmed Retirement Decisions
 
@@ -192,15 +146,11 @@ Confirmed by the project owner and sole collaborator on 2026-07-16:
   - Dev Tools
   - Videos
 - Old news/event/announcement posts not currently matched to GitHub Pages content.
-- Preserve contributor content. `community.md` was selected as the target
-  during Post-MCQMC URL mapping.
+- Preserve contributor content. `community.md` was selected as the target during Post-MCQMC URL mapping.
 
 ### Confirmed External URLs / Backlinks
 
-Public search references were found on 2026-05-26. Their importance ratings
-were confirmed by the project owner and sole collaborator on 2026-07-16 for the
-current inventory. Exact redirect decisions remain Post-MCQMC work. Search
-queries included:
+Public search references were found on 2026-05-26. Their importance ratings were confirmed by the project owner and sole collaborator on 2026-07-16 for the current inventory. Exact redirect decisions remain Post-MCQMC work. Search queries included:
 
 - `"qmcpy.org" -site:qmcpy.org`
 - `"https://qmcpy.org" -site:qmcpy.org`
@@ -249,23 +199,15 @@ Checked on 2026-07-16:
 
 Read-only checks on 2026-07-16:
 
-- Public WHOIS reports Automattic Inc. as registrar, registry expiration at
-  `2028-08-31T22:25:48Z`, and DNSSEC as unsigned.
-- Authoritative nameservers remain `ns1.wordpress.com`, `ns2.wordpress.com`,
-  and `ns3.wordpress.com`.
-- The apex A records are the four GitHub Pages addresses:
-  `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and
-  `185.199.111.153`.
+- Public WHOIS reports Automattic Inc. as registrar, registry expiration at `2028-08-31T22:25:48Z`, and DNSSEC as unsigned.
+- Authoritative nameservers remain `ns1.wordpress.com`, `ns2.wordpress.com`, and `ns3.wordpress.com`.
+- The apex A records are the four GitHub Pages addresses: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and `185.199.111.153`.
 - No apex AAAA record was returned.
-- `www.qmcpy.org` is a CNAME to `qmcsoftware.github.io` and redirects to the
-  apex homepage.
-- A wildcard probe resolves through `CNAME * -> qmcpy.org` to the same GitHub
-  Pages IPv4 addresses.
+- `www.qmcpy.org` is a CNAME to `qmcsoftware.github.io` and redirects to the apex homepage.
+- A wildcard probe resolves through `CNAME * -> qmcpy.org` to the same GitHub Pages IPv4 addresses.
 - Email forwarding remains `MX 0 smtp-fwd.wordpress.com`.
-- SPF is `v=spf1 include:_spf.wpcloud.com ~all`; DMARC is
-  `v=DMARC1;p=none;`.
-- No DS record is published. DKIM selector names were not present in the
-  repository evidence and were not guessed or enumerated.
+- SPF is `v=spf1 include:_spf.wpcloud.com ~all`; DMARC is `v=DMARC1;p=none;`.
+- No DS record is published. DKIM selector names were not present in the repository evidence and were not guessed or enumerated.
 - No DNS, registrar, GitHub Pages, or WordPress setting was changed.
 
 Build command:
@@ -277,11 +219,8 @@ conda run -n qmcpy python -m mkdocs build
 Build result:
 
 - The 2026-05-26 build completed successfully.
-- On 2026-07-16, `conda run -n qmcpy make copydocs` stopped at the paper-render
-  step because `pandoc` is not installed in the environment. The failed command
-  produced no additional tracked file changes.
-- `conda run -n qmcpy python -m mkdocs build` then completed successfully in
-  approximately 52 seconds.
+- On 2026-07-16, `conda run -n qmcpy make copydocs` stopped at the paper-render step because `pandoc` is not installed in the environment. The failed command produced no additional tracked file changes.
+- `conda run -n qmcpy python -m mkdocs build` then completed successfully in approximately 52 seconds.
 
 2026-07-16 warning classification:
 
@@ -301,17 +240,12 @@ No warning was introduced by the four `Source WordPress URL` metadata changes.
 Checked on `migrate_qmcpy` on 2026-07-17:
 
 - `docs/blogs/index.md` links all 18 preserved posts.
-- `docs/publications.md` preserves the old publication list and adds the
-  current QMCPy software paper from repository-visible sources.
+- `docs/publications.md` preserves the old publication list and adds the current QMCPy software paper from repository-visible sources.
 - `data/redirects.yml` contains 20 unique old paths and no missing targets.
 - `scripts/make_redirect_pages.py` generated all 20 path-exact pages.
-- The full copy, UML, and MkDocs build workflows completed successfully; the
-  final build reported no warnings or unresolved relative links.
-- Browser checks covered desktop and mobile layouts and the required old "Why
-  Add Q to MC?" path.
-- No GitHub Pages setting, DNS record, WordPress setting, or live site was
-  changed. Live URL checks remain pending publication and Final Hosting
-  Migration.
+- The full copy, UML, and MkDocs build workflows completed successfully; the final build reported no warnings or unresolved relative links.
+- Browser checks covered desktop and mobile layouts and the required old "Why Add Q to MC?" path.
+- No GitHub Pages setting, DNS record, WordPress setting, or live site was changed. Live URL checks remain pending publication and Final Hosting Migration.
 
 ### Latest Develop Synchronization Verification
 
@@ -320,15 +254,10 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 - The merge completed without conflicts.
 - The 50 exported page/post URLs still match the 50 inventory entries exactly.
 - All 18 migrated blog targets and Source WordPress URL metadata still match.
-- Relative to `origin/develop`, the migration branch adds only the three
-  Before-MCQMC migration documents and four blog metadata changes.
-- `conda run -n qmcpy make copydocs` still stops because `pandoc` is missing and
-  produces no tracked file changes.
-- `conda run -n qmcpy python -m mkdocs build` completed successfully in
-  approximately 60 seconds.
-- The latest `develop` adds one non-blocking navigation warning for
-  `QMCPy_Shared_Leadership.md`, in addition to the previously classified
-  baseline messages.
+- Relative to `origin/develop`, the migration branch adds only the three Before-MCQMC migration documents and four blog metadata changes.
+- `conda run -n qmcpy make copydocs` still stops because `pandoc` is missing and produces no tracked file changes.
+- `conda run -n qmcpy python -m mkdocs build` completed successfully in approximately 60 seconds.
+- The latest `develop` adds one non-blocking navigation warning for `QMCPy_Shared_Leadership.md`, in addition to the previously classified baseline messages.
 
 ## Pages
 
@@ -392,14 +321,8 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 
 ## Confirmed Before-MCQMC Decisions
 
-- Preserve Home, Publications, Blogs, GitHub, Docs, PyPI, contributor content,
-  and the 18 already migrated blog posts.
-- Do not migrate the five extra published post candidates removed from the
-  current scope on 2026-07-17.
-- Retire Donation, Videos, Dev Tools, unpublished drafts, and unmatched old
-  news, event, and announcement posts.
-- Apply the tiered external backlink policy above; the recorded Illinois Tech
-  Elevate deep link requires preservation of the old "Why Add Q to MC?" path.
-- Exact targets and redirect scope are implemented in `data/redirects.yml` and
-  generated by `scripts/make_redirect_pages.py`; live deployment verification
-  remains Final Hosting Migration work.
+- Preserve Home, Publications, Blogs, GitHub, Docs, PyPI, contributor content, and the 18 already migrated blog posts.
+- Do not migrate the five extra published post candidates removed from the current scope on 2026-07-17.
+- Retire Donation, Videos, Dev Tools, unpublished drafts, and unmatched old news, event, and announcement posts.
+- Apply the tiered external backlink policy above; the recorded Illinois Tech Elevate deep link requires preservation of the old "Why Add Q to MC?" path.
+- Exact targets and redirect scope are implemented in `data/redirects.yml` and generated by `scripts/make_redirect_pages.py`; live deployment verification remains Final Hosting Migration work.
