@@ -18,12 +18,11 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
-import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 HREF_RE = re.compile(r'href=["\']([^"\'#][^"\']*)["\']')
 # Only <a href="...">, not <link href="..."> (stylesheets, preconnect resource
@@ -94,7 +93,40 @@ def check_internal(site_dir: Path) -> list[str]:
     return problems
 
 
-def check_external(site_dir: Path, delay: float = 0.1, timeout: float = 8.0) -> list[str]:
+def _check_one(url: str, timeout: float) -> str | None:
+    """Return None if url looks reachable, else a short problem description.
+
+    HEAD is tried first; a 405 (method not allowed) is retried with GET since
+    some hosts simply don't implement HEAD. A 403 is NOT retried -- academic
+    publisher/DOI hosts (ACM, Wiley, INFORMS, ScienceDirect, MathWorks,
+    SigOpt, doi.org itself, ...) routinely 403 scripted requests regardless
+    of method, so a GET retry just doubles the cost without changing the
+    outcome. Those are reported as a distinct, lower-confidence category.
+    """
+    req = urllib.request.Request(url, headers={"User-Agent": "qmcpy-link-checker"}, method="HEAD")
+    try:
+        urllib.request.urlopen(req, timeout=timeout)
+        return None
+    except urllib.error.HTTPError as e:
+        if e.code == 403:
+            return f"[likely bot-blocked, verify manually] {url} -- HTTP 403"
+        if e.code == 405:
+            try:
+                urllib.request.urlopen(
+                    urllib.request.Request(url, headers={"User-Agent": "qmcpy-link-checker"}),
+                    timeout=timeout,
+                )
+                return None
+            except Exception as e2:
+                return f"{url} -- {e2}"
+        if e.code >= 400:
+            return f"{url} -- HTTP {e.code}"
+        return None
+    except Exception as e:
+        return f"{url} -- {e}"
+
+
+def check_external(site_dir: Path, timeout: float = 8.0, workers: int = 16) -> list[str]:
     links: dict[str, list[Path]] = {}
     for f in sorted(site_dir.rglob("*.html")):
         text = f.read_text(encoding="utf-8", errors="replace")
@@ -103,26 +135,14 @@ def check_external(site_dir: Path, delay: float = 0.1, timeout: float = 8.0) -> 
                 links.setdefault(href, []).append(f.relative_to(site_dir))
 
     problems = []
-    for url in sorted(links):
-        req = urllib.request.Request(url, headers={"User-Agent": "qmcpy-link-checker"}, method="HEAD")
-        try:
-            urllib.request.urlopen(req, timeout=timeout)
-        except urllib.error.HTTPError as e:
-            if e.code in (405, 403):
-                # Some hosts reject HEAD; retry with GET before giving up.
-                try:
-                    urllib.request.urlopen(
-                        urllib.request.Request(url, headers={"User-Agent": "qmcpy-link-checker"}),
-                        timeout=timeout,
-                    )
-                except Exception as e2:
-                    problems.append(f"{url} -- {e2} (seen on {links[url][0]})")
-            elif e.code >= 400:
-                problems.append(f"{url} -- HTTP {e.code} (seen on {links[url][0]})")
-        except Exception as e:
-            problems.append(f"{url} -- {e} (seen on {links[url][0]})")
-        time.sleep(delay)
-    return problems
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        future_to_url = {pool.submit(_check_one, url, timeout): url for url in links}
+        for future in as_completed(future_to_url):
+            url = future_to_url[future]
+            result = future.result()
+            if result is not None:
+                problems.append(f"{result} (seen on {links[url][0]})")
+    return sorted(problems)
 
 
 def main() -> int:
