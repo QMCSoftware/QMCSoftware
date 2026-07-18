@@ -37,7 +37,7 @@ clean_local_only_files:
 	done
 
 clean_coverage:
-	rm -fr artifacts/coverage/ .coverage*
+	rm -fr artifacts/coverage/ .coverage* test/booktests/.coverage* 
 
 ##########################################################
 # Doctests
@@ -205,7 +205,7 @@ tests_no_docker:
 # Fast test target: run doctests, unittests, booktests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
-	@make clean_local_only_files && \
+	@make clean_local_only_files clean_coverage && \
 	if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
 		DOCTESTS_TARGET=doctests_no_docker; \
 		UNITTESTS_ARGS=""; \
@@ -341,7 +341,7 @@ docnouml: copydocs runmkdocserve
 # PEP8
 ##########################################################
 check_pep8:
-	@pylint qmcpy --exit-zero --disable=R,C,E0401
+	@pylint qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
 
 pep8: update_pep8_badge
 
