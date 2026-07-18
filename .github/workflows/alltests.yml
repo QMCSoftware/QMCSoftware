@@ -71,36 +71,6 @@ jobs:
           auto-activate-base: true
           conda-remove-defaults: true
           use-only-tar-bz2: true
-      - name: Pin Miniconda base Python (Unix)
-        if: runner.os != 'Windows'
-        shell: bash -el {0}
-        run: |
-          for i in 1 2 3; do
-            conda install -n base -y -c conda-forge python=${{ matrix.python-version }} && break
-            if [ "$i" -eq 3 ]; then
-              echo "Conda Python pin failed after 3 attempts"
-              exit 1
-            fi
-            echo "Conda Python pin attempt $i failed; retrying in 20s..."
-            sleep 20
-          done
-          python --version
-      - name: Pin Miniconda base Python (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          for ($i = 1; $i -le 3; $i++) {
-            try {
-              conda install -n base -y -c conda-forge python=${{ matrix.python-version }}
-              break
-            } catch {
-              if ($i -eq 3) { throw }
-              Write-Host "Conda Python pin attempt $i/3 failed; retrying in 20s..."
-              Start-Sleep -Seconds 20
-            }
-          }
-          python --version
       
       # -----------------------------------------------------------
       # Clean old coverage files
