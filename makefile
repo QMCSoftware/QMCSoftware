@@ -338,6 +338,14 @@ doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
 
+checklinks: copydocs  # internal links + anchors only; fast, no network, safe for CI
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site
+
+checklinks_external: copydocs  # also checks http/https links; slow and network-flaky, run locally
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site --external
+
 ##########################################################
 # PEP8
 ##########################################################
