@@ -1,8 +1,6 @@
 # QMCPy Blogs
 
-Technical articles from the QMCPy community cover quasi-Monte Carlo methods,
-software design, numerical experiments, and applications. This archive
-preserves the project posts selected during the `qmcpy.org` migration.
+Technical articles from the QMCPy community cover quasi-Monte Carlo methods, software design, numerical experiments, and applications. This archive preserves the project posts selected during the `qmcpy.org` migration.
 
 ## 2026
 

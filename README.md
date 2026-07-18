@@ -11,17 +11,9 @@
 [![codecov on All Tests](https://codecov.io/github/QMCSoftware/QMCSoftware/graph/badge.svg?token=Gqf0grDPQt)](https://codecov.io/github/QMCSoftware/QMCSoftware)
 [![PEP8 score](docs/assets/pep8-badge.svg)](https://github.com/QMCSoftware/QMCSoftware/actions/workflows/pep8.yml)
 
-QMCPy is an open-source Python framework for Monte Carlo and quasi-Monte Carlo
-integration. It combines low-discrepancy point generators, probability
-measures, integrands, and stopping criteria through a common object-oriented
-interface. The project supports practitioners applying modern QMC methods and
-researchers developing new algorithms within a shared, reproducible framework.
+QMCPy is an open-source Python framework for Monte Carlo and quasi-Monte Carlo integration. It combines low-discrepancy point generators, probability measures, integrands, and stopping criteria through a common object-oriented interface. The project supports practitioners applying modern QMC methods and researchers developing new algorithms within a shared, reproducible framework.
 
-[Get started](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/) |
-[API reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) |
-[Demos](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/) |
-[Blogs](https://qmcsoftware.github.io/QMCSoftware/blogs/) |
-[Publications](https://qmcsoftware.github.io/QMCSoftware/publications/)
+[Get started](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/) | [API reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) | [Demos](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/) | [Blogs](https://qmcsoftware.github.io/QMCSoftware/blogs/) | [Publications](https://qmcsoftware.github.io/QMCSoftware/publications/)
 
 ## Installation
 
@@ -29,8 +21,7 @@ researchers developing new algorithms within a shared, reproducible framework.
 pip install qmcpy
 ```
 
-To install from source or contribute to QMCPy, see the
-[contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/).
+To install from source or contribute to QMCPy, see the [contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/).
 
 ## How QMCPy Fits Together
 
@@ -39,31 +30,22 @@ A QMCPy integration problem is assembled from four main components:
 1. A **discrete distribution** generates IID or low-discrepancy samples.
 2. A **true measure** transforms those samples to the desired probability law.
 3. An **integrand** evaluates the quantity of interest.
-4. A **stopping criterion** determines when the requested error tolerance has
-   been met.
+4. A **stopping criterion** determines when the requested error tolerance has been met.
 
-See the [component overview](https://qmcsoftware.github.io/QMCSoftware/components/)
-for the mathematical interfaces and the
-[introduction notebook](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/)
-for a complete example.
+See the [component overview](https://qmcsoftware.github.io/QMCSoftware/components/) for the mathematical interfaces and the [introduction notebook](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/) for a complete example.
 
 ## Learn and Explore
 
 - Start with the [quickstart notebook](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/).
-- Browse the [package reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/)
-  and the full collection of rendered notebook demos.
+- Browse the [package reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) and the full collection of rendered notebook demos.
 - Read technical articles in the [QMCPy blog archive](https://qmcsoftware.github.io/QMCSoftware/blogs/).
 - Review [publications on QMCPy and related work](https://qmcsoftware.github.io/QMCSoftware/publications/).
 - Compare projects in the [QMC software ecosystem](https://qmcsoftware.github.io/QMCSoftware/qmc-software/).
-- Watch the [2023 PyData Chicago tutorial](https://www.youtube.com/watch?v=bRcKiLA2yBQ)
-  or the [2020 MCQMC tutorial](https://www.youtube.com/watch?v=gL8M_7c-YUE).
+- Watch the [2023 PyData Chicago tutorial](https://www.youtube.com/watch?v=bRcKiLA2yBQ) or the [2020 MCQMC tutorial](https://www.youtube.com/watch?v=gL8M_7c-YUE).
 
 ## Citation
 
-If QMCPy supports your work, please cite the project. The repository contains a
-[BibTeX entry](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib),
-and the current software paper is available from
-[JOSS](https://doi.org/10.21105/joss.09705).
+If QMCPy supports your work, please cite the project. The repository contains a [BibTeX entry](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib), and the current software paper is available from [JOSS](https://doi.org/10.21105/joss.09705).
 
 ```text
 Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt,
@@ -74,12 +56,6 @@ https://qmcsoftware.github.io/QMCSoftware/
 
 ## Community
 
-QMCPy is developed by an international community of researchers and software
-contributors. See the [community page](https://qmcsoftware.github.io/QMCSoftware/community/)
-for the steering council, collaborators, contributors, sponsors, and selected
-references. PyPI usage statistics are updated on the
-[download statistics page](https://qmcsoftware.github.io/QMCSoftware/stats/pypi_downloads/).
+QMCPy is developed by an international community of researchers and software contributors. See the [community page](https://qmcsoftware.github.io/QMCSoftware/community/) for the steering council, collaborators, contributors, sponsors, and selected references. PyPI usage statistics are updated on the [download statistics page](https://qmcsoftware.github.io/QMCSoftware/stats/pypi_downloads/).
 
-QMCPy is distributed under the
-[Apache 2.0 license](https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE)
-from the Illinois Institute of Technology.
+QMCPy is distributed under the [Apache 2.0 license](https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE) from the Illinois Institute of Technology.

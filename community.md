@@ -60,9 +60,7 @@ The contributors to our GitHub are:
   <img src="https://contrib.rocks/image?repo=QMCSoftware/QMCSoftware" width=600/>
 </a>
 
-Website and documentation contributions are preserved in the
-[repository history](https://github.com/QMCSoftware/QMCSoftware/commits/master/)
-and attributed on individual pages where applicable.
+Website and documentation contributions are preserved in the [repository history](https://github.com/QMCSoftware/QMCSoftware/commits/master/) and attributed on individual pages where applicable.
 
 ## Sponsors
 
