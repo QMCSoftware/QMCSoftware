@@ -317,6 +317,7 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
 	@python scripts/make_qmc_software_page.py
+	@python scripts/make_redirect_pages.py
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
 	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
@@ -336,6 +337,14 @@ runmkdocserve:
 doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
+
+checklinks: copydocs  # internal links + anchors only; fast, no network, safe for CI
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site
+
+checklinks_external: copydocs  # also checks http/https links; slow and network-flaky, run locally
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site --external
 
 ##########################################################
 # PEP8

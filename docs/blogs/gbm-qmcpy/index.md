@@ -1,3 +1,7 @@
+<!--
+Source WordPress URL: https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/
+-->
+
 # Highly Efficient Geometric Brownian Motion Modeling with QMCPy
 
 --8<-- "snippets/blog-authors/gbm-qmcpy.md"
@@ -186,8 +190,7 @@ To further validate these performance findings, we conducted an extended paramet
   While QuantLib's standard uniform IID sampler yields slightly lower
   MAE for a larger number of paths compared to QMCPy's IID sampler, it
   is notably slower.
-- Regarding speed, low-discrepancy samplers like Sobol, lattice, and
-Halton demonstrate superior convergence rates with increasing path counts compared to IID methods. With QMCPy, Sobol and lattice samplers offer the best speed-accuracy trade-off. QuantLib achieves comparable runtime to QMCPy's faster samplers, but without the accuracy benefits. The Halton sampler, while yielding the most accurate results, incurs significantly higher computational costs. These results highlight QMCPy's quasi-Monte Carlo methods as particularly well-suited for applications requiring high accuracy, with Sobol and lattice samplers providing an optimal balance of speed and precision for most practical scenarios.
+- Regarding speed, low-discrepancy samplers like Sobol, lattice, and Halton demonstrate superior convergence rates with increasing path counts compared to IID methods. With QMCPy, Sobol and lattice samplers offer the best speed-accuracy trade-off. QuantLib achieves comparable runtime to QMCPy's faster samplers, but without the accuracy benefits. The Halton sampler, while yielding the most accurate results, incurs significantly higher computational costs. These results highlight QMCPy's quasi-Monte Carlo methods as particularly well-suited for applications requiring high accuracy, with Sobol and lattice samplers providing an optimal balance of speed and precision for most practical scenarios.
 
 <figure id="fig-gbm-performance2">
   <img src="figures/figure_7.png" alt="Comprehensive parameter sweep performance analysis">
@@ -200,10 +203,8 @@ The `GeometricBrownianMotion` class in QMCPy is engineered for speed, robustness
 
 The class uses vectorized NumPy operations to generate entire arrays of GBM paths in a single call, minimizing Python loops and maximizing computational throughput. Sample generation proceeds in two stages:
 
-1. The parent class `BrownianMotion` generates standard BM sample paths
-using the specified sampler (e.g., low-discrepancy lattice, IID uniform), with drift and diffusion handled in the mean and covariance structure.
-2. The GBM class transforms the BM samples via the exponential mapping
-above, performed in a fully vectorized fashion, ensuring that thousands of paths can be efficiently simulated.
+1. The parent class `BrownianMotion` generates standard BM sample paths using the specified sampler (e.g., low-discrepancy lattice, IID uniform), with drift and diffusion handled in the mean and covariance structure.
+2. The GBM class transforms the BM samples via the exponential mapping above, performed in a fully vectorized fashion, ensuring that thousands of paths can be efficiently simulated.
 
 The class computes and stores the theoretical mean and covariance matrices for GBM at initialization, which can be used for validation and theoretical comparisons. Both mean and covariance are calculated using analytical formulas, leveraging [NumPy broadcasting](https://numpy.org/devdocs/user/basics.broadcasting.html) for efficient computations. Briefly, broadcasting in NumPy allows arithmetic operations between arrays of different shapes by automatically expanding the smaller array to match the shape of the larger array.
 
@@ -261,18 +262,12 @@ In the future, we aim to investigate ways to improve the runtime of the Halton s
 
 ## References
 
-1. Glasserman, P. *Monte Carlo Methods in Financial Engineering*.
-   Springer-Verlag, New York, 2004.
-2. Hull, J. *Options, Futures, and Other Derivatives* (10th ed.).
-   Pearson, 2017.
-3. Ross, S. M. *Introduction to Probability Models* (11th ed.).
-   Academic Press, 2014.
-4. Choi, S.-C. T., Hickernell, F. J., Jagadeeswaran, R., McCourt, M. J.,
-& Sorokin, A. G. Quasi-Monte Carlo Software. In A. Keller (Ed.), *Monte Carlo and Quasi-Monte Carlo Methods*, 2022.
-5. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy:
-A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
-6. The QuantLib contributors. QuantLib: A free/open-source library for
-quantitative finance. Version 1.38. DOI: [10.5281/zenodo.1440997](https://doi.org/10.5281/zenodo.1440997). 2003--2025. [https://www.quantlib.org](https://www.quantlib.org).
+1. Glasserman, P. *Monte Carlo Methods in Financial Engineering*. Springer-Verlag, New York, 2004.
+2. Hull, J. *Options, Futures, and Other Derivatives* (10th ed.). Pearson, 2017.
+3. Ross, S. M. *Introduction to Probability Models* (11th ed.). Academic Press, 2014.
+4. Choi, S.-C. T., Hickernell, F. J., Jagadeeswaran, R., McCourt, M. J., & Sorokin, A. G. Quasi-Monte Carlo Software. In A. Keller (Ed.), *Monte Carlo and Quasi-Monte Carlo Methods*, 2022.
+5. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
+6. The QuantLib contributors. QuantLib: A free/open-source library for quantitative finance. Version 1.38. DOI: [10.5281/zenodo.1440997](https://doi.org/10.5281/zenodo.1440997). 2003--2025. [https://www.quantlib.org](https://www.quantlib.org).
 
 ## Acknowledgments
 

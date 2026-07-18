@@ -141,12 +141,8 @@ This guide is a quick introduction to the QMCPy framework and syntax, not an exh
 
 ## References
 
-1. Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J., &
-Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
-2. Keister, B. D. Multidimensional Quadrature Algorithms.
-   *Computers in Physics* 10, 119-122. 1996.
+1. Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
+2. Keister, B. D. Multidimensional Quadrature Algorithms. *Computers in Physics* 10, 119-122. 1996.
 3. Oliphant, T. *Guide to NumPy*. Trelgol Publishing, USA, 2006.
-4. Hickernell, F. J., Choi, S.-C. T., Jiang, L., & Jimenez Rugama, L. A.
-Quasi-Monte Carlo Methods. In *Wiley StatsRef: Statistics Reference Online*. John Wiley & Sons, 2018.
-5. Jimenez Rugama, L. A. & Hickernell, F. J. Adaptive multidimensional
-integration based on rank-1 lattices. In *Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014*, 407-422. Springer-Verlag, Berlin, 2016. arXiv:1411.1966.
+4. Hickernell, F. J., Choi, S.-C. T., Jiang, L., & Jimenez Rugama, L. A. Quasi-Monte Carlo Methods. In *Wiley StatsRef: Statistics Reference Online*. John Wiley & Sons, 2018.
+5. Jimenez Rugama, L. A. & Hickernell, F. J. Adaptive multidimensional integration based on rank-1 lattices. In *Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014*, 407-422. Springer-Verlag, Berlin, 2016. arXiv:1411.1966.

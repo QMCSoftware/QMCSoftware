@@ -286,15 +286,9 @@ QMCPy also includes stopping criteria that automatically select the number of po
 
 ## References
 
-1. Dick, J., Kuo, F. Y., & Sloan, I. H. High-dimensional integration:
-   The quasi-Monte Carlo way. *Acta Numerica*, 22, 133-288 (2013).
-2. Dick, J., & Pillichshammer, F. *Digital Nets and Sequences*.
-   Cambridge University Press (2010).
-3. Harase, S. Comparison of Sobol' sequences in financial applications.
-   *Monte Carlo Methods and Applications*, 25(1), 61-74 (2019).
-4. Niederreiter, H. Point sets and sequences with small discrepancy.
-   *Monatshefte fur Mathematik*, 104, 273-337 (1987).
-5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo
-Methods*. Number 63 in CBMS-NSF Series in Applied Mathematics. SIAM, Philadelphia (1992).
-6. Bitbucket repository of Adrian Ebert.
-   [https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/).
+1. Dick, J., Kuo, F. Y., & Sloan, I. H. High-dimensional integration: The quasi-Monte Carlo way. *Acta Numerica*, 22, 133-288 (2013).
+2. Dick, J., & Pillichshammer, F. *Digital Nets and Sequences*. Cambridge University Press (2010).
+3. Harase, S. Comparison of Sobol' sequences in financial applications. *Monte Carlo Methods and Applications*, 25(1), 61-74 (2019).
+4. Niederreiter, H. Point sets and sequences with small discrepancy. *Monatshefte fur Mathematik*, 104, 273-337 (1987).
+5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo Methods*. Number 63 in CBMS-NSF Series in Applied Mathematics. SIAM, Philadelphia (1992).
+6. Bitbucket repository of Adrian Ebert. [https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/).
