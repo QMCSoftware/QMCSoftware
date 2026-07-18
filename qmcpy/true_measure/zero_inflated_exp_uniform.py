@@ -68,10 +68,8 @@ class ZeroInflatedExpUniform(SciPyWrapper):
     --------
     Without replications:
 
-    >>> import warnings
     >>> from qmcpy.discrete_distribution import DigitalNetB2
     >>> from qmcpy.true_measure import ZeroInflatedExpUniform
-    >>> warnings.simplefilter("ignore", UserWarning)
     >>> tm = ZeroInflatedExpUniform(
     ...     DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
     ... )
