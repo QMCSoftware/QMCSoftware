@@ -204,13 +204,8 @@ construct certain popular LD sequences [4, 5].
 
 ## References
 
-1. Dick, J., Kuo, F., & Sloan, I. H. High dimensional integration: The
-   quasi-Monte Carlo way. *Acta Numerica*, 22, 133-288 (2013).
-2. Hickernell, F. J. A generalized discrepancy and quadrature error
-   bound. *Mathematics of Computation*, 67, 299-322 (1998).
-3. Winker, P., & Fang, K. T. Application of threshold accepting to the
-evaluation of the discrepancy of a set of points. *SIAM Journal on Numerical Analysis*, 34, 2028-2042 (1997).
-4. Dick, J., & Pillichshammer, F. *Digital Nets and Sequences:
-Discrepancy Theory and Quasi-Monte Carlo Integration*. Cambridge University Press, Cambridge (2010).
-5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo
-   Methods*. SIAM, Philadelphia (1992).
+1. Dick, J., Kuo, F., & Sloan, I. H. High dimensional integration: The quasi-Monte Carlo way. *Acta Numerica*, 22, 133-288 (2013).
+2. Hickernell, F. J. A generalized discrepancy and quadrature error bound. *Mathematics of Computation*, 67, 299-322 (1998).
+3. Winker, P., & Fang, K. T. Application of threshold accepting to the evaluation of the discrepancy of a set of points. *SIAM Journal on Numerical Analysis*, 34, 2028-2042 (1997).
+4. Dick, J., & Pillichshammer, F. *Digital Nets and Sequences: Discrepancy Theory and Quasi-Monte Carlo Integration*. Cambridge University Press, Cambridge (2010).
+5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo Methods*. SIAM, Philadelphia (1992).

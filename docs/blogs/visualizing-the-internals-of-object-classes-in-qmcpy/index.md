@@ -112,6 +112,5 @@ We hope these UML diagrams help both researchers and developers better understan
 
 ## References
 
-1. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A
-quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
+1. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
 2. Unhelkar, B. *Software Engineering with UML*. CRC Press, 2017.

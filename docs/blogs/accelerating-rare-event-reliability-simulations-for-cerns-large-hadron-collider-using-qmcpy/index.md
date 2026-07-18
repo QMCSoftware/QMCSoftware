@@ -73,7 +73,5 @@ In our tests of the rare-events scenarios, the gains are visible. The results' a
 
 ## References
 
-1. AvailSim4 GitLab repository.
-   [https://gitlab.cern.ch/availsim4/availsim4](https://gitlab.cern.ch/availsim4/availsim4).
-2. Blaszkiewicz, M. *Methods to optimize rare-event Monte Carlo
-reliability simulations for Large Hadron Collider Protection Systems*. MSc Thesis. [https://cds.cern.ch/record/2808520](https://cds.cern.ch/record/2808520).
+1. AvailSim4 GitLab repository. [https://gitlab.cern.ch/availsim4/availsim4](https://gitlab.cern.ch/availsim4/availsim4).
+2. Blaszkiewicz, M. *Methods to optimize rare-event Monte Carlo reliability simulations for Large Hadron Collider Protection Systems*. MSc Thesis. [https://cds.cern.ch/record/2808520](https://cds.cern.ch/record/2808520).

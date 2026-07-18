@@ -29,12 +29,9 @@ To support scalable notebook testing, we developed a lightweight yet flexible te
 
 The harness coordinates three primary components to achieve reproducible, high-throughput notebook testing:
 
-- **Continuous Integration (CI):** A GitHub Actions workflow prepares the
-execution environment, including Conda environment creation, minimal LaTeX installation, optional swap configuration, project dependency installation, and test-target execution. This ensures consistent, version-controlled execution across platforms.
-- **Parsl controller and workers:** Parsl provisions local or remote executors,
-including processes, threads, or cluster jobs, and schedules notebook tests as independent tasks. This enables parallel execution with configurable concurrency limits, resource profiles, and executor backends.
-- **Testbook runner and artifact collection:** Each worker executes its
-assigned notebook tests through Testbook. Outputs, execution logs, error traces, generated figures, and notebook artifacts with executed cells are returned to the Parsl controller and can be uploaded by CI for inspection, provenance tracking, and debugging.
+- **Continuous Integration (CI):** A GitHub Actions workflow prepares the execution environment, including Conda environment creation, minimal LaTeX installation, optional swap configuration, project dependency installation, and test-target execution. This ensures consistent, version-controlled execution across platforms.
+- **Parsl controller and workers:** Parsl provisions local or remote executors, including processes, threads, or cluster jobs, and schedules notebook tests as independent tasks. This enables parallel execution with configurable concurrency limits, resource profiles, and executor backends.
+- **Testbook runner and artifact collection:** Each worker executes its assigned notebook tests through Testbook. Outputs, execution logs, error traces, generated figures, and notebook artifacts with executed cells are returned to the Parsl controller and can be uploaded by CI for inspection, provenance tracking, and debugging.
 
 Key features of the harness include pinned Conda environment specifications for reproducibility, customizable Parsl executors, timeout and retry policies for handling flaky or long-running tests, and centralized logging to streamline diagnosis of failures. Together, these components provide a robust framework for scalable, automated validation of computational notebooks.
 
@@ -92,10 +89,7 @@ Feedback from ParslFest participants also highlighted that the system is quite g
 
 ## References
 
-1. Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J., & Sorokin,
-   A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcpy.org](https://qmcpy.org).
-2. ParslFest 2025 presentation materials:
-   [Parsl Testbook Speedup](../../demos/talk_paper_demos/Parslfest_2025/Parsl_Testbook_Speedup.pdf).
+1. Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcpy.org](https://qmcpy.org).
+2. ParslFest 2025 presentation materials: [Parsl Testbook Speedup](../../demos/talk_paper_demos/Parslfest_2025/Parsl_Testbook_Speedup.pdf).
 3. Testbook documentation. [https://testbook.readthedocs.io/](https://testbook.readthedocs.io/).
-4. Babuji, Y. et al. Parsl: Pervasive Parallel Programming in Python.
-*Proceedings of the 28th International Symposium on High-Performance Parallel and Distributed Computing* (2019).
+4. Babuji, Y. et al. Parsl: Pervasive Parallel Programming in Python. *Proceedings of the 28th International Symposium on High-Performance Parallel and Distributed Computing* (2019).
