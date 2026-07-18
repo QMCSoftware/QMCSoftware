@@ -93,40 +93,55 @@ def check_internal(site_dir: Path) -> list[str]:
     return problems
 
 
-def _check_one(url: str, timeout: float) -> str | None:
-    """Return None if url looks reachable, else a short problem description.
+# Some hosts (Figma confirmed) 404 any HEAD request regardless of who's
+# asking, but 200 a GET from a browser-like UA -- their HEAD route is simply
+# unimplemented, not a bot check. Others (ACM, Wiley, INFORMS, ScienceDirect,
+# MathWorks, SigOpt, doi.org, ...) 403 real browsers too on scripted-looking
+# requests; a GET retry there confirms rather than changes the outcome. So:
+# always retry any HEAD failure with a browser-UA GET, and only label it
+# "likely bot-blocked" if that GET *also* comes back 403.
+BROWSER_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
 
-    HEAD is tried first; a 405 (method not allowed) is retried with GET since
-    some hosts simply don't implement HEAD. A 403 is NOT retried -- academic
-    publisher/DOI hosts (ACM, Wiley, INFORMS, ScienceDirect, MathWorks,
-    SigOpt, doi.org itself, ...) routinely 403 scripted requests regardless
-    of method, so a GET retry just doubles the cost without changing the
-    outcome. Those are reported as a distinct, lower-confidence category.
+
+def _check_one(url: str, timeout: float) -> tuple[str, str] | None:
+    """Return ``(severity, message)`` when a URL cannot be verified.
+
+    A 404 or 410 returned by a browser-like GET is a confirmed broken link.
+    Access controls, rate limits, server errors, redirects that urllib cannot
+    follow, and network/TLS failures are warnings: they do not prove that the
+    target is broken and should not make a documentation build fail.
     """
-    req = urllib.request.Request(url, headers={"User-Agent": "qmcpy-link-checker"}, method="HEAD")
     try:
-        urllib.request.urlopen(req, timeout=timeout)
+        urllib.request.urlopen(
+            urllib.request.Request(url, headers={"User-Agent": BROWSER_UA}, method="HEAD"),
+            timeout=timeout,
+        )
+        return None
+    except Exception:
+        pass
+
+    try:
+        urllib.request.urlopen(
+            urllib.request.Request(url, headers={"User-Agent": BROWSER_UA}),
+            timeout=timeout,
+        )
         return None
     except urllib.error.HTTPError as e:
+        if e.code in (404, 410):
+            return "broken", f"{url} -- HTTP {e.code}"
         if e.code == 403:
-            return f"[likely bot-blocked, verify manually] {url} -- HTTP 403"
-        if e.code == 405:
-            try:
-                urllib.request.urlopen(
-                    urllib.request.Request(url, headers={"User-Agent": "qmcpy-link-checker"}),
-                    timeout=timeout,
-                )
-                return None
-            except Exception as e2:
-                return f"{url} -- {e2}"
-        if e.code >= 400:
-            return f"{url} -- HTTP {e.code}"
-        return None
+            return "warning", f"[likely bot-blocked, verify manually] {url} -- HTTP 403"
+        return "warning", f"{url} -- HTTP {e.code}"
     except Exception as e:
-        return f"{url} -- {e}"
+        return "warning", f"{url} -- {e}"
 
 
-def check_external(site_dir: Path, timeout: float = 8.0, workers: int = 16) -> list[str]:
+def check_external(
+    site_dir: Path, timeout: float = 8.0, workers: int = 4
+) -> tuple[list[str], list[str]]:
     links: dict[str, list[Path]] = {}
     for f in sorted(site_dir.rglob("*.html")):
         text = f.read_text(encoding="utf-8", errors="replace")
@@ -134,15 +149,21 @@ def check_external(site_dir: Path, timeout: float = 8.0, workers: int = 16) -> l
             if urlparse(href).scheme in ("http", "https"):
                 links.setdefault(href, []).append(f.relative_to(site_dir))
 
-    problems = []
+    broken = []
+    warnings = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
         future_to_url = {pool.submit(_check_one, url, timeout): url for url in links}
         for future in as_completed(future_to_url):
             url = future_to_url[future]
             result = future.result()
             if result is not None:
-                problems.append(f"{result} (seen on {links[url][0]})")
-    return sorted(problems)
+                severity, message = result
+                report = f"{message} (seen on {links[url][0]})"
+                if severity == "broken":
+                    broken.append(report)
+                else:
+                    warnings.append(report)
+    return sorted(broken), sorted(warnings)
 
 
 def main() -> int:
@@ -158,11 +179,16 @@ def main() -> int:
         print(f"  {p}")
 
     if args.external:
-        ext_problems = check_external(site_dir)
-        print(f"\nChecked external links: {len(ext_problems)} problem(s).")
-        for p in ext_problems:
+        ext_broken, ext_warnings = check_external(site_dir)
+        print(
+            f"\nChecked external links: {len(ext_broken)} broken link(s), "
+            f"{len(ext_warnings)} warning(s)."
+        )
+        for p in ext_broken:
             print(f"  {p}")
-        problems += ext_problems
+        for p in ext_warnings:
+            print(f"  [warning] {p}")
+        problems += ext_broken
 
     return 1 if problems else 0
 
