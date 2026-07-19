@@ -199,7 +199,6 @@ def to_bin(x, t):
             return x
         else:
             raise ParameterError("x.dtype must be float or int, got %s" % str(x.dtype))
-    return xb
 
 
 def to_float(x, t):

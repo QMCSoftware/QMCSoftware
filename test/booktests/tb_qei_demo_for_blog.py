@@ -1,5 +1,4 @@
-import unittest, pytest
-from testbook import testbook
+import unittest
 from __init__ import BaseNotebookTest
 
 

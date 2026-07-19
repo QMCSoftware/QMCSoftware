@@ -1,4 +1,4 @@
-from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG
+from .abstract_cub_qmc_ld_g import AbstractCubQMCLDG, _default_fudge
 from ..discrete_distribution import Lattice
 from ..true_measure import Gaussian, Uniform
 from ..integrand import Keister, BoxIntegral, CustomFun
@@ -161,7 +161,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
         n_init=2**10,
         n_limit=2**30,
         error_fun="EITHER",
-        fudge=lambda m: 5.0 * 2.0 ** (-m),
+        fudge=_default_fudge,
         check_cone=False,
         ptransform="BAKER",
     ):
@@ -186,7 +186,7 @@ class CubQMCLatticeG(AbstractCubQMCLDG):
                     ```
             fudge (function): Positive function multiplying the finite sum of the Fourier coefficients specified in the cone of functions.
             check_cone (bool): Whether or not to check if the function falls in the cone.
-            ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
+            ptransform (str): Periodization transform, see the options in `AbstractIntegrand.f`.
         """
         super(CubQMCLatticeG, self).__init__(
             integrand,

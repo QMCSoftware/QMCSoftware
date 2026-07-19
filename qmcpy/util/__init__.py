@@ -7,11 +7,11 @@ from .stop_notebook import stop_notebook
 try:
     import torch
     import gpytorch
-    from .exact_gpytorch_gression_model import ExactGPyTorchRegressionModel
+    from .exact_gpytorch_regression_model import ExactGPyTorchRegressionModel
 except ImportError:
 
     class ExactGPyTorchRegressionModel(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ImportError(
                 "ExactGPyTorchRegressionModel requires torch and gpytorch but no installations found"
             )
