@@ -226,7 +226,7 @@ class FinancialOption(AbstractIntegrand):
                 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
-            option (str): Option type in `['ASIAN', 'EUROPEAN', 'BARRIER', 'LOOKBACK', 'DIGITAL']`
+            option (str): Option type in `['ASIAN', 'EUROPEAN', 'BARRIER', 'LOOKBACK', 'DIGITAL', 'AMERICAN']`
             call_put (str): Either `'CALL'` or `'PUT'`. 
             volatility (float): $\sigma$.
             start_price (float): $S_0$.
@@ -327,7 +327,11 @@ class FinancialOption(AbstractIntegrand):
     
     def g(self, t, **kwargs):
         gbm = self.gbm(t)
-        discounted_payoffs = self.payoff(gbm)*self.discount_factor
+        # NOTE (American-only fix): the payoff for "AMERICAN" already returns
+        # fully time-discounted cashflows (discounting is done internally in
+        # _fit_and_apply_longstaff_schwartz using each path's actual exercise
+        # time), so self.discount_factor must NOT be applied again here.
+        # All other option types are unaffected and keep the original behavior.
         if self.option == "AMERICAN":
             discounted_payoffs = self.payoff(gbm)
         else:
@@ -336,7 +340,10 @@ class FinancialOption(AbstractIntegrand):
             if self.level==0:
                 discounted_payoffs_coarse = np.zeros_like(discounted_payoffs)
             else: 
-                discounted_payoffs_coarse = self.payoff(gbm[...,1::2])*self.discount_factor
+                if self.option == "AMERICAN":
+                    discounted_payoffs_coarse = self.payoff(gbm[...,1::2])
+                else:
+                    discounted_payoffs_coarse = self.payoff(gbm[...,1::2])*self.discount_factor
             discounted_payoffs = np.stack([discounted_payoffs_coarse,discounted_payoffs])
         return discounted_payoffs
     
@@ -442,6 +449,7 @@ class FinancialOption(AbstractIntegrand):
     
     def payoff_digital_put(self, gbm):
         return np.where(gbm[...,-1]<=self.strike_price,self.digital_payout,0)
+
     def _basis_functions(self, x: np.ndarray) -> np.ndarray:
         """
         Basis functions for Longstaff-Schwartz regression.
@@ -457,8 +465,6 @@ class FinancialOption(AbstractIntegrand):
             x**2
         ])
 
-
-    
     def get_exact_value(self):
         """
         Compute the exact analytic fair price of the option in finite dimensions. Supports 
@@ -498,12 +504,25 @@ class FinancialOption(AbstractIntegrand):
     def _fit_and_apply_longstaff_schwartz(self, gbm: np.ndarray, is_call: bool):
         """
         Proper Longstaff-Schwartz on current batch only (no path accumulation).
+
+        Fixes applied (American-option-only):
+          - dt now matches the actual monitoring grid: gbm's columns are
+            tau_1,...,tau_d (there is no tau_0 = 0 column), so dt = t_final/n_times,
+            not t_final/(n_times-1).
+          - The backward-induction loop now includes t=0, the earliest possible
+            exercise date, which was previously skipped.
+          - The continuation value used in the regression target is discounted
+            using each path's *actual* stored exercise time (elapsed time from
+            the current step to when that cashflow will occur), not a fixed
+            one-step discount factor.
+          - The final discount to time 0 correctly accounts for column index c
+            corresponding to actual time (c+1)*dt.
         """
         n_paths, n_times = gbm.shape
-        dt = self.t_final / (n_times - 1)
-        disc = np.exp(-self.interest_rate * dt)
+        dt = self.t_final / n_times
+        r = self.interest_rate
+        exercise_time = np.full(n_paths, n_times - 1, dtype=int)
 
-        # payoff at all times
         if is_call:
             payoff = np.maximum(gbm - self.strike_price, 0)
         else:
@@ -511,16 +530,16 @@ class FinancialOption(AbstractIntegrand):
 
         # initialize with terminal payoff
         cashflow = payoff[:, -1].copy()
-        exercise_time = np.full(n_paths, n_times - 1, dtype=int)
 
-        # backward induction
-        for t in range(n_times - 2, 0, -1):
+        # backward induction, now including t = 0 (first exercise date)
+        for t in range(n_times - 2, -1, -1):
             itm = payoff[:, t] > 0
             if not np.any(itm):
                 continue
 
             X = self._basis_functions(gbm[itm, t])
-            Y = cashflow[itm] * disc  # one-step discounted continuation
+            elapsed = (exercise_time[itm] - t) * dt
+            Y = cashflow[itm] * np.exp(-r * elapsed)  # continuation discounted from its actual exercise time
 
             coeffs, _, _, _ = np.linalg.lstsq(X, Y, rcond=None)
             continuation = X @ coeffs
@@ -532,8 +551,8 @@ class FinancialOption(AbstractIntegrand):
             cashflow[ex_idx] = exercise[ex_now]
             exercise_time[ex_idx] = t
 
-        # discount to time 0
-        discounted_cf = cashflow * np.exp(-self.interest_rate * exercise_time * dt)
+        # discount to time 0; column index c corresponds to actual time (c+1)*dt
+        discounted_cf = cashflow * np.exp(-r * (exercise_time + 1) * dt)
 
         return discounted_cf
 
@@ -550,8 +569,6 @@ class FinancialOption(AbstractIntegrand):
 
         cashflow_new = self._fit_and_apply_longstaff_schwartz(gbm_reshaped, is_call=True)
         return cashflow_new.reshape(orig_shape)
-
-
 
     def get_exact_value_inf_dim(self):
         r"""
@@ -642,6 +659,3 @@ class DigitalOption(FinancialOption):
         if "option" in kwargs:
             raise ParameterError("please do not pass 'option' to DigitalOption")
         super(DigitalOption,self).__init__(*args, **kwargs, option="DIGITAL")
-
-
-
