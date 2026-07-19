@@ -3,7 +3,6 @@ import scipy.stats as stats
 
 from ..util import ParameterError, DimensionError
 from .scipy_wrapper import SciPyWrapper
-from ..discrete_distribution import DigitalNetB2
 
 
 class _StudentTAdapter:

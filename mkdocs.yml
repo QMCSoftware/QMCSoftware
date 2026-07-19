@@ -18,6 +18,7 @@ nav:
       - Quickstart: demos/quickstart.ipynb
       - Pricing Options: demos/pricing_options.ipynb 
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
+    - Resume Feature: demos/demo_resume_data/resume_examples.ipynb
     - Publication Notebooks:
       - 2026 JOSS Paper: demos/talk_paper_demos/JOSS2026/joss2026.ipynb
       - 2025 Sorokin Thesis: demos/talk_paper_demos/SorokinThesis2025/sorokin_thesis_2025.ipynb
@@ -63,26 +64,44 @@ nav:
       - Importance Sampling with True Measures:
         - Some True Measures: demos/some_true_measures.ipynb
         - SciPyWrapper dependence and Custom distributions: demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb
+        - Acceptance-Rejection Sampling: demos/acceptance_rejection.ipynb
   - Blogs: 
-    - SciPyWrapper: demos/scipywrapper_dependence_custom/blog.md
-  # - Papers: 
-  #   - JOSS: paper/paper.md
+    - Iteration Log: demos/demo_resume_data/Iteration_Log_Tolerance_Demo.ipynb
+    - Resume Feature: demos/demo_resume_data/accuracy_and_resume.ipynb
+    - SciPyWrapper: blogs/scipywrapper/index.md
+    - Visualizing the Generated Samples Helps: blogs/visualizing-the-generated-samples-helps/index.md
+    - "CubMCCLTVec: Vectorizing the CubMCCLT Algorithm": blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md
+    - Accelerating QMCPy Notebook Tests with Parsl: blogs/accelerating-qmcpy-notebook-tests-with-parsl/index.md
+    - GBM with QMCPy: blogs/gbm-qmcpy/index.md
+    - Linear Matrix Scrambling and Digital Shift for Halton: blogs/linear-matrix-scrambling-and-digital-shift-for-halton/index.md
+    - QMC Efficiency for Asian Option Pricing: blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/index.md
+    - Random Lattice Generators are Not Bad: blogs/random-lattice-generators-are-not-bad/index.md
+    - Accelerating Rare-event Reliability Simulations for CERN's Large Hadron Collider using QMCPy: blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/index.md
+    - Bayesian Stopping Criteria: blogs/bayesian-stopping-criteria/index.md
+    - Digital Sequences, the Niederreiter Construction: blogs/digital-sequences-the-niederreiter-construction/index.md
+    - Speeding up QMCPy with Distributable C Code: blogs/speeding-up-qmcpy-with-distributable-c-code/index.md
+    - Visualizing the Internals of Object Classes in QMCPy: blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md
+    - Safe Handling of QMC Points: blogs/safe-handling-of-qmc-points/index.md
+    - qEI with QMCPy: blogs/qei-with-qmcpy/index.md
+    - What Makes a Sequence Low Discrepancy?: blogs/what-makes-a-sequence-low-discrepancy/index.md
+    - A QMCPy Quick Start: blogs/a-qmcpy-quick-start/index.md
+    - Why Add Q to MC?: blogs/why-add-q-to-mc/index.md
   - For Developers:
     - Release Manual: RELEASE.md
     - Testing Guidelines: 
       - Doc tests and unit tests on `qmcpy`: tests.md
       - Unit tests on Jupyter Notebooks: booktests.md
-  - Printable Docs: print_page/
+    - JOSS 2026 Paper: paper/paper.md
   
 
 plugins:
-  - search
+  - material/search
   - mkdocs-jupyter:
       ignore_h1_titles: true       # Ignore H1 titles from notebooks
       execute: false               # Execute notebooks during build
       include_source: true         # Add download link for source notebooks
+      include: ["*.ipynb"]       # Restrict plugin to notebooks; avoid parsing API markdown
       # theme: dark                # Use dark theme for code cells
-      # include: ["*.ipynb"]       # File patterns to include
       # execute_ignore: []         # Skip certain files
       # allow_errors: false        # Fail build on notebook errors
       # kernel_name: python3       # Specify kernel to use
@@ -116,22 +135,24 @@ plugins:
               ignore_init_summary: false
             merge_init_into_class: true
   - glightbox:
-       touchNavigation: true
-       loop: false
-       effect: zoom
-       slide_effect: zoom
-       width: 100%
-       height: auto
-       zoomable: true
-       draggable: false
-       skip_classes:
-         - custom-skip-class-name
-       auto_caption: false
-       caption_position: bottom
-       background: white
-       shadow: true
-       manual: false
-  - print-site  # enables generating pdf by saving docs in print_page/ https://timvink.github.io/mkdocs-print-site-plugin/index.html 
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      slide_effect: zoom
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: false
+      skip_classes:
+        - custom-skip-class-name
+      auto_caption: false
+      caption_position: bottom
+      background: white
+      shadow: true
+      manual: false
+  - autorefs  # explicitly listed so print-site stays last (mkdocstrings auto-injects this)
+  - print-site:  # Enables PDF generation (saves docs to print_page/). See https://tinyurl.com/52ba83ax
+      add_to_navigation: true
   
 theme:
   palette:
@@ -200,4 +221,5 @@ extra_javascript:
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
 
 extra_css:
+  - stylesheets/paper.css
   - https://unpkg.com/katex@0/dist/katex.min.css

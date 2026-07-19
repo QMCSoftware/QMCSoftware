@@ -1,9 +1,8 @@
-from ..util import MethodImplementationError, _univ_repr, DimensionError, ParameterError
+from ..util import MethodImplementationError, _univ_repr, ParameterError
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
 import numpy as np
-from typing import Union
 
 
 class AbstractTrueMeasure(object):
@@ -90,6 +89,7 @@ class AbstractTrueMeasure(object):
 
     def _jacobian_transform_r(self, x, return_weights):
         r"""Recursive Jacobian transform."""
+        jac = None
         if self.sub_compatibility_error:
             raise ParameterError(
                 "The transform domain must match the sub-transform range."

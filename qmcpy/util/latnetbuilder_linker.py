@@ -1,4 +1,4 @@
-from ..util import ParameterError, NotYetImplemented
+from ..util import NotYetImplemented
 import numpy as np
 
 
@@ -32,7 +32,7 @@ def latnetbuilder_linker(lnb_dir="./", out_dir="./", fout_prefix="lnb4qmcpy"):
             gen_vector.append(int(Lines[5 + i].split(sep)[0]))
         v = np.array(gen_vector, dtype=np.uint64)
         f_out = "%s/%s.%d.%d.npy" % (out_dir, fout_prefix, dim, np.log2(nb_points))
-        save(f_out, v)
+        #save(f_out, v)
         return f_out
     else:
         nb_cols = int(Lines[0].split(sep)[0])
@@ -56,5 +56,5 @@ def latnetbuilder_linker(lnb_dir="./", out_dir="./", fout_prefix="lnb4qmcpy"):
             mint.append((np.array(M) * pows2).sum(0))
         mint = np.array(mint, dtype=np.uint64)
         f_out = "%s/%s.%d.%d.%d.msb.npy" % (out_dir, fout_prefix, dim, nb_rows, nb_cols)
-        save(f_out, mint)
+        #save(f_out, mint)
         return f_out
