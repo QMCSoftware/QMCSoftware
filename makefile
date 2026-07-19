@@ -299,7 +299,8 @@ uml:
 # Documentation with `mkdocs`
 #
 # Run ` mkdocs build -v` to debug. It generates HTML in site/ folder. 
-# You can enter `open site.index.html` to open the local pages in  browser.
+# You can enter `open site.index.html` to open the local pages in  browser. 
+# (However, the search function may be slow.)
 #
 # Use `mkdocs serve` to run a local server. The webpages are stored in a temporary folder and will be deleted when the server is stopped.
 ##########################################################
