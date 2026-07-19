@@ -301,7 +301,7 @@ uml:
 # Run ` mkdocs build -v` to debug. It generates HTML in site/ folder. 
 # You can enter `open site.index.html` to open the local pages in  browser.
 #
-# Use `mkdocs serve` to run a local server.
+# Use `mkdocs serve` to run a local server. The webpages are stored in a temporary folder and will be deleted when the server is stopped.
 ##########################################################
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
 	@rm -rf docs/paper docs/demos
