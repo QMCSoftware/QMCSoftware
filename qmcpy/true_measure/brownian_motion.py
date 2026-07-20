@@ -155,6 +155,8 @@ class BrownianMotion(Gaussian):
         # default to transform from standard uniform
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
+        if not np.isfinite(t_final) or t_final <= 0:
+            raise ParameterError(f"t_final must be positive and finite. Got {t_final}.")
         self.t = t_final  # exercise time
         self.initial_value = initial_value
         self.drift = drift
@@ -230,6 +232,8 @@ class BrownianMotion(Gaussian):
         s = np.asarray(monitoring_times, dtype=float).flatten()
         if s.shape != (self.d,):
             raise ParameterError(f"monitoring_times must have length d={self.d}. Got length {s.shape[0]}.")
+        if not np.isfinite(s).all():
+            raise ParameterError("monitoring_times must be finite. Got NaN or infinite values.")
         if (s <= 0).any():
             raise ParameterError("monitoring_times must be positive.")
         if (s > self.t).any():

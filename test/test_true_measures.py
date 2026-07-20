@@ -648,6 +648,20 @@ class TestBrownianMotion(unittest.TestCase):
             BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
                            decomp_type="BrownianBridge", 
                            monitoring_times=[0.1, 0.2, 0.3, 5.0])
+            
+    def test_brownian_bridge_monitoring_times_nan(self):
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
+                           decomp_type="BrownianBridge", 
+                           monitoring_times=[0.1, 0.2, np.nan, 1.0])
+            
+    def test_brownian_motion_invalid_t_final(self):
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=-8, 
+                           decomp_type="BrownianBridge")
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=np.nan, 
+                           decomp_type="BrownianBridge")
 
 class TestGeometricBrownianMotion(unittest.TestCase):
     def setUp(self):
