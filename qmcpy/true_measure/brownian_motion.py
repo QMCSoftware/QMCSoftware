@@ -14,6 +14,8 @@ class BrownianMotion(Gaussian):
     $$B(t) = B_0 + \gamma t + \sigma W(t).$$
 
     Examples:
+        Example 1: Basic usage
+
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),t_final=2,drift=2)
         >>> true_measure(2)
         array([[0.82189263, 2.7851793 , 3.60126805, 3.98054724],
@@ -29,7 +31,7 @@ class BrownianMotion(Gaussian):
                              [0.5 1.  1.5 2. ]]
             decomp_type     PCA
 
-        With independent replications
+        Example 2: With independent replications
 
         >>> x = BrownianMotion(DigitalNetB2(3,seed=7,replications=2),t_final=2,drift=2)(4)
         >>> x.shape
@@ -45,7 +47,7 @@ class BrownianMotion(Gaussian):
                 [0.23147948, 2.25289769, 3.00039101],
                 [2.06762574, 3.21756319, 4.93375923]]])
 
-        With Brownian Bridge construction
+        Example 3: With Brownian Bridge construction
 
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge')
         >>> true_measure(2)
@@ -62,7 +64,7 @@ class BrownianMotion(Gaussian):
                              [0.25 0.5  0.75 1.  ]]
             decomp_type     BROWNIANBRIDGE
 
-        With Brownian Bridge construction and independent replications
+        Example 4: With Brownian Bridge construction and independent replications
 
         >>> x = BrownianMotion(DigitalNetB2(4,seed=7,replications=3),decomp_type='BrownianBridge')(2)
         >>> x.shape
@@ -77,7 +79,7 @@ class BrownianMotion(Gaussian):
                [[ 0.59845146,  1.10849282,  1.34022073,  1.02092441],
                 [-0.20298903, -0.23324496, -0.3026512 , -0.35202342]]])
 
-        With custom monitoring times and passing bridge_vdc_gray_ordering=False (reaches all four cases)
+        Example 5: With custom monitoring times and passing bridge_vdc_gray_ordering=False (reaches all four cases)
 
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8],bridge_vdc_gray_ordering=False)        
         >>> true_measure.time_vec
@@ -86,7 +88,7 @@ class BrownianMotion(Gaussian):
         array([[-0.42678211,  0.23976687,  0.19961117,  0.56330283],
                [-0.31994843, -1.22738085, -1.29415239, -1.73713917]])
 
-        With custom monitoring times. By default the times are sorted and inserted in van der Corput order 
+        Example 6: With custom monitoring times. By default the times are sorted and inserted in van der Corput order 
 
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8])
         >>> true_measure.time_vec
@@ -95,7 +97,7 @@ class BrownianMotion(Gaussian):
         array([[-0.02913874,  0.4363325 , -0.07341545,  0.3095377 ],
                [-0.44240726, -1.34558221, -1.22522271, -1.58454187]])
 
-        With custom output order
+        Example 7: With custom output order
 
         >>> true_measure = BrownianMotion(DigitalNetB2(4,seed=7),decomp_type='BrownianBridge',monitoring_times=[0.6,1.0,0.3,0.8],bridge_output_order='input')
         >>> true_measure.time_vec
