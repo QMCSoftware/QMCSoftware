@@ -63,6 +63,8 @@ class BrownianMotion(Gaussian):
                              [0.25 0.5  0.75 0.75]
                              [0.25 0.5  0.75 1.  ]]
             decomp_type     BROWNIANBRIDGE
+            bridge_construction_times [1.   0.5  0.75 0.25]
+            bridge_output_times [0.25 0.5  0.75 1.  ]
 
         Example 4: With Brownian Bridge construction and independent replications
 
@@ -87,6 +89,10 @@ class BrownianMotion(Gaussian):
         >>> true_measure(2)
         array([[-0.42678211,  0.23976687,  0.19961117,  0.56330283],
                [-0.31994843, -1.22738085, -1.29415239, -1.73713917]])
+        >>> true_measure.bridge_construction_times
+        array([0.6, 1. , 0.3, 0.8])
+        >>> true_measure.bridge_output_times
+        array([0.3, 0.6, 0.8, 1. ])
 
         Example 6: With custom monitoring times. By default the times are sorted and inserted in van der Corput order 
 
@@ -96,6 +102,10 @@ class BrownianMotion(Gaussian):
         >>> true_measure(2)
         array([[-0.02913874,  0.4363325 , -0.07341545,  0.3095377 ],
                [-0.44240726, -1.34558221, -1.22522271, -1.58454187]])
+        >>> true_measure.bridge_construction_times
+        array([1. , 0.6, 0.8, 0.3])
+        >>> true_measure.bridge_output_times
+        array([0.3, 0.6, 0.8, 1. ])
 
         Example 7: With custom output order
 
@@ -105,6 +115,10 @@ class BrownianMotion(Gaussian):
         >>> true_measure(2)
         array([[ 0.4363325 ,  0.3095377 , -0.02913874, -0.07341545],
                [-1.34558221, -1.58454187, -0.44240726, -1.22522271]])
+        >>> true_measure.bridge_construction_times
+        array([1. , 0.6, 0.8, 0.3])
+        >>> true_measure.bridge_output_times
+        array([0.6, 1. , 0.3, 0.8])
 
         **References:**
 
@@ -168,8 +182,8 @@ class BrownianMotion(Gaussian):
             raise ParameterError("bridge_output_order must be 'increasing' or 'input'.")
         self.bridge_output_order = str(bridge_output_order).lower()
         self.monitoring_times = monitoring_times
-        self._construction_times = self._get_construction_times(monitoring_times, decomp_type, bridge_vdc_gray_ordering)
-        self.time_vec = np.sort(self._construction_times)
+        construction_times = self._get_construction_times(monitoring_times, decomp_type, bridge_vdc_gray_ordering)
+        self.time_vec = np.sort(construction_times)
         self.diffused_sigma_bm = self.diffusion * np.minimum.outer(
             self.time_vec, self.time_vec
         )
@@ -187,8 +201,11 @@ class BrownianMotion(Gaussian):
             lazy_decomp if decomp_type.upper() != "BROWNIANBRIDGE" else True,
         )
         if self.decomp_type == "BROWNIANBRIDGE":
+            self.bridge_construction_times = construction_times
             self._setup_bridge()  # precompute bridge parameters
             self._output_order = self._get_output_order()
+            self.bridge_output_times = self.time_vec[self._output_order]
+            self.parameters += ["bridge_construction_times", "bridge_output_times"]
         if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
             warnings.warn(
                 f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.", 
@@ -263,7 +280,7 @@ class BrownianMotion(Gaussian):
     
     def _setup_bridge(self):
         """Precompute parameters (Owen Algorithm 6.1)"""
-        s = self._construction_times
+        s = self.bridge_construction_times
         d = self.d
         left = np.full(d, -1, dtype=int)
         right = np.full(d, -1, dtype=int)
