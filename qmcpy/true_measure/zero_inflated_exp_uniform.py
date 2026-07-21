@@ -105,6 +105,7 @@ class ZeroInflatedExpUniform(SciPyWrapper):
             [0.        ],
             [0.85384192],
             [0.        ]],
+    <BLANKLINE>
            [[1.3024994 ],
             [0.03378461],
             [0.20489897],
