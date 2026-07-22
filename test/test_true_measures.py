@@ -158,6 +158,27 @@ class TestTrueMeasure(unittest.TestCase):
 
 
 class TestMatern(unittest.TestCase):
+    def test_spawn(self):
+        points = np.linspace(0, 1, 3)[:, None]
+        matern = MaternGP(
+            IIDStdUniform(3, seed=7),
+            points=points,
+            variance=0.01,
+            nugget=0.002,
+        )
+
+        direct_spawn = matern._spawn(IIDStdUniform(3, seed=8))
+        public_spawn = matern.spawn(1)[0]
+
+        for spawned in (direct_spawn, public_spawn):
+            self.assertIsInstance(spawned, MaternGP)
+            np.testing.assert_array_equal(spawned.points, points)
+            np.testing.assert_allclose(spawned.mean, matern.mean)
+            np.testing.assert_allclose(spawned.covariance, matern.covariance)
+
+        with self.assertRaises(DimensionError):
+            matern.spawn(1, dimensions=4)
+
     def test_sklearn_equivalence(self):
         points = np.array([[5, 4], [1, 2], [0, 0]])
         mean = np.full(3, 1.1)
