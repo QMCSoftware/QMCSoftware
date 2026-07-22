@@ -171,8 +171,8 @@ class BrownianMotion(Gaussian):
         # default to transform from standard uniform
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
-        if not np.isfinite(t_final) or t_final <= 0:
-            raise ParameterError(f"t_final must be positive and finite. Got {t_final}.")
+        if not np.isfinite(t_final) or t_final < 0:
+            raise ParameterError(f"t_final must be non-negative and finite. Got {t_final}.")
         self.t = t_final  # exercise time
         self.initial_value = initial_value
         self.drift = drift
