@@ -198,7 +198,7 @@ class BrownianMotion(Gaussian):
             self.drift_time_vec_plus_init,
             self.diffused_sigma_bm,
             decomp_type,
-            lazy_decomp if decomp_type.upper() != "BROWNIANBRIDGE" else True,
+            lazy_decomp if str(decomp_type).upper() != "BROWNIANBRIDGE" else True,
         )
         if self.decomp_type == "BROWNIANBRIDGE":
             self.bridge_construction_times = construction_times
@@ -242,7 +242,7 @@ class BrownianMotion(Gaussian):
 
     def _get_construction_times(self, monitoring_times, decomp_type, bridge_vdc_gray_ordering):
         """Return d construction times"""
-        if decomp_type.upper() != "BROWNIANBRIDGE":
+        if str(decomp_type).upper() != "BROWNIANBRIDGE":
             if monitoring_times is not None:
                 raise ParameterError("monitoring_times is only valid with decomp_type='BrownianBridge'.")
             return np.linspace(self.t / self.d, self.t, self.d)  # evenly spaced
