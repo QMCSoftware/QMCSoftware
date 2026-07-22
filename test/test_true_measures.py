@@ -200,6 +200,21 @@ class TestMatern(unittest.TestCase):
 
 
 class TestUniform(unittest.TestCase):
+    def test_upper_bound_must_exceed_lower_bound(self):
+        for lower_bound, upper_bound in [([1], [0]), ([1], [1])]:
+            with self.subTest(
+                lower_bound=lower_bound, upper_bound=upper_bound
+            ):
+                with self.assertRaisesRegex(
+                    ParameterError,
+                    "upper bound must be strictly greater than lower bound",
+                ):
+                    Uniform(
+                        IIDStdUniform(1, seed=7),
+                        lower_bound=lower_bound,
+                        upper_bound=upper_bound,
+                    )
+
     def test_moment_attributes_with_scalar_bounds(self):
         uniform = Uniform(
             DigitalNetB2(3, seed=7), lower_bound=-2, upper_bound=4

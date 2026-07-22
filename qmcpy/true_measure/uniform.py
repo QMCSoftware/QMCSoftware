@@ -1,5 +1,5 @@
 from .abstract_true_measure import AbstractTrueMeasure
-from ..util import DimensionError
+from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
 
@@ -68,6 +68,10 @@ class Uniform(AbstractTrueMeasure):
                 "upper bound and lower bound must be of length dimension"
             )
         self.delta = self.b - self.a
+        if np.any(self.delta <= 0):
+            raise ParameterError(
+                "upper bound must be strictly greater than lower bound"
+            )
         self.mean = (self.a + self.b) / 2
         self.variance = self.delta**2 / 12
         self.standard_deviation = self.delta / np.sqrt(12)
