@@ -7,6 +7,18 @@ from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangl
 from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
 
 
+def assert_sample_mean_and_covariance(measure):
+    samples = measure.gen_samples(2**15)
+    sample_mean = samples.mean(axis=0)
+    centered_samples = samples - sample_mean
+    sample_covariance = centered_samples.T @ centered_samples / len(samples)
+
+    np.testing.assert_allclose(sample_mean, measure.mean, rtol=0, atol=1e-5)
+    np.testing.assert_allclose(
+        sample_covariance, measure.covariance, rtol=0, atol=1e-5
+    )
+
+
 class TestTrueMeasure(unittest.TestCase):
     """General tests for TrueMeasures"""
 
@@ -200,6 +212,15 @@ class TestMatern(unittest.TestCase):
 
 
 class TestUniform(unittest.TestCase):
+    def test_sample_mean_and_covariance(self):
+        uniform = Uniform(
+            DigitalNetB2(2, seed=7),
+            lower_bound=[-2, 1],
+            upper_bound=[4, 10],
+        )
+
+        assert_sample_mean_and_covariance(uniform)
+
     def test_upper_bound_must_exceed_lower_bound(self):
         for lower_bound, upper_bound in [([1], [0]), ([1], [1])]:
             with self.subTest(
@@ -262,6 +283,13 @@ class TestUniform(unittest.TestCase):
 
 
 class TestKumaraswamy(unittest.TestCase):
+    def test_sample_mean_and_covariance(self):
+        kumaraswamy = Kumaraswamy(
+            DigitalNetB2(2, seed=7), a=[1, 2], b=[3, 4]
+        )
+
+        assert_sample_mean_and_covariance(kumaraswamy)
+
     def test_moment_attributes_with_scalar_parameters(self):
         kumaraswamy = Kumaraswamy(DigitalNetB2(3, seed=7), a=1, b=3)
         expected_mean = np.full(3, 0.25)
@@ -382,6 +410,15 @@ class TestGaussian(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures with fixed seeds for reproducibility."""
         self.seed = 42
+
+    def test_sample_mean_and_covariance(self):
+        gaussian = Gaussian(
+            DigitalNetB2(2, seed=7),
+            mean=[1, 2],
+            covariance=[[0.09, 0.04], [0.04, 0.05]],
+        )
+
+        assert_sample_mean_and_covariance(gaussian)
 
     def test_gaussian_basic_output_reproducibility(self):
         """Test that basic Gaussian sample generation produces expected values with fixed seed."""
