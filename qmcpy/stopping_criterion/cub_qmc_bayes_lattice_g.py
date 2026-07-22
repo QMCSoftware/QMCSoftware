@@ -38,8 +38,11 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             order           2^(1)
         Keister (AbstractIntegrand)
         Gaussian (AbstractTrueMeasure)
-            mean            0
-            covariance      2^(-1)
+            mean            [0. 0.]
+            variance        [0.5 0.5]
+            standard_deviation [0.707 0.707]
+            covariance      [[0.5 0. ]
+                             [0.  0.5]]
             decomp_type     PCA
         Lattice (AbstractLDDiscreteDistribution)
             d               2^(1)
@@ -79,6 +82,12 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            variance        [0.083 0.083 0.083]
+            standard_deviation [0.289 0.289 0.289]
+            covariance      [[0.083 0.    0.   ]
+                             [0.    0.083 0.   ]
+                             [0.    0.    0.083]]
         Lattice (AbstractLDDiscreteDistribution)
             d               3
             replications    1
@@ -132,6 +141,12 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            variance        [0.083 0.083 0.083]
+            standard_deviation [0.289 0.289 0.289]
+            covariance      [[0.083 0.    0.   ]
+                             [0.    0.083 0.   ]
+                             [0.    0.    0.083]]
         Lattice (AbstractLDDiscreteDistribution)
             d               3
             replications    1

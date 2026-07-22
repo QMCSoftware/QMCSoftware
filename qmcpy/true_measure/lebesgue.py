@@ -14,14 +14,22 @@ class Lebesgue(AbstractTrueMeasure):
         >>> Lebesgue(Gaussian(DigitalNetB2(2,seed=7)))
         Lebesgue (AbstractTrueMeasure)
             transform       Gaussian (AbstractTrueMeasure)
-                                mean            0
-                                covariance      1
+                                mean            [0. 0.]
+                                variance        [1. 1.]
+                                standard_deviation [1. 1.]
+                                covariance      [[1. 0.]
+                                                 [0. 1.]]
                                 decomp_type     PCA
         >>> Lebesgue(Uniform(DigitalNetB2(2,seed=7)))
         Lebesgue (AbstractTrueMeasure)
             transform       Uniform (AbstractTrueMeasure)
                                 lower_bound     0
                                 upper_bound     1
+                                mean            [0.5 0.5]
+                                variance        [0.083 0.083]
+                                standard_deviation [0.289 0.289]
+                                covariance      [[0.083 0.   ]
+                                                 [0.    0.083]]
     """
 
     def __init__(self, sampler):

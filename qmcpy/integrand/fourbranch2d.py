@@ -19,6 +19,11 @@ class FourBranch2d(AbstractIntegrand):
         Uniform (AbstractTrueMeasure)
             lower_bound     -8
             upper_bound     2^(3)
+            mean            [0. 0.]
+            variance        [21.333 21.333]
+            standard_deviation [4.619 4.619]
+            covariance      [[21.333  0.   ]
+                             [ 0.    21.333]]
 
         With independent replications
 

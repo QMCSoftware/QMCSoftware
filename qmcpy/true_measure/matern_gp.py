@@ -24,7 +24,9 @@ class MaternGP(Gaussian):
         >>> true_measure
         MaternGP (AbstractTrueMeasure)
             mean            [0.3 0.4 0.5]
-            covariance      [[0.01  0.01  0.01 ]
+            variance        [0.01 0.01 0.01]
+            standard_deviation [0.1 0.1 0.1]
+            covariance      [[0.01  0.01  0.009]
                              [0.01  0.01  0.01 ]
                              [0.009 0.01  0.01 ]]
             decomp_type     PCA
@@ -121,7 +123,8 @@ class MaternGP(Gaussian):
         self.points = points
         self.length_scale = length_scale
         self.nu = nu
-        self.variance = variance
+        self._kernel_variance = variance
+        self.nugget = nugget
         dists = np.linalg.norm(
             points[..., :, None, :] - points[..., None, :, :], axis=-1
         )
@@ -147,13 +150,20 @@ class MaternGP(Gaussian):
             sampler, mean=mean, covariance=covariance, decomp_type=decomp_type
         )
 
-    def _spawn(self, sampler):
+    def _spawn(self, sampler, dimension=None):
+        dimension = sampler.d if dimension is None else dimension
+        if dimension != self.d:
+            raise DimensionError(
+                "MaternGP cannot be spawned with a different dimension because "
+                "its dimension is fixed by the number of points."
+            )
         return MaternGP(
             sampler,
             self.points,
             length_scale=self.length_scale,
             nu=self.nu,
-            variance=self.variance,
+            variance=self._kernel_variance,
             mean=self.mean,
+            nugget=self.nugget,
             decomp_type=self.decomp_type,
         )
