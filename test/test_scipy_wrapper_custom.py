@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 import numpy as np
 import scipy.stats as stats
@@ -5,6 +7,19 @@ import scipy.stats as stats
 from qmcpy.discrete_distribution import DigitalNetB2
 from qmcpy.true_measure import SciPyWrapper, ZeroInflatedExpUniform, StudentT
 from qmcpy.true_measure.triangular import TriangularDistribution
+from qmcpy.util import DimensionError, ParameterError
+
+
+MISSING_PDF_WARNING = "no 'pdf' or 'logpdf'"
+
+
+def _missing_pdf_warnings(caught):
+    return [
+        warning
+        for warning in caught
+        if issubclass(warning.category, UserWarning)
+        and MISSING_PDF_WARNING in str(warning.message)
+    ]
 
 
 def test_mvn_dependence_correlation_and_moment():
@@ -56,19 +71,156 @@ def test_triangular_custom_marginal_range_and_shape():
 
 def test_zero_inflated_zero_rate():
     """
-    Check that the zero inflated joint distribution preserves the
+    Check that the zero-inflated exponential distribution preserves the
     specified probability mass at X = 0.
     """
     p_zero = 0.4
-    sampler = DigitalNetB2(2, seed=17)
-    tm = ZeroInflatedExpUniform(sampler, p_zero=p_zero, lam=1.5, y_split=0.5)
+    sampler = DigitalNetB2(1, seed=17)
+    tm = ZeroInflatedExpUniform(sampler, p_zero=p_zero, lam=1.5)
 
     n = 4096
     samples = tm(n)
-    x = samples[:, 0]
+    x = samples.ravel()
     zero_rate = np.mean(x == 0.0)
 
+    assert samples.shape == (n, 1)
     assert abs(zero_rate - p_zero) < 0.05
+
+
+@pytest.mark.parametrize("p_zero", [0.0, 1.0, -0.1, 1.1])
+def test_zero_inflated_rejects_invalid_p_zero(p_zero):
+    with pytest.raises(ParameterError, match="p_zero must be in"):
+        ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=17),
+            p_zero=p_zero,
+            lam=1.5,
+        )
+
+
+@pytest.mark.parametrize("lam", [0.0, -1.0])
+def test_zero_inflated_rejects_nonpositive_lam(lam):
+    with pytest.raises(ParameterError, match="lam must be positive"):
+        ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=17),
+            p_zero=0.4,
+            lam=lam,
+        )
+
+
+def test_zero_inflated_requires_one_dimensional_sampler():
+    with pytest.raises(
+        DimensionError,
+        match="requires a one-dimensional sampler",
+    ):
+        ZeroInflatedExpUniform(
+            DigitalNetB2(2, seed=17),
+            p_zero=0.4,
+            lam=1.5,
+        )
+
+
+def test_zero_inflated_inverse_transform_exact_values():
+    tm = ZeroInflatedExpUniform(
+        DigitalNetB2(1, seed=17),
+        p_zero=0.4,
+        lam=2.0,
+    )
+    u = np.array([[0.0], [0.2], [0.4], [0.7], [0.9]])
+
+    x = tm._transform(u)
+
+    assert x.shape == (5, 1)
+    assert np.array_equal(x[:3], np.zeros((3, 1)))
+    assert np.all(x[3:] > 0.0)
+
+    u_positive = u[3:, 0]
+    u_rescaled = (u_positive - 0.4) / 0.6
+    expected = -np.log1p(-u_rescaled) / 2.0
+    assert np.allclose(x[3:, 0], expected)
+
+
+def test_zero_inflated_inverse_transform_all_zero_branch():
+    tm = ZeroInflatedExpUniform(
+        DigitalNetB2(1, seed=17),
+        p_zero=0.4,
+        lam=2.0,
+    )
+    u = np.array([[0.0], [0.1], [0.4]])
+
+    x = tm._transform(u)
+
+    assert x.shape == (3, 1)
+    assert np.array_equal(x, np.zeros((3, 1)))
+
+
+def test_zero_inflated_inverse_transform_clips_one():
+    tm = ZeroInflatedExpUniform(
+        DigitalNetB2(1, seed=17),
+        p_zero=0.4,
+        lam=2.0,
+    )
+    u = np.array([[1.0]])
+
+    x = tm._transform(u)
+
+    assert x.shape == (1, 1)
+    assert np.isfinite(x).all()
+    assert x[0, 0] > 0.0
+
+
+def test_zero_inflated_construction_does_not_warn_about_missing_pdf():
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=17),
+            p_zero=0.4,
+            lam=1.5,
+        )
+
+    assert tm.d == 1
+    assert _missing_pdf_warnings(caught) == []
+
+
+def test_zero_inflated_sampling_does_not_warn_about_missing_pdf():
+    tm = ZeroInflatedExpUniform(DigitalNetB2(1, seed=17), p_zero=0.4, lam=1.5)
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        x = tm(8)
+
+    assert x.shape == (8, 1)
+    assert _missing_pdf_warnings(caught) == []
+
+
+def test_zero_inflated_return_weights_warns_once_for_missing_pdf():
+    tm = ZeroInflatedExpUniform(DigitalNetB2(1, seed=17), p_zero=0.4, lam=1.5)
+
+    with pytest.warns(UserWarning, match=MISSING_PDF_WARNING):
+        x, jac = tm(8, return_weights=True)
+
+    assert x.shape == (8, 1)
+    assert jac.shape == (8,)
+    assert np.allclose(jac, 1.0)
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        x_second, jac_second = tm(8, return_weights=True)
+
+    assert x_second.shape == (8, 1)
+    assert np.allclose(jac_second, 1.0)
+    assert _missing_pdf_warnings(caught) == []
+
+
+def test_zero_inflated_y_split_deprecation():
+    with pytest.warns(DeprecationWarning, match="y_split"):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=17),
+            p_zero=0.4,
+            lam=1.5,
+            y_split=0.5,
+        )
+
+    assert tm(4).shape == (4, 1)
 
 
 def test_student_t_marginals_shape():

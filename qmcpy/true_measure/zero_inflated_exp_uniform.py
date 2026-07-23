@@ -1,53 +1,144 @@
+import warnings
+
 import numpy as np
 
-from ..util import ParameterError, DimensionError
+from ..util import DimensionError, ParameterError
 from .scipy_wrapper import SciPyWrapper
 
 
-class _ZeroInflatedExpUniformAdapter:
-    def __init__(self, p_zero=0.4, lam=1.5, y_split=0.5):
+class _ZeroInflatedExponential:
+    """
+    One-dimensional zero-inflated exponential distribution.
+
+    This distribution has probability mass ``p_zero`` at zero and an
+    exponential distribution with rate ``lam`` on positive values.
+
+    It implements ``ppf`` so it can be passed to ``SciPyWrapper`` as a
+    custom univariate marginal.
+    """
+
+    def __init__(self, p_zero=0.4, lam=1.5):
         if not (0.0 < p_zero < 1.0):
             raise ParameterError("p_zero must be in (0,1).")
         if lam <= 0.0:
             raise ParameterError("lam must be positive.")
-        if not (0.0 < y_split < 1.0):
-            raise ParameterError("y_split must be in (0,1).")
 
         self.p_zero = float(p_zero)
         self.lam = float(lam)
-        self.y_split = float(y_split)
-        self.dim = 2
 
-    def transform(self, u):
+    def ppf(self, u):
+        """
+        Generalized inverse CDF of the zero-inflated exponential.
+
+        SciPyWrapper supplies one coordinate at a time. For example:
+
+            sampler output: (n, 1)
+            ppf input:      (n,)
+        """
         u = np.asarray(u, dtype=float)
-        if u.shape[-1] != 2:
-            raise DimensionError(f"Expected last axis 2, got {u.shape[-1]}")
 
-        u1 = u[..., 0]
-        u2 = u[..., 1]
+        # Values up to p_zero map to the point mass at X = 0.
+        x = np.zeros_like(u, dtype=float)
+        mask_exp = u > self.p_zero
 
-        x = np.zeros_like(u1, dtype=float)
-        y = np.empty_like(u1, dtype=float)
-
-        mask_zero = u1 <= self.p_zero
-        mask_exp = ~mask_zero
-
-        y[mask_zero] = self.y_split * u2[mask_zero]
-
+        # Rescale the remaining values to (0, 1), then use the
+        # exponential inverse CDF.
         if np.any(mask_exp):
-            u1r = (u1[mask_exp] - self.p_zero) / (1.0 - self.p_zero)
-            x[mask_exp] = -np.log(1.0 - u1r) / self.lam
-            y[mask_exp] = self.y_split + (1.0 - self.y_split) * u2[mask_exp]
+            u_rescaled = (u[mask_exp] - self.p_zero) / (
+                1.0 - self.p_zero
+            )
+            u_rescaled = np.clip(
+                u_rescaled,
+                np.finfo(float).eps,
+                1.0 - np.finfo(float).eps,
+            )
+            x[mask_exp] = -np.log1p(-u_rescaled) / self.lam
 
-        out = np.empty(u.shape, dtype=float)
-        out[..., 0] = x
-        out[..., 1] = y
-        return out
+        return x
 
 
 class ZeroInflatedExpUniform(SciPyWrapper):
-    def __init__(self, sampler, p_zero=0.4, lam=1.5, y_split=0.5):
+    """
+    One-dimensional zero-inflated exponential true measure.
+
+    The ``y_split`` keyword is retained temporarily for backward
+    compatibility but is ignored.
+
+    Examples
+    --------
+    Without replications:
+
+    >>> from qmcpy.discrete_distribution import DigitalNetB2
+    >>> from qmcpy.true_measure import ZeroInflatedExpUniform
+    >>> tm = ZeroInflatedExpUniform(
+    ...     DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+    ... )
+    >>> x = tm(8)
+    >>> x
+    array([[0.        ],
+           [0.76621559],
+           [0.        ],
+           [0.18405583],
+           [0.08112272],
+           [1.19997153],
+           [0.        ],
+           [0.33259467]])
+    >>> x.shape
+    (8, 1)
+    >>> bool((x >= 0).all())
+    True
+
+    With independent replications:
+
+    >>> tm = ZeroInflatedExpUniform(
+    ...     DigitalNetB2(1, seed=7, replications=2),
+    ...     p_zero=0.4,
+    ...     lam=1.5,
+    ... )
+    >>> x = tm(8)
+    >>> x
+    array([[[0.51197024],
+            [0.        ],
+            [2.54258665],
+            [0.03368876],
+            [0.2192598 ],
+            [0.        ],
+            [0.85384192],
+            [0.        ]],
+    <BLANKLINE>
+           [[1.3024994 ],
+            [0.03378461],
+            [0.20489897],
+            [0.        ],
+            [0.58638285],
+            [0.        ],
+            [0.35227285],
+            [0.        ]]])
+    >>> x.shape
+    (2, 8, 1)
+    >>> bool((x >= 0).all())
+    True
+    """
+
+    def __init__(self, sampler, p_zero=0.4, lam=1.5, y_split=None):
+        if sampler.d != 1:
+            raise DimensionError(
+                "ZeroInflatedExpUniform requires a one-dimensional sampler."
+            )
+
+        if y_split is not None:
+            warnings.warn(
+                "`y_split` is deprecated and ignored. "
+                "`ZeroInflatedExpUniform` is now one-dimensional; "
+                "remove `y_split` from this call.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
         super().__init__(
             sampler=sampler,
-            scipy_distribs=_ZeroInflatedExpUniformAdapter(p_zero, lam, y_split),
+            scipy_distribs=_ZeroInflatedExponential(
+                p_zero=p_zero,
+                lam=lam,
+            ),
         )
