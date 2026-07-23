@@ -3,6 +3,7 @@ from qmcpy.util import *
 import numpy as np
 import scipy.stats
 import unittest
+import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
 from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
 
@@ -37,6 +38,7 @@ class TestTrueMeasure(unittest.TestCase):
             BrownianMotion(
                 DigitalNetB2(d, seed=7), t_final=2, drift=3, decomp_type="Cholesky"
             ),
+            BrownianMotion(DigitalNetB2(d, seed=7), decomp_type="BrownianBridge"),
             BernoulliCont(DigitalNetB2(d, seed=7)),
             BernoulliCont(DigitalNetB2(d, seed=7), lam=[0.25, 0.75]),
             SciPyWrapper(
@@ -392,6 +394,274 @@ class TestBrownianMotion(unittest.TestCase):
                 err_msg="Parent BrownianMotion covariance changed unexpectedly",
             )
 
+    def test_brownian_bridge_output_reproducibility(self):
+        """Test that Brownian Bridge construction produces expected values with fixed seed."""
+        bb = BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="BrownianBridge")
+
+        samples = bb.gen_samples(2)
+
+        # Expected output based on fixed seed
+        expected_samples = np.array(
+            [
+                [-0.02048429,  0.41054648, -0.13899299,  0.3095377 ],
+                [-0.38732442, -1.19527027, -1.12175754, -1.58454187],
+            ]
+        )
+
+        np.testing.assert_array_almost_equal(
+            samples,
+            expected_samples,
+            decimal=6,
+            err_msg="Brownian Bridge sample generation output changed unexpectedly",
+        )
+
+    def test_brownian_bridge_decomp_type(self):
+        """Test BrownianBridge as a decomposition type for BrownianMotion."""
+        bm = BrownianMotion(
+            DigitalNetB2(4, seed=self.seed, replications=2), 
+            decomp_type="BrownianBridge")
+        samples = bm.gen_samples(2)
+        self.assertEqual(samples.shape, (2, 2, 4))
+        self.assertEqual(samples.dtype, np.float64)
+
+    def test_brownian_bridge_no_matrix_decomp(self):
+        """BrownianBridge raises ParameterError when matrix decomposition is called."""
+        bm = BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="BrownianBridge")
+        with self.assertRaises(ParameterError):
+            bm._compute_decomposition()
+
+    def test_brownian_bridge_manual_replications_d4(self):
+        """Manually construct a d=4 BrownianBridge path and compare with the automated version."""
+        d, n, reps = 4, 4, 2
+        t = np.linspace(1 / d, 1.0, d)
+
+        # Automated result
+        automated = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed, replications=reps), 
+            decomp_type="BrownianBridge"
+        ).gen_samples(n)
+
+        # Manual construction
+        u = DigitalNetB2(d, seed=self.seed, replications=reps).gen_samples(n)
+        z = scipy.stats.norm.ppf(u)
+
+        w_0 = np.zeros((reps, n, 1))
+
+        z_1 = z[..., 0:1]
+        z_2 = z[..., 1:2]
+        z_3 = z[..., 2:3]
+        z_4 = z[..., 3:4]
+
+        w_4 = np.sqrt(t[3]) * z_1
+
+        mean = w_0 + (t[1] - 0.0) / (t[3] - 0.0) * (w_4 - w_0)
+        std = np.sqrt((t[1] - 0.0) * (t[3] - t[1]) / (t[3] - 0.0))
+        w_2 = mean + std * z_2
+
+        mean = w_0 + (t[0] - 0.0) / (t[1] - 0.0) * (w_2 - w_0)
+        std  = np.sqrt((t[0] - 0.0) * (t[1] - t[0]) / (t[1] - 0.0))
+        w_1  = mean + std * z_4
+
+        mean = w_2 + (t[2] - t[1]) / (t[3] - t[1]) * (w_4 - w_2)
+        std  = np.sqrt((t[2] - t[1]) * (t[3] - t[2]) / (t[3] - t[1]))
+        w_3  = mean + std * z_3
+
+        expected = np.concatenate([w_1, w_2, w_3, w_4], axis=-1)
+
+        # Check consistency
+        self.assertEqual(automated.shape, (reps, n, d))
+        np.testing.assert_array_almost_equal(
+            expected, automated, decimal=10,
+            err_msg="Manual d=4 BrownianBridge path with replications does not match automated version."
+        )
+
+    def test_brownian_bridge_manual_replications_d3(self):
+        """Manually construct a d=3 BrownianBridge path and compare with the automated version."""
+        d, n, reps = 3, 4, 2
+        # default sampling order is van der Corput [1, 1/2, 3/4]
+
+        # Automated result (suppress warning)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            automated = BrownianMotion(
+                DigitalNetB2(d, seed=self.seed, replications=reps), 
+                decomp_type="BrownianBridge"
+            ).gen_samples(n)
+
+        # Manual construction
+        u = DigitalNetB2(d, seed=self.seed, replications=reps).gen_samples(n)
+        z = scipy.stats.norm.ppf(u)
+
+        w_0 = np.zeros((reps, n, 1))
+
+        z_1 = z[..., 0:1]
+        z_2 = z[..., 1:2]
+        z_3 = z[..., 2:3]
+
+        w_3 = np.sqrt(1.0) * z_1
+
+        mean = w_0 + (0.5 - 0.0) / (1.0 - 0.0) * (w_3 - w_0)
+        std = np.sqrt((0.5 - 0.0) * (1.0 - 0.5) / (1.0 - 0.0))
+        w_1 = mean + std * z_2
+
+        mean = w_1 + (0.75 - 0.5) / (1.0 - 0.5) * (w_3 - w_1)
+        std = np.sqrt((0.75 - 0.5) * (1.0 - 0.75) / (1.0 - 0.5))
+        w_2 = mean + std * z_3
+
+        expected = np.concatenate([w_1, w_2, w_3], axis=-1)
+
+        # Check consistency
+        self.assertEqual(automated.shape, (reps, n, d))
+        np.testing.assert_array_almost_equal(
+            expected, automated, decimal=10,
+            err_msg="Manual d=3 BrownianBridge path with replications does not match automated version."
+        )
+
+    def test_brownian_bridge_custom_monitoring_times(self):
+        """Manually construct a BrownianBridge path with custom monitoring times and compare with the automated version."""
+        d, n, reps = 4, 4, 2
+        # times in an order that hits all four anchor cases 
+        times = [0.6, 1.0, 0.3, 0.8]
+
+        automated = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed, replications=reps),
+            decomp_type="BrownianBridge", monitoring_times=times, bridge_vdc_gray_ordering=False
+        )
+        samples = automated.gen_samples(n)
+
+        np.testing.assert_array_almost_equal(
+            automated.time_vec, [0.3, 0.6, 0.8, 1.0],
+            err_msg="time_vec should be sorted into increasing order"
+        )
+
+        u = DigitalNetB2(d, seed=self.seed, replications=reps).gen_samples(n)
+        z = scipy.stats.norm.ppf(u)
+
+        w_0 = np.zeros((reps, n, 1))
+
+        z_1 = z[..., 0:1]
+        z_2 = z[..., 1:2]
+        z_3 = z[..., 2:3]
+        z_4 = z[..., 3:4]
+
+        w_2 = np.sqrt(0.6) * z_1
+
+        w_4 = w_2 + np.sqrt(1.0 - 0.6) * z_2
+
+        mean = w_0 + (0.3 - 0.0) / (0.6 - 0.0) * (w_2 - w_0)
+        std = np.sqrt((0.3 - 0.0) * (0.6 - 0.3) / (0.6 - 0.0))
+        w_1 = mean + std * z_3
+
+        mean = w_2 + (0.8 - 0.6) / (1.0 - 0.6) * (w_4 - w_2)
+        std = np.sqrt((0.8 - 0.6) * (1.0 - 0.8) / (1.0 - 0.6))
+        w_3 = mean + std * z_4
+
+        expected = np.concatenate([w_1, w_2, w_3, w_4], axis=-1)
+
+        self.assertEqual(samples.shape, (reps, n, d))
+        np.testing.assert_array_almost_equal(
+            expected, samples, decimal=10,
+            err_msg="Manual BrownianBridge path with custom monitoring times does not match automated version."
+        )
+
+    def test_brownian_bridge_vdc_ordering_matches_default(self):
+        """Use 4 evenly spaced custom times and compare to van der Corput ordering"""
+        d, n = 4, 4
+
+        default = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed), decomp_type='BrownianBridge'
+        ).gen_samples(n)
+
+        reordered = BrownianMotion(
+            DigitalNetB2(d, seed=self.seed),
+            decomp_type='BrownianBridge', monitoring_times=np.linspace(1/d, 1.0, d)
+        ).gen_samples(n)
+
+        np.testing.assert_almost_equal(
+            default, reordered, decimal=10,
+            err_msg="4 evenly spaced custom times should match van der Corput ordering"
+        )
+
+    def test_brownian_bridge_output_order(self):
+        """Test that custom ordered output matches given input and contains same values as increasing output"""
+        times = [0.6, 1.0, 0.3, 0.8]
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            increasing_output = BrownianMotion(DigitalNetB2(4, seed=self.seed),
+                decomp_type="BrownianBridge", monitoring_times=times).gen_samples(8)
+            custom_output = BrownianMotion(DigitalNetB2(4, seed=self.seed),
+                decomp_type="BrownianBridge", monitoring_times=times,
+                bridge_output_order="input").gen_samples(8)
+            
+        np.testing.assert_allclose(
+            custom_output[..., np.argsort(times)], increasing_output,
+            err_msg="custom ordered output should match given input and contain equivalent values to increasing output"
+        )
+
+    def test_brownian_bridge_warning_for_non_power_of_2(self):
+        """BrownianBridge issues ParameterWarning for suboptimal d but still produces valid output."""
+        from qmcpy.util import ParameterWarning
+        with self.assertWarns(ParameterWarning):
+            bm = BrownianMotion(DigitalNetB2(6, seed=self.seed), decomp_type='BrownianBridge')
+        samples = bm.gen_samples(4)
+        self.assertEqual(samples.shape, (4, 6))
+        self.assertEqual(samples.dtype, np.float64)
+
+    def test_brownian_bridge_lazy_decomp_false(self):
+        """BrownianBridge proceeds with lazy_decomp=False"""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            bm = BrownianMotion(DigitalNetB2(6, seed=self.seed),
+                decomp_type="BrownianBridge", lazy_decomp=False
+            )
+            samples = bm.gen_samples(4)
+        self.assertEqual(samples.shape, (4,6))
+
+    def test_brownian_bridge_spawn_matches_parent(self):
+        """Spawn must match parent"""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            bm = BrownianMotion(
+                DigitalNetB2(4, seed=self.seed),
+                decomp_type="BrownianBridge",
+                initial_value=2, drift=3, diffusion=4,
+                monitoring_times=[0.6, 1.0, 0.3, 0.8],
+                bridge_vdc_gray_ordering=True,
+                bridge_output_order="input",
+            )
+            child = bm._spawn(DigitalNetB2(4, seed=self.seed), 4)
+            parent_samples = bm.gen_samples(8)
+            child_samples = child.gen_samples(8)
+        np.testing.assert_array_equal(
+            parent_samples, child_samples,
+            err_msg="samples of a same dimension spawn should match parent samples"
+        )
+
+    def test_brownian_bridge_invalid_decomp_lazy_false(self):
+        with self.assertRaises(ParameterError) as context:
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), decomp_type="invalid", lazy_decomp=False)
+        self.assertIn("BrownianBridge", str(context.exception))
+
+    def test_brownian_bridge_monitoring_times_exceed_t_final(self):
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
+                           decomp_type="BrownianBridge", 
+                           monitoring_times=[0.1, 0.2, 0.3, 5.0])
+            
+    def test_brownian_bridge_monitoring_times_nan(self):
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
+                           decomp_type="BrownianBridge", 
+                           monitoring_times=[0.1, 0.2, np.nan, 1.0])
+            
+    def test_brownian_motion_invalid_t_final(self):
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=-8, 
+                           decomp_type="BrownianBridge")
+        with self.assertRaises(ParameterError):
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=np.nan, 
+                           decomp_type="BrownianBridge")
 
 class TestGeometricBrownianMotion(unittest.TestCase):
     def setUp(self):
