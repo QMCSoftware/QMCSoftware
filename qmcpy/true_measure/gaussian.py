@@ -67,18 +67,12 @@ class Gaussian(AbstractTrueMeasure):
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
         self._parse_gaussian_params(mean, covariance, decomp_type)
-        self.mean = self.mu.astype(float, copy=True)
-        self.covariance = self.sigma.copy()
-        self.variance = np.diag(self.sigma).copy()
-        self.standard_deviation = np.sqrt(self.variance)
         self.range = np.array([[-np.inf, np.inf]])
         super(Gaussian, self).__init__()
         assert self.mu.shape == (self.d,) and self.a.shape == (self.d, self.d)
 
     def _parse_gaussian_params(self, mean, covariance, decomp_type, lazy_decomp=False):
         self.decomp_type = decomp_type.upper()
-        self.mean = mean
-        self.covariance = covariance
         self.lazy_decomp = lazy_decomp
 
         if np.isscalar(mean):
@@ -96,6 +90,13 @@ class Gaussian(AbstractTrueMeasure):
                     mean must have length d and
                     covariance must be of shape d x d"""
             )
+        variance = np.diag(self.sigma)
+        self._set_moments(
+            mean=self.mu.astype(float, copy=False),
+            variance=variance,
+            standard_deviation=np.sqrt(variance),
+            covariance=self.sigma,
+        )
 
         # Cache for lazy loading
         self._a_cache = None

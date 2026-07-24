@@ -100,8 +100,6 @@ class BrownianMotion(Gaussian):
             decomp_type,
             lazy_decomp,
         )
-        self.variance = np.diag(self.sigma).copy()
-        self.standard_deviation = np.sqrt(self.variance)
         self.range = np.array([[-np.inf, np.inf]])
         super(Gaussian, self).__init__()
 

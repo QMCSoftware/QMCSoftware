@@ -173,6 +173,31 @@ class TestTrueMeasure(unittest.TestCase):
                     np.diag(measure.covariance), measure.variance
                 )
 
+    def test_moment_attributes_are_read_only(self):
+        measures = [
+            Uniform(DigitalNetB2(2, seed=7)),
+            Kumaraswamy(DigitalNetB2(2, seed=7)),
+            Gaussian(DigitalNetB2(2, seed=7), covariance=np.eye(2)),
+            BrownianMotion(DigitalNetB2(2, seed=7)),
+        ]
+
+        for measure in measures:
+            with self.subTest(measure=type(measure).__name__):
+                for parameter in (
+                    "mean",
+                    "variance",
+                    "standard_deviation",
+                    "covariance",
+                ):
+                    value = getattr(measure, parameter)
+                    self.assertFalse(value.flags.writeable)
+                    with self.assertRaises(ValueError):
+                        value.flat[0] = 9
+                    with self.assertRaises(ValueError):
+                        value.setflags(write=True)
+                    with self.assertRaises(AttributeError):
+                        setattr(measure, parameter, np.zeros_like(value))
+
 
 class TestMatern(unittest.TestCase):
     def test_spawn(self):

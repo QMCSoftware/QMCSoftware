@@ -22,6 +22,45 @@ class AbstractTrueMeasure(object):
         if not hasattr(self, "parameters"):
             self.parameters = []
 
+    @staticmethod
+    def _read_only_array(value):
+        """Return an owned, read only array containing ``value``."""
+        array = np.array(value, copy=True)
+        array.setflags(write=False)
+        return array
+
+    def _set_moments(self, mean, variance, standard_deviation, covariance):
+        """Store distribution moments behind the read only public API."""
+        self._mean = self._read_only_array(mean)
+        self._variance = self._read_only_array(variance)
+        self._standard_deviation = self._read_only_array(standard_deviation)
+        self._covariance = self._read_only_array(covariance)
+
+    @staticmethod
+    def _read_only_view(value):
+        """Return a view which cannot be made writeable while its base is read only."""
+        view = value.view()
+        view.setflags(write=False)
+        return view
+
+    # store mean, variance, standard deviation, and covariance as read only array
+
+    @property
+    def mean(self):
+        return self._read_only_view(self._mean)
+
+    @property
+    def variance(self):
+        return self._read_only_view(self._variance)
+
+    @property
+    def standard_deviation(self):
+        return self._read_only_view(self._standard_deviation)
+
+    @property
+    def covariance(self):
+        return self._read_only_view(self._covariance)
+
     def _parse_sampler(self, sampler):
         self.sub_compatibility_error = False
         if isinstance(sampler, AbstractDiscreteDistribution):

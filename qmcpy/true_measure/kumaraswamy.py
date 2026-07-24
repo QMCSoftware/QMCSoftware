@@ -72,11 +72,15 @@ class Kumaraswamy(AbstractTrueMeasure):
             )
         if not ((self.alpha > 0).all() and (self.beta > 0).all()):
             raise ParameterError("Kumaraswamy requires a,b>0.")
-        self.mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
+        mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
         second_moment = self.beta * beta_function(1 + 2 / self.alpha, self.beta)
-        self.variance = second_moment - self.mean**2
-        self.standard_deviation = np.sqrt(self.variance)
-        self.covariance = np.diag(self.variance)
+        variance = second_moment - mean**2
+        self._set_moments(
+            mean=mean,
+            variance=variance,
+            standard_deviation=np.sqrt(variance),
+            covariance=np.diag(variance),
+        )
         super(Kumaraswamy, self).__init__()
         assert self.alpha.shape == (self.d,) and self.beta.shape == (self.d,)
 

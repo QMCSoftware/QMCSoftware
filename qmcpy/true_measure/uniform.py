@@ -74,10 +74,14 @@ class Uniform(AbstractTrueMeasure):
             raise ParameterError(
                 "upper bound must be strictly greater than lower bound"
             )
-        self.mean = (self.a + self.b) / 2
-        self.variance = self.delta**2 / 12
-        self.standard_deviation = self.delta / np.sqrt(12)
-        self.covariance = np.diag(self.variance)
+        mean = (self.a + self.b) / 2
+        variance = self.delta**2 / 12
+        self._set_moments(
+            mean=mean,
+            variance=variance,
+            standard_deviation=self.delta / np.sqrt(12),
+            covariance=np.diag(variance),
+        )
         self.inv_delta_prod = 1 / self.delta.prod()
         self.range = np.hstack(
             (self.a.reshape((self.d, 1)), self.b.reshape((self.d, 1)))
