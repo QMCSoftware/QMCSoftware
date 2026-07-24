@@ -67,6 +67,8 @@ class Uniform(AbstractTrueMeasure):
             raise DimensionError(
                 "upper bound and lower bound must be of length dimension"
             )
+        if not (np.all(np.isfinite(self.a)) and np.all(np.isfinite(self.b))):
+            raise ParameterError("upper bound and lower bound must be finite")
         self.delta = self.b - self.a
         if np.any(self.delta <= 0):
             raise ParameterError(

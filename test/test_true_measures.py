@@ -241,6 +241,26 @@ class TestUniform(unittest.TestCase):
                         upper_bound=upper_bound,
                     )
 
+    def test_bounds_must_be_finite(self):
+        for lower_bound, upper_bound in [
+            (np.nan, 1),
+            (0, np.nan),
+            (-np.inf, 1),
+            (0, np.inf),
+        ]:
+            with self.subTest(
+                lower_bound=lower_bound, upper_bound=upper_bound
+            ):
+                with self.assertRaisesRegex(
+                    ParameterError,
+                    "upper bound and lower bound must be finite",
+                ):
+                    Uniform(
+                        IIDStdUniform(1, seed=7),
+                        lower_bound=lower_bound,
+                        upper_bound=upper_bound,
+                    )
+
     def test_moment_attributes_with_scalar_bounds(self):
         uniform = Uniform(
             DigitalNetB2(3, seed=7), lower_bound=-2, upper_bound=4
