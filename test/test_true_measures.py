@@ -140,6 +140,11 @@ class TestTrueMeasure(unittest.TestCase):
                 mean=[1, -1],
                 covariance=[[4, 1], [1, 9]],
             ),
+            BrownianMotion(
+                DigitalNetB2(2, seed=7),
+                t_final=2,
+                diffusion=3,
+            ),
         ]
         moment_parameters = [
             "mean",
@@ -664,6 +669,51 @@ class TestBrownianMotion(unittest.TestCase):
                 decimal=10,
                 err_msg="Parent BrownianMotion covariance changed unexpectedly",
             )
+
+    def test_moment_attributes(self):
+        brownian_motion = BrownianMotion(
+            DigitalNetB2(4, seed=self.seed),
+            t_final=2,
+            initial_value=3,
+            drift=0.5,
+            diffusion=2,
+        )
+        expected_variance = np.array([1.0, 2.0, 3.0, 4.0])
+
+        np.testing.assert_allclose(
+            brownian_motion.variance, expected_variance
+        )
+        np.testing.assert_allclose(
+            brownian_motion.standard_deviation,
+            np.sqrt(expected_variance),
+        )
+        np.testing.assert_allclose(
+            np.diag(brownian_motion.covariance),
+            brownian_motion.variance,
+        )
+
+    def test_spawn_recomputes_moment_attributes(self):
+        brownian_motion = BrownianMotion(
+            DigitalNetB2(2, seed=self.seed),
+            t_final=2,
+            initial_value=3,
+            drift=0.5,
+            diffusion=2,
+        )
+        spawn = brownian_motion.spawn(1, dimensions=4)[0]
+        expected_variance = np.array([1.0, 2.0, 3.0, 4.0])
+
+        np.testing.assert_allclose(
+            spawn.mean, np.array([3.25, 3.5, 3.75, 4.0])
+        )
+        np.testing.assert_allclose(spawn.variance, expected_variance)
+        np.testing.assert_allclose(
+            spawn.standard_deviation, np.sqrt(expected_variance)
+        )
+        np.testing.assert_allclose(
+            spawn.covariance,
+            2 * np.minimum.outer(spawn.time_vec, spawn.time_vec),
+        )
 
 
 class TestGeometricBrownianMotion(unittest.TestCase):

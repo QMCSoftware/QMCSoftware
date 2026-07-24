@@ -20,6 +20,8 @@ class BrownianMotion(Gaussian):
             time_vec        [0.5 1.  1.5 2. ]
             drift           2^(1)
             mean            [1. 2. 3. 4.]
+            variance        [0.5 1.  1.5 2. ]
+            standard_deviation [0.707 1.    1.225 1.414]
             covariance      [[0.5 0.5 0.5 0.5]
                              [0.5 1.  1.  1. ]
                              [0.5 1.  1.5 1.5]
@@ -69,7 +71,15 @@ class BrownianMotion(Gaussian):
                 - `'Cholesky'` for cholesky decomposition.
             lazy_decomp (bool): If True, defer expensive matrix decomposition until needed.
         """
-        self.parameters = ["time_vec", "drift", "mean", "covariance", "decomp_type"]
+        self.parameters = [
+            "time_vec",
+            "drift",
+            "mean",
+            "variance",
+            "standard_deviation",
+            "covariance",
+            "decomp_type",
+        ]
         # default to transform from standard uniform
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
@@ -90,10 +100,18 @@ class BrownianMotion(Gaussian):
             decomp_type,
             lazy_decomp,
         )
+        self.variance = np.diag(self.sigma).copy()
+        self.standard_deviation = np.sqrt(self.variance)
         self.range = np.array([[-np.inf, np.inf]])
         super(Gaussian, self).__init__()
 
     def _spawn(self, sampler, dimension):
         return BrownianMotion(
-            sampler, t_final=self.t, drift=self.drift, decomp_type=self.decomp_type
+            sampler,
+            t_final=self.t,
+            initial_value=self.initial_value,
+            drift=self.drift,
+            diffusion=self.diffusion,
+            decomp_type=self.decomp_type,
+            lazy_decomp=self.lazy_decomp,
         )
