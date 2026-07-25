@@ -40,6 +40,9 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.kronecker.Kronecker
 
+## `RandomizedLHS`
+::: qmcpy.discrete_distribution.randomized_lhs.RandomizedLHS
+
 ## `IIDStdUniform`
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform

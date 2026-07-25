@@ -30,6 +30,7 @@ class TestDiscreteDistribution(unittest.TestCase):
                 DigitalNetB2(d, order="GRAY", seed=7),
                 Halton(d, randomize="QRNG", seed=7),
                 Halton(d, randomize="Owen", seed=7),
+                RandomizedLHS(d, replications=None, seed=7),
             ]
             for dd in dds:
                 for _dd in [dd] + dd.spawn(1):
@@ -49,6 +50,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             Lattice(d, seed=7),
             DigitalNetB2(d, seed=7),
             Halton(d, seed=7, warn=False),
+            RandomizedLHS(d, replications=None, seed=7),
         ]:
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
@@ -362,6 +364,109 @@ class TestHalton(unittest.TestCase):
             [[0, 0], [1.0 / 2, 1.0 / 3], [1.0 / 4, 2.0 / 3], [3.0 / 4, 1.0 / 9]]
         )
         self.assertTrue((x_ur == x_true).all())
+
+
+class TestRandomizedLHS(unittest.TestCase):
+    """Unit tests for RandomizedLHS DiscreteDistribution."""
+
+    def test_gen_samples_shape(self):
+        # replications=None -> squeeze to 2D
+        d1 = RandomizedLHS(dimension=4, replications=None, seed=7)
+        x1 = d1.gen_samples(4, warn=False)
+        self.assertEqual(x1.shape, (4, 4))
+
+        # replications=k -> stays 3D
+        d2 = RandomizedLHS(dimension=2, replications=5, seed=7)
+        x2 = d2.gen_samples(3, warn=False)
+        self.assertEqual(x2.shape, (5, 3, 2))
+
+    def test_values_seed_7(self):
+        # Regression/reproducibility test: exact values for a fixed seed.
+        # SFC64 with a fixed SeedSequence is bit-reproducible, so these
+        # values should not change unless the generation algorithm changes.
+        true_sample = np.array(
+            [
+                [0.2379328690962694, 0.2988121617836623, 0.3540711883388259, 0.011804150087474569],
+                [0.5717283616874396, 0.8457204749453818, 0.5998019968276497, 0.8653851925864751],
+                [0.2975410791646444, 0.719019775383696, 0.9111095799461322, 0.35764889149581724],
+                [0.7865408130452101, 0.20797630306113987, 0.16828594953947298, 0.7065550077006459],
+            ]
+        )
+        distribution = RandomizedLHS(dimension=4, replications=None, seed=7)
+        x = distribution.gen_samples(n_min=0, n_max=4, warn=False)
+        self.assertTrue((x == true_sample).all())
+
+    def test_values_seed_13_replications(self):
+        # We should get the same result if we use the same seed = 13
+        true_sample = np.array(
+            [
+                [[0.5749269005334164, 0.7367635418185489],
+                 [0.8027989348020131, 0.09642877089260105],
+                 [0.2028827909704837, 0.5170029561963858]],
+                [[0.36408554620435707, 0.1218666235293967],
+                 [0.8182985171529366, 0.8428148875176115],
+                 [0.08025760006653519, 0.5347078626517302]],
+            ]
+        )
+        distribution = RandomizedLHS(dimension=2, replications=2, seed=13)
+        x = distribution.gen_samples(n_min=0, n_max=3, warn=False)
+        self.assertTrue((x == true_sample).all())
+
+    def test_stratification_property(self):
+        # Core LHS invariant: in every dimension, splitting [0,1) into n
+        # equal strata must yield exactly one point per stratum.
+        n, d = 10, 5
+        distribution = RandomizedLHS(dimension=d, replications=None, seed=42)
+        x = distribution.gen_samples(n, warn=False)
+        for j in range(d):
+            strata = np.floor(x[:, j] * n).astype(int)
+            self.assertEqual(sorted(strata), list(range(n)))
+
+    def test_stratification_property_with_replications(self):
+        n, d, reps = 8, 3, 4
+        distribution = RandomizedLHS(dimension=d, replications=reps, seed=42)
+        x = distribution.gen_samples(n, warn=False)
+        for r in range(reps):
+            for j in range(d):
+                strata = np.floor(x[r, :, j] * n).astype(int)
+                self.assertEqual(sorted(strata), list(range(n)))
+
+    def test_values_in_unit_cube(self):
+        distribution = RandomizedLHS(dimension=4, replications=3, seed=11)
+        x = distribution.gen_samples(20, warn=False)
+        self.assertTrue((x >= 0).all() and (x < 1).all())
+
+    def test_reproducibility_same_seed(self):
+        d1 = RandomizedLHS(dimension=3, replications=None, seed=123)
+        d2 = RandomizedLHS(dimension=3, replications=None, seed=123)
+        x1 = d1.gen_samples(6, warn=False)
+        x2 = d2.gen_samples(6, warn=False)
+        self.assertTrue((x1 == x2).all())
+
+    def test_n_min_n_max_equivalent_to_n(self):
+        # For LHS only n_max-n_min matters, not the absolute indices.
+        d1 = RandomizedLHS(dimension=3, replications=None, seed=99)
+        x_n = d1.gen_samples(n=5, warn=False)
+        d2 = RandomizedLHS(dimension=3, replications=None, seed=99)
+        x_nminmax = d2.gen_samples(n_min=0, n_max=5, warn=False)
+        self.assertTrue((x_n == x_nminmax).all())
+
+    def test_return_binary_raises(self):
+        distribution = RandomizedLHS(dimension=2, replications=None, seed=7)
+        with self.assertRaises(ParameterError):
+            distribution.gen_samples(4, return_binary=True, warn=False)
+
+    def test_warns_by_default(self):
+        distribution = RandomizedLHS(dimension=2, replications=None, seed=7)
+        with self.assertWarns(ParameterWarning):
+            distribution.gen_samples(4)
+
+    def test_no_warning_when_disabled(self):
+        distribution = RandomizedLHS(dimension=2, replications=None, seed=7)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            distribution.gen_samples(4, warn=False)
+
 
 
 if __name__ == "__main__":
