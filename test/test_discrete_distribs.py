@@ -49,6 +49,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             Lattice(d, seed=7),
             DigitalNetB2(d, seed=7),
             Halton(d, seed=7, warn=False),
+            HammersleyPointSet(d, seed=7, warn=False),
         ]:
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
@@ -345,6 +346,87 @@ class TestDigitalNetB2(unittest.TestCase):
                     self.assertTrue((x_full[:,4:16,:]==dnb2(4,16)).all())
 
 
+class TestHammersleyPointSet(unittest.TestCase):
+    """Unit tests for HammersleyPointSet discrete distribution."""
+
+    def test_gen_samples_shape(self):
+        distribution = HammersleyPointSet(dimension=3, seed=7)
+        x = distribution.gen_samples(8, warn=False)
+        self.assertEqual(x.shape, (8, 3))
+
+    def test_dimension_one(self):
+        distribution = HammersleyPointSet(dimension=1, seed=7)
+        x = distribution.gen_samples(4, warn=False)
+        true_sample = np.array([[0.0], [0.25], [0.5], [0.75]])
+        self.assertTrue((x == true_sample).all())
+
+    def test_values_in_unit_cube(self):
+        distribution = HammersleyPointSet(dimension=4, seed=7)
+        x = distribution.gen_samples(16, warn=False)
+        self.assertTrue((x >= 0).all() and (x < 1).all())
+
+    def test_first_point_is_origin(self):
+        distribution = HammersleyPointSet(dimension=3, seed=7)
+        x = distribution.gen_samples(8, warn=False)
+        self.assertTrue((x[0] == 0).all())
+
+    def test_matches_classical_definition(self):
+        # t_i = (i/n, phi_p1(i), ..., phi_p_{d-1}(i)) -- 
+        def van_der_corput(i, base):
+            f, r, idx = 1.0, 0.0, i
+            while idx > 0:
+                f /= base
+                r += f * (idx % base)
+                idx //= base
+            return r
+
+        primes = [2, 3, 5]
+        n, d = 8, 4
+        expected = np.array([
+            [i / n] + [van_der_corput(i, p) for p in primes]
+            for i in range(n)
+        ])
+        distribution = HammersleyPointSet(dimension=d, seed=7)
+        x = distribution.gen_samples(n, warn=False)
+        self.assertTrue(np.allclose(x, expected))
+
+
+    def test_array_dimension_raises(self):
+        with self.assertRaises(ParameterError):
+            HammersleyPointSet(dimension=[1, 3, 5], seed=7)
+
+    def test_dimension_less_than_one_raises(self):
+        with self.assertRaises(ParameterError):
+            HammersleyPointSet(dimension=0, seed=7)
+
+    def test_return_binary_raises(self):
+        distribution = HammersleyPointSet(dimension=2, seed=7)
+        with self.assertRaises(ParameterError):
+            distribution.gen_samples(4, return_binary=True, warn=False)
+
+    def test_n_min_nonzero_raises(self):
+        distribution = HammersleyPointSet(dimension=2, seed=7)
+        with self.assertRaises(ParameterError):
+            distribution.gen_samples(n_min=4, n_max=8, warn=False)
+
+    def test_warns_by_default(self):
+        distribution = HammersleyPointSet(dimension=2, seed=7)
+        with self.assertWarns(ParameterWarning):
+            distribution.gen_samples(8)
+
+    def test_no_warning_when_disabled(self):
+        distribution = HammersleyPointSet(dimension=2, seed=7)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            distribution.gen_samples(8, warn=False)
+
+    def test_spawn_dimension(self):
+        d = HammersleyPointSet(dimension=3, seed=7)
+        spawns = d.spawn(s=2, dimensions=[2, 4])
+        self.assertEqual(len(spawns), 2)
+        self.assertTrue(all(isinstance(s, HammersleyPointSet) for s in spawns))
+        self.assertEqual(spawns[0].d, 2)
+        self.assertEqual(spawns[1].d, 4)
 
 class TestHalton(unittest.TestCase):
     """Unit test for Halton DiscreteDistribution."""
