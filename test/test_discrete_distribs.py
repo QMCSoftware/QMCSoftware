@@ -30,6 +30,7 @@ class TestDiscreteDistribution(unittest.TestCase):
                 DigitalNetB2(d, order="GRAY", seed=7),
                 Halton(d, randomize="QRNG", seed=7),
                 Halton(d, randomize="Owen", seed=7),
+                KorobovLattice(d, replications=None, seed=7),
             ]
             for dd in dds:
                 for _dd in [dd] + dd.spawn(1):
@@ -49,6 +50,7 @@ class TestDiscreteDistribution(unittest.TestCase):
             Lattice(d, seed=7),
             DigitalNetB2(d, seed=7),
             Halton(d, seed=7, warn=False),
+            KorobovLattice(d, replications=None, seed=7),
         ]:
             s = 3
             for spawn_dim in [4, [1, 4, 6]]:
@@ -59,6 +61,92 @@ class TestDiscreteDistribution(unittest.TestCase):
                     (np.array([spawn.d for spawn in spawns]) == spawn_dim).all()
                 )
 
+class TestKorobovLattice(unittest.TestCase):
+    """Unit tests for KorobovLattice discrete distribution."""
+
+    def test_gen_samples_shape(self):
+        d1 = KorobovLattice(dimension=3, replications=None, seed=7)
+        x1 = d1.gen_samples(8, warn=False)
+        self.assertEqual(x1.shape, (8, 3))
+
+        d2 = KorobovLattice(dimension=2, replications=5, seed=7)
+        x2 = d2.gen_samples(8, warn=False)
+        self.assertEqual(x2.shape, (5, 8, 2))
+
+    def test_values_in_unit_cube(self):
+        distribution = KorobovLattice(dimension=3, replications=4, seed=11)
+        x = distribution.gen_samples(16, warn=False)
+        self.assertTrue((x >= 0).all() and (x < 1).all())
+
+    def test_unrandomized_values_seed_7(self):
+        # Check the result using precomputed samples
+        true_sample = np.array([
+            [0.0,   0.0  ],
+            [0.125, 0.375],
+            [0.25,  0.75 ],
+            [0.375, 0.125],
+            [0.5,   0.5  ],
+            [0.625, 0.875],
+            [0.75,  0.25 ],
+            [0.875, 0.625],
+        ])
+        distribution = KorobovLattice(dimension=2, randomize="FALSE", seed=7)
+        x = distribution.gen_samples(8, warn=False)
+        self.assertTrue((x == true_sample).all())
+
+    def test_rank1_lattice_structure(self):
+        # general invariant of a rank-1 lattice: x_{k+1} - x_k = z/n (mod 1)
+        # is CONSTANT for every k -- checked without depending on the internal values of a
+        distribution = KorobovLattice(dimension=4, randomize="FALSE", seed=7)
+        x = distribution.gen_samples(16, warn=False)
+        diffs = (x[1:] - x[:-1]) % 1.0
+        self.assertTrue(np.allclose(diffs, diffs[0]))
+
+    def test_first_point_is_origin_unrandomized(self):
+        distribution = KorobovLattice(dimension=3, randomize="FALSE", seed=7)
+        x = distribution.gen_samples(8, warn=False)
+        self.assertTrue((x[0] == 0).all())
+
+    def test_n_not_tabulated_raises(self):
+        distribution = KorobovLattice(dimension=3, seed=7)
+        with self.assertRaises(ParameterError):
+            distribution.gen_samples(5, warn=False)   # 5 n'est pas dans la table
+
+    def test_n_min_nonzero_raises(self):
+        distribution = KorobovLattice(dimension=3, seed=7)
+        with self.assertRaises(ParameterError):
+            distribution.gen_samples(n_min=4, n_max=8, warn=False)
+
+    def test_return_binary_raises(self):
+        distribution = KorobovLattice(dimension=2, seed=7)
+        with self.assertRaises(ParameterError):
+            distribution.gen_samples(8, return_binary=True, warn=False)
+
+    def test_warns_by_default_without_randomization(self):
+        distribution = KorobovLattice(dimension=2, randomize="FALSE", seed=7)
+        with self.assertWarns(ParameterWarning):
+            distribution.gen_samples(8)
+
+    def test_no_warning_when_disabled(self):
+        distribution = KorobovLattice(dimension=2, randomize="FALSE", seed=7)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            distribution.gen_samples(8, warn=False)
+
+    def test_reproducibility_same_seed(self):
+        d1 = KorobovLattice(dimension=3, seed=123)
+        d2 = KorobovLattice(dimension=3, seed=123)
+        x1 = d1.gen_samples(8, warn=False)
+        x2 = d2.gen_samples(8, warn=False)
+        self.assertTrue((x1 == x2).all())
+
+    def test_spawn_dimension(self):
+        d = KorobovLattice(dimension=3, seed=7)
+        spawns = d.spawn(s=2, dimensions=[2, 4])
+        self.assertEqual(len(spawns), 2)
+        self.assertTrue(all(isinstance(s, KorobovLattice) for s in spawns))
+        self.assertEqual(spawns[0].d, 2)
+        self.assertEqual(spawns[1].d, 4)
 
 class TestLattice(unittest.TestCase):
     """Unit tests for Lattice DiscreteDistribution."""
