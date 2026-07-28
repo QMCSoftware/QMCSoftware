@@ -243,6 +243,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
                 - `"CBC"`: uses the first $d$ components of a known good Component-by-Component (CBC) generating vector.
                 - `"RICHTMYER"`: uses $\boldsymbol{\alpha}_j = \sqrt{p_j} \bmod 1$, where $p_j$ are primes. This is the classical Richtmyer construction.
                 - `"SUZUKI"`: uses a deterministic construction $\boldsymbol{\alpha}_j = 2^{j/(d+1)}$.
+                - `"CBC_MT"`: uses the first $d$ components of a known good CBC generating vector obtained using the Mobius transformation method, which can be found in kronecker_search_methods.py.
                 - np.array: user-specified generating vector.
 
             shift (np.ndarray): Shift vector $\boldsymbol{\delta}$. If `randomize=True`, this is ignored and a random shift is generated. Otherwise, a fixed shift is used.
@@ -285,9 +286,9 @@ class Kronecker(AbstractLDDiscreteDistribution):
         elif isinstance(generating_vector, str) and generating_vector.lower() == "suzuki":
             self.gen_vec_source = "SUZUKI"
             gen_vec = _suzuki_generating_vector(self.dvec.max()+1)       
-        elif isinstance(generating_vector, str) and generating_vector.lower() == "anders_cbc":
-            self.gen_vec_source = "ANDERS_CBC"
-            ANDERS_CBC = np.array([0.618033988749895,
+        elif isinstance(generating_vector, str) and generating_vector.lower() == "cbc_mt":
+            self.gen_vec_source = "CBC_MT"
+            CBC_MT = np.array([0.618033988749895,
                 0.3173225474723,
                 0.59332263014446,
                 0.20776441643926,
@@ -387,11 +388,11 @@ class Kronecker(AbstractLDDiscreteDistribution):
                 0.337431120990153,
                 0.542476014178907,
                 0.307279789725491], dtype=np.float64)
-            gen_vec = ANDERS_CBC
+            gen_vec = CBC_MT
             if not (self.dvec.max() < len(gen_vec)):
                 if warn:
                     warnings.warn(
-                        f"ANDERS_CBC generating vector only supports dimension <= {len(ANDERS_CBC)}; falling back to Richtmyer.",
+                        f"CBC_MT generating vector only supports dimension <= {len(CBC_MT)}; falling back to Richtmyer.",
                         RuntimeWarning,
                     )
                 self.gen_vec_source = "RICHTMYER"
@@ -460,7 +461,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
         return np.sqrt(self._square_periodic_discrepancies(n, k_tilde, gamma))
         
 
-    def wssd_discrepancy(self, n, weights, k_tilde = None, gamma = None):
+    def wssd_discrepancy(self, n, sample_weights, k_tilde = None, gamma = None):
         # calculates the weighted sum of square discrepancy
         if gamma is None:
             gamma = np.ones(self.d)
@@ -469,7 +470,7 @@ class Kronecker(AbstractLDDiscreteDistribution):
             k_tilde = (lambda x, gamma: np.prod(1 + (x * (x - 1) + 1/6) * gamma, axis=-1), 1)
 
         discrepancies = self._square_periodic_discrepancies(n, k_tilde, gamma)
-        return np.sum(weights * discrepancies, axis=-1)
+        return np.sum(sample_weights * discrepancies, axis=-1)
 
     
     def _square_periodic_discrepancies(self, n, k_tilde, gamma):

@@ -4,7 +4,7 @@ from .lattice import Lattice, lattice_vector_wssd_search
 from .digital_net_b2 import DigitalNetB2
 from .digital_net_any_bases import DigitalNetAnyBases,Halton,Faure
 from .mpmc import MPMC
-from .kronecker import Kronecker, kronecker_search_march_2026
+from .kronecker import Kronecker, kronecker_vector_search_mobius_transform
 
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution
