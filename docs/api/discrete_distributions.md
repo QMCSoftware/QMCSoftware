@@ -44,9 +44,9 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.kronecker.Kronecker
 
-## `kronecker_search_march_2026`
+## `kronecker_vector_search_mobius_transform`
 
-::: qmcpy.discrete_distribution.kronecker.kronecker_search_methods.kronecker_search_march_2026
+::: qmcpy.discrete_distribution.kronecker.kronecker_search_methods.kronecker_vector_search_mobius_transform
 
 ## `IIDStdUniform`
 
