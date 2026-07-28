@@ -33,7 +33,7 @@ def lattice_vector_wssd_search(n_max, d_max, coord_weights=None, kernel=None):
         array([1, 1635, 6875, 8665, 8531, 1361, 11771, 10987, 2805, 9961])
     """
 
-    if kernel == None:
+    if kernel is None:
         kernel = lambda x: x * (x - 1) + 1 / 6 # default kernel is the second Bernoulli polynomial
     if coord_weights is None:
         coord_weights = np.array([j**(-2) for j in range(1, d_max + 1)], dtype=np.float64) # default coordinate weights are j^(-2)
