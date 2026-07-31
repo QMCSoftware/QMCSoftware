@@ -55,8 +55,7 @@ class ProductMeasure(AbstractTrueMeasure):
     --------
     Combine two one-dimensional uniform true measures:
 
-    >>> from qmcpy.discrete_distribution import DigitalNetB2, DummySampler
-    >>> from qmcpy.true_measure import ProductMeasure, Uniform
+    >>> from qmcpy import DigitalNetB2, DummySampler, ProductMeasure, Uniform
     >>> marginals = [
     ...     Uniform(DummySampler(1), lower_bound=0, upper_bound=2),
     ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
@@ -84,7 +83,7 @@ class ProductMeasure(AbstractTrueMeasure):
     Marginals may have different dimensions:
 
     >>> import numpy as np
-    >>> from qmcpy.true_measure import Gaussian
+    >>> from qmcpy import Gaussian
     >>> marginals = [
     ...     Gaussian(
     ...         DummySampler(2),

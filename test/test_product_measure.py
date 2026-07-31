@@ -2,8 +2,9 @@ import numpy as np
 import pytest
 import scipy.stats as stats
 
-from qmcpy.discrete_distribution import DigitalNetB2, DummySampler
-from qmcpy.true_measure import (
+from qmcpy import (
+    DigitalNetB2,
+    DummySampler,
     Gaussian,
     GaussianCopula,
     ProductMeasure,
@@ -146,8 +147,8 @@ def test_product_measure_does_not_use_marginal_dummy_sampler_values():
         Uniform(DummySampler(1), lower_bound=10.0, upper_bound=12.0),
     ]
 
-    dummy_samples = marginals[0].discrete_distrib(4)
-    assert dummy_samples.shape == (4, 1)
+    with pytest.raises(ParameterError, match="construction placeholder"):
+        marginals[0].discrete_distrib(4)
 
     tm = ProductMeasure(sampler=DigitalNetB2(2, seed=19), marginals=marginals)
     x = tm(8)

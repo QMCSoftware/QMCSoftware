@@ -5,6 +5,9 @@ from qmcpy.discrete_distribution import DummySampler
 from qmcpy.util import ParameterError
 
 
+PLACEHOLDER_ERROR = "construction placeholder"
+
+
 def test_dummy_sampler_constructs_dimension_one():
     sampler = DummySampler(1)
 
@@ -33,55 +36,50 @@ def test_dummy_sampler_constructs_larger_dimension_with_replications():
     assert np.array_equal(sampler.dvec, np.arange(4))
 
 
-def test_dummy_sampler_direct_sampling_returns_standard_shape():
+def test_dummy_sampler_direct_sampling_raises_placeholder_error():
     sampler = DummySampler(2)
 
-    x = sampler(8)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler(8)
 
-    assert x.shape == (8, 2)
 
-
-def test_dummy_sampler_replicated_direct_sampling_returns_standard_shape():
+def test_dummy_sampler_replicated_direct_sampling_raises_placeholder_error():
     sampler = DummySampler(2, replications=3)
 
-    x = sampler(8)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler(8)
 
-    assert x.shape == (3, 8, 2)
 
-
-def test_dummy_sampler_supported_calling_conventions_return_standard_shapes():
+def test_dummy_sampler_supported_calling_conventions_raise_placeholder_error():
     sampler = DummySampler(2)
 
-    x_n = sampler(n=4)
-    x_range = sampler(n_min=2, n_max=6)
-    x_n_to_n_min = sampler(n=2, n_min=6)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler(n=4)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler(n_min=2, n_max=6)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler(n=2, n_min=6)
 
-    assert x_n.shape == (4, 2)
-    assert x_range.shape == (4, 2)
-    assert x_n_to_n_min.shape == (4, 2)
 
-
-def test_dummy_sampler_nonzero_n_min_uses_requested_count():
+def test_dummy_sampler_nonzero_n_min_raises_placeholder_error():
     sampler = DummySampler(2)
 
-    x = sampler(n_min=5, n_max=9)
-
-    assert x.shape == (4, 2)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler(n_min=5, n_max=9)
 
 
 def test_dummy_sampler_rejects_return_binary():
     sampler = DummySampler(2)
 
-    with pytest.raises(ParameterError, match="return_binary"):
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
         sampler(4, return_binary=True)
 
 
-def test_dummy_sampler_internal_gen_samples_returns_base_shape():
+def test_dummy_sampler_internal_gen_samples_raises_placeholder_error():
     sampler = DummySampler(2)
 
-    x = sampler._gen_samples(n_min=5, n_max=9, return_binary=False, warn=True)
-
-    assert x.shape == (1, 4, 2)
+    with pytest.raises(ParameterError, match=PLACEHOLDER_ERROR):
+        sampler._gen_samples(n_min=5, n_max=9, return_binary=False, warn=True)
 
 
 def test_dummy_sampler_spawn_preserves_relevant_fields():

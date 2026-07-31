@@ -1,5 +1,3 @@
-import numpy as np
-
 from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from ..util import ParameterError
 
@@ -14,22 +12,21 @@ class DummySampler(AbstractLDDiscreteDistribution):
     constructed with an attached sampler, but ``ProductMeasure`` samples only
     from its own outer sampler.
 
-    Direct calls to ``DummySampler`` return an uninitialized ``np.empty`` array
-    with the standard QMCPy sample shape. These placeholder values are not
-    meaningful QMC points and should not be inspected.
+    Direct calls to ``DummySampler`` raise an error because the sampler is only
+    a construction placeholder and cannot generate meaningful QMC points.
 
     Examples
     --------
-    >>> from qmcpy.discrete_distribution import DummySampler
+    >>> from qmcpy import DummySampler
     >>> sampler = DummySampler(2)
     >>> sampler.d
     2
     >>> sampler.replications
     1
-    >>> sampler(4).shape
-    (4, 2)
-    >>> DummySampler(2, replications=3)(4).shape
-    (3, 4, 2)
+    >>> sampler(4)
+    Traceback (most recent call last):
+        ...
+    qmcpy.util.exceptions_warnings.ParameterError: DummySampler is only a construction placeholder for ProductMeasure child true measures and cannot generate samples.
     """
 
     def __init__(self, dimension=1, replications=None, seed=None, warn=True):
@@ -52,21 +49,10 @@ class DummySampler(AbstractLDDiscreteDistribution):
         )
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
-        # warn is unused.
-        del warn
-        if return_binary:
-            # DummySampler does not support binary output.
-            raise ParameterError("DummySampler does not support return_binary=True")
-
-        # The base class passes either:
-        #   sampler(n)           -> n_min=0, n_max=n
-        #   sampler(n_min,n_max) -> use the given range
-        # Number of requested samples is n_max - n_min.
-        n = n_max - n_min
-
-        # Return an array with the requested shape.
-        # ProductMeasure only needs the shape.
-        return np.empty((self.replications, n, self.d))
+        raise ParameterError(
+            "DummySampler is only a construction placeholder for ProductMeasure "
+            "child true measures and cannot generate samples."
+        )
 
     def _spawn(self, child_seed, dimension):
         # Create a new DummySampler with the given dimension and seed.

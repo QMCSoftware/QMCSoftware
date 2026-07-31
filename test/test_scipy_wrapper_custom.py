@@ -4,8 +4,7 @@ import pytest
 import numpy as np
 import scipy.stats as stats
 
-from qmcpy.discrete_distribution import DigitalNetB2
-from qmcpy.true_measure import SciPyWrapper, ZeroInflatedExpUniform, StudentT
+from qmcpy import DigitalNetB2, SciPyWrapper, StudentT, ZeroInflatedExpUniform
 from qmcpy.true_measure.triangular import TriangularDistribution
 from qmcpy.util import DimensionError, ParameterError
 
@@ -85,6 +84,19 @@ def test_zero_inflated_zero_rate():
 
     assert samples.shape == (n, 1)
     assert abs(zero_rate - p_zero) < 0.05
+
+
+def test_zero_inflated_replications_shape():
+    tm = ZeroInflatedExpUniform(
+        DigitalNetB2(1, seed=17, replications=2),
+        p_zero=0.4,
+        lam=1.5,
+    )
+
+    x = tm(8)
+
+    assert x.shape == (2, 8, 1)
+    assert np.all(x >= 0.0)
 
 
 @pytest.mark.parametrize("p_zero", [0.0, 1.0, -0.1, 1.1])
@@ -221,6 +233,22 @@ def test_zero_inflated_y_split_deprecation():
         )
 
     assert tm(4).shape == (4, 1)
+
+
+def test_zero_inflated_y_split_preserves_deprecated_two_dimensional_usage():
+    with pytest.warns(DeprecationWarning, match="2D zero-inflated"):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(2, seed=17),
+            p_zero=0.4,
+            lam=1.5,
+            y_split=0.5,
+        )
+
+    x = tm(16)
+
+    assert x.shape == (16, 2)
+    assert np.all(x[:, 0] >= 0.0)
+    assert np.all((0.0 <= x[:, 1]) & (x[:, 1] <= 1.0))
 
 
 def test_student_t_marginals_shape():
