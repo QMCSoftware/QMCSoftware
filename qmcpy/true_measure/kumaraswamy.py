@@ -1,6 +1,8 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
+from numpy.polynomial.legendre import leggauss
+from scipy.special import digamma, polygamma
 from scipy.special import beta as beta_function, gammaln
 import numpy as np
 
@@ -72,21 +74,72 @@ class Kumaraswamy(AbstractTrueMeasure):
             )
         if not ((self.alpha > 0).all() and (self.beta > 0).all()):
             raise ParameterError("Kumaraswamy requires a,b>0.")
-        def log_moment(r: float) -> float:
-            return (
-                gammaln(1.0 + r / a)
-                + gammaln(b + 1.0)
-                - gammaln(b + 1.0 + r / a)
+
+
+        # Precompute once at module import.
+        _GL_X, _GL_W = leggauss(8)
+
+        # Nodes and weights mapped from [-1, 1] to [0, 1].
+        _S = 0.5 * (_GL_X + 1.0)
+        _W = 0.5 * _GL_W
+
+        inv_a = 1.0 / a
+
+        # log(mean) = integral_0^1 K'(r) dr
+        r = _S
+        k_prime = inv_a * (
+            digamma(1.0 + r * inv_a)
+            - digamma(b + 1.0 + r * inv_a)
+        )
+        log_mean = np.dot(_W, k_prime)
+
+        mean = np.exp(log_mean)
+
+        # K''(r), the curvature of the log-moment function.
+        def k_double_prime(r):
+            value = inv_a**2 * (
+                polygamma(1, 1.0 + r * inv_a)
+                - polygamma(1, b + 1.0 + r * inv_a)
             )
 
-        L1 = log_moment(1.0)
-        L2 = log_moment(2.0)
-        print(L1, L2)
-        print(2 * L1 - L2)
-        print(-np.exp(L2), np.expm1(2.0 * L1 - L2))
-        variance = -np.exp(L2) * np.expm1(2.0 * L1 - L2) 
+            # K'' is mathematically nonnegative. Remove only possible
+            # last-bit negative roundoff.
+            return np.maximum(value, 0.0)
 
-        mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
+        # q = K(2) - 2K(1)
+        #
+        # First integral:  integral_0^1 r K''(r) dr
+        # Second integral: integral_1^2 (2-r) K''(r) dr
+        #
+        # In the second integral put r = 1+s, giving weight 1-s.
+        q = np.dot(
+            _W,
+            _S * k_double_prime(_S)
+            + (1.0 - _S) * k_double_prime(1.0 + _S)
+        )
+
+        # expm1(q) accurately computes exp(q)-1 when q is very small.
+        variance = mean * mean * np.expm1(q)
+
+        # Defensive cleanup of signed zero or exceptional last-bit effects.
+        variance = max(float(variance), 0.0)
+
+
+        # def log_moment(r: float) -> float:
+        #     return (
+        #         gammaln(1.0 + r / a)
+        #         + gammaln(b + 1.0)
+        #         - gammaln(b + 1.0 + r / a)
+        #     )
+
+        # L1 = log_moment(1.0)
+        # L2 = log_moment(2.0)
+        # print(L1, L2)
+        # print(2 * L1 - L2)
+        # print(-np.exp(L2), np.expm1(2.0 * L1 - L2))
+        # variance = -np.exp(L2) * np.expm1(2.0 * L1 - L2) 
+
+        # mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
         # second_moment = self.beta * beta_function(1 + 2 / self.alpha, self.beta)
         # variance = second_moment - mean**2
         self._set_moments(
