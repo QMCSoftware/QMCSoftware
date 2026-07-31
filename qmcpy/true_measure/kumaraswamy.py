@@ -1,7 +1,7 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
-from scipy.special import beta as beta_function
+from scipy.special import beta as beta_function, gammaln
 import numpy as np
 
 
@@ -72,9 +72,23 @@ class Kumaraswamy(AbstractTrueMeasure):
             )
         if not ((self.alpha > 0).all() and (self.beta > 0).all()):
             raise ParameterError("Kumaraswamy requires a,b>0.")
+        def log_moment(r: float) -> float:
+            return (
+                gammaln(1.0 + r / a)
+                + gammaln(b + 1.0)
+                - gammaln(b + 1.0 + r / a)
+            )
+
+        L1 = log_moment(1.0)
+        L2 = log_moment(2.0)
+        print(L1, L2)
+        print(2 * L1 - L2)
+        print(-np.exp(L2), np.expm1(2.0 * L1 - L2))
+        variance = -np.exp(L2) * np.expm1(2.0 * L1 - L2) 
+
         mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
-        second_moment = self.beta * beta_function(1 + 2 / self.alpha, self.beta)
-        variance = second_moment - mean**2
+        # second_moment = self.beta * beta_function(1 + 2 / self.alpha, self.beta)
+        # variance = second_moment - mean**2
         self._set_moments(
             mean=mean,
             variance=variance,
