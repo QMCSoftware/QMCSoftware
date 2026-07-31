@@ -144,6 +144,14 @@ class ProductMeasure(AbstractTrueMeasure):
         # marginal samplers are not sampled. The marginals are used for their
         # dimension, range, transform, and weight behavior.
         self.marginals = list(marginals)
+        for marginal in self.marginals:
+            target_dim = getattr(marginal, "target_dim", marginal.d)
+            if target_dim != marginal.d:
+                raise DimensionError(
+                    "ProductMeasure marginals must be dimension-preserving "
+                    "block transforms. Marginal target dimension "
+                    f"{target_dim} does not match sampler dimension {marginal.d}."
+                )
 
         self.marginal_dimensions = np.array(
             [marginal.d for marginal in self.marginals], dtype=int

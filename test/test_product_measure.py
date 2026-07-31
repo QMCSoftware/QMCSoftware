@@ -3,6 +3,7 @@ import pytest
 import scipy.stats as stats
 
 from qmcpy import (
+    AcceptanceRejection,
     DigitalNetB2,
     DummySampler,
     Gaussian,
@@ -116,6 +117,18 @@ def test_product_measure_invalid_inputs():
     marginals = [Uniform(DummySampler(1))]
     with pytest.raises(DimensionError, match="sum of marginal dimensions"):
         ProductMeasure(sampler=DigitalNetB2(2, seed=7), marginals=marginals)
+
+
+def test_product_measure_rejects_non_dimension_preserving_marginal():
+    marginal = AcceptanceRejection(
+        DigitalNetB2(2, seed=7),
+        lambda x: np.ones(len(x)),
+        1.0,
+        1.0,
+    )
+
+    with pytest.raises(DimensionError, match="dimension-preserving"):
+        ProductMeasure(DigitalNetB2(2, seed=11), [marginal])
 
 
 def test_product_measure_spawn_preserves_marginal_blocks_and_replaces_outer_sampler():

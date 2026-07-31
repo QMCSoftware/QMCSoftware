@@ -2,7 +2,6 @@ import warnings
 
 import numpy as np
 
-from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from .scipy_wrapper import SciPyWrapper
 
@@ -56,6 +55,56 @@ class _ZeroInflatedExponential:
             x[mask_exp] = -np.log1p(-u_rescaled) / self.lam
 
         return x
+
+
+class _DeprecatedZeroInflatedExpUniform2D:
+    """
+    Adapter for the deprecated two-dimensional ``y_split`` construction.
+    """
+
+    dim = 2
+
+    def __init__(self, p_zero=0.4, lam=1.5, y_split=0.5):
+        if not (0.0 < p_zero < 1.0):
+            raise ParameterError("p_zero must be in (0,1).")
+        if lam <= 0.0:
+            raise ParameterError("lam must be positive.")
+        if not (0.0 < y_split < 1.0):
+            raise ParameterError("y_split must be in (0,1).")
+
+        self.p_zero = float(p_zero)
+        self.lam = float(lam)
+        self.y_split = float(y_split)
+
+    def transform(self, u):
+        u = np.asarray(u, dtype=float)
+        positive = u[..., 0] > self.p_zero
+
+        t = np.empty_like(u, dtype=float)
+        if np.any(positive):
+            u_rescaled = (u[..., 0][positive] - self.p_zero) / (
+                1.0 - self.p_zero
+            )
+            u_rescaled = np.clip(
+                u_rescaled,
+                np.finfo(float).eps,
+                1.0 - np.finfo(float).eps,
+            )
+            exp_values = -np.log1p(-u_rescaled) / self.lam
+        else:
+            exp_values = np.array([], dtype=float)
+
+        t[..., 0] = 0.0
+        t[..., 0][positive] = exp_values
+        t[..., 1] = np.where(
+            positive,
+            self.y_split + (1.0 - self.y_split) * u[..., 1],
+            self.y_split * u[..., 1],
+        )
+        return t
+
+    def logpdf(self, x):
+        return np.zeros(np.asarray(x).shape[:-1], dtype=float)
 
 
 class ZeroInflatedExpUniform(SciPyWrapper):
@@ -121,7 +170,6 @@ class ZeroInflatedExpUniform(SciPyWrapper):
     """
 
     def __init__(self, sampler, p_zero=0.4, lam=1.5, y_split=None):
-        self._deprecated_2d_y_split = False
         if y_split is not None:
             warnings.warn(
                 "`y_split` is deprecated. The 2D zero-inflated "
@@ -131,67 +179,49 @@ class ZeroInflatedExpUniform(SciPyWrapper):
                 DeprecationWarning,
                 stacklevel=2,
             )
-            if not (0.0 < y_split < 1.0):
-                raise ParameterError("y_split must be in (0,1).")
 
-        if y_split is not None and sampler.d == 2:
-            if not (0.0 < p_zero < 1.0):
-                raise ParameterError("p_zero must be in (0,1).")
-            if lam <= 0.0:
-                raise ParameterError("lam must be positive.")
+            if sampler.d == 2:
+                scipy_distribs = _DeprecatedZeroInflatedExpUniform2D(
+                    p_zero=p_zero,
+                    lam=lam,
+                    y_split=y_split,
+                )
+                self._deprecated_2d_y_split = True
+            elif sampler.d == 1:
+                scipy_distribs = _ZeroInflatedExponential(
+                    p_zero=p_zero,
+                    lam=lam,
+                )
+                self._deprecated_2d_y_split = False
+            else:
+                raise DimensionError(
+                    "ZeroInflatedExpUniform with deprecated y_split requires "
+                    "a one- or two-dimensional sampler."
+                )
+        else:
+            if sampler.d != 1:
+                raise DimensionError(
+                    "ZeroInflatedExpUniform requires a one-dimensional sampler."
+                )
 
-            self.parameters = ["p_zero", "lam", "y_split"]
-            self.domain = np.tile([0.0, 1.0], (2, 1))
-            self.range = np.array([[0.0, np.inf], [0.0, 1.0]])
-            self._parse_sampler(sampler)
-            self.p_zero = float(p_zero)
-            self.lam = float(lam)
-            self.y_split = float(y_split)
-            self._deprecated_2d_y_split = True
-            AbstractTrueMeasure.__init__(self)
-            return
-
-        if sampler.d != 1:
-            raise DimensionError(
-                "ZeroInflatedExpUniform requires a one-dimensional sampler."
+            scipy_distribs = _ZeroInflatedExponential(
+                p_zero=p_zero,
+                lam=lam,
             )
+            self._deprecated_2d_y_split = False
 
         super().__init__(
             sampler=sampler,
-            scipy_distribs=_ZeroInflatedExponential(
-                p_zero=p_zero,
-                lam=lam,
-            ),
+            scipy_distribs=scipy_distribs,
         )
 
+        self.parameters = ["p_zero", "lam"]
         self.p_zero = float(p_zero)
         self.lam = float(lam)
         self.y_split = y_split
-
-    def _transform(self, x):
-        if not self._deprecated_2d_y_split:
-            return super()._transform(x)
-
-        u = np.asarray(x, dtype=float)
-        eps = np.finfo(float).eps
-        exp_u = np.clip(u[..., 0], eps, 1.0 - eps)
-        exp_values = -np.log1p(-exp_u) / self.lam
-        positive = u[..., 1] > self.y_split
-
-        t = np.empty_like(u, dtype=float)
-        t[..., 0] = np.where(positive, exp_values, 0.0)
-        t[..., 1] = np.where(
-            positive,
-            (u[..., 1] - self.y_split) / (1.0 - self.y_split),
-            u[..., 1] / self.y_split,
-        )
-        return t
-
-    def _weight(self, x):
-        if not self._deprecated_2d_y_split:
-            return super()._weight(x)
-
-        return np.ones(np.asarray(x).shape[:-1], dtype=float)
+        if self._deprecated_2d_y_split:
+            self.parameters.append("y_split")
+            self.range = np.array([[0.0, np.inf], [0.0, 1.0]])
 
     def _spawn(self, sampler, dimension):
         if self._deprecated_2d_y_split:

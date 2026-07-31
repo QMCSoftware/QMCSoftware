@@ -223,7 +223,7 @@ def test_zero_inflated_return_weights_warns_once_for_missing_pdf():
     assert _missing_pdf_warnings(caught) == []
 
 
-def test_zero_inflated_y_split_deprecation():
+def test_zero_inflated_y_split_warns_and_uses_one_dimensional_interface():
     with pytest.warns(DeprecationWarning, match="y_split"):
         tm = ZeroInflatedExpUniform(
             DigitalNetB2(1, seed=17),
@@ -232,7 +232,10 @@ def test_zero_inflated_y_split_deprecation():
             y_split=0.5,
         )
 
-    assert tm(4).shape == (4, 1)
+    x = tm(4)
+
+    assert x.shape == (4, 1)
+    assert np.all(x >= 0.0)
 
 
 def test_zero_inflated_y_split_preserves_deprecated_two_dimensional_usage():
@@ -249,6 +252,26 @@ def test_zero_inflated_y_split_preserves_deprecated_two_dimensional_usage():
     assert x.shape == (16, 2)
     assert np.all(x[:, 0] >= 0.0)
     assert np.all((0.0 <= x[:, 1]) & (x[:, 1] <= 1.0))
+    assert np.all(x[x[:, 0] == 0.0, 1] <= 0.5)
+    assert np.all(x[x[:, 0] > 0.0, 1] >= 0.5)
+
+
+def test_zero_inflated_y_split_preserves_replicated_two_dimensional_usage():
+    with pytest.warns(DeprecationWarning, match="2D zero-inflated"):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(2, seed=17, replications=2),
+            p_zero=0.4,
+            lam=1.5,
+            y_split=0.5,
+        )
+
+    x = tm(16)
+
+    assert x.shape == (2, 16, 2)
+    assert np.all(x[..., 0] >= 0.0)
+    assert np.all((0.0 <= x[..., 1]) & (x[..., 1] <= 1.0))
+    assert np.all(x[..., 1][x[..., 0] == 0.0] <= 0.5)
+    assert np.all(x[..., 1][x[..., 0] > 0.0] >= 0.5)
 
 
 def test_student_t_marginals_shape():
