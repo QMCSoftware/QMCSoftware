@@ -403,6 +403,51 @@ class TestKumaraswamy(unittest.TestCase):
             spawn.covariance, np.diag(expected_variance)
         )
 
+    def test_variance_is_length_d_array(self):
+        for d, a, b in [(1, 2, 3), (2, [1, 2], [3, 4]), (4, 3, 5)]:
+            with self.subTest(d=d):
+                kumaraswamy = Kumaraswamy(DigitalNetB2(d, seed=7), a=a, b=b)
+                variance = kumaraswamy.variance
+
+                self.assertEqual(variance.shape, (d,))
+                self.assertEqual(variance.ndim, 1)
+                self.assertTrue(np.all(variance > 0))
+
+    def test_covariance_is_d_by_d_matrix(self):
+        for d, a, b in [(1, 2, 3), (2, [1, 2], [3, 4]), (4, 3, 5)]:
+            with self.subTest(d=d):
+                kumaraswamy = Kumaraswamy(DigitalNetB2(d, seed=7), a=a, b=b)
+                covariance = kumaraswamy.covariance
+
+                self.assertEqual(covariance.shape, (d, d))
+                self.assertEqual(covariance.ndim, 2)
+                # Independent marginals: covariance is diagonal with the
+                # per-dimension variances on the diagonal.
+                np.testing.assert_allclose(
+                    np.diag(covariance), kumaraswamy.variance
+                )
+                np.testing.assert_allclose(
+                    covariance, np.diag(np.diag(covariance))
+                )
+
+    def test_variance_matches_closed_form(self):
+        # Kumaraswamy raw moments: M_n = b * B(1 + n/a, b), so
+        # variance = M_2 - M_1**2. Compare the quadrature-based variance
+        # against this closed form evaluated with scipy's beta function.
+        from scipy.special import beta as beta_function
+
+        a = np.array([1.0, 2.0, 3.5])
+        b = np.array([3.0, 4.0, 1.5])
+        kumaraswamy = Kumaraswamy(DigitalNetB2(3, seed=7), a=a, b=b)
+
+        m1 = b * beta_function(1 + 1 / a, b)
+        m2 = b * beta_function(1 + 2 / a, b)
+        expected_variance = m2 - m1**2
+
+        np.testing.assert_allclose(
+            kumaraswamy.variance, expected_variance, rtol=1e-10
+        )
+
 
 class TestUniformTriangle(unittest.TestCase):
     """Tests for UniformTriangle and _UniformTriangleAdapter."""

@@ -3,7 +3,6 @@ from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 from numpy.polynomial.legendre import leggauss
 from scipy.special import digamma, polygamma
-from scipy.special import beta as beta_function, gammaln
 import numpy as np
 
 
@@ -64,7 +63,6 @@ class Kumaraswamy(AbstractTrueMeasure):
         self.alpha = np.array(a)
         if self.alpha.size == 1:
             self.alpha = self.alpha.item() * np.ones(self.d)
-            a = np.tile(self.a, self.d)
         self.beta = np.array(b)
         if self.beta.size == 1:
             self.beta = self.beta.item() * np.ones(self.d)
@@ -75,73 +73,7 @@ class Kumaraswamy(AbstractTrueMeasure):
         if not ((self.alpha > 0).all() and (self.beta > 0).all()):
             raise ParameterError("Kumaraswamy requires a,b>0.")
 
-
-        # Precompute once at module import.
-        _GL_X, _GL_W = leggauss(8)
-
-        # Nodes and weights mapped from [-1, 1] to [0, 1].
-        _S = 0.5 * (_GL_X + 1.0)
-        _W = 0.5 * _GL_W
-
-        inv_a = 1.0 / a
-
-        # log(mean) = integral_0^1 K'(r) dr
-        r = _S
-        k_prime = inv_a * (
-            digamma(1.0 + r * inv_a)
-            - digamma(b + 1.0 + r * inv_a)
-        )
-        log_mean = np.dot(_W, k_prime)
-
-        mean = np.exp(log_mean)
-
-        # K''(r), the curvature of the log-moment function.
-        def k_double_prime(r):
-            value = inv_a**2 * (
-                polygamma(1, 1.0 + r * inv_a)
-                - polygamma(1, b + 1.0 + r * inv_a)
-            )
-
-            # K'' is mathematically nonnegative. Remove only possible
-            # last-bit negative roundoff.
-            return np.maximum(value, 0.0)
-
-        # q = K(2) - 2K(1)
-        #
-        # First integral:  integral_0^1 r K''(r) dr
-        # Second integral: integral_1^2 (2-r) K''(r) dr
-        #
-        # In the second integral put r = 1+s, giving weight 1-s.
-        q = np.dot(
-            _W,
-            _S * k_double_prime(_S)
-            + (1.0 - _S) * k_double_prime(1.0 + _S)
-        )
-
-        # expm1(q) accurately computes exp(q)-1 when q is very small.
-        variance = mean * mean * np.expm1(q)
-
-        # Defensive cleanup of signed zero or exceptional last-bit effects.
-        variance = max(float(variance), 0.0)
-
-
-        # def log_moment(r: float) -> float:
-        #     return (
-        #         gammaln(1.0 + r / a)
-        #         + gammaln(b + 1.0)
-        #         - gammaln(b + 1.0 + r / a)
-        #     )
-
-        # L1 = log_moment(1.0)
-        # L2 = log_moment(2.0)
-        # print(L1, L2)
-        # print(2 * L1 - L2)
-        # print(-np.exp(L2), np.expm1(2.0 * L1 - L2))
-        # variance = -np.exp(L2) * np.expm1(2.0 * L1 - L2) 
-
-        # mean = self.beta * beta_function(1 + 1 / self.alpha, self.beta)
-        # second_moment = self.beta * beta_function(1 + 2 / self.alpha, self.beta)
-        # variance = second_moment - mean**2
+        mean, variance = self._compute_moments()
         self._set_moments(
             mean=mean,
             variance=variance,
@@ -150,6 +82,40 @@ class Kumaraswamy(AbstractTrueMeasure):
         )
         super(Kumaraswamy, self).__init__()
         assert self.alpha.shape == (self.d,) and self.beta.shape == (self.d,)
+
+    def _compute_moments(self):
+        inv_a = 1.0 / self.alpha
+        beta = self.beta
+
+        # 8-point Gauss-Legendre nodes and weights mapped from [-1, 1] to [0, 1].
+        nodes, weights = leggauss(8)
+        s = 0.5 * (nodes + 1.0)[:, None]  # quadrature nodes, shape (8, 1)
+        w = 0.5 * weights  # quadrature weights, shape (8,)
+
+        # K'(r) = (1/a) * (digamma(1 + r/a) - digamma(b + 1 + r/a)).
+        # K(1) = integral_0^1 K'(r) dr since K(0) = 0.
+        k_prime = inv_a * (
+            digamma(1.0 + s * inv_a) - digamma(beta + 1.0 + s * inv_a)
+        )
+        mean = np.exp(w @ k_prime)
+
+        # K''(r) = (1/a^2) * (polygamma(1, 1 + r/a) - polygamma(1, b + 1 + r/a)).
+        # K'' is mathematically nonnegative. Remove only possible last-bit negative roundoff.
+        def k_double_prime(r):
+            value = inv_a**2 * (
+                polygamma(1, 1.0 + r * inv_a)
+                - polygamma(1, beta + 1.0 + r * inv_a)
+            )
+            return np.maximum(value, 0.0)
+
+        # q = K(2) - 2K(1) = integral_0^1 r K''(r) dr + integral_1^2 (2-r) K''(r) dr.
+        # In the second integral substitute r = 1 + s, giving weight 1 - s.
+        q = w @ (s * k_double_prime(s) + (1.0 - s) * k_double_prime(1.0 + s))
+
+        # expm1(q) accurately computes exp(q) - 1 when q is very small.
+        variance = mean * mean * np.expm1(q)
+        
+        return mean, variance
 
     def _transform(self, x):
         return (1 - (1 - x) ** (1 / self.beta)) ** (1 / self.alpha)
