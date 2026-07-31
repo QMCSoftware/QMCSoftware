@@ -1,6 +1,7 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
+from scipy.sparse import diags
 import numpy as np
 
 
@@ -80,7 +81,7 @@ class Uniform(AbstractTrueMeasure):
             mean=mean,
             variance=variance,
             standard_deviation=self.delta / np.sqrt(12),
-            covariance=np.diag(variance),
+            covariance=diags(variance, format="dia"),
         )
         self.inv_delta_prod = 1 / self.delta.prod()
         self.range = np.hstack(

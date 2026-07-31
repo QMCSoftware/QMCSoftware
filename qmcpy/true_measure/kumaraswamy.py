@@ -3,6 +3,7 @@ from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 from numpy.polynomial.legendre import leggauss
 from scipy.special import digamma, polygamma
+from scipy.sparse import diags
 import numpy as np
 
 
@@ -78,7 +79,7 @@ class Kumaraswamy(AbstractTrueMeasure):
             mean=mean,
             variance=variance,
             standard_deviation=np.sqrt(variance),
-            covariance=np.diag(variance),
+            covariance=diags(variance, format="dia"),
         )
         super(Kumaraswamy, self).__init__()
         assert self.alpha.shape == (self.d,) and self.beta.shape == (self.d,)

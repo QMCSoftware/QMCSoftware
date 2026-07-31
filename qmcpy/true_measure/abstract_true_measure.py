@@ -3,6 +3,7 @@ from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
 import numpy as np
+from scipy import sparse
 
 
 class AbstractTrueMeasure(object):
@@ -30,11 +31,13 @@ class AbstractTrueMeasure(object):
         return array
 
     def _set_moments(self, mean, variance, standard_deviation, covariance):
-        """Store distribution moments behind the read only public API."""
         self._mean = self._read_only_array(mean)
         self._variance = self._read_only_array(variance)
         self._standard_deviation = self._read_only_array(standard_deviation)
-        self._covariance = self._read_only_array(covariance)
+        if sparse.issparse(covariance):
+            self._covariance = covariance
+        else:
+            self._covariance = self._read_only_array(covariance)
 
     @staticmethod
     def _read_only_view(value):
@@ -59,7 +62,10 @@ class AbstractTrueMeasure(object):
 
     @property
     def covariance(self):
-        return self._read_only_view(self._covariance)
+        covariance = self._covariance
+        if sparse.issparse(covariance):
+            covariance = self._read_only_array(covariance.toarray())
+        return self._read_only_view(covariance)
 
     def _parse_sampler(self, sampler):
         self.sub_compatibility_error = False
