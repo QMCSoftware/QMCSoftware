@@ -360,5 +360,8 @@ update_pep8_badge:
 # Formatting
 ##########################################################
 
+flatten_qmcpy_imports:
+	python3 scripts/flatten_qmcpy_imports.py
+
 markdown-unwrap:
 	$(PYTHON) scripts/unwrap_markdown.py "$(MARKDOWN_UNWRAP_PATH)"

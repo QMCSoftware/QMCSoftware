@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from qmcpy.fast_transform import (
+from qmcpy import (
     fftbr,
     ifftbr,
     fwht,

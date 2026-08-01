@@ -10,10 +10,10 @@ torch = pytest.importorskip("torch")
 pytest.importorskip("pyg_lib")
 pytest.importorskip("torch_geometric")
 
-from qmcpy.discrete_distribution.mpmc import utils as mpmc_utils
-from qmcpy.discrete_distribution.mpmc.models import MPMC_net
-from qmcpy.discrete_distribution.mpmc.mpmc import MPMC
-from qmcpy.util import ParameterError
+from qmcpy import utils as mpmc_utils
+from qmcpy import MPMC_net
+from qmcpy import MPMC
+from qmcpy import ParameterError
 
 
 UNWEIGHTED_DISCREPANCIES = [

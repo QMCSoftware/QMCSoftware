@@ -1,10 +1,10 @@
 from qmcpy import *
-from qmcpy.util import *
+from qmcpy import *
 import numpy as np
 import scipy.stats
 import unittest
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
-from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
+from qmcpy import SciPyWrapper
 
 
 class TestTrueMeasure(unittest.TestCase):
@@ -606,7 +606,7 @@ class TestAcceptanceRejection(unittest.TestCase):
     """Unit tests for AcceptanceRejection and AcceptanceRejectionReal."""
 
     def setUp(self):
-        from qmcpy.true_measure import AcceptanceRejection, AcceptanceRejectionReal
+        from qmcpy import AcceptanceRejection, AcceptanceRejectionReal
         from scipy.stats import norm
         self.AcceptanceRejection = AcceptanceRejection
         self.AcceptanceRejectionReal = AcceptanceRejectionReal

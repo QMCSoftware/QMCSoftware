@@ -15,11 +15,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 from qmcpy import *
-from qmcpy.util import *
-from qmcpy.util.data import Data
-from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractDiscreteDistribution
-from qmcpy.integrand.abstract_integrand import AbstractIntegrand
-from qmcpy.stopping_criterion.abstract_stopping_criterion import AbstractStoppingCriterion
+from qmcpy import *
+from qmcpy import Data
+from qmcpy import AbstractDiscreteDistribution
+from qmcpy import AbstractIntegrand
+from qmcpy import AbstractStoppingCriterion
 from qmcpy.stopping_criterion.diagnostics import _IterationHistoryTable, _IterationTraceLogger, _print_diagnostic, _get_iteration_log_frame
 
 

@@ -2,9 +2,9 @@ import pytest
 import numpy as np
 import scipy.stats as stats
 
-from qmcpy.discrete_distribution import DigitalNetB2
-from qmcpy.true_measure import SciPyWrapper, ZeroInflatedExpUniform, StudentT
-from qmcpy.true_measure.triangular import TriangularDistribution
+from qmcpy import DigitalNetB2
+from qmcpy import SciPyWrapper, ZeroInflatedExpUniform, StudentT
+from qmcpy import TriangularDistribution
 
 
 def test_mvn_dependence_correlation_and_moment():

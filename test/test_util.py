@@ -6,12 +6,12 @@ from qmcpy.util import (
     ParameterError,
     MethodImplementationError,
 )
-from qmcpy.util.data import Data
-from qmcpy.util.dig_shift_invar_ops import to_bin, to_float, weighted_walsh_funcs
-from qmcpy.util.latnetbuilder_linker import latnetbuilder_linker
-from qmcpy.util.shift_invar_ops import bernoulli_poly
-from qmcpy.util.torch_numpy_ops import get_npt
-from qmcpy.util.transforms import (
+from qmcpy import Data
+from qmcpy import to_bin, to_float, weighted_walsh_funcs
+from qmcpy import latnetbuilder_linker
+from qmcpy import bernoulli_poly
+from qmcpy import get_npt
+from qmcpy import (
     insert_batch_dims,
     parse_assign_param,
     tf_exp,

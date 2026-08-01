@@ -1,7 +1,7 @@
 import numpy as np
 
-from qmcpy.util import ParameterError
-from qmcpy.true_measure import SciPyWrapper
+from qmcpy import ParameterError
+from qmcpy import SciPyWrapper
 
 
 class TriangularUserDistribution:

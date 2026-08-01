@@ -1,5 +1,5 @@
 from qmcpy import *
-from qmcpy.util import *
+from qmcpy import *
 import qmctoolscl
 import os
 import unittest

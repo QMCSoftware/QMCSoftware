@@ -23,7 +23,7 @@ from qmcpy.true_measure.copula import (
     _validate_dimension,
     _validate_marginals,
 )
-from qmcpy.util import DimensionError, MethodImplementationError, ParameterError
+from qmcpy import DimensionError, MethodImplementationError, ParameterError
 
 
 class PPFOnlyMarginal:

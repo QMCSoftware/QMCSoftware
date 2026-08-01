@@ -1,5 +1,5 @@
 from qmcpy import *
-from qmcpy.util.transforms import tf_exp_eps_inv,tf_exp_eps
+from qmcpy import tf_exp_eps_inv,tf_exp_eps
 import unittest
 
 
