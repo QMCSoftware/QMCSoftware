@@ -1,3 +1,5 @@
+import json
+
 from scripts.flatten_qmcpy_imports import flatten_imports, main
 
 
@@ -49,6 +51,44 @@ def test_flatten_imports_preserves_private_modules_and_names():
         _nested_import("integrand", "Keister").encode(),
         b"from qmcpy import Keister",
     )
+
+
+def test_flatten_imports_deduplicates_same_scope_star_imports():
+    source = (
+        b"from qmcpy import *\n"
+        + (_nested_import("util", "*") + "\n").encode()
+        + b"\n"
+        + b"    from qmcpy import *\n"
+    )
+
+    updated, count = flatten_imports(source)
+
+    assert count == 2
+    assert updated == (
+        b"from qmcpy import *\n"
+        b"\n"
+        b"    from qmcpy import *\n"
+    )
+
+
+def test_flatten_imports_deduplicates_notebook_star_imports():
+    notebook = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "source": [
+                    _nested_import("integrand", "*") + "\n",
+                    _nested_import("true_measure", "*"),
+                ],
+            }
+        ]
+    }
+    source = json.dumps(notebook, indent=1).encode()
+
+    updated, count = flatten_imports(source)
+
+    assert count == 3
+    assert json.loads(updated)["cells"][0]["source"] == ["from qmcpy import *"]
 
 
 def test_check_mode_reports_changes_without_writing(tmp_path):

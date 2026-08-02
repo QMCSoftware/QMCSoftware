@@ -1,5 +1,4 @@
 from qmcpy import *
-from qmcpy import *
 import numpy as np
 import scipy.stats
 import unittest

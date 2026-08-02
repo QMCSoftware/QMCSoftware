@@ -39,10 +39,56 @@ QMCPY_IMPORT_RE = re.compile(
     rb"(?P<imported>[ \t]*(?:\([^)]*\)|[^\r\n]*))"
 )
 PRIVATE_NAME_RE = re.compile(rb"(?<![A-Za-z0-9_])_[A-Za-z0-9_]+")
+TEXT_STAR_IMPORT_RE = re.compile(
+    rb"^(?P<indent>[ \t]*)from[ \t]+qmcpy[ \t]+import[ \t]+\*[ \t]*"
+    rb"(?:\r\n|\n|\r)?$"
+)
+NOTEBOOK_STAR_IMPORT_RE = re.compile(
+    rb'^(?P<json_indent>[ \t]*)"(?P<code_indent>(?:[ \t]|\\t)*)'
+    rb"from[ \t]+qmcpy[ \t]+import[ \t]+\*(?:\\r)?(?:\\n)?\""
+    rb",?[ \t]*(?:\r\n|\n|\r)?$"
+)
+
+
+def _star_import_context(line: bytes) -> tuple[bytes, bytes] | None:
+    text_match = TEXT_STAR_IMPORT_RE.match(line)
+    if text_match:
+        return b"text", text_match.group("indent")
+
+    notebook_match = NOTEBOOK_STAR_IMPORT_RE.match(line)
+    if notebook_match:
+        indentation = (
+            notebook_match.group("json_indent")
+            + b'"'
+            + notebook_match.group("code_indent")
+        )
+        return b"notebook", indentation
+
+    return None
+
+
+def _deduplicate_adjacent_star_imports(content: bytes) -> tuple[bytes, int]:
+    """Keep the last line in each run of same-scope QMCPy star imports."""
+
+    output: list[bytes] = []
+    previous_context: tuple[bytes, bytes] | None = None
+    removed_count = 0
+
+    for line in content.splitlines(keepends=True):
+        context = _star_import_context(line)
+        if context is not None and context == previous_context:
+            # Keeping the last line preserves JSON comma and newline placement.
+            output[-1] = line
+            removed_count += 1
+        else:
+            output.append(line)
+        previous_context = context
+
+    return b"".join(output), removed_count
 
 
 def flatten_imports(content: bytes) -> tuple[bytes, int]:
-    """Flatten public imports while preserving imports involving private names."""
+    """Flatten public imports and deduplicate adjacent same-scope star imports."""
 
     change_count = 0
 
@@ -64,7 +110,9 @@ def flatten_imports(content: bytes) -> tuple[bytes, int]:
             + match.group("imported")
         )
 
-    return QMCPY_IMPORT_RE.sub(replace, content), change_count
+    updated = QMCPY_IMPORT_RE.sub(replace, content)
+    updated, duplicate_count = _deduplicate_adjacent_star_imports(updated)
+    return updated, change_count + duplicate_count
 
 
 def _is_supported(path: Path) -> bool:
@@ -134,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
     paths = args.paths or [repository_root]
 
     try:
-        targets = sorted(iter_target_files(paths), key=lambda path: str(path))
+        targets = sorted(iter_target_files(paths), key=str)
     except (FileNotFoundError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
