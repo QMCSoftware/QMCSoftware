@@ -345,8 +345,28 @@ docnouml: copydocs runmkdocserve
 ##########################################################
 # PEP8
 ##########################################################
+PYLINT ?= pylint
+PYLINT_BASE ?= develop
+
 check_pep8:
-	@pylint qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
+	@$(PYLINT) qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
+
+pylint_changed:
+	@set -e; \
+	changed_files="$$( \
+		{ \
+			git diff --name-only --diff-filter=ACMR "$(PYLINT_BASE)...HEAD" -- '*.py'; \
+			git diff --name-only --diff-filter=ACMR HEAD -- '*.py'; \
+			git ls-files --others --exclude-standard -- '*.py'; \
+		} | sort -u \
+	)"; \
+	if [ -z "$$changed_files" ]; then \
+		echo "No changed Python files relative to $(PYLINT_BASE)."; \
+	else \
+		echo "Running pylint on changed Python files relative to $(PYLINT_BASE):"; \
+		printf '%s\n' "$$changed_files"; \
+		$(PYLINT) --disable=R,C,E0401 --ignored-modules=qmctoolscl $$changed_files; \
+	fi
 
 pep8: update_pep8_badge
 
