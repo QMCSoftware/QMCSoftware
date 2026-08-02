@@ -76,9 +76,14 @@ from .util.transforms import (
 try:
     from .discrete_distribution.mpmc.models import MPMC_net
     from .discrete_distribution.mpmc import utils
-except ImportError:
-    # Optional MPMC dependencies are unavailable. Keep the base package importable.
-    pass
+except ImportError as error:
+    missing_module = getattr(error, "name", None)
+    if missing_module is None or missing_module.split(".", 1)[0] not in {
+        "pyg_lib",
+        "torch",
+        "torch_geometric",
+    }:
+        raise
 
 name = "qmcpy"
 __version__ = "2.3"

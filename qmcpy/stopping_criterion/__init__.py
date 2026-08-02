@@ -23,7 +23,6 @@ try:
     )
 except ImportError:
 
-
     class PFGPCI(object):
         def __init__(self, *args, **kwargs):
             raise ModuleNotFoundError(
