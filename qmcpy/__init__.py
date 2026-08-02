@@ -74,8 +74,11 @@ from .util.transforms import (
 )
 
 try:
+    _mpmc_utils_available = False
     # Keep the Torch-only utilities available when the heavier PyG import fails.
     from .discrete_distribution.mpmc import utils as mpmc_utils
+
+    _mpmc_utils_available = True
     from .discrete_distribution.mpmc.models import MPMC_net
 except ImportError as error:
     _missing_module = getattr(error, "name", None)
@@ -85,6 +88,24 @@ except ImportError as error:
         "torch_geometric",
     }:
         raise
+
+    def _raise_missing_mpmc_dependency(component):
+        raise ModuleNotFoundError(
+            f"{component} requires optional MPMC dependencies; missing module "
+            f"'{_missing_module}'. Install torch, pyg_lib, and torch-geometric.",
+            name=_missing_module,
+        )
+
+    if not _mpmc_utils_available:
+        class _MissingMPMCUtils(object):
+            def __getattr__(self, _name):
+                _raise_missing_mpmc_dependency("mpmc_utils")
+
+        mpmc_utils = _MissingMPMCUtils()
+
+    class MPMC_net(object):
+        def __init__(self, *args, **kwargs):
+            _raise_missing_mpmc_dependency("MPMC_net")
 
 name = "qmcpy"
 __version__ = "2.3"

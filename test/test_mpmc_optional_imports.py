@@ -5,9 +5,7 @@ from pathlib import Path
 import pytest
 
 
-def test_mpmc_utils_remain_available_without_pyg():
-    pytest.importorskip("torch")
-
+def _execute_optional_import(blocked_import):
     repository_root = Path(__file__).resolve().parent.parent
     init_path = repository_root / "qmcpy" / "__init__.py"
     init_tree = ast.parse(init_path.read_text())
@@ -26,20 +24,62 @@ def test_mpmc_utils_remain_available_without_pyg():
 
     real_import = builtins.__import__
 
-    def import_without_pyg(name, globals=None, locals=None, fromlist=(), level=0):
-        if level == 1 and name == "discrete_distribution.mpmc.models":
-            raise ModuleNotFoundError("blocked optional dependency", name="torch_geometric")
+    def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
+        missing_module = blocked_import(name, fromlist, level)
+        if missing_module is not None:
+            raise ModuleNotFoundError(
+                "blocked optional dependency",
+                name=missing_module,
+            )
         return real_import(name, globals, locals, fromlist, level)
 
     test_builtins = vars(builtins).copy()
-    test_builtins["__import__"] = import_without_pyg
+    test_builtins["__import__"] = guarded_import
     namespace = {"__builtins__": test_builtins, "__package__": "qmcpy"}
     module = ast.Module(body=[optional_import], type_ignores=[])
     exec(compile(module, str(init_path), "exec"), namespace)
+    return namespace
+
+
+def test_mpmc_utils_remain_available_without_pyg():
+    pytest.importorskip("torch")
+
+    def block_pyg_models(name, fromlist, level):
+        if level == 1 and name == "discrete_distribution.mpmc.models":
+            return "torch_geometric"
+        return None
+
+    namespace = _execute_optional_import(block_pyg_models)
+
+    import qmcpy
 
     assert namespace["mpmc_utils"] is qmcpy.mpmc_utils
     assert namespace["mpmc_utils"].__name__ == (
         "qmcpy.discrete_distribution.mpmc.utils"
     )
     assert "utils" not in namespace
-    assert "MPMC_net" not in namespace
+
+    with pytest.raises(ModuleNotFoundError, match="MPMC_net.*torch_geometric") as error:
+        namespace["MPMC_net"]()
+    assert error.value.name == "torch_geometric"
+
+
+def test_mpmc_placeholders_report_missing_torch():
+    def block_torch_utils(name, fromlist, level):
+        if (
+            level == 1
+            and name == "discrete_distribution.mpmc"
+            and "utils" in fromlist
+        ):
+            return "torch"
+        return None
+
+    namespace = _execute_optional_import(block_torch_utils)
+
+    with pytest.raises(ModuleNotFoundError, match="mpmc_utils.*torch") as error:
+        namespace["mpmc_utils"].L2star
+    assert error.value.name == "torch"
+
+    with pytest.raises(ModuleNotFoundError, match="MPMC_net.*torch") as error:
+        namespace["MPMC_net"]()
+    assert error.value.name == "torch"
