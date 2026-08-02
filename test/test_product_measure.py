@@ -13,7 +13,7 @@ from qmcpy import (
     Uniform,
     ZeroInflatedExpUniform,
 )
-from qmcpy.util import DimensionError, ParameterError
+from qmcpy import DimensionError, ParameterError
 
 
 def test_product_measure_zero_inflated_with_scipy_uniform_shape():

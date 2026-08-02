@@ -1,4 +1,4 @@
-from qmcpy import *
+from qmcpy import DigitalNetB2, Halton, IIDStdUniform, Lattice, ParameterError
 import qmctoolscl
 import os
 import unittest

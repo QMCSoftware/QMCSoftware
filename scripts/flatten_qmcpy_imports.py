@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from collections.abc import Iterable, Iterator
+import json
 import os
 from pathlib import Path
 import re
@@ -48,6 +50,12 @@ NOTEBOOK_STAR_IMPORT_RE = re.compile(
     rb"from[ \t]+qmcpy[ \t]+import[ \t]+\*(?:\\r)?(?:\\n)?\""
     rb",?[ \t]*(?:\r\n|\n|\r)?$"
 )
+STAR_IMPORT_LITERAL = b"from qmcpy import *"
+
+# A line only looks like an IPython magic/shell escape when '%'/'%%' is
+# immediately followed by a name (e.g. "%matplotlib"); "% (x, y)" is a
+# modulo-operator continuation and must be left alone.
+MAGIC_LINE_RE = re.compile(r"^[ \t]*(?:%{1,2}[A-Za-z_]|!|\?)")
 
 
 def _star_import_context(line: bytes) -> tuple[bytes, bytes] | None:
@@ -87,8 +95,160 @@ def _deduplicate_adjacent_star_imports(content: bytes) -> tuple[bytes, int]:
     return b"".join(output), removed_count
 
 
-def flatten_imports(content: bytes) -> tuple[bytes, int]:
-    """Flatten public imports and deduplicate adjacent same-scope star imports."""
+def _load_qmcpy_public_names(repository_root: Path) -> frozenset[str] | None:
+    """Return qmcpy's public top-level names, or None if qmcpy can't be imported."""
+
+    if str(repository_root) not in sys.path:
+        sys.path.insert(0, str(repository_root))
+    try:
+        import qmcpy
+    except ImportError:
+        return None
+    return frozenset(name for name in dir(qmcpy) if not name.startswith("_"))
+
+
+def _names_needing_import(source: str, public_names: frozenset[str]) -> set[str] | None:
+    """Return public qmcpy names referenced but not otherwise bound in `source`.
+
+    Returns None if `source` isn't parseable Python. The scan is file-wide
+    rather than scope-aware, so a name bound anywhere (even in an unrelated
+    scope) is treated as locally defined and excluded, which is the safe
+    direction to err in.
+    """
+
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return None
+
+    loaded: set[str] = set()
+    bound: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name):
+            (loaded if isinstance(node.ctx, ast.Load) else bound).add(node.id)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            bound.add(node.name)
+        elif isinstance(node, ast.arg):
+            bound.add(node.arg)
+        elif isinstance(node, ast.alias):
+            bound.add((node.asname or node.name).split(".")[0])
+        elif isinstance(node, ast.ExceptHandler) and node.name:
+            bound.add(node.name)
+
+    return (loaded & public_names) - bound
+
+
+def _line_ending(line: bytes) -> bytes:
+    for ending in (b"\r\n", b"\n", b"\r"):
+        if line.endswith(ending):
+            return ending
+    return b""
+
+
+def _format_expanded_import(indent: bytes, names: Iterable[str], ending: bytes) -> bytes:
+    sorted_names = sorted(names)
+    indent_text = indent.decode()
+    single_line = f"{indent_text}from qmcpy import {', '.join(sorted_names)}"
+    if len(single_line) <= 88:
+        return single_line.encode() + ending
+
+    body_lines = [f"{indent_text}from qmcpy import ("]
+    body_lines.extend(f"{indent_text}    {name}," for name in sorted_names)
+    body_lines.append(f"{indent_text})")
+    return ending.join(line.encode() for line in body_lines) + ending
+
+
+def _expand_text_star_imports(content: bytes, public_names: frozenset[str]) -> tuple[bytes, int]:
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return content, 0
+
+    needed = _names_needing_import(text, public_names)
+    if not needed:
+        return content, 0
+
+    output: list[bytes] = []
+    change_count = 0
+    for line in content.splitlines(keepends=True):
+        match = TEXT_STAR_IMPORT_RE.match(line)
+        if match is None:
+            output.append(line)
+            continue
+        output.append(
+            _format_expanded_import(match.group("indent"), needed, _line_ending(line))
+        )
+        change_count += 1
+
+    return b"".join(output), change_count
+
+
+def _sanitize_magic_lines(source: str) -> str:
+    """Blank out IPython magic/shell-escape lines so the cell can be parsed as Python."""
+
+    return "".join(
+        "pass\n" if MAGIC_LINE_RE.match(line) else line
+        for line in source.splitlines(keepends=True)
+    )
+
+
+def _notebook_python_source(content: bytes) -> str | None:
+    """Concatenate a notebook's code cells into one pseudo-module for analysis."""
+
+    try:
+        notebook = json.loads(content)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(notebook, dict):
+        return None
+    cells = notebook.get("cells")
+    if not isinstance(cells, list):
+        return None
+
+    sources = []
+    for cell in cells:
+        if not isinstance(cell, dict) or cell.get("cell_type") != "code":
+            continue
+        source = cell.get("source", "")
+        if isinstance(source, list):
+            source = "".join(source)
+        if isinstance(source, str) and source:
+            sources.append(_sanitize_magic_lines(source))
+
+    return "\n\n".join(sources)
+
+
+def _expand_notebook_star_imports(content: bytes, public_names: frozenset[str]) -> tuple[bytes, int]:
+    combined_source = _notebook_python_source(content)
+    if combined_source is None:
+        return content, 0
+
+    needed = _names_needing_import(combined_source, public_names)
+    if not needed:
+        return content, 0
+
+    import_text = ("from qmcpy import " + ", ".join(sorted(needed))).encode()
+
+    output: list[bytes] = []
+    change_count = 0
+    for line in content.splitlines(keepends=True):
+        if NOTEBOOK_STAR_IMPORT_RE.match(line) is None:
+            output.append(line)
+            continue
+        output.append(line.replace(STAR_IMPORT_LITERAL, import_text, 1))
+        change_count += 1
+
+    return b"".join(output), change_count
+
+
+def flatten_imports(
+    content: bytes, public_names: frozenset[str] | None = None
+) -> tuple[bytes, int]:
+    """Flatten public imports, deduplicate star imports, and expand them.
+
+    `public_names` is qmcpy's public API surface (see `_load_qmcpy_public_names`).
+    When it's None, star imports are still deduplicated but left unexpanded.
+    """
 
     change_count = 0
 
@@ -112,7 +272,18 @@ def flatten_imports(content: bytes) -> tuple[bytes, int]:
 
     updated = QMCPY_IMPORT_RE.sub(replace, content)
     updated, duplicate_count = _deduplicate_adjacent_star_imports(updated)
-    return updated, change_count + duplicate_count
+    change_count += duplicate_count
+
+    if public_names and STAR_IMPORT_LITERAL in updated:
+        expand = (
+            _expand_notebook_star_imports
+            if _notebook_python_source(updated) is not None
+            else _expand_text_star_imports
+        )
+        updated, expand_count = expand(updated, public_names)
+        change_count += expand_count
+
+    return updated, change_count
 
 
 def _is_supported(path: Path) -> bool:
@@ -187,11 +358,19 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {error}", file=sys.stderr)
         return 2
 
+    public_names = _load_qmcpy_public_names(repository_root)
+    if public_names is None:
+        print(
+            "warning: qmcpy is not importable; star imports will be "
+            "deduplicated but not expanded",
+            file=sys.stderr,
+        )
+
     changed_files = 0
     changed_imports = 0
     for path in targets:
         original = path.read_bytes()
-        updated, count = flatten_imports(original)
+        updated, count = flatten_imports(original, public_names)
         if not count:
             continue
 

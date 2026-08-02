@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from qmcpy.discrete_distribution import DummySampler
-from qmcpy.util import ParameterError
+from qmcpy import DummySampler
+from qmcpy import ParameterError
 
 
 PLACEHOLDER_ERROR = "construction placeholder"
