@@ -41,7 +41,7 @@ def ObjectiveFunction(theta, order, xun, ftilde):
     loss = loss1 + loss2
     if np.imag(loss) != 0:
         # keyboard
-        raise ("error ! : loss value is complex")
+        raise ValueError("error ! : loss value is complex")
 
     # print('L1 %1.3f L2 %1.3f L %1.3f r %1.3e theta %1.3e\n'.format(loss1, loss2, loss, order, theta))
     return loss, Lambda, RKHSnorm
@@ -124,7 +124,7 @@ def doPeriodTx(x, integrand, ptransform):
         xp = x
         w = 1
     else:
-        raise (f"The {ptransform} periodization transform is not implemented")
+        raise ValueError(f"The {ptransform} periodization transform is not implemented")
     y = integrand(xp) * w
     return y
 
