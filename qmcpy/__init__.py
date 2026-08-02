@@ -74,8 +74,9 @@ from .util.transforms import (
 )
 
 try:
+    # Keep the Torch-only utilities available when the heavier PyG import fails.
+    from .discrete_distribution.mpmc import utils as mpmc_utils
     from .discrete_distribution.mpmc.models import MPMC_net
-    from .discrete_distribution.mpmc import utils
 except ImportError as error:
     _missing_module = getattr(error, "name", None)
     if _missing_module is None or _missing_module.split(".", 1)[0] not in {
