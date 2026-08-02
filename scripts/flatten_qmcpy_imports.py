@@ -51,6 +51,15 @@ NOTEBOOK_STAR_IMPORT_RE = re.compile(
     rb",?[ \t]*(?:\r\n|\n|\r)?$"
 )
 STAR_IMPORT_LITERAL = b"from qmcpy import *"
+# Bare (already top-level) single-line "from qmcpy import ..." statements, so
+# stale comma spacing can be cleaned up even when there's no module path to
+# flatten. Anchored to line start, so notebook JSON lines (which have a
+# leading quote before "from") never match.
+NAMED_IMPORT_LINE_RE = re.compile(
+    rb"^(?P<prefix>[ \t]*from[ \t]+qmcpy[ \t]+import)(?P<imported>[ \t][^\r\n]*?)"
+    rb"[ \t]*(?:\r\n|\n|\r)?$"
+)
+COMMA_SPACING_RE = re.compile(rb",(?=\S)")
 
 # A line only looks like an IPython magic/shell escape when '%'/'%%' is
 # immediately followed by a name (e.g. "%matplotlib"); "% (x, y)" is a
@@ -241,6 +250,29 @@ def _expand_notebook_star_imports(content: bytes, public_names: frozenset[str]) 
     return b"".join(output), change_count
 
 
+def _normalize_comma_spacing(content: bytes) -> tuple[bytes, int]:
+    """Ensure a space follows each comma in single-line qmcpy import statements."""
+
+    output: list[bytes] = []
+    change_count = 0
+    for line in content.splitlines(keepends=True):
+        match = NAMED_IMPORT_LINE_RE.match(line)
+        if match is None:
+            output.append(line)
+            continue
+
+        imported = match.group("imported")
+        normalized = COMMA_SPACING_RE.sub(b", ", imported)
+        if normalized == imported:
+            output.append(line)
+            continue
+
+        change_count += 1
+        output.append(match.group("prefix") + normalized + _line_ending(line))
+
+    return b"".join(output), change_count
+
+
 def flatten_imports(
     content: bytes, public_names: frozenset[str] | None = None
 ) -> tuple[bytes, int]:
@@ -282,6 +314,9 @@ def flatten_imports(
         )
         updated, expand_count = expand(updated, public_names)
         change_count += expand_count
+
+    updated, comma_count = _normalize_comma_spacing(updated)
+    change_count += comma_count
 
     return updated, change_count
 
