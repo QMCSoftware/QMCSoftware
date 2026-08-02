@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Flatten public absolute QMCPy imports to use the top-level package."""
+"""Flatten public absolute QMCPy imports to use the top-level package.
+
+Adjacent public ``from qmcpy import ...`` statements in the same scope are
+combined, deduplicated, and ordered alphabetically.  The combined import stays
+on one line when it fits within 88 characters; otherwise it uses a
+parenthesized block with one name per line.  A blank line, comment, different
+statement, or change in indentation ends a group.  Authors can therefore keep
+intentional semantic groups (for example, true measures and integrands) by
+separating and, when useful, labeling those groups themselves.
+
+Private module paths and private imported names are left unchanged.  They stay
+as separate statements and end any adjacent public-import group.
+"""
 
 from __future__ import annotations
 
@@ -51,6 +63,14 @@ NOTEBOOK_STAR_IMPORT_RE = re.compile(
     rb",?[ \t]*(?:\r\n|\n|\r)?$"
 )
 STAR_IMPORT_LITERAL = b"from qmcpy import *"
+TEXT_NAMED_IMPORT_START_RE = re.compile(
+    rb"^(?P<indent>[ \t]*)from[ \t]+qmcpy[ \t]+import[ \t]+"
+    rb"(?P<imported>[^\r\n]*?)[ \t]*(?:\r\n|\n|\r)?$"
+)
+NOTEBOOK_SOURCE_LINE_RE = re.compile(
+    rb'^(?P<json_indent>[ \t]*)(?P<string>"(?:[^"\\]|\\.)*")'
+    rb"(?P<comma>,?)(?P<trailing>[ \t]*)(?P<ending>\r\n|\n|\r)?$"
+)
 # Bare (already top-level) single-line "from qmcpy import ..." statements, so
 # stale comma spacing can be cleaned up even when there's no module path to
 # flatten. Anchored to line start, so notebook JSON lines (which have a
@@ -155,16 +175,175 @@ def _line_ending(line: bytes) -> bytes:
 
 
 def _format_expanded_import(indent: bytes, names: Iterable[str], ending: bytes) -> bytes:
-    sorted_names = sorted(names)
+    sorted_names = sorted(
+        dict.fromkeys(names),
+        key=lambda name: tuple(part.casefold() for part in name.partition(" as ")),
+    )
     indent_text = indent.decode()
     single_line = f"{indent_text}from qmcpy import {', '.join(sorted_names)}"
     if len(single_line) <= 88:
         return single_line.encode() + ending
 
+    separator = ending or b"\n"
     body_lines = [f"{indent_text}from qmcpy import ("]
     body_lines.extend(f"{indent_text}    {name}," for name in sorted_names)
     body_lines.append(f"{indent_text})")
-    return ending.join(line.encode() for line in body_lines) + ending
+    return separator.join(line.encode() for line in body_lines) + ending
+
+
+def _parse_named_import_statement(statement_bytes: bytes, indent: bytes):
+    """Return imported names for a safe top-level QMCPy import statement."""
+
+    if b"#" in statement_bytes:
+        return None
+
+    dedented = b"".join(
+        line[len(indent) :] if line.startswith(indent) else line
+        for line in statement_bytes.splitlines(keepends=True)
+    )
+    try:
+        tree = ast.parse(dedented.decode("utf-8"))
+    except (SyntaxError, UnicodeDecodeError):
+        return None
+    if len(tree.body) != 1 or not isinstance(tree.body[0], ast.ImportFrom):
+        return None
+    statement = tree.body[0]
+    if statement.level or statement.module != "qmcpy":
+        return None
+
+    names = []
+    for alias in statement.names:
+        if alias.name == "*" or alias.name.startswith("_"):
+            return None
+        names.append(
+            alias.name if alias.asname is None else f"{alias.name} as {alias.asname}"
+        )
+    return names
+
+
+def _parse_text_named_import(lines: list[bytes], start: int):
+    """Parse one safe single-line or parenthesized QMCPy import."""
+
+    match = TEXT_NAMED_IMPORT_START_RE.match(lines[start])
+    if match is None:
+        return None
+
+    imported = match.group("imported").lstrip()
+    stop = start + 1
+    if imported.startswith(b"("):
+        depth = lines[start].count(b"(") - lines[start].count(b")")
+        while depth > 0 and stop < len(lines):
+            depth += lines[stop].count(b"(") - lines[stop].count(b")")
+            stop += 1
+        if depth != 0:
+            return None
+
+    original = b"".join(lines[start:stop])
+    indent = match.group("indent")
+    names = _parse_named_import_statement(original, indent)
+    if names is None:
+        return None
+    return indent, names, _line_ending(lines[stop - 1]), original, stop
+
+
+def _combine_text_named_imports(content: bytes) -> tuple[bytes, int]:
+    """Combine adjacent, same-scope public QMCPy imports in text files."""
+
+    lines = content.splitlines(keepends=True)
+    output: list[bytes] = []
+    run: list[tuple[bytes, list[str], bytes, bytes]] = []
+    change_count = 0
+
+    def flush() -> None:
+        nonlocal change_count
+        if not run:
+            return
+        indent = run[0][0]
+        names = [name for _, imported, _, _ in run for name in imported]
+        combined = _format_expanded_import(indent, names, run[-1][2])
+        original = b"".join(item[3] for item in run)
+        output.append(combined)
+        change_count += int(combined != original)
+        run.clear()
+
+    index = 0
+    while index < len(lines):
+        parsed = _parse_text_named_import(lines, index)
+        if parsed is None:
+            flush()
+            output.append(lines[index])
+            index += 1
+            continue
+        indent, names, ending, original, stop = parsed
+        if run and run[-1][0] != indent:
+            flush()
+        run.append((indent, names, ending, original))
+        index = stop
+    flush()
+    return b"".join(output), change_count
+
+
+def _parse_notebook_named_import(line: bytes):
+    match = NOTEBOOK_SOURCE_LINE_RE.match(line)
+    if match is None:
+        return None
+    try:
+        source = json.loads(match.group("string"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(source, str):
+        return None
+    source_bytes = source.encode("utf-8")
+    source_lines = source_bytes.splitlines(keepends=True)
+    if not source_lines:
+        return None
+    parsed = _parse_text_named_import(source_lines, 0)
+    if parsed is None or parsed[4] != len(source_lines):
+        return None
+    code_indent, names, code_ending, _, _ = parsed
+    context = (match.group("json_indent"), code_indent)
+    return context, names, code_ending, match
+
+
+def _combine_notebook_named_imports(content: bytes) -> tuple[bytes, int]:
+    """Combine adjacent public QMCPy imports in notebook source arrays."""
+
+    output: list[bytes] = []
+    run = []
+    change_count = 0
+
+    def flush() -> None:
+        nonlocal change_count
+        if not run:
+            return
+        context = run[0][0]
+        names = [name for _, imported, _, _, _ in run for name in imported]
+        code = _format_expanded_import(context[1], names, run[-1][2]).decode()
+        last_match = run[-1][3]
+        combined = (
+            context[0]
+            + json.dumps(code).encode()
+            + last_match.group("comma")
+            + last_match.group("trailing")
+            + (last_match.group("ending") or b"")
+        )
+        original = b"".join(item[4] for item in run)
+        output.append(combined)
+        change_count += int(combined != original)
+        run.clear()
+
+    for line in content.splitlines(keepends=True):
+        parsed = _parse_notebook_named_import(line)
+        if parsed is None:
+            flush()
+            output.append(line)
+            continue
+        context, names, code_ending, match = parsed
+        if run and run[-1][0] != context:
+            flush()
+        run.append((context, names, code_ending, match, line))
+    flush()
+    return b"".join(output), change_count
 
 
 def _expand_text_star_imports(content: bytes, public_names: frozenset[str]) -> tuple[bytes, int]:
@@ -276,7 +455,7 @@ def _normalize_comma_spacing(content: bytes) -> tuple[bytes, int]:
 def flatten_imports(
     content: bytes, public_names: frozenset[str] | None = None
 ) -> tuple[bytes, int]:
-    """Flatten public imports, deduplicate star imports, and expand them.
+    """Flatten, combine, alphabetize, and deduplicate public imports.
 
     `public_names` is qmcpy's public API surface (see `_load_qmcpy_public_names`).
     When it's None, star imports are still deduplicated but left unexpanded.
@@ -314,6 +493,14 @@ def flatten_imports(
         )
         updated, expand_count = expand(updated, public_names)
         change_count += expand_count
+
+    combine = (
+        _combine_notebook_named_imports
+        if _notebook_python_source(updated) is not None
+        else _combine_text_named_imports
+    )
+    updated, combine_count = combine(updated)
+    change_count += combine_count
 
     updated, comma_count = _normalize_comma_spacing(updated)
     change_count += comma_count

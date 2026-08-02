@@ -15,6 +15,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from qmcpy import (
+    AbstractDiscreteDistribution,
+    AbstractIntegrand,
+    AbstractStoppingCriterion,
     CubBayesLatticeG,
     CubBayesNetG,
     CubMCCLT,
@@ -32,6 +35,7 @@ from qmcpy import (
     CubQMCMLCont,
     CubQMCNetG,
     CubQMCRepStudentT,
+    Data,
     DigitalNetB2,
     DistributionCompatibilityError,
     FinancialOption,
@@ -43,15 +47,11 @@ from qmcpy import (
     MaxLevelsWarning,
     MaxSamplesWarning,
     MethodImplementationError,
-    PFGPCI,
     ParameterError,
+    PFGPCI,
     SensitivityIndices,
     SobolIndices,
 )
-from qmcpy import Data
-from qmcpy import AbstractDiscreteDistribution
-from qmcpy import AbstractIntegrand
-from qmcpy import AbstractStoppingCriterion
 from qmcpy.stopping_criterion.diagnostics import _IterationHistoryTable, _IterationTraceLogger, _print_diagnostic, _get_iteration_log_frame
 
 

@@ -6,21 +6,23 @@ from qmcpy.util import (
     ParameterError,
     MethodImplementationError,
 )
-from qmcpy import Data
-from qmcpy import to_bin, to_float, weighted_walsh_funcs
-from qmcpy import latnetbuilder_linker
-from qmcpy import bernoulli_poly
-from qmcpy import get_npt
 from qmcpy import (
+    bernoulli_poly,
+    Data,
+    get_npt,
     insert_batch_dims,
+    latnetbuilder_linker,
     parse_assign_param,
     tf_exp,
     tf_exp_inv,
-    tf_square,
-    tf_square_inv,
-    tf_identity,
     tf_explinear,
     tf_explinear_inv,
+    tf_identity,
+    tf_square,
+    tf_square_inv,
+    to_bin,
+    to_float,
+    weighted_walsh_funcs,
 )
 
 

@@ -61,8 +61,7 @@ The user-facing interface remains familiar.
 
 ```python
 import scipy.stats as stats
-from qmcpy import DigitalNetB2
-from qmcpy import SciPyWrapper
+from qmcpy import DigitalNetB2, SciPyWrapper
 
 tm = SciPyWrapper(
     sampler=DigitalNetB2(2, seed=7),
@@ -75,8 +74,7 @@ x = tm(4096)
 
 ```python
 import scipy.stats as stats
-from qmcpy import DigitalNetB2
-from qmcpy import SciPyWrapper
+from qmcpy import DigitalNetB2, SciPyWrapper
 
 mvn = stats.multivariate_normal(
     mean=[0.0, 0.0],
@@ -89,9 +87,7 @@ x_joint = tm_joint(4096)
 ##### New custom-univariate workflow
 
 ```python
-from qmcpy import DigitalNetB2
-from qmcpy import TriangularDistribution
-from qmcpy import SciPyWrapper
+from qmcpy import DigitalNetB2, SciPyWrapper, TriangularDistribution
 
 tri = TriangularDistribution(c=0.3, loc=-1.0, scale=2.0)
 tm_custom = SciPyWrapper(DigitalNetB2(1, seed=11), scipy_distribs=tri)

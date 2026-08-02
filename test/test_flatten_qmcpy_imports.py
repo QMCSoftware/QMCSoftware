@@ -17,11 +17,9 @@ def test_flatten_imports_preserves_imported_names_and_formatting():
 
     updated, count = flatten_imports(source)
 
-    assert count == 2
+    assert count == 3
     assert updated == (
-        b"from qmcpy import Keister\n"
-        b"from qmcpy import Lattice as LD\n"
-        b"from qmcpy import DigitalNetB2\n"
+        b"from qmcpy import DigitalNetB2, Keister, Lattice as LD\n"
         b"import qmcpy.util\n"
     )
 
@@ -51,6 +49,19 @@ def test_flatten_imports_preserves_private_modules_and_names():
         _nested_import("integrand", "Keister").encode(),
         b"from qmcpy import Keister",
     )
+
+
+def test_private_module_import_separates_public_import_groups():
+    source = (
+        b"from qmcpy import Zeta\n"
+        b"from qmcpy._internal._helpers import PublicHelper\n"
+        b"from qmcpy import Alpha\n"
+    )
+
+    updated, count = flatten_imports(source)
+
+    assert count == 0
+    assert updated == source
 
 
 def test_flatten_imports_deduplicates_same_scope_star_imports():
@@ -89,6 +100,101 @@ def test_flatten_imports_deduplicates_notebook_star_imports():
 
     assert count == 3
     assert json.loads(updated)["cells"][0]["source"] == ["from qmcpy import *"]
+
+
+def test_flatten_imports_combines_and_alphabetizes_named_imports():
+    source = (
+        b"from qmcpy import Zeta,Beta\n"
+        b"from qmcpy import Alpha\n"
+        b"\n"
+        b"from qmcpy import Gamma\n"
+    )
+
+    updated, count = flatten_imports(source)
+
+    assert count == 1
+    assert updated == (
+        b"from qmcpy import Alpha, Beta, Zeta\n"
+        b"\n"
+        b"from qmcpy import Gamma\n"
+    )
+    assert flatten_imports(updated) == (updated, 0)
+
+
+def test_flatten_imports_combines_parenthesized_and_single_line_imports():
+    source = b"""from qmcpy import (
+    KernelDigShiftInvar,
+    KernelDigShiftInvarAdaptiveAlpha,
+    KernelDigShiftInvarCombined,
+    KernelShiftInvar,
+    KernelShiftInvarCombined,
+)
+from qmcpy import tf_exp_eps, tf_exp_eps_inv
+"""
+
+    updated, count = flatten_imports(source)
+
+    assert count == 1
+    assert updated == b"""from qmcpy import (
+    KernelDigShiftInvar,
+    KernelDigShiftInvarAdaptiveAlpha,
+    KernelDigShiftInvarCombined,
+    KernelShiftInvar,
+    KernelShiftInvarCombined,
+    tf_exp_eps,
+    tf_exp_eps_inv,
+)
+"""
+    assert flatten_imports(updated) == (updated, 0)
+
+
+def test_flatten_imports_combines_only_within_the_same_scope():
+    source = (
+        b"if enabled:\n"
+        b"    from qmcpy import Zeta\n"
+        b"    from qmcpy import Alpha as First\n"
+        b"else:\n"
+        b"    from qmcpy import Beta\n"
+        b"from qmcpy import _Private\n"
+        b"from qmcpy import Gamma  # keep this comment\n"
+    )
+
+    updated, count = flatten_imports(source)
+
+    assert count == 1
+    assert updated == (
+        b"if enabled:\n"
+        b"    from qmcpy import Alpha as First, Zeta\n"
+        b"else:\n"
+        b"    from qmcpy import Beta\n"
+        b"from qmcpy import _Private\n"
+        b"from qmcpy import Gamma  # keep this comment\n"
+    )
+
+
+def test_flatten_imports_combines_notebook_named_imports():
+    notebook = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "source": [
+                    "from qmcpy import Zeta\n",
+                    "from qmcpy import Alpha,Beta\n",
+                    "print(Alpha)\n",
+                ],
+            }
+        ]
+    }
+    source = json.dumps(notebook, indent=1).encode()
+
+    updated, count = flatten_imports(source)
+
+    assert count == 1
+    assert json.loads(updated)["cells"][0]["source"] == [
+        "from qmcpy import Alpha, Beta, Zeta\n",
+        "print(Alpha)\n",
+    ]
+    assert flatten_imports(updated) == (updated, 0)
 
 
 def test_check_mode_reports_changes_without_writing(tmp_path):

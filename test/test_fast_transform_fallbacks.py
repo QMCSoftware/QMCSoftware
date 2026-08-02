@@ -3,14 +3,14 @@ import pytest
 
 from qmcpy import (
     fftbr,
-    ifftbr,
-    fwht,
-    omega_fftbr,
-    omega_fwht,
     fftbr_torch,
-    ifftbr_torch,
+    fwht,
     fwht_torch,
+    ifftbr,
+    ifftbr_torch,
+    omega_fftbr,
     omega_fftbr_torch,
+    omega_fwht,
     omega_fwht_torch,
 )
 

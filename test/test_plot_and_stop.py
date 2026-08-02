@@ -5,8 +5,7 @@ import builtins
 import pytest
 
 import qmcpy
-from qmcpy import plot_proj
-from qmcpy import stop_notebook
+from qmcpy import plot_proj, stop_notebook
 
 
 class FakeAxes:

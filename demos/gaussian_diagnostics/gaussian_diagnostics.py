@@ -6,8 +6,7 @@ from scipy.stats import norm as gaussnorm
 from matplotlib import cm
 import os
 
-from qmcpy import Keister
-from qmcpy import Lattice
+from qmcpy import Keister, Lattice
 
 # print(plt.style.available)
 # plt.style.use('./presentation.mplstyle')  # custom settings

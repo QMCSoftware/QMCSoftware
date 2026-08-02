@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
 
-from qmcpy import DummySampler
-from qmcpy import ParameterError
+from qmcpy import DummySampler, ParameterError
 
 
 PLACEHOLDER_ERROR = "construction placeholder"
