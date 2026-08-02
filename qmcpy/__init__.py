@@ -77,8 +77,8 @@ try:
     from .discrete_distribution.mpmc.models import MPMC_net
     from .discrete_distribution.mpmc import utils
 except ImportError as error:
-    missing_module = getattr(error, "name", None)
-    if missing_module is None or missing_module.split(".", 1)[0] not in {
+    _missing_module = getattr(error, "name", None)
+    if _missing_module is None or _missing_module.split(".", 1)[0] not in {
         "pyg_lib",
         "torch",
         "torch_geometric",
