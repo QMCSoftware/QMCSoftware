@@ -77,6 +77,7 @@ try:
     from .discrete_distribution.mpmc.models import MPMC_net
     from .discrete_distribution.mpmc import utils
 except ImportError:
+    # Optional MPMC dependencies are unavailable. Keep the base package importable.
     pass
 
 name = "qmcpy"
