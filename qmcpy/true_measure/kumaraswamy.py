@@ -85,6 +85,62 @@ class Kumaraswamy(AbstractTrueMeasure):
         assert self.alpha.shape == (self.d,) and self.beta.shape == (self.d,)
 
     def _compute_moments(self):
+        r"""
+        Compute the marginal mean and variance of each coordinate.
+
+        The Kumaraswamy raw moments are $M_n = b\,B(1 + n/a, b)$ [1], so the
+        mean is $M_1$ and the variance is $M_2 - M_1^2$. Forming that difference
+        directly causes cancellation error once the variance is small relative
+        to $M_1^2$ (e.g. large $a$).
+
+        Instead, with the log-moment function $K(r) = \log M_r$ (so $K(0) = 0$),
+
+        $$\text{mean} = e^{K(1)}, \qquad
+          \operatorname{Var}[X] = \text{mean}^2\,(e^{q} - 1), \qquad
+          q = K(2) - 2K(1).$$
+
+        The mean is recovered as $K(1) = \int_0^1 K'(r)\,\mathrm{d}r$ and, adding
+        $K(0) = 0$, $q$ becomes a second central difference with the exact
+        tent-weight (linear B-spline) form
+
+        $$q = \int_0^1 r\,K''(r)\,\mathrm{d}r
+            + \int_1^2 (2 - r)\,K''(r)\,\mathrm{d}r.$$
+
+        Here $K'$ uses the digamma and $K''$ the trigamma function [5]. $K$ is
+        convex ($K''(r) > 0$, since $r \mapsto M_r$ is log-convex by Holder's
+        inequality [2]), so both integrands are nonnegative and $q$ is built
+        from nonnegative pieces with no cancellation. Both integrals share one
+        8-node Gauss-Legendre rule on $[0, 1]$ [3] (nodes from ``leggauss`` [4]);
+        ``numpy.expm1`` keeps $e^{q} - 1$ accurate for small $q$ [4]. Every
+        operation is applied elementwise to the per-coordinate parameters $a$
+        and $b$, so ``mean`` and ``variance`` are returned as length-``d``
+        arrays.
+
+        **References:**
+
+        1.  Kumaraswamy distribution. Wikipedia.
+            [https://en.wikipedia.org/wiki/Kumaraswamy_distribution](https://en.wikipedia.org/wiki/Kumaraswamy_distribution).
+
+        2.  G. H. Hardy, J. E. Littlewood, and G. Polya.
+            Inequalities, 2nd edition, Cambridge University Press, Cambridge, 1952
+            (Holder's inequality; implies log-convexity of the moment sequence).
+
+        3.  Philip J. Davis and Philip Rabinowitz.
+            Methods of Numerical Integration, 2nd edition,
+            Academic Press, Orlando, FL, 1984, ISBN 0-12-206360-0
+            (Gauss-Legendre quadrature).
+
+        4.  NumPy Reference. numpy.polynomial.legendre.leggauss and numpy.expm1.
+            [https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html).
+            [https://numpy.org/doc/stable/reference/generated/numpy.expm1.html](https://numpy.org/doc/stable/reference/generated/numpy.expm1.html).
+
+        5.  SciPy Reference. scipy.special.digamma and scipy.special.polygamma.
+            [https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.digamma.html](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.digamma.html).
+            [https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.polygamma.html](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.polygamma.html).
+
+        Returns:
+            tuple: Length ``d`` arrays ``(mean, variance)``.
+        """
         inv_a = 1.0 / self.alpha
         beta = self.beta
 
@@ -115,7 +171,7 @@ class Kumaraswamy(AbstractTrueMeasure):
 
         # expm1(q) accurately computes exp(q) - 1 when q is very small.
         variance = mean * mean * np.expm1(q)
-        
+
         return mean, variance
 
     def _transform(self, x):
@@ -140,7 +196,7 @@ class Kumaraswamy(AbstractTrueMeasure):
                 raise DimensionError(
                     """
                     In order to spawn a Kumaraswamy measure
-                    a must all be the same and 
+                    a must all be the same and
                     b must all be the same"""
                 )
             spawn = Kumaraswamy(sampler, a=a, b=b)
