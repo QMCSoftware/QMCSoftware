@@ -46,19 +46,28 @@ class AbstractTrueMeasure(object):
         view.setflags(write=False)
         return view
 
-    # store mean, variance, standard deviation, and covariance as read only array
+    def _scalar_if_univariate(self, value):
+        """For univariate (``d == 1``) measures, return a Python ``float`` scalar
+        (via :func:`numpy.squeeze`); otherwise return a read only array view."""
+        if getattr(self, "d", None) == 1:
+            return float(np.squeeze(value))
+        return self._read_only_view(value)
+
+    # store mean, variance, standard deviation, and covariance as read only array.
+    # For univariate measures the mean, variance, and standard deviation are
+    # returned as Python float scalars rather than length-1 arrays.
 
     @property
     def mean(self):
-        return self._read_only_view(self._mean)
+        return self._scalar_if_univariate(self._mean)
 
     @property
     def variance(self):
-        return self._read_only_view(self._variance)
+        return self._scalar_if_univariate(self._variance)
 
     @property
     def standard_deviation(self):
-        return self._read_only_view(self._standard_deviation)
+        return self._scalar_if_univariate(self._standard_deviation)
 
     @property
     def covariance(self):

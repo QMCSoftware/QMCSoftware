@@ -404,14 +404,20 @@ class TestKumaraswamy(unittest.TestCase):
             spawn.covariance, np.diag(expected_variance)
         )
 
-    def test_variance_is_length_d_array(self):
+    def test_variance_shape(self):
+        # Univariate (d==1) measures return scalar moments; multivariate
+        # measures return length-d arrays.
         for d, a, b in [(1, 2, 3), (2, [1, 2], [3, 4]), (4, 3, 5)]:
             with self.subTest(d=d):
                 kumaraswamy = Kumaraswamy(DigitalNetB2(d, seed=7), a=a, b=b)
                 variance = kumaraswamy.variance
 
-                self.assertEqual(variance.shape, (d,))
-                self.assertEqual(variance.ndim, 1)
+                if d == 1:
+                    self.assertIsInstance(variance, float)
+                    self.assertEqual(np.ndim(variance), 0)
+                else:
+                    self.assertEqual(variance.shape, (d,))
+                    self.assertEqual(variance.ndim, 1)
                 self.assertTrue(np.all(variance > 0))
 
     def test_covariance_is_d_by_d_matrix(self):
@@ -478,14 +484,15 @@ class TestZeroInflatedExpUniform(unittest.TestCase):
                     tm.standard_deviation, [np.sqrt(variance)]
                 )
 
-    def test_moment_attribute_shapes(self):
+    def test_moment_attributes_are_scalars(self):
         tm = ZeroInflatedExpUniform(
             DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
         )
         self.assertEqual(tm.d, 1)
-        self.assertEqual(tm.mean.shape, (1,))
-        self.assertEqual(tm.variance.shape, (1,))
-        self.assertEqual(tm.standard_deviation.shape, (1,))
+        # Univariate measures return scalar (0-d) moments rather than length-1 arrays.
+        for value in (tm.mean, tm.variance, tm.standard_deviation):
+            self.assertIsInstance(value, float)
+            self.assertEqual(np.ndim(value), 0)
         np.testing.assert_allclose(
             tm.standard_deviation**2, tm.variance
         )
@@ -525,13 +532,11 @@ class TestZeroInflatedExpUniform(unittest.TestCase):
         ):
             with self.subTest(parameter=parameter):
                 value = getattr(tm, parameter)
-                self.assertFalse(value.flags.writeable)
-                with self.assertRaises(ValueError):
-                    value.flat[0] = 9
-                with self.assertRaises(ValueError):
-                    value.setflags(write=True)
+                # Univariate moments are returned as immutable Python floats,
+                # and the attribute has no setter.
+                self.assertIsInstance(value, float)
                 with self.assertRaises(AttributeError):
-                    setattr(tm, parameter, np.zeros_like(value))
+                    setattr(tm, parameter, 0.0)
 
     def test_sample_mean_and_variance(self):
         tm = ZeroInflatedExpUniform(

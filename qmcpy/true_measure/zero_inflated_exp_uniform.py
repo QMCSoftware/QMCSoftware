@@ -148,11 +148,11 @@ class ZeroInflatedExpUniform(SciPyWrapper):
     covariance would simply repeat the variance):
 
     >>> tm.mean
-    array([0.4])
+    0.39999999999999997
     >>> tm.variance
-    array([0.37333333])
+    0.3733333333333333
     >>> tm.standard_deviation
-    array([0.61101009])
+    0.6110100926607787
 
     With independent replications:
 
