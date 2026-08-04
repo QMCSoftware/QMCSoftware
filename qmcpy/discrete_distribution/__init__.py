@@ -6,6 +6,8 @@ from .digital_net_any_bases import DigitalNetAnyBases,Halton,Faure
 from .mpmc import MPMC
 from .kronecker import Kronecker
 from .randomized_lhs import RandomizedLHS
+from .dummy_sampler import DummySampler
+
 
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution
