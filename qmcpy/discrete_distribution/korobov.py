@@ -5,10 +5,10 @@ import qmctoolscl
 import warnings
 from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
 
-_TABLE_PATH = Path(__file__).resolve().parent / "generating_params" / "korobov_p2_table.csv"
 
 
-def csv_to_numpy(csv_path):
+
+def csv_to_numpy(csv_path = Path(__file__).resolve().parent / "generating_params" / "korobov_p2_table.csv"):
     """
     Lit le fichier csv et renvoie (raw, lut) :
 
@@ -45,7 +45,7 @@ def csv_to_numpy(csv_path):
     }
     return raw, lut
 
-_RAW, _LUT = csv_to_numpy(_TABLE_PATH)  
+ 
 
 def get_a(lut, n, d):
     i = np.searchsorted(lut["n_values"], n)
@@ -194,6 +194,8 @@ class KorobovLattice(AbstractLDDiscreteDistribution):
                 "Without randomization, the first lattice point is the origin",
                 ParameterWarning,
             )
+        # Loading the table
+        _RAW, _LUT = csv_to_numpy() 
 
         n = int(n_max - n_min)
         d = int(self.d)
