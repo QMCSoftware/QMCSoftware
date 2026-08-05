@@ -40,10 +40,9 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.kronecker.Kronecker
 
+## `LatinHypercube`
 
-## `RandomizedLHS`
-
-::: qmcpy.discrete_distribution.randomized_lhs.RandomizedLHS
+::: qmcpy.discrete_distribution.latin_hypercube.LatinHypercube
 
 ## `DummySampler`
 
