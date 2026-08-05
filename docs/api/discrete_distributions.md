@@ -28,9 +28,9 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.halton.Halton
 
-## `HammersleyPointSet`
+## `Hammersley`
 
-::: qmcpy.discrete_distribution.digital_net_any_bases.hammersley.HammersleyPointSet
+::: qmcpy.discrete_distribution.digital_net_any_bases.hammersley.Hammersley
 
 ## `Faure`
 

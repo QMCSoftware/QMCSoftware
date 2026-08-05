@@ -2,7 +2,7 @@ from .abstract_discrete_distribution import AbstractDiscreteDistribution
 from .iid_std_uniform import IIDStdUniform
 from .lattice import Lattice
 from .digital_net_b2 import DigitalNetB2
-from .digital_net_any_bases import DigitalNetAnyBases,Halton,Faure,HammersleyPointSet
+from .digital_net_any_bases import DigitalNetAnyBases,Halton,Faure,Hammersley
 from .mpmc import MPMC
 from .kronecker import Kronecker
 

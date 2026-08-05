@@ -7,7 +7,7 @@ import warnings
 
 
 
-class HammersleyPointSet(DigitalNetAnyBases):
+class Hammersley(DigitalNetAnyBases):
     r"""
     Hammersley point set: a deterministic, 'closed' low discrepancy point set.
 
@@ -34,7 +34,7 @@ class HammersleyPointSet(DigitalNetAnyBases):
           at index j" would be ambiguous for an array-valued `dimension`.
 
     Examples:
-        >>> discrete_distrib = HammersleyPointSet(4,seed=7)
+        >>> discrete_distrib = Hammersley(4,seed=7)
         >>> discrete_distrib(8,warn=False)
         array([[0.        , 0.        , 0.        , 0.        ],
                [0.125     , 0.5       , 0.33333333, 0.2       ],
@@ -47,7 +47,7 @@ class HammersleyPointSet(DigitalNetAnyBases):
 
         dimension=1 : only the i/n coordinate
 
-        >>> HammersleyPointSet(1)(4,warn=False)
+        >>> Hammersley(1)(4,warn=False)
         array([[0.  ],
                [0.25],
                [0.5 ],
@@ -68,15 +68,13 @@ class HammersleyPointSet(DigitalNetAnyBases):
     def __init__(self,
                  dimension=1,
                  seed=None,
-                 bases_generating_matrices=None,
                  t=None,
-                 alpha=1,
                  n_lim=2**32,
                  warn=True):
 
         if not np.isscalar(dimension):
             raise ParameterError(
-                "HammersleyPointSet does not support dimension as an array of "
+                "Hammersley does not support dimension as an array of "
                 "indices: unlike Halton, the i/n coordinate is not associated "
                 "with any prime index, so 'component at index j' is ambiguous "
                 "for this construction. Pass an int instead."
@@ -96,9 +94,7 @@ class HammersleyPointSet(DigitalNetAnyBases):
                 replications=None,
                 seed=seed,
                 randomize='None',
-                bases_generating_matrices=bases_generating_matrices,
                 t=t,
-                alpha=alpha,
                 n_lim=n_lim,
                 warn=warn)
         else:
@@ -107,15 +103,15 @@ class HammersleyPointSet(DigitalNetAnyBases):
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if return_binary:
-            raise ParameterError("HammersleyPointSet does not support return_binary=True")
+            raise ParameterError("Hammersley does not support return_binary=True")
         if n_min != 0:
             raise ParameterError(
-                "HammersleyPointSet requires n_min=0: the i/n coordinate "
+                "Hammersley requires n_min=0: the i/n coordinate "
                 "depends on the total number of points n."
             )
         if warn:
             warnings.warn(
-                "HammersleyPointSet is deterministic; the first point is "
+                "Hammersley is deterministic; the first point is "
                 "always the origin",
                 ParameterWarning,
             )
@@ -134,7 +130,7 @@ class HammersleyPointSet(DigitalNetAnyBases):
         return x
 
     def _spawn(self, child_seed, dimension):
-        return HammersleyPointSet(
+        return Hammersley(
             dimension=dimension,
             seed=child_seed,
         )                     
