@@ -3,6 +3,7 @@ from qmcpy.util import *
 import numpy as np
 import scipy.stats
 import unittest
+import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
 from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
 
@@ -403,14 +404,20 @@ class TestKumaraswamy(unittest.TestCase):
             spawn.covariance, np.diag(expected_variance)
         )
 
-    def test_variance_is_length_d_array(self):
+    def test_variance_shape(self):
+        # Univariate (d==1) measures return scalar moments; multivariate
+        # measures return length-d arrays.
         for d, a, b in [(1, 2, 3), (2, [1, 2], [3, 4]), (4, 3, 5)]:
             with self.subTest(d=d):
                 kumaraswamy = Kumaraswamy(DigitalNetB2(d, seed=7), a=a, b=b)
                 variance = kumaraswamy.variance
 
-                self.assertEqual(variance.shape, (d,))
-                self.assertEqual(variance.ndim, 1)
+                if d == 1:
+                    self.assertIsInstance(variance, float)
+                    self.assertEqual(np.ndim(variance), 0)
+                else:
+                    self.assertEqual(variance.shape, (d,))
+                    self.assertEqual(variance.ndim, 1)
                 self.assertTrue(np.all(variance > 0))
 
     def test_covariance_is_d_by_d_matrix(self):
@@ -447,6 +454,136 @@ class TestKumaraswamy(unittest.TestCase):
         np.testing.assert_allclose(
             kumaraswamy.variance, expected_variance, rtol=1e-10
         )
+
+
+class TestZeroInflatedExpUniform(unittest.TestCase):
+    """Moment tests for the (1D) zero-inflated exponential true measure.
+
+    The distribution has probability mass ``p_zero`` at 0 and, otherwise,
+    an exponential with rate ``lam``. Its closed-form moments are
+    ``mean = (1 - p) / lam`` and ``variance = (1 - p**2) / lam**2``.
+    """
+
+    @staticmethod
+    def _closed_form(p_zero, lam):
+        mean = (1.0 - p_zero) / lam
+        variance = (1.0 - p_zero**2) / lam**2
+        return mean, variance
+
+    def test_moment_attributes_match_closed_form(self):
+        for p_zero, lam in [(0.4, 1.5), (0.1, 0.5), (0.75, 3.0)]:
+            with self.subTest(p_zero=p_zero, lam=lam):
+                tm = ZeroInflatedExpUniform(
+                    DigitalNetB2(1, seed=7), p_zero=p_zero, lam=lam
+                )
+                mean, variance = self._closed_form(p_zero, lam)
+
+                np.testing.assert_allclose(tm.mean, [mean])
+                np.testing.assert_allclose(tm.variance, [variance])
+                np.testing.assert_allclose(
+                    tm.standard_deviation, [np.sqrt(variance)]
+                )
+
+    def test_moment_attributes_are_scalars(self):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+        )
+        self.assertEqual(tm.d, 1)
+        # Univariate measures return scalar (0-d) moments rather than length-1 arrays.
+        for value in (tm.mean, tm.variance, tm.standard_deviation):
+            self.assertIsInstance(value, float)
+            self.assertEqual(np.ndim(value), 0)
+        np.testing.assert_allclose(
+            tm.standard_deviation**2, tm.variance
+        )
+
+    def test_covariance_is_not_exposed(self):
+        # Covariance is intentionally omitted for this 1D measure: it would
+        # be a 1x1 matrix equal to the variance, so it adds no information.
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+        )
+        self.assertNotIn("covariance", tm.parameters)
+        self.assertNotIn("covariance", str(tm))
+        self.assertFalse(hasattr(tm, "covariance"))
+        with self.assertRaises(AttributeError):
+            tm.covariance
+
+    def test_moment_parameters_are_public_and_in_repr(self):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+        )
+        for parameter in (
+            "mean",
+            "variance",
+            "standard_deviation",
+        ):
+            self.assertIn(parameter, tm.parameters)
+            self.assertIn(parameter, str(tm))
+
+    def test_moment_attributes_are_read_only(self):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+        )
+        for parameter in (
+            "mean",
+            "variance",
+            "standard_deviation",
+        ):
+            with self.subTest(parameter=parameter):
+                value = getattr(tm, parameter)
+                # Univariate moments are returned as immutable Python floats,
+                # and the attribute has no setter.
+                self.assertIsInstance(value, float)
+                with self.assertRaises(AttributeError):
+                    setattr(tm, parameter, 0.0)
+
+    def test_sample_mean_and_variance(self):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+        )
+        samples = tm.gen_samples(2**18)
+        sample_mean = samples.mean(axis=0)
+        sample_variance = samples.var(axis=0)
+
+        np.testing.assert_allclose(
+            sample_mean, tm.mean, rtol=0, atol=1e-4
+        )
+        np.testing.assert_allclose(
+            sample_variance, tm.variance, rtol=0, atol=1e-3
+        )
+
+    def test_spawn_preserves_type_and_moments(self):
+        tm = ZeroInflatedExpUniform(
+            DigitalNetB2(1, seed=7), p_zero=0.4, lam=1.5
+        )
+        spawn = tm.spawn(1)[0]
+
+        self.assertIsInstance(spawn, ZeroInflatedExpUniform)
+        np.testing.assert_allclose(spawn.mean, tm.mean)
+        np.testing.assert_allclose(spawn.variance, tm.variance)
+        np.testing.assert_allclose(
+            spawn.standard_deviation, tm.standard_deviation
+        )
+        self.assertFalse(hasattr(spawn, "covariance"))
+
+    def test_deprecated_2d_construction_has_no_moment_parameters(self):
+        # The deprecated 2D y_split construction does not define moments.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            tm = ZeroInflatedExpUniform(
+                DigitalNetB2(2, seed=7),
+                p_zero=0.4,
+                lam=1.5,
+                y_split=0.5,
+            )
+        for parameter in (
+            "mean",
+            "variance",
+            "standard_deviation",
+            "covariance",
+        ):
+            self.assertNotIn(parameter, tm.parameters)
 
 
 class TestUniformTriangle(unittest.TestCase):
