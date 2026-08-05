@@ -299,7 +299,8 @@ class ZeroInflatedExpUniform(SciPyWrapper):
         p = self.p_zero
         lam = self.lam
         mean = np.array([(1.0 - p) / lam])
-        variance = np.array([((1.0 - p)**2) / lam**2])
+        variance = mean**2
+        print(variance)
         return mean, variance
 
     def _spawn(self, sampler, dimension):
