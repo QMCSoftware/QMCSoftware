@@ -548,23 +548,10 @@ class TestLatinHypercube(unittest.TestCase):
         x2 = d2.gen_samples(6, warn=False)
         self.assertTrue((x1 == x2).all())
 
-    def test_n_min_n_max_equivalent_to_n(self):
-        # For LHS only n_max-n_min matters, not the absolute indices.
-        d1 = LatinHypercube(dimension=3, replications=None, seed=99)
-        x_n = d1.gen_samples(n=5, warn=False)
-        d2 = LatinHypercube(dimension=3, replications=None, seed=99)
-        x_nminmax = d2.gen_samples(n_min=0, n_max=5, warn=False)
-        self.assertTrue((x_n == x_nminmax).all())
-
     def test_return_binary_raises(self):
         distribution = LatinHypercube(dimension=2, replications=None, seed=7)
         with self.assertRaises(ParameterError):
             distribution.gen_samples(4, return_binary=True, warn=False)
-
-    def test_warns_by_default(self):
-        distribution = LatinHypercube(dimension=2, replications=None, seed=7)
-        with self.assertWarns(ParameterWarning):
-            distribution.gen_samples(4)
 
     def test_no_warning_when_disabled(self):
         distribution = LatinHypercube(dimension=2, replications=None, seed=7)

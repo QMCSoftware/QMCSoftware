@@ -21,9 +21,8 @@ class LatinHypercube(AbstractDiscreteDistribution):
         - Unlike the low discrepancy sequences in this package (e.g. `Lattice`,
           `Halton`, `DigitalNetB2`), `LatinHypercube` points are *not* extensible
           in `n`: the entire point set must be regenerated whenever `n` changes,
-          since the strata boundaries themselves depend on `n`. Consequently
-          `n_min` and `n_max` only matter through their difference `n_max`-`n_min`;
-          the absolute indices carry no meaning.
+          since the strata boundaries themselves depend on `n`. 
+          Consequently `LatinHypercube` requires `n_min=0`, it cannot be generated starting from a nonzero offset.
         - `replications` produces independent randomizations (independent random
           permutations, and independent within-stratum jitter when `randomize`
           is `True`), not an extension or reshaping of a single sequence.
@@ -67,15 +66,6 @@ class LatinHypercube(AbstractDiscreteDistribution):
                [0.375, 0.625],
                [0.875, 0.125]])
 
-    Parameters
-    ----------
-    dimension (int): Dimension of the samples.
-
-    replications (Union[None, int]): Number of independent randomizations. This is implemented only for API consistency; equivalent to reshaping the samples.
-
-    seed (Union[None, int, np.random.SeedSequence]): Seed for the random number generator to ensure reproducibility.
-
-    randomize (str): Whether to jitter each point uniformly within its stratum (`True`, the default) or place it at the stratum's center (`False`)
 
     **References:**
 
@@ -108,6 +98,19 @@ class LatinHypercube(AbstractDiscreteDistribution):
     def __init__(
             self, dimension, replications, seed, randomize="TRUE"
             ):
+        r"""
+        Initialize a Latin Hypercube sampler.
+
+        Parameters
+        ----------
+        dimension (int): Dimension of the samples.
+
+        replications (Union[None, int]): Number of independent LHS designs to generate. Each replication is its own independently permuted, independently jittered stratification into `n` strata.
+
+        seed (Union[None, int, np.random.SeedSequence]): Seed for the random number generator to ensure reproducibility.
+
+        randomize (str): Whether to jitter each point uniformly within its stratum (`True`, the default) or place it at the stratum's center (`False`). Accepts `True`/`False`, or the case-insensitive strings `"TRUE"`, `"FALSE"`, `"NONE"`, `"NO"`.
+        """
         super().__init__(dimension=dimension, replications=replications, seed=seed, d_limit=np.inf, n_limit=np.inf)
         self.randomize = str(randomize).upper()
         if self.randomize in ("NONE", "NO", "FALSE"):
@@ -125,12 +128,20 @@ class LatinHypercube(AbstractDiscreteDistribution):
         r"""..."""  # (inchangee)
         if return_binary:
             raise ParameterError("LatinHypercube does not support return_binary=True")
-        if warn:
+        if n_min != 0:
+            raise ParameterError(
+            "LatinHypercube requires n_min=0: since the strata boundaries "
+            "depend on the total number of points n, points cannot be "
+            "generated starting from a nonzero index."
+        )
+        if warn and self.randomize == "FALSE":
             warnings.warn(
-                "For LatinHypercube, the values of n_max and n_min are not really important. The only thing that matters is the total number of points 'n' "
-                "in order to split each dimension correctly and to place each coordinate of each point within its own stratum",
-                ParameterWarning,
-            )
+            "randomize=False only fixes the position of each point within "
+            "its stratum (center instead of jittered). The assignment of "
+            "strata to dimensions is still drawn randomly and depends on "
+            "seed.",
+            ParameterWarning,
+        )
         n = int(n_max - n_min)
         keys = self.rng.random(size=(self.replications, self.d, n))
         perm_indices = np.argsort(keys, axis=-1)
