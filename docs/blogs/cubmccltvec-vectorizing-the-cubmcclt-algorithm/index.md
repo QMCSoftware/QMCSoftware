@@ -33,28 +33,17 @@ be approximated by
 and \(C^2\) is an inflation factor greater than 1 for a more
 conservative estimate.
 
-Building on the `CubMCCLT` algorithm, we have developed a vectorized
-version of it known as `CubMCCLTVec`.
+Building on the `CubMCCLT` algorithm, we have developed a vectorized version of it known as `CubMCCLTVec`.
 
 ## What Does the CubMCCLTVec Class Do?
 
-The `CubMCCLTVec` class, which is a stopping criterion object,
-calculates a confidence interval for functions with multiple outputs
-based on the user-specified confidence level (default is 99%). Given an
-initial and maximum sample size and an absolute tolerance, we keep on
-doubling the sample size and recomputing the confidence interval until
-half the confidence interval width is less than the absolute tolerance
-or the double of the current sample size exceeds the maximum sample
-size.
+The `CubMCCLTVec` class, which is a stopping criterion object, calculates a confidence interval for functions with multiple outputs based on the user-specified confidence level (default is 99%). Given an initial and maximum sample size and an absolute tolerance, we keep on doubling the sample size and recomputing the confidence interval until half the confidence interval width is less than the absolute tolerance or the double of the current sample size exceeds the maximum sample size.
 
-Like the other stopping criterion objects, `CubMCCLTVec` too utilizes an
-accumulate data object to recompute the confidence interval known as
-`MeanVarDataVec`.
+Like the other stopping criterion objects, `CubMCCLTVec` too utilizes an accumulate data object to recompute the confidence interval known as `MeanVarDataVec`.
 
 ## Some Examples Utilizing the CubMCCLTVec Class
 
-The following code illustrates three examples that are being solved using
-`CubMCCLTVec`:
+The following code illustrates three examples that are being solved using `CubMCCLTVec`:
 
 1. Covariance [2]: \(T \sim \mathcal{N}(1,I_d)\) and the covariance of
    \(P = T_0\cdots T_{d-1}\) and \(S = T_0+\dots+T_{d-1}\) is:
@@ -232,22 +221,13 @@ IIDStdUniform (DiscreteDistribution Object)
 
 ## Benefits of Developing the CubMCCLTVec Class
 
-This class gives us a new and different option to find when the
-user-specified error tolerance has been satisfied and its generalization
-to functions with multiple outputs allows us to utilize the existing
-`CubMCCLT` algorithm and extend it to such functions.
+This class gives us a new and different option to find when the user-specified error tolerance has been satisfied and its generalization to functions with multiple outputs allows us to utilize the existing `CubMCCLT` algorithm and extend it to such functions.
 
 ## References
 
 1. Sorokin, A. G., & Rathinavel, J. *On Bounding and Approximating
-   Functions of Multiple Expectations using Quasi-Monte Carlo*. To
-   appear in the *Monte Carlo and Quasi-Monte Carlo Methods in
-   Scientific Computing Proceedings 2022* (2022).
+Functions of Multiple Expectations using Quasi-Monte Carlo*. To appear in the *Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing Proceedings 2022* (2022).
 2. Sorokin, A. *Monte Carlo for Vector Functions of Integrals*. Jupyter
-   Notebook. QMCPy: A quasi-Monte Carlo Python Library, 2023.
-   [https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/pydata.chi.2023.ipynb](https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/pydata.chi.2023.ipynb).
+Notebook. QMCPy: A quasi-Monte Carlo Python Library, 2023. [https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/pydata.chi.2023.ipynb](https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/pydata.chi.2023.ipynb).
 3. Bailey, D., Borwein, J., & Crandall, R. *Box integrals*. *Journal of
-   Computational and Applied Mathematics* **206**, 196-208. ISSN:
-   0377-0427.
-   [https://www.sciencedirect.com/science/article/pii/S0377042706004250](https://www.sciencedirect.com/science/article/pii/S0377042706004250)
-   (2007).
+Computational and Applied Mathematics* **206**, 196-208. ISSN: 0377-0427. [https://www.sciencedirect.com/science/article/pii/S0377042706004250](https://www.sciencedirect.com/science/article/pii/S0377042706004250) (2007).

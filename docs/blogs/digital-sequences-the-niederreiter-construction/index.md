@@ -173,19 +173,11 @@ display the first $128$ points of the sequence in 2 dimensions in Figure
   <figcaption>Figure 1: The first \(128\) points of the Niederreiter sequence in 2 dimensions.</figcaption>
 </figure>
 
-The performance of the Niederreiter sequence in practical applications
-is, in general, similar to that of the widely used Sobol' sequence. For
-a more detailed comparison in financial applications, see for example
-[3].
+The performance of the Niederreiter sequence in practical applications is, in general, similar to that of the widely used Sobol' sequence. For a more detailed comparison in financial applications, see for example [3].
 
 ## Niederreiter Points via QMCPy
 
-The Niederreiter sequence has recently been added to the
-`DiscreteDistribution` class of the QMCPy Python library. As a digital
-sequence, the Niederreiter sequence is part of the `DigitalNet` or
-`Sobol` generator and can be accessed by specifying the corresponding
-generating matrices. The code in Listing 1 below can be used to draw
-randomized points from QMCPy's Niederreiter object.
+The Niederreiter sequence has recently been added to the `DiscreteDistribution` class of the QMCPy Python library. As a digital sequence, the Niederreiter sequence is part of the `DigitalNet` or `Sobol` generator and can be accessed by specifying the corresponding generating matrices. The code in Listing 1 below can be used to draw randomized points from QMCPy's Niederreiter object.
 
 ```python
 from qmcpy import DigitalNet
@@ -202,15 +194,9 @@ array([[0.89 , 0.603, 0.288, 0.881, 0.298],
        [0.43 , 0.806, 0.98 , 0.527, 0.246]])
 ```
 
-Listing 1: Supplying the Niederreiter generating matrices to the digital
-net generator.
+Listing 1: Supplying the Niederreiter generating matrices to the digital net generator.
 
-For further details on the construction of the generating matrices of
-the Niederreiter sequence, we refer the interested reader to the
-[documentation](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/src/master/digital-constructions/digseq/niederreitermats/construction_programmes/documentation-niederreiter.pdf).
-Additionally, the C++ code which was used to construct the generating
-matrices can be found
-[here](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/src/master/digital-constructions/digseq/niederreitermats/construction_programmes/niederreiter.cpp).
+For further details on the construction of the generating matrices of the Niederreiter sequence, we refer the interested reader to the [documentation](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/src/master/digital-constructions/digseq/niederreitermats/construction_programmes/documentation-niederreiter.pdf). Additionally, the C++ code which was used to construct the generating matrices can be found [here](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/src/master/digital-constructions/digseq/niederreitermats/construction_programmes/niederreiter.cpp).
 
 ## Comparison with the Sobol' Sequence
 
@@ -291,12 +277,7 @@ almost identical rate.
   <figcaption>Figure 2: Error convergence behavior for the numerical integration of the Keister function with \(d=5\) using Niederreiter and Sobol' points.</figcaption>
 </figure>
 
-QMCPy also includes stopping criteria that automatically select the
-number of points required to meet an error tolerance. Here it is assumed
-that the exact solution is not known and we track the number of samples
-required to guarantee an approximation within a user-specified
-tolerance. Figure 3 shows similar performance for Niederreiter and
-Sobol' sequences when utilized by the `CubQMCNetG` stopping criterion.
+QMCPy also includes stopping criteria that automatically select the number of points required to meet an error tolerance. Here it is assumed that the exact solution is not known and we track the number of samples required to guarantee an approximation within a user-specified tolerance. Figure 3 shows similar performance for Niederreiter and Sobol' sequences when utilized by the `CubQMCNetG` stopping criterion.
 
 <figure id="fig-cubqmcnetg-samples">
   <img src="figures/cubqmcnetg-samples.png" alt="Number of samples required by CubQMCNetG for Niederreiter and Sobol sequences">
@@ -314,7 +295,6 @@ Sobol' sequences when utilized by the `CubQMCNetG` stopping criterion.
 4. Niederreiter, H. Point sets and sequences with small discrepancy.
    *Monatshefte fur Mathematik*, 104, 273-337 (1987).
 5. Niederreiter, H. *Random Number Generation and Quasi-Monte Carlo
-   Methods*. Number 63 in CBMS-NSF Series in Applied Mathematics. SIAM,
-   Philadelphia (1992).
+Methods*. Number 63 in CBMS-NSF Series in Applied Mathematics. SIAM, Philadelphia (1992).
 6. Bitbucket repository of Adrian Ebert.
    [https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/](https://bitbucket.org/adrian_ebert/qmc-construction-algorithms/).

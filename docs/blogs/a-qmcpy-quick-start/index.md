@@ -12,16 +12,9 @@ July 6, 2020
 
 This quick start introduces QMCPy through the Keister integration problem and shows how a discrete distribution, true measure, integrand, and stopping criterion fit together.
 
-QMCPy is an open-source, object-oriented
-[quasi-Monte Carlo (QMC)](../why-add-q-to-mc/index.md) software framework in
-Python 3. It contains standardized parent classes for modeling
-integrands, true measures, discrete distributions, and stopping criteria.
-The framework is designed to help researchers and users quickly extend
-and experiment with new algorithmic components, validate theory, and
-compare proven methods in their own applications.
+QMCPy is an open-source, object-oriented [quasi-Monte Carlo (QMC)](../why-add-q-to-mc/index.md) software framework in Python 3. It contains standardized parent classes for modeling integrands, true measures, discrete distributions, and stopping criteria. The framework is designed to help researchers and users quickly extend and experiment with new algorithmic components, validate theory, and compare proven methods in their own applications.
 
-QMCPy can be installed with `pip install qmcpy`. The source code is available from the
-[QMCSoftware GitHub repository](https://github.com/QMCSoftware/QMCSoftware).
+QMCPy can be installed with `pip install qmcpy`. The source code is available from the [QMCSoftware GitHub repository](https://github.com/QMCSoftware/QMCSoftware).
 
 ## Keister Integration Problem
 
@@ -95,8 +88,7 @@ The stopping criterion determines how many points are needed for the
 mean approximation to satisfy a user-specified error tolerance,
 $\varepsilon$.
 
-For this example, we use a lattice sequence and the corresponding
-lattice-based cubature stopping criterion:
+For this example, we use a lattice sequence and the corresponding lattice-based cubature stopping criterion:
 
 ```python
 import qmcpy
@@ -106,9 +98,7 @@ cf_keister = qmcpy.CustomFun(gaussian, g = keister)
 stopping_criterion = qmcpy.CubQMCLatticeG(cf_keister, abs_tol = 1e-4)
 ```
 
-Calling `integrate` on the stopping criterion returns the numerical
-solution and a data object. Printing the data object provides a summary
-of the integration problem:
+Calling `integrate` on the stopping criterion returns the numerical solution and a data object. Printing the data object provides a summary of the integration problem:
 
 ```python
 solution, data = stopping_criterion.integrate()
@@ -147,24 +137,16 @@ Lattice (AbstractLDDiscreteDistribution)
     entropy         7
 ```
 
-This guide is a quick introduction to the QMCPy framework and syntax,
-not an exhaustive overview. See the searchable
-[QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) for
-more details.
+This guide is a quick introduction to the QMCPy framework and syntax, not an exhaustive overview. See the searchable [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) for more details.
 
 ## References
 
 1. Choi, S.-C. T., Hickernell, F. J., McCourt, M., Rathinavel, J., &
-   Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library.
-   [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
-   2020.
+Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
 2. Keister, B. D. Multidimensional Quadrature Algorithms.
    *Computers in Physics* 10, 119-122. 1996.
 3. Oliphant, T. *Guide to NumPy*. Trelgol Publishing, USA, 2006.
 4. Hickernell, F. J., Choi, S.-C. T., Jiang, L., & Jimenez Rugama, L. A.
-   Quasi-Monte Carlo Methods. In *Wiley StatsRef: Statistics Reference
-   Online*. John Wiley & Sons, 2018.
+Quasi-Monte Carlo Methods. In *Wiley StatsRef: Statistics Reference Online*. John Wiley & Sons, 2018.
 5. Jimenez Rugama, L. A. & Hickernell, F. J. Adaptive multidimensional
-   integration based on rank-1 lattices. In *Monte Carlo and
-   Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014*,
-   407-422. Springer-Verlag, Berlin, 2016. arXiv:1411.1966.
+integration based on rank-1 lattices. In *Monte Carlo and Quasi-Monte Carlo Methods: MCQMC, Leuven, Belgium, April 2014*, 407-422. Springer-Verlag, Berlin, 2016. arXiv:1411.1966.

@@ -12,12 +12,7 @@ May 19, 2022
 
 This post explains Bayesian stopping criteria for QMC integration and how matching kernels with lattice or digital net designs reduces credible-interval costs.
 
-The blog [Why Add Q to MC?](../why-add-q-to-mc/index.md) explained the
-advantages of carefully chosen, low discrepancy sampling sites for
-approximating multivariate integrals, or equivalently, expectations of
-functions of multivariate random variables. This blog post explains a
-Bayesian approach to determining the sample size required to satisfy the
-user's error tolerance.
+The blog [Why Add Q to MC?](../why-add-q-to-mc/index.md) explained the advantages of carefully chosen, low discrepancy sampling sites for approximating multivariate integrals, or equivalently, expectations of functions of multivariate random variables. This blog post explains a Bayesian approach to determining the sample size required to satisfy the user's error tolerance.
 
 Recall that the problem of interest takes the following form:
 
@@ -95,9 +90,7 @@ $$
 \ge 99\%.
 $$
 
-The [Bayesian credible interval](https://arxiv.org/abs/1809.09803),
-which depends on the sampling nodes and the parameters defining the
-Gaussian process, is
+The [Bayesian credible interval](https://arxiv.org/abs/1809.09803), which depends on the sampling nodes and the parameters defining the Gaussian process, is
 
 $$
 \mathbb{P}_f
@@ -225,8 +218,7 @@ In both cases, the computational burden attributable to tuning the
 hyperparameters and computing the width of the credible interval is a
 reasonable $\mathcal{O}(n \log(n))$.
 
-The following code shows how to use a Bayesian stopping criterion for
-Keister's example.
+The following code shows how to use a Bayesian stopping criterion for Keister's example.
 
 ```python
 import qmcpy as qp
@@ -245,35 +237,25 @@ print("Integration error: ", abs(solution - keister_2d_exact) < tol)
 
 Listing 1: Example usage of the lattice Bayesian cubature algorithm.
 
-This example can be run in Google Colab without any installation using
-this
-[notebook](https://github.com/QMCSoftware/QMCSoftware/blob/develop/demos/integration_examples.ipynb).
+This example can be run in Google Colab without any installation using this [notebook](https://github.com/QMCSoftware/QMCSoftware/blob/develop/demos/integration_examples.ipynb).
 
 ## References
 
 1. Hickernell, F. J. Blog: Why Add Q to MC?
-   [https://qmcpy.org/2020/06/25/why_add_q_to_mc/](https://qmcpy.org/2020/06/25/why_add_q_to_mc/).
-   2020.
+[https://qmcpy.org/2020/06/25/why_add_q_to_mc/](https://qmcpy.org/2020/06/25/why_add_q_to_mc/). 2020.
 2. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A
-   quasi-Monte Carlo Python Library.
-   [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/).
-   2020.
+quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
 3. Rathinavel, J., & Hickernell, F. Fast automatic Bayesian cubature
-   using lattice sampling. *Statistics and Computing*, 29, 1215-1229
-   (2019).
+using lattice sampling. *Statistics and Computing*, 29, 1215-1229 (2019).
 4. Sloan, I. H., & Joe, S. *Lattice Methods for Multiple Integration*.
    Oxford University Press, Oxford (1994).
 5. Hickernell, F., & Niederreiter, H. The existence of good extensible
    rank-1 lattices. *Journal of Complexity*, 19, 286-300 (2003).
 6. Cooley, J. W., & Tukey, J. W. An algorithm for the machine
-   calculation of complex Fourier series. *Mathematics of Computation*,
-   19, 297-301 (1965).
+calculation of complex Fourier series. *Mathematics of Computation*, 19, 297-301 (1965).
 7. Ebert, A. Blog: Digital Sequences, the Niederreiter Construction.
-   [https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/](https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/).
-   2021.
+[https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/](https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/). 2021.
 8. Rathinavel, J. *Fast Automatic Bayesian Cubature Using Matching
-   Kernels and Designs*. PhD thesis, Illinois Institute of Technology
-   (2019).
+Kernels and Designs*. PhD thesis, Illinois Institute of Technology (2019).
 9. Fino, B. J., & Algazi, V. R. Unified matrix treatment of the fast
-   Walsh-Hadamard transform. *IEEE Transactions on Computers*, C-25,
-   1142-1146 (1976).
+Walsh-Hadamard transform. *IEEE Transactions on Computers*, C-25, 1142-1146 (1976).

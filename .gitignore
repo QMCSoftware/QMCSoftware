@@ -1,9 +1,12 @@
 # General Python
+.cache/
+PATH
 .pdm-python
 .pytest_cache/
 raw.githubusercontent.com/*
 packages.svg
 classes.svg
+*.dot
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
@@ -34,6 +37,13 @@ demos/prob_failure_gp_ci_plots/
 demos/fgpr_figs/
 demos/GBM/images/*.png
 demos/GBM/outputs/*.*
+
+# Generated notebook/demo images
+figures/
+*.png
+*.jpg
+*.jpeg
+*.svg
 
 # tests
 .coverage
@@ -90,7 +100,6 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-*.png
 *.eps
 
 # release
@@ -128,3 +137,4 @@ sc_*
 /qmc-software.html
 /qmc-software_files/
 /.quarto-watch-logs/
+.venv_new/

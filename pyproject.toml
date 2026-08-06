@@ -43,7 +43,7 @@ keywords=[
     "sobol",
     "lattice",
     ]
-license = "Apache-2.0"
+license = {file = "LICENSE"}
 dynamic = ["version"]
 requires-python = ">= 3.5"
 dependencies = [
@@ -65,14 +65,19 @@ botorch = [
 umbridge = [
     "umbridge >= 1.2.1",
     ]
+mpmc = [
+    "torch >= 2.2.0, < 2.13", # PyG publishes pyg_lib wheels only through torch 2.12 (https://data.pyg.org/whl/); raise when 2.13+ wheels ship
+    "pyg_lib >= 0.6.0",
+    "torch-geometric >= 2.6.1",
+]
 test = [
-    "pytest >= 8.3.5",
+    "pytest >= 9.0.3",
     "pytest-cov >= 6.1.1",
     "phmutest >= 1.0.1",
     "pytest-accept >= 0.1.10",
     "testbook >= 0.4.2",
     "psutil >= 5.9.5",
-    "parsl >= 2025.7.28",
+    "parsl >= 2026.01.05",
     "seaborn >= 0.8",
     "scikit-learn >= 1.0.0",
     "scikit-optimize",
@@ -86,7 +91,7 @@ test = [
     "pytest-xdist >= 3.8.0",
     ]
 test_torch = [
-    "torch >= 2.7.0",
+    "torch >= 2.7.0, < 2.13", # kept in sync with the mpmc extra: PyG pyg_lib wheels stop at torch 2.12
     ]
 test_gpytorch = [
     "gpytorch >= 1.11, <= 1.15.1", # some issue with gpytorch == 1.15.2, see qmcpy/util/exact_gpytorch_regression_model.py, see # https://github.com/cornellius-gp/gpytorch/issues/2736
@@ -97,7 +102,13 @@ test_botorch = [
 test_umbridge = [
     "umbridge >= 1.2.4",
     ]
-docs = [
+test_mpmc = [
+    "torch >= 2.2.0, < 2.13", # PyG publishes pyg_lib wheels only through torch 2.12 (https://data.pyg.org/whl/); raise when 2.13+ wheels ship
+    "pyg_lib >= 0.6.0",
+    "torch-geometric >= 2.6.1",
+    ]
+docs = [  # brew install weasyprint
+    "qmcpy[test,test_torch,test_gpytorch,test_botorch,test_umbridge,test_mpmc]",
     "nbval >= 0.10.0",
     "attrs >= 21.0.0",
     "pyyaml >= 6.0",
