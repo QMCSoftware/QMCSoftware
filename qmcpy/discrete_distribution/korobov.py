@@ -4,48 +4,25 @@ from pathlib import Path
 import qmctoolscl
 import warnings
 from .abstract_discrete_distribution import AbstractLDDiscreteDistribution
+from functools import lru_cache
 
-
-
-
-def csv_to_numpy(csv_path = Path(__file__).resolve().parent / "generating_params" / "korobov_p2_table.csv"):
-    """
-    Lit le fichier csv et renvoie (raw, lut) :
-
-      raw : np.ndarray (N, 6) -- copie brute du csv, une ligne = un (n,d,a,...)
-      lut : dict de tableaux 2D indexes par (n, d), pour un acces direct
-    """
-    # --- 1. le tableau brut : une seule ligne suffit, csv 100% numerique ---
-    raw = np.loadtxt(csv_path, delimiter=",", skiprows=1)
-
-    # --- 2. le tableau de correspondance (n, d) -> a / p2 / exact ---
-    n_col, d_col, a_col, p2_col, _, exact_col = raw.T
-
-    n_values = np.unique(n_col).astype(np.int64)
-    d_values = np.unique(d_col).astype(np.int64)
-
-    ni = np.searchsorted(n_values, n_col.astype(np.int64))
-    di = np.searchsorted(d_values, d_col.astype(np.int64))
-
-    shape = (len(n_values), len(d_values))
-    a = np.zeros(shape, dtype=np.int64)
-    p2 = np.zeros(shape, dtype=np.float64)
-    exact = np.zeros(shape, dtype=np.int64)
-
-    a[ni, di] = a_col.astype(np.int64)
-    p2[ni, di] = p2_col
-    exact[ni, di] = exact_col.astype(np.int64)
-
-    lut = {
-        "n_values": n_values,
-        "d_values": d_values,
-        "a": a,
-        "p2": p2,
-        "exact": exact,
-    }
+@lru_cache(maxsize=1)
+def load_korobov_table(
+        npz_path=Path(__file__).resolve().parent / "generating_params" / "korobov_p2_table.npz"
+    ):
+    """Load the Korobov table from the compressed .npz file. Cached via
+       lru_cache: the file is only actually read once per process, with no
+       explicit module-level global variable."""
+    with np.load(npz_path) as data:
+        raw = data["raw"]
+        lut = {
+            "n_values": data["n_values"],
+            "d_values": data["d_values"],
+            "a": data["a"],
+            "p2": data["p2"],
+            "exact": data["exact"],
+        }
     return raw, lut
-
- 
 
 def get_a(lut, n, d):
     i = np.searchsorted(lut["n_values"], n)
@@ -61,8 +38,6 @@ def get_a(lut, n, d):
             f"{lut['d_values'][0]}..{lut['d_values'][-1]})"
         )
     return int(lut["a"][i, j])
-
-
 
 
 
@@ -165,6 +140,23 @@ class KorobovLattice(AbstractLDDiscreteDistribution):
             seed=None,
             randomize="SHIFT",
         ):
+        r"""
+        Args:
+            dimension (int): Dimension of the samples. Must be between 1 and
+                250 (the range covered by the precomputed table).
+
+            replications (int): Number of independent Cranley-Patterson
+                shifts of the same underlying deterministic lattice.
+
+            seed (Union[None, int, np.random.SeedSequence]): Seed the random
+                number generator for reproducibility.
+
+            randomize (str): Options are
+
+                - `'SHIFT'` or `'TRUE'`: Random Cranley-Patterson shift (the default).
+                - `'FALSE'`, `'NONE'`, or `'NO'`: No randomization. In this
+                case the first point will be the origin.
+    """
         super().__init__(dimension, replications, seed, d_limit = 250, n_limit = 131072)
 
         self.randomize = str(randomize).upper()
@@ -175,6 +167,10 @@ class KorobovLattice(AbstractLDDiscreteDistribution):
         if self.randomize == "NO":
             self.randomize = "FALSE"
         assert self.randomize in ["SHIFT", "FALSE"]
+        if self.randomize not in ("SHIFT", "FALSE"):
+            raise ParameterError(
+            f"randomize must be one of 'SHIFT', 'TRUE', 'FALSE', 'NONE', or 'NO' (case-insensitive), got {randomize!r}."
+            )
         if self.randomize == "SHIFT":
             self.shift = self.rng.uniform(size=(self.replications, self.d))
 
@@ -195,7 +191,7 @@ class KorobovLattice(AbstractLDDiscreteDistribution):
                 ParameterWarning,
             )
         # Loading the table
-        _RAW, _LUT = csv_to_numpy() 
+        _RAW, _LUT = load_korobov_table()
 
         n = int(n_max - n_min)
         d = int(self.d)
