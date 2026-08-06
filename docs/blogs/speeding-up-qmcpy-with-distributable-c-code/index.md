@@ -116,9 +116,6 @@ include qmcpy/discrete_distribution/lattice/generating_vectors/*.npy
 
 ## References
 
-1. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A
-quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
-2. Owen, A. B. A randomized Halton algorithm in R. 2017.
-   [arXiv:1706.02808 [stat.CO]](https://arxiv.org/abs/1706.02808).
-3. L'Ecuyer, P. Good parameters and implementations for combined
-multiple recursive random number generators. *Operations Research*, 47, 159-164. [https://pubsonline.informs.org/doi/abs/10.1287/opre.47.1.159](https://pubsonline.informs.org/doi/abs/10.1287/opre.47.1.159). 1999.
+1. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
+2. Owen, A. B. A randomized Halton algorithm in R. 2017. [arXiv:1706.02808 [stat.CO]](https://arxiv.org/abs/1706.02808).
+3. L'Ecuyer, P. Good parameters and implementations for combined multiple recursive random number generators. *Operations Research*, 47, 159-164. [https://pubsonline.informs.org/doi/abs/10.1287/opre.47.1.159](https://pubsonline.informs.org/doi/abs/10.1287/opre.47.1.159). 1999.

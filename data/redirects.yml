@@ -1,0 +1,62 @@
+# Old qmcpy.org paths that must remain reachable after the GitHub Pages migration.
+redirects:
+  - source: /contributors/
+    target: /community/
+    title: QMCPy Community
+  - source: /contributors-2/
+    target: /community/
+    title: QMCPy Community
+  - source: /2020/06/25/why_add_q_to_mc/
+    target: /blogs/why-add-q-to-mc/
+    title: Why Add Q to MC?
+  - source: /2020/07/06/a-qmcpy-quick-start/
+    target: /blogs/a-qmcpy-quick-start/
+    title: A QMCPy Quick Start
+  - source: /2020/07/08/what-makes-a-sequence-low-discrepancy/
+    target: /blogs/what-makes-a-sequence-low-discrepancy/
+    title: What Makes a Sequence Low Discrepancy?
+  - source: /2020/07/19/qei-with-qmcpy/
+    target: /blogs/qei-with-qmcpy/
+    title: qEI with QMCPy
+  - source: /2020/08/31/safe-handling-of-qmc-points/
+    target: /blogs/safe-handling-of-qmc-points/
+    title: Safe Handling of QMC Points
+  - source: /2021/02/25/speeding-up-qmcpy-with-distributable-c-code/
+    target: /blogs/speeding-up-qmcpy-with-distributable-c-code/
+    title: Speeding up QMCPy with Distributable C Code
+  - source: /2021/02/25/visualizing-the-internals-of-object-classes-in-qmcpy/
+    target: /blogs/visualizing-the-internals-of-object-classes-in-qmcpy/
+    title: Visualizing the Internals of Object Classes in QMCPy
+  - source: /2021/06/04/digital-sequences-the-niederreiter-construction/
+    target: /blogs/digital-sequences-the-niederreiter-construction/
+    title: Digital Sequences, the Niederreiter Construction
+  - source: /2022/05/19/bayesian-stopping-criteria/
+    target: /blogs/bayesian-stopping-criteria/
+    title: Bayesian Stopping Criteria
+  - source: /2023/04/07/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/
+    target: /blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/
+    title: Accelerating Rare-event Reliability Simulations for CERN's Large Hadron Collider using QMCPy
+  - source: /2023/05/16/random-lattice-generators-are-not-bad/
+    target: /blogs/random-lattice-generators-are-not-bad/
+    title: Random Lattice Generators are Not Bad
+  - source: /2025/07/15/analysis-of-quasi-monte-carlo-efficiency-for-asian-option-pricing/
+    target: /blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/
+    title: Analysis of Quasi-Monte Carlo Efficiency for Asian Option Pricing
+  - source: /2025/09/29/linear-matrix-scrambling-and-digital-shift-for-halton/
+    target: /blogs/linear-matrix-scrambling-and-digital-shift-for-halton/
+    title: Linear Matrix Scrambling and Digital Shift for Halton
+  - source: /2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/
+    target: /blogs/gbm-qmcpy/
+    title: Highly Efficient Geometric Brownian Motion Modeling with QMCPy
+  - source: /2025/11/29/parsl-accelerated-qmcpy-notebook-tests/
+    target: /blogs/accelerating-qmcpy-notebook-tests-with-parsl/
+    title: Parsl Accelerated QMCPy Notebook Tests
+  - source: /2026/02/25/cubmccltvec-vectorizing-the-cubmcclt-algorithm/
+    target: /blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/
+    title: "CubMCCLTVec: Vectorizing the CubMCCLT Algorithm"
+  - source: /2026/02/25/visualizing-the-generated-samples-helps/
+    target: /blogs/visualizing-the-generated-samples-helps/
+    title: Visualizing the Generated Samples Helps
+  - source: /2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/
+    target: /blogs/scipywrapper/
+    title: Extending QMCPy's SciPyWrapper to Support Dependent and Custom Distributions

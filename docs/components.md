@@ -16,7 +16,7 @@ Classic **Monte Carlo** methods choose IID (independent and identically distribu
 
 Often practitioners would like to run their (Quasi-)Monte Carlo method until the error $E_n$ is below a desired error tolerance $\varepsilon$ and/or until they have expired their sample budget $B$. For example, one may wish to estimate the expected discounted payoff of a financial option to within a tolerance of one penny, $\varepsilon = 0.01$, or until $1$ million option paths have been simulated, $B=10^6$. **Stopping criterion** deploy (Quasi-)Monte Carlo methods under such constraints by utilizing adaptive sampling schemes and efficient error estimation procedures.  
 
-`QMCPy` is organized into into the four main components below. Details for each of these classes are available in the linked guides and API docs.
+`QMCPy` is organized into the four main components below. Details for each of these classes are available in the linked guides and API docs.
 
 ## Discrete Distributions
 

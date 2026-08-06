@@ -43,12 +43,9 @@ This blog discusses the implementation of three new randomizations for Halton: l
 
 ## LMS, DS, and LMS_DS
 
-1. `LMS`: Linear matrix scrambling of Halton [3]. Based on the bases, a
-different scrambling matrix is generated for each dimension. The lower triangle is random between 0 and base minus 1, the diagonal is random between 1 and base minus 1, and the upper triangle is all zeros. After the indexes are converted to their base representations and a decimal point has been added before the reversed digits, their dot product is computed with the scrambling matrix. After computing the dot product, the scrambled indexes or coefficients are converted to base 10 to generate the samples.
-2. `DS`: Digital shift. Based on the bases, a different vector is
-generated for each dimension, with entries random between 0 and base minus 1. After the indexes are converted to their base representations and a decimal point has been added before the reversed digits, they are added to the vector and then converted to base 10 to generate the samples.
-3. `LMS_DS`: A combination of linear matrix scrambling and digital shift.
-Linear matrix scrambling of Halton is applied first; then, before converting to base 10, the digital shift is applied to the scrambled indexes or coefficients.
+1. `LMS`: Linear matrix scrambling of Halton [3]. Based on the bases, a different scrambling matrix is generated for each dimension. The lower triangle is random between 0 and base minus 1, the diagonal is random between 1 and base minus 1, and the upper triangle is all zeros. After the indexes are converted to their base representations and a decimal point has been added before the reversed digits, their dot product is computed with the scrambling matrix. After computing the dot product, the scrambled indexes or coefficients are converted to base 10 to generate the samples.
+2. `DS`: Digital shift. Based on the bases, a different vector is generated for each dimension, with entries random between 0 and base minus 1. After the indexes are converted to their base representations and a decimal point has been added before the reversed digits, they are added to the vector and then converted to base 10 to generate the samples.
+3. `LMS_DS`: A combination of linear matrix scrambling and digital shift. Linear matrix scrambling of Halton is applied first; then, before converting to base 10, the digital shift is applied to the scrambled indexes or coefficients.
 
 `LMS` includes the origin as the first point in the sequence, but `DS` prevents this. This makes `LMS_DS` the recommended randomized option among these three.
 
@@ -142,10 +139,6 @@ Through this speed comparison, we can see that `LMS_DS` is slower than the other
 
 ## References
 
-1. Hofert, M. & Lemieux, C. `qrng`: (Randomized) Quasi-Random Number
-Generators. R package version 0.0-7. 2019. [https://CRAN.R-project.org/package=qrng](https://CRAN.R-project.org/package=qrng).
-2. Owen, A. B. A randomized Halton algorithm in R. 2017.
-   [arXiv:1706.02808](https://arxiv.org/abs/1706.02808) [stat.CO].
-3. Owen, A. B. & Pan, Z. Gain coefficients for scrambled Halton points.
-   2023. [arXiv:2308.08035](https://arxiv.org/abs/2308.08035)
-   [math.NA].
+1. Hofert, M. & Lemieux, C. `qrng`: (Randomized) Quasi-Random Number Generators. R package version 0.0-7. 2019. [https://CRAN.R-project.org/package=qrng](https://CRAN.R-project.org/package=qrng).
+2. Owen, A. B. A randomized Halton algorithm in R. 2017. [arXiv:1706.02808](https://arxiv.org/abs/1706.02808) [stat.CO].
+3. Owen, A. B. & Pan, Z. Gain coefficients for scrambled Halton points. 2023. [arXiv:2308.08035](https://arxiv.org/abs/2308.08035) [math.NA].

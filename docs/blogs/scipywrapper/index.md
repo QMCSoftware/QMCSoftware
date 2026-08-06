@@ -1,6 +1,7 @@
 <!--
 Source WordPress URL: https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/
 Source original Markdown file: docs/blogs/blog.md
+Source WordPress URL: https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/
 Original metadata: SciPyWrapper blog source supplied as local Markdown.
 Image handling: original local image references were preserved.
 -->

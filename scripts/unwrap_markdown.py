@@ -11,7 +11,10 @@ import sys
 
 SUPPORTED_SUFFIXES = {".md", ".ipynb"}
 FENCE_RE = re.compile(r"^\s*([`~]{3,})")
-LIST_RE = re.compile(r"^\s*(?:[-+*]|\d+[.)])\s+")
+LIST_RE = re.compile(
+    r"^(?P<indent>[ \t]*)(?P<marker>[-+*]|\d+[.)])(?P<spacing>[ \t]+)(?P<body>.*)$",
+)
+YEAR_MARKER_RE = re.compile(r"^(?:19|20)\d{2}\.$")
 REFERENCE_DEF_RE = re.compile(r"^\s*\[[^\]]+\]:\s+\S")
 SETEXT_RE = re.compile(r"^\s{0,3}(?:=+|-+)\s*$")
 HR_RE = re.compile(r"^\s{0,3}(?:[-*_]\s*){3,}$")
@@ -48,11 +51,16 @@ def _closing_fence(line: str, marker: str) -> bool:
     return stripped.startswith(marker[0] * len(marker))
 
 
-def _is_structural_line(line: str) -> bool:
+def _leading_indent_width(line: str) -> int:
+    prefix = line[: len(line) - len(line.lstrip(" \t"))]
+    return len(prefix.expandtabs(4))
+
+
+def _is_structural_line(line: str, *, allow_indented_text: bool = False) -> bool:
     stripped = line.strip()
     if not stripped:
         return True
-    if line.startswith("    ") or line.startswith("\t"):
+    if not allow_indented_text and (line.startswith("    ") or line.startswith("\t")):
         return True
     if stripped.startswith(("#", ">", "|", "<!--", ":::", "!!!", "???", "[![")):
         return True
@@ -73,6 +81,16 @@ def _unwrap_paragraph(lines: list[str]) -> str:
     return " ".join(line.strip() for line in lines)
 
 
+def _unwrap_list_item(lines: list[str]) -> str:
+    if len(lines) <= 1:
+        return lines[0]
+    return " ".join([lines[0].rstrip(), *(line.strip() for line in lines[1:])])
+
+
+def _has_explicit_line_break(lines: list[str]) -> bool:
+    return any(line.endswith("  ") or line.endswith("\\") for line in lines)
+
+
 def _paragraph_has_latex(lines: list[str]) -> bool:
     return bool(LATEX_HINT_RE.search("\n".join(lines)))
 
@@ -86,6 +104,9 @@ def unwrap_markdown_text(text: str, *, preserve_latex: bool = False) -> str:
     lines = text.splitlines()
     out: list[str] = []
     paragraph: list[str] = []
+    list_item: list[str] = []
+    list_content_indent = 0
+    list_marker_indent = 0
     fence_marker: str | None = None
     math_fence_end: str | None = None
     latex_env_name: str | None = None
@@ -96,11 +117,32 @@ def unwrap_markdown_text(text: str, *, preserve_latex: bool = False) -> str:
     def flush_paragraph() -> None:
         nonlocal paragraph
         if paragraph:
-            if preserve_latex and _paragraph_has_latex(paragraph):
+            if (
+                (preserve_latex and _paragraph_has_latex(paragraph))
+                or _has_explicit_line_break(paragraph)
+            ):
                 out.extend(paragraph)
             else:
                 out.append(_unwrap_paragraph(paragraph))
             paragraph = []
+
+    def flush_list_item() -> None:
+        nonlocal list_item, list_content_indent, list_marker_indent
+        if list_item:
+            if (
+                (preserve_latex and _paragraph_has_latex(list_item))
+                or _has_explicit_line_break(list_item)
+            ):
+                out.extend(list_item)
+            else:
+                out.append(_unwrap_list_item(list_item))
+            list_item = []
+            list_content_indent = 0
+            list_marker_indent = 0
+
+    def flush_text() -> None:
+        flush_paragraph()
+        flush_list_item()
 
     for index, line in enumerate(lines):
         stripped = line.strip()
@@ -144,13 +186,13 @@ def unwrap_markdown_text(text: str, *, preserve_latex: bool = False) -> str:
 
         fence_match = FENCE_RE.match(line)
         if fence_match:
-            flush_paragraph()
+            flush_text()
             fence_marker = fence_match.group(1)
             out.append(line)
             continue
 
         if stripped in {"$$", "\\[", "\\("}:
-            flush_paragraph()
+            flush_text()
             if stripped == "$$":
                 math_fence_end = "$$"
             elif stripped == "\\[":
@@ -160,14 +202,14 @@ def unwrap_markdown_text(text: str, *, preserve_latex: bool = False) -> str:
             out.append(line)
             continue
         if stripped in {"\\]", "\\)"}:
-            flush_paragraph()
+            flush_text()
             out.append(line)
             continue
 
         if preserve_latex:
             begin_match = LATEX_ENV_BEGIN_RE.match(line)
             if begin_match:
-                flush_paragraph()
+                flush_text()
                 latex_env_name = begin_match.group(1)
                 out.append(line)
                 end_match = LATEX_ENV_END_RE.match(line)
@@ -176,12 +218,54 @@ def unwrap_markdown_text(text: str, *, preserve_latex: bool = False) -> str:
                 continue
 
         if not stripped:
-            flush_paragraph()
+            flush_text()
             out.append(line)
             continue
 
-        if _is_structural_line(line):
-            flush_paragraph()
+        list_match = LIST_RE.match(line)
+        if list_match:
+            list_indent = _leading_indent_width(line)
+            code_indent = list_content_indent + 4 if list_item else 4
+            is_wrapped_year = bool(
+                list_item
+                and list_indent > list_marker_indent
+                and list_indent < code_indent
+                and YEAR_MARKER_RE.match(list_match.group("marker"))
+                and list_item[-1].rstrip().endswith(",")
+            )
+            if is_wrapped_year:
+                list_item.append(line)
+                continue
+            if list_indent < code_indent:
+                content_prefix = (
+                    list_match.group("indent")
+                    + list_match.group("marker")
+                    + list_match.group("spacing")
+                )
+                content_indent = len(content_prefix.expandtabs(4))
+                flush_text()
+                list_item = [line]
+                list_content_indent = content_indent
+                list_marker_indent = list_indent
+                continue
+
+        line_indent = _leading_indent_width(line)
+        is_plain_dedent = bool(
+            list_item
+            and line_indent < list_content_indent
+            and not _is_structural_line(line, allow_indented_text=True)
+        )
+        if is_plain_dedent:
+            flush_list_item()
+            out.append(line)
+            continue
+
+        allow_indented_text = bool(
+            list_item
+            and line_indent < list_content_indent + 4
+        )
+        if _is_structural_line(line, allow_indented_text=allow_indented_text):
+            flush_text()
             out.append(line)
             if stripped.startswith("<!--") and "-->" not in stripped:
                 in_comment = True
@@ -189,11 +273,15 @@ def unwrap_markdown_text(text: str, *, preserve_latex: bool = False) -> str:
                 in_html_block = True
             continue
 
+        if list_item:
+            list_item.append(line)
+            continue
+
         if paragraph and (paragraph[-1].endswith("  ") or paragraph[-1].endswith("\\")):
             flush_paragraph()
         paragraph.append(line)
 
-    flush_paragraph()
+    flush_text()
     result = newline.join(out)
     if had_final_newline:
         result += newline

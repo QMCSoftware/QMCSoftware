@@ -16,7 +16,7 @@ As a software library grows, so does its complexity. This comment certainly appl
 
 ## Overview of QMCPy Classes
 
-First, we overview the relationships between the five main abstract classes in [QMCPy version 1.0](https://qmcpy.org/2021/02/12/qmcpy-version-1-0/):
+First, we overview the relationships between the five main abstract classes in QMCPy version 1.0:
 
 - `Integrand`,
 - `TrueMeasure`,
@@ -112,6 +112,5 @@ We hope these UML diagrams help both researchers and developers better understan
 
 ## References
 
-1. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A
-quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
+1. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
 2. Unhelkar, B. *Software Engineering with UML*. CRC Press, 2017.
