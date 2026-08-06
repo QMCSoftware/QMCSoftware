@@ -71,6 +71,28 @@ class Hammersley(DigitalNetAnyBases):
                  t=None,
                  n_lim=2**32,
                  warn=True):
+        r"""
+        Args:
+            dimension (int): Dimension of the samples. Must be a scalar
+                `int` (unlike `Halton`, an array of indices is not
+                supported -- see class Notes).
+
+            seed (Union[None, int, np.random.SeedSequence]): Unused; kept
+                for API consistency with the other discrete distributions.
+                This point set is fully deterministic, so `seed` has no
+                effect on the generated points.
+
+            t (Union[None, int]): Passed through to the internal `Halton`
+                generator used for dimensions 2,...,`dimension` (ignored
+                when `dimension` is 1). See `Halton`'s docstring for
+                details.
+
+            n_lim (int): Maximum number of points `n` this distribution
+                can be asked to generate.
+
+            warn (bool): If `False`, disable the warning about the first
+                point always being the origin.
+        """
 
         if not np.isscalar(dimension):
             raise ParameterError(
