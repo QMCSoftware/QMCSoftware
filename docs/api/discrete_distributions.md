@@ -24,6 +24,10 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.lattice.Lattice
 
+## `KorobovLattice`
+
+::: qmcpy.discrete_distribution.korobov.KorobovLattice
+
 ## `Halton`
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.halton.Halton
