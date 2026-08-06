@@ -99,18 +99,20 @@ class LatinHypercube(AbstractDiscreteDistribution):
             self, dimension, replications, seed, randomize="TRUE"
             ):
         r"""
-        Initialize a Latin Hypercube sampler.
+        Args:
+            dimension (int): Dimension of the samples.
 
-        Parameters
-        ----------
-        dimension (int): Dimension of the samples.
+            replications (Union[None, int]): Number of independent LHS designs
+                to generate. Each replication is its own independently permuted,
+                independently jittered stratification into `n` strata.
 
-        replications (Union[None, int]): Number of independent LHS designs to generate. Each replication is its own independently permuted, independently jittered stratification into `n` strata.
+            seed (Union[None, int, np.random.SeedSequence]): Seed for the random
+                number generator to ensure reproducibility.
 
-        seed (Union[None, int, np.random.SeedSequence]): Seed for the random number generator to ensure reproducibility.
-
-        randomize (str): Whether to jitter each point uniformly within its stratum (`True`, the default) or place it at the stratum's center (`False`). Accepts `True`/`False`, or the case-insensitive strings `"TRUE"`, `"FALSE"`, `"NONE"`, `"NO"`.
-        """
+            randomize (str): Whether to jitter each point uniformly within its
+                stratum (`True`, the default) or place it at the stratum's
+                center (`False`), must be one of 'TRUE', 'FALSE', 'NONE', or 'NO' (case-insensitive).
+    """
         super().__init__(dimension=dimension, replications=replications, seed=seed, d_limit=np.inf, n_limit=np.inf)
         self.randomize = str(randomize).upper()
         if self.randomize in ("NONE", "NO", "FALSE"):
