@@ -28,6 +28,10 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.halton.Halton
 
+## `Hammersley`
+
+::: qmcpy.discrete_distribution.digital_net_any_bases.hammersley.Hammersley
+
 ## `Faure`
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.faure.Faure
