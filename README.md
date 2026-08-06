@@ -58,4 +58,8 @@ https://qmcsoftware.github.io/QMCSoftware/
 
 QMCPy is developed by an international community of researchers and software contributors. See the [community page](https://qmcsoftware.github.io/QMCSoftware/community/) for the steering council, collaborators, contributors, sponsors, and selected references. PyPI usage statistics are updated on the [download statistics page](https://qmcsoftware.github.io/QMCSoftware/stats/pypi_downloads/).
 
+## Development
+
+Want to contribute to QMCPy? Please see the [contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/) for developer installation, test, and documentation instructions.
+
 QMCPy is distributed under the [Apache 2.0 license](https://github.com/QMCSoftware/QMCSoftware/blob/master/LICENSE) from the Illinois Institute of Technology.
