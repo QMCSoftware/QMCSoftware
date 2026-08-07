@@ -69,8 +69,8 @@ class Hammersley(DigitalNetAnyBases):
                  dimension=1,
                  seed=None,
                  t=None,
-                 n_lim=2**32,
-                 warn=True):
+                 n_lim=2**32
+                ):
         r"""
         Args:
             dimension (int): Dimension of the samples. Must be a scalar
@@ -89,9 +89,6 @@ class Hammersley(DigitalNetAnyBases):
 
             n_lim (int): Maximum number of points `n` this distribution
                 can be asked to generate.
-
-            warn (bool): If `False`, disable the warning about the first
-                point always being the origin.
         """
 
         if not np.isscalar(dimension):
@@ -118,10 +115,9 @@ class Hammersley(DigitalNetAnyBases):
                 randomize='None',
                 t=t,
                 n_lim=n_lim,
-                warn=warn)
+                warn=False)
         else:
             self.halton = None
-        self.warn = warn
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if return_binary:
