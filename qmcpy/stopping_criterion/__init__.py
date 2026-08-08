@@ -17,7 +17,6 @@ try:
     import gpytorch
     from .pf_gp_ci import (
         PFGPCI,
-        PFGPCIData,
         PFSampleErrorDensityAR,
         SuggesterSimple,
     )
