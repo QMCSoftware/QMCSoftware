@@ -70,8 +70,13 @@ class Kumaraswamy(AbstractTrueMeasure):
             raise DimensionError(
                 "a and b must be scalar or have length equal to dimension."
             )
-        if not ((self.alpha > 0).all() and (self.beta > 0).all()):
-            raise ParameterError("Kumaraswamy requires a,b>0.")
+        if not (
+            np.isfinite(self.alpha).all()
+            and np.isfinite(self.beta).all()
+            and (self.alpha > 0).all()
+            and (self.beta > 0).all()
+        ):
+            raise ParameterError("Kumaraswamy requires finite a,b>0.")
 
         mean, variance = self._compute_moments()
         self._set_moments(
