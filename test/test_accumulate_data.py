@@ -3,7 +3,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from qmcpy import CubBayesNetG, DigitalNetB2, Keister, PFGPCIData
+from qmcpy import CubBayesNetG, DigitalNetB2, Keister
+from qmcpy.stopping_criterion.pf_gp_ci import PFGPCIData
 
 
 class _DummyDiscreteDistrib(object):

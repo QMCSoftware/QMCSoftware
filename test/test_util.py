@@ -11,23 +11,21 @@ from qmcpy.util import (
     ParameterError,
     MethodImplementationError,
 )
-from qmcpy import (
-    bernoulli_poly,
-    Data,
-    get_npt,
+from qmcpy.util.data import Data
+from qmcpy.util.dig_shift_invar_ops import to_bin, to_float, weighted_walsh_funcs
+from qmcpy.util.latnetbuilder_linker import latnetbuilder_linker
+from qmcpy.util.shift_invar_ops import bernoulli_poly
+from qmcpy.util.torch_numpy_ops import get_npt
+from qmcpy.util.transforms import (
     insert_batch_dims,
-    latnetbuilder_linker,
     parse_assign_param,
     tf_exp,
     tf_exp_inv,
-    tf_explinear,
-    tf_explinear_inv,
-    tf_identity,
     tf_square,
     tf_square_inv,
-    to_bin,
-    to_float,
-    weighted_walsh_funcs,
+    tf_identity,
+    tf_explinear,
+    tf_explinear_inv,
 )
 
 

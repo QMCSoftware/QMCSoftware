@@ -14,11 +14,11 @@ from qmcpy import (
     Kumaraswamy,
     Linear0,
     Multimodal2d,
-    ParameterError,
     SciPyWrapper,
     Sin1d,
     Uniform,
 )
+from qmcpy.util import ParameterError
 import numpy as np
 import unittest
 import scipy.stats

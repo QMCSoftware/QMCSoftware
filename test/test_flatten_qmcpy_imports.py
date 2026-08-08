@@ -15,7 +15,9 @@ def test_flatten_imports_preserves_imported_names_and_formatting():
         + "\nfrom qmcpy import DigitalNetB2\nimport qmcpy.util\n"
     ).encode()
 
-    updated, count = flatten_imports(source)
+    updated, count = flatten_imports(
+        source, frozenset({"DigitalNetB2", "Keister", "Lattice"})
+    )
 
     assert count == 3
     assert updated == (
@@ -42,7 +44,7 @@ def test_flatten_imports_preserves_private_modules_and_names():
         + "\n"
     ).encode()
 
-    updated, count = flatten_imports(source)
+    updated, count = flatten_imports(source, frozenset({"Keister"}))
 
     assert count == 1
     assert updated == source.replace(
@@ -64,22 +66,31 @@ def test_private_module_import_separates_public_import_groups():
     assert updated == source
 
 
-def test_flatten_imports_deduplicates_same_scope_star_imports():
+def test_flatten_imports_preserves_utility_imports():
     source = (
-        b"from qmcpy import *\n"
-        + (_nested_import("util", "*") + "\n").encode()
-        + b"\n"
-        + b"    from qmcpy import *\n"
+        b"from qmcpy.util import ParameterError\n"
+        b"from qmcpy.util.transforms import tf_exp\n"
     )
+
+    updated, count = flatten_imports(source, frozenset({"ParameterError", "tf_exp"}))
+
+    assert (updated, count) == (source, 0)
+
+
+def test_flatten_imports_preserves_names_not_available_at_top_level():
+    source = b"from qmcpy.stopping_criterion.pf_gp_ci import PFGPCIData\n"
+
+    updated, count = flatten_imports(source, frozenset({"PFGPCI"}))
+
+    assert (updated, count) == (source, 0)
+
+
+def test_flatten_imports_preserves_nested_imports_without_public_api():
+    source = (_nested_import("integrand", "Keister") + "\n").encode()
 
     updated, count = flatten_imports(source)
 
-    assert count == 2
-    assert updated == (
-        b"from qmcpy import *\n"
-        b"\n"
-        b"    from qmcpy import *\n"
-    )
+    assert (updated, count) == (source, 0)
 
 
 def test_flatten_imports_deduplicates_notebook_star_imports():
@@ -96,7 +107,7 @@ def test_flatten_imports_deduplicates_notebook_star_imports():
     }
     source = json.dumps(notebook, indent=1).encode()
 
-    updated, count = flatten_imports(source)
+    updated, count = flatten_imports(source, frozenset({"Keister"}))
 
     assert count == 3
     assert json.loads(updated)["cells"][0]["source"] == ["from qmcpy import *"]

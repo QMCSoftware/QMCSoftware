@@ -2,7 +2,6 @@ from qmcpy import (
     BernoulliCont,
     BrownianMotion,
     DigitalNetB2,
-    DimensionError,
     Gaussian,
     GeometricBrownianMotion,
     JohnsonsSU,
@@ -10,9 +9,9 @@ from qmcpy import (
     Lattice,
     Lebesgue,
     MaternGP,
-    ParameterError,
     Uniform,
 )
+from qmcpy.util import DimensionError, ParameterError
 import numpy as np
 import scipy.stats
 import unittest

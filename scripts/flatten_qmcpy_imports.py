@@ -458,7 +458,8 @@ def flatten_imports(
     """Flatten, combine, alphabetize, and deduplicate public imports.
 
     `public_names` is qmcpy's public API surface (see `_load_qmcpy_public_names`).
-    When it's None, star imports are still deduplicated but left unexpanded.
+    When it's None, nested imports are left unchanged and existing top-level
+    star imports are deduplicated but left unexpanded.
     """
 
     change_count = 0
@@ -466,10 +467,23 @@ def flatten_imports(
     def replace(match: re.Match[bytes]) -> bytes:
         nonlocal change_count
         module_segments = match.group("module_path").lstrip(b".").split(b".")
-        if any(segment.startswith(b"_") for segment in module_segments):
+        if module_segments[0] == b"util" or any(
+            segment.startswith(b"_") for segment in module_segments
+        ):
             return match.group(0)
         if PRIVATE_NAME_RE.search(match.group("imported")):
             return match.group(0)
+        if public_names is None:
+            return match.group(0)
+
+        if not match.group("imported").lstrip().startswith(b"*"):
+            try:
+                statement = ast.parse(match.group(0).decode("utf-8")).body[0]
+            except (SyntaxError, UnicodeDecodeError):
+                return match.group(0)
+            imported_names = {alias.name for alias in statement.names}
+            if not imported_names <= public_names:
+                return match.group(0)
 
         change_count += 1
         return (
@@ -583,8 +597,8 @@ def main(argv: list[str] | None = None) -> int:
     public_names = _load_qmcpy_public_names(repository_root)
     if public_names is None:
         print(
-            "warning: qmcpy is not importable; star imports will be "
-            "deduplicated but not expanded",
+            "warning: qmcpy is not importable; nested imports will be left "
+            "unchanged and top-level star imports will not be expanded",
             file=sys.stderr,
         )
 

@@ -6,13 +6,12 @@ import scipy.stats as stats
 
 from qmcpy import (
     DigitalNetB2,
-    DimensionError,
-    ParameterError,
     SciPyWrapper,
     StudentT,
     TriangularDistribution,
     ZeroInflatedExpUniform,
 )
+from qmcpy.util import DimensionError, ParameterError
 
 
 MISSING_PDF_WARNING = "no 'pdf' or 'logpdf'"

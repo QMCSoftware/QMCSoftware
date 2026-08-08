@@ -5,16 +5,15 @@ import scipy.stats as stats
 from qmcpy import (
     AcceptanceRejection,
     DigitalNetB2,
-    DimensionError,
     DummySampler,
     Gaussian,
     GaussianCopula,
-    ParameterError,
     ProductMeasure,
     SciPyWrapper,
     Uniform,
     ZeroInflatedExpUniform,
 )
+from qmcpy.util import DimensionError, ParameterError
 
 
 def test_product_measure_zero_inflated_with_scipy_uniform_shape():

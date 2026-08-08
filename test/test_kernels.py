@@ -4,9 +4,8 @@ from qmcpy import (
     KernelDigShiftInvarCombined,
     KernelShiftInvar,
     KernelShiftInvarCombined,
-    tf_exp_eps,
-    tf_exp_eps_inv,
 )
+from qmcpy.util.transforms import tf_exp_eps, tf_exp_eps_inv
 import unittest
 
 
