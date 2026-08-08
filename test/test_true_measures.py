@@ -443,9 +443,9 @@ class TestKumaraswamy(unittest.TestCase):
         # against this closed form evaluated with scipy's beta function.
         from scipy.special import beta as beta_function
 
-        a = np.array([1.0, 2.0, 3.5])
-        b = np.array([3.0, 4.0, 1.5])
-        kumaraswamy = Kumaraswamy(DigitalNetB2(3, seed=7), a=a, b=b)
+        a = np.array([0.01, 1.0, 2.0, 3.5])
+        b = np.array([1, 3.0, 4.0, 1.5])
+        kumaraswamy = Kumaraswamy(DigitalNetB2(4, seed=7), a=a, b=b)
 
         m1 = b * beta_function(1 + 1 / a, b)
         m2 = b * beta_function(1 + 2 / a, b)

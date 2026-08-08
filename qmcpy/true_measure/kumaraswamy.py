@@ -1,8 +1,7 @@
 from .abstract_true_measure import AbstractTrueMeasure
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
-from numpy.polynomial.legendre import leggauss
-from scipy.special import digamma, polygamma
+from scipy.special import betaln
 from scipy.sparse import diags
 import numpy as np
 
@@ -23,9 +22,9 @@ class Kumaraswamy(AbstractTrueMeasure):
             a               [1 2]
             b               [3 4]
             mean            [0.25  0.406]
-            variance        [0.038 0.035]
+            variance        [0.037 0.035]
             standard_deviation [0.194 0.187]
-            covariance      [[0.038 0.   ]
+            covariance      [[0.037 0.   ]
                              [0.    0.035]]
 
         With independent replications
@@ -93,50 +92,36 @@ class Kumaraswamy(AbstractTrueMeasure):
         directly causes cancellation error once the variance is small relative
         to $M_1^2$ (e.g. large $a$).
 
-        Instead, with the log-moment function $K(r) = \log M_r$ (so $K(0) = 0$),
+        Instead, with the log-moment function $K(r) = \log M_r$,
 
         $$\text{mean} = e^{K(1)}, \qquad
           \operatorname{Var}[X] = \text{mean}^2\,(e^{q} - 1), \qquad
           q = K(2) - 2K(1).$$
 
-        The mean is recovered as $K(1) = \int_0^1 K'(r)\,\mathrm{d}r$ and, adding
-        $K(0) = 0$, $q$ becomes a second central difference with the exact
-        tent-weight (linear B-spline) form
-
-        $$q = \int_0^1 r\,K''(r)\,\mathrm{d}r
-            + \int_1^2 (2 - r)\,K''(r)\,\mathrm{d}r.$$
-
-        Here $K'$ uses the digamma and $K''$ the trigamma function [5]. $K$ is
-        convex ($K''(r) > 0$, since $r \mapsto M_r$ is log-convex by Holder's
-        inequality [2]), so both integrands are nonnegative and $q$ is built
-        from nonnegative pieces with no cancellation. Both integrals share one
-        8-node Gauss-Legendre rule on $[0, 1]$ [3] (nodes from ``leggauss`` [4]);
-        ``numpy.expm1`` keeps $e^{q} - 1$ accurate for small $q$ [4]. Every
-        operation is applied elementwise to the per-coordinate parameters $a$
-        and $b$, so ``mean`` and ``variance`` are returned as length-``d``
-        arrays.
+        Each log-moment is available in closed form via the log-Beta function
+        [2], $K(r) = \log b + \ln B(1 + r/a, b)$, so ``mean`` and $q$ are
+        evaluated exactly (up to floating-point rounding of ``betaln``) for
+        every $a, b > 0$. The $\log b$ terms cancel in $q = \ln B(1 + 2/a, b) -
+        2\ln B(1 + 1/a, b) - \log b$. Because $K$ is convex ($r \mapsto M_r$ is
+        log-convex by Holder's inequality [3]) we have $q \ge 0$, so ``expm1``
+        [4] recovers $e^{q} - 1$ without cancellation even when $q$ is tiny.
+        Every operation is elementwise on the per-coordinate parameters $a$ and
+        $b$, so ``mean`` and ``variance`` are returned as length-``d`` arrays.
 
         **References:**
 
         1.  Kumaraswamy distribution. Wikipedia.
             [https://en.wikipedia.org/wiki/Kumaraswamy_distribution](https://en.wikipedia.org/wiki/Kumaraswamy_distribution).
 
-        2.  G. H. Hardy, J. E. Littlewood, and G. Polya.
+        2.  SciPy Reference. scipy.special.betaln.
+            [https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.betaln.html](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.betaln.html).
+
+        3.  G. H. Hardy, J. E. Littlewood, and G. Polya.
             Inequalities, 2nd edition, Cambridge University Press, Cambridge, 1952
             (Holder's inequality; implies log-convexity of the moment sequence).
 
-        3.  Philip J. Davis and Philip Rabinowitz.
-            Methods of Numerical Integration, 2nd edition,
-            Academic Press, Orlando, FL, 1984, ISBN 0-12-206360-0
-            (Gauss-Legendre quadrature).
-
-        4.  NumPy Reference. numpy.polynomial.legendre.leggauss and numpy.expm1.
-            [https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.leggauss.html).
+        4.  NumPy Reference. numpy.expm1.
             [https://numpy.org/doc/stable/reference/generated/numpy.expm1.html](https://numpy.org/doc/stable/reference/generated/numpy.expm1.html).
-
-        5.  SciPy Reference. scipy.special.digamma and scipy.special.polygamma.
-            [https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.digamma.html](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.digamma.html).
-            [https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.polygamma.html](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.polygamma.html).
 
         Returns:
             tuple: Length ``d`` arrays ``(mean, variance)``.
@@ -144,32 +129,16 @@ class Kumaraswamy(AbstractTrueMeasure):
         inv_a = 1.0 / self.alpha
         beta = self.beta
 
-        # 8-point Gauss-Legendre nodes and weights mapped from [-1, 1] to [0, 1].
-        nodes, weights = leggauss(8)
-        s = 0.5 * (nodes + 1.0)[:, None]  # quadrature nodes, shape (8, 1)
-        w = 0.5 * weights  # quadrature weights, shape (8,)
+        # K(r) = log M_r = log(b) + betaln(1 + r/a, b), the log of the r-th raw moment.
+        log_b = np.log(beta)
+        k1 = log_b + betaln(1.0 + inv_a, beta)
+        k2 = log_b + betaln(1.0 + 2.0 * inv_a, beta)
 
-        # K'(r) = (1/a) * (digamma(1 + r/a) - digamma(b + 1 + r/a)).
-        # K(1) = integral_0^1 K'(r) dr since K(0) = 0.
-        k_prime = inv_a * (
-            digamma(1.0 + s * inv_a) - digamma(beta + 1.0 + s * inv_a)
-        )
-        mean = np.exp(w @ k_prime)
+        mean = np.exp(k1)
 
-        # K''(r) = (1/a^2) * (polygamma(1, 1 + r/a) - polygamma(1, b + 1 + r/a)).
-        # K'' is mathematically nonnegative. Remove only possible last-bit negative roundoff.
-        def k_double_prime(r):
-            value = inv_a**2 * (
-                polygamma(1, 1.0 + r * inv_a)
-                - polygamma(1, beta + 1.0 + r * inv_a)
-            )
-            return np.maximum(value, 0.0)
-
-        # q = K(2) - 2K(1) = integral_0^1 r K''(r) dr + integral_1^2 (2-r) K''(r) dr.
-        # In the second integral substitute r = 1 + s, giving weight 1 - s.
-        q = w @ (s * k_double_prime(s) + (1.0 - s) * k_double_prime(1.0 + s))
-
+        # q = K(2) - 2K(1) >= 0 by log-convexity of the moment sequence.
         # expm1(q) accurately computes exp(q) - 1 when q is very small.
+        q = k2 - 2.0 * k1
         variance = mean * mean * np.expm1(q)
 
         return mean, variance
