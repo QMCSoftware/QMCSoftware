@@ -101,7 +101,7 @@ class Hammersley(DigitalNetAnyBases):
             )
         dimension = int(dimension)
         if dimension < 1:
-            raise ParameterError("HammersleyPointSet requires dimension >= 1")
+            raise ParameterError("Hammersley requires dimension >= 1")
         
         AbstractLDDiscreteDistribution.__init__(
             self, dimension, replications=None, seed=seed,
