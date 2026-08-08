@@ -390,7 +390,7 @@ format:
 	$(MAKE) _rm_trailing_whitespace FORMAT_PATH="$(FORMAT_PATH)"
 
 _flatten_qmcpy_imports:
-	python3 scripts/flatten_qmcpy_imports.py
+	$(PYTHON) scripts/flatten_qmcpy_imports.py
 
 _markdown-unwrap:
 	$(PYTHON) scripts/unwrap_markdown.py "$(MARKDOWN_UNWRAP_PATH)"
