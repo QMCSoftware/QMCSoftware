@@ -52,6 +52,22 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
+### Minimum Python Version by Role
+
+`qmcpy` declares `requires-python` for a bare install, but several optional dependency groups (`[project.optional-dependencies]` in `pyproject.toml`) pull in packages with their own, higher floors. The table below lists the actual minimum Python version needed for each role, derived from the strictest `requires-python` among that role's dependencies as pinned in `pyproject.toml`.
+
+| Role | Install command | Binding dependency | Minimum Python |
+|---|---|---|---|
+| Application user | `pip install qmcpy` | f-strings in the `qmcpy` source | 3.6 |
+| + torch / GP features | `pip install "qmcpy[torch,gpytorch,mpmc]"` | `torch >= 2.2.0` | 3.8 |
+| + Bayesian optimization | `pip install "qmcpy[botorch]"` | `botorch >= 0.10.0` | 3.9 |
+| Test developer | `pip install -e ".[test]"` | `pytest >= 9.0.3`, `parsl >= 2026.01.05` | 3.10 |
+| Documentation developer | `pip install -e ".[docs]"` | inherits `test`; also `pylint >= 4.0.5` | 3.10 |
+| Release / core developer | `pip install -e ".[dev]"` | inherits `docs` / `test` | 3.10 |
+| Course instructor (`class` extra) | `pip install -e ".[class]"` | `arviz >= 0.17`, `matplotlib >= 3.9.0`, `statsmodels >= 0.14.3` | 3.9 |
+
+In short: importing `qmcpy` itself only needs Python 3.6+, but contributing code, running the test suite, or building the documentation requires **Python 3.10+**, since `pytest >= 9.0.3` and `pylint >= 4.0.5` both hard-require it. We recommend Python 3.13 (as used in the `conda create` command above) for day-to-day development.
+
 ## 📚 Using `qmcpy` In Courses (`class` Extra)
 
 `qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.

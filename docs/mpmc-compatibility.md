@@ -7,7 +7,7 @@
 - Treat MPMC as an optional feature, not part of the minimum QMCPy dependency set.
 - Prefer `pyg_lib` plus `torch-geometric`; do not require `torch-cluster` as a separate dependency.
 - For reproducible local work and future CI pinning, prefer a modern PyTorch line with matching `data.pyg.org` wheels.
-- Keep older Python jobs in `unittests.yml` for core QMCPy coverage, but do not require them to run MPMC.
+- `unittests.yml` now only covers Python `3.10`–`3.14` (see [Minimum Python Version by Role](CONTRIBUTING.md#minimum-python-version-by-role)); there is no separate "core-only" tier below `3.10` to carry MPMC exceptions for.
 
 ## Support Policy
 
@@ -17,7 +17,8 @@
 | `3.13` | Target | Supported | `torch >= 2.10`, `torch-geometric >= 2.6.1`, `pyg_lib >= 0.6.0` | Run MPMC doctests and unit tests |
 | `3.12` | Target | Supported | `torch >= 2.10`, `torch-geometric >= 2.6.1`, `pyg_lib >= 0.6.0` | Run MPMC doctests and unit tests |
 | `3.10` to `3.11` | Best effort | Not a release blocker for MPMC | May work with matching PyTorch / PyG wheels, but not required by current CI policy | Optional manual testing only |
-| `3.5` to `3.9` | Legacy core-package coverage only | Not supported for MPMC | Do not spend CI budget trying to keep MPMC running here | No MPMC doctests or unit tests |
+
+Python `3.6` to `3.9` can still import core QMCPy (see [Minimum Python Version by Role](CONTRIBUTING.md#minimum-python-version-by-role)), but `unittests.yml` no longer runs jobs on those interpreters — the `test` extras (`pytest >= 9.0.3`, `parsl >= 2026.01.05`) require Python `3.10+` to install at all, let alone MPMC's PyTorch Geometric stack.
 
 The distinction is intentional:
 
@@ -29,10 +30,9 @@ The distinction is intentional:
 The current CI split should be:
 
 - `alltests.yml`: full-sweep validation on Linux, macOS, and Windows for Python `3.13`, including `make doctests_mpmc` and the standard unit-test suite.
-- `unittests.yml`: a broader version sampler for the repository, with explicit MPMC jobs on Python `3.12`, `3.13`, and `3.14`.
-- Older `unittests.yml` jobs: keep them for core QMCPy regressions, but do not require MPMC there.
+- `unittests.yml`: a version sampler across Python `3.10`–`3.14`, with explicit MPMC jobs on Python `3.12`, `3.13`, and `3.14`.
 
-This gives one place to enforce modern MPMC compatibility without forcing the entire repository to abandon older Python jobs immediately.
+This gives one place to enforce modern MPMC compatibility without maintaining Python interpreters that can no longer install the `test` extras at all.
 
 ## Local Developer Commands
 
