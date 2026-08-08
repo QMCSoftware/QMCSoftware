@@ -27,21 +27,21 @@ def _sqrt_safe(v):
 def L2star(x: torch.Tensor) -> torch.Tensor:
     B, N, d = _check_inputs(x)
     t1 = (1.0 / 3.0) ** d
-    p = torch.prod(1.0 - x**2, dim=2)              
+    p = torch.prod(1.0 - x**2, dim=2)
     t2 = (2.0 / N) * (2.0 ** (-d)) * torch.sum(p, dim=1)
     xi, xj = _pairwise(x)
-    prod_ij = torch.prod(1.0 - torch.maximum(xi, xj), dim=3)  
+    prod_ij = torch.prod(1.0 - torch.maximum(xi, xj), dim=3)
     t3 = (1.0 / (N * N)) * torch.sum(prod_ij, dim=(1, 2))
     return _sqrt_safe(t1 - t2 + t3)
 
 def L2star_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
     B, N, d = _check_inputs(x, gamma)
     g = gamma
-    t1 = torch.prod(1.0 + g / 3.0)           
-    p = torch.prod(1.0 + (g.view(1, 1, d) / 2.0) * (1.0 - x**2), dim=2)  
+    t1 = torch.prod(1.0 + g / 3.0)
+    p = torch.prod(1.0 + (g.view(1, 1, d) / 2.0) * (1.0 - x**2), dim=2)
     t2 = (2.0 / N) * torch.sum(p, dim=1)
     xi, xj = _pairwise(x)
-    q = torch.prod(1.0 + g.view(1, 1, 1, d) * (1.0 - torch.maximum(xi, xj)), dim=3)  
+    q = torch.prod(1.0 + g.view(1, 1, 1, d) * (1.0 - torch.maximum(xi, xj)), dim=3)
     t3 = (1.0 / (N * N)) * torch.sum(q, dim=(1, 2))
     return _sqrt_safe(t1 - t2 + t3)
 
@@ -51,7 +51,7 @@ def L2star_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
 def L2ext(x: torch.Tensor) -> torch.Tensor:
     B, N, d = _check_inputs(x)
     t1 = (1.0 / 12.0) ** d
-    p = torch.prod(0.5 * (x - x**2), dim=2)   
+    p = torch.prod(0.5 * (x - x**2), dim=2)
     t2 = (2.0 / N) * torch.sum(p, dim=1)
     xi, xj = _pairwise(x)
     q = torch.prod(torch.minimum(xi, xj) - xi * xj, dim=3)
@@ -92,7 +92,7 @@ def L2per_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
     return _sqrt_safe(-t1 + t3)
 
 # -----------------------------------------
-# L2 CENTERED 
+# L2 CENTERED
 # -----------------------------------------
 def L2ctr(x: torch.Tensor) -> torch.Tensor:
     B, N, d = _check_inputs(x)
@@ -142,7 +142,7 @@ def L2sym_weighted(x: torch.Tensor, gamma: torch.Tensor) -> torch.Tensor:
     return _sqrt_safe(t1 - t2 + t3)
 
 # -----------------------------------------
-# L2 MIXTURE 
+# L2 MIXTURE
 # -----------------------------------------
 def L2mix(x: torch.Tensor) -> torch.Tensor:
     B, N, d = _check_inputs(x)
