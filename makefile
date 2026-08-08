@@ -1,5 +1,11 @@
 # Emit pytest-xdist argument if available; can be overridden on the make command line
 PYTEST_XDIST ?= $(shell python scripts/pytest_xdist.py 2>/dev/null)
+PYTEST ?=
+WITH_MPMC ?= 0
+HAS_MPMC ?= $(shell python -c "import importlib.util; mods=('torch','pyg_lib','torch_geometric'); print(int(all(importlib.util.find_spec(m) is not None for m in mods)))" 2>/dev/null || echo 0)
+
+# set environment variable for documentation
+export JUPYTER_PLATFORM_DIRS=1
 
 ##########################################################
 # Coverage artifacts (local-only; should be gitignored)
@@ -24,11 +30,14 @@ find_local_only_files:
 	./scripts/find_local_only_folders.sh 
 
 clean_local_only_files:
-	rm -fr test/booktests/.ipynb_checkpoints/
+	rm -fr test/booktests/.ipynb_checkpoints/ .pytest_cache/ .ruff_cache/ __pycache__/ */__pycache__/ */*/__pycache__/ raw.githubusercontent.com/ */raw.githubusercontent.com/ */*/raw.githubusercontent.com/ site/ build/ .pdm-build/ artifacts/logs/ artifacts/booktests/ */*/logs/ */*/runinfo/ 
 	chmod +x scripts/find_local_only_folders.sh > /dev/null 2>&1
 	for f in $(shell ./scripts/find_local_only_folders.sh > /dev/null 2>&1); do \
 		rm -f "$$f"; > /dev/null 2>&1; \
 	done
+
+clean_coverage:
+	rm -fr artifacts/coverage/ .coverage* test/booktests/.coverage* 
 
 ##########################################################
 # Doctests
@@ -46,6 +55,7 @@ doctests_minimal: ensure_artifacts
 		--ignore qmcpy/util/exact_gpytorch_gression_model.py \
 		--ignore qmcpy/integrand/umbridge_wrapper.py \
 		--ignore qmcpy/integrand/hartmann6d.py \
+		--ignore qmcpy/discrete_distribution/mpmc/ \
 
 doctests_torch: ensure_artifacts
 	@mkdir -p $(DOCTEST_COV_DIR)/torch
@@ -68,6 +78,12 @@ doctests_botorch: ensure_artifacts
 	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/botorch/coverage.json --no-header --cov-append \
 		--doctest-modules qmcpy/integrand/hartmann6d.py \
 
+doctests_mpmc:
+	@mkdir -p $(DOCTEST_COV_DIR)/mpmc
+	COVERAGE_FILE=$(DOCTEST_COV_DIR)/mpmc/.coverage \
+	python -m pytest $(PYTEST_XDIST) -x --cov qmcpy/ --cov-report term --cov-report json:$(DOCTEST_COV_DIR)/mpmc/coverage.json --no-header --cov-append \
+		--doctest-modules qmcpy/discrete_distribution/mpmc/*.py \
+
 doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issues/96
 	@mkdir -p $(DOCTEST_COV_DIR)/umbridge
 	@docker --version
@@ -78,22 +94,34 @@ doctests_umbridge: ensure_artifacts # https://github.com/UM-Bridge/umbridge/issu
 doctests_markdown:
 	@phmutest docs/*.md --replmode --log -c
 
-doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
 
-doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+doctests_no_docker_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch
+
+doctests_no_docker: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_mpmc
+
+doctests_no_mpmc: doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge
+
+doctests: doctests_markdown doctests_minimal doctests_torch doctests_gpytorch doctests_botorch doctests_umbridge doctests_mpmc
 
 ##########################################################
 # Unit Tests in `test/` folder (OFFICIAL coverage)
 ##########################################################
 unittests: ensure_artifacts
 	@mkdir -p $(UNIT_COV_DIR)
+	@PYTHON_BIN=$$(command -v python 2>/dev/null || { [ -n "$$CONDA_PREFIX" ] && command -v "$$CONDA_PREFIX/bin/python" 2>/dev/null; } || { command -v conda >/dev/null 2>&1 && conda run -n qmcpy python -c 'import sys; print(sys.executable)' 2>/dev/null; } || command -v python3 2>/dev/null); \
+	if [ -z "$$PYTHON_BIN" ]; then \
+		echo "No Python interpreter found (tried: python, $$CONDA_PREFIX/bin/python, python3)."; \
+		exit 127; \
+	fi; \
 	COVERAGE_FILE=$(UNIT_COV_DIR)/.coverage \
-	python -m pytest $(PYTEST_XDIST) -x \
+	"$$PYTHON_BIN" -m pytest $(PYTEST_XDIST) -x $(PYTEST_EXTRA_ARGS) \
 		--cov=qmcpy \
 		--cov-report term \
 		--cov-report json:$(UNIT_COV_DIR)/coverage.json \
 		--no-header \
 		test/ -W ignore::DeprecationWarning
+
+tests_no_docker_no_mpmc: doctests_no_docker_no_mpmc unittests coverage
 
 ##########################################################
 # Unit Tests for `*.ipynb` in `demos/` folder
@@ -116,6 +144,8 @@ check_booktests:
 	done
 	@echo "Total notebooks:  $$(find demos -name '*.ipynb' | wc -l)"
 	@echo "Total test files: $$(find test/booktests -name 'tb_*.py' | wc -l)"
+
+tests_no_mpmc: doctests_no_mpmc unittests coverage
 
 booktests_no_docker: check_booktests generate_booktests clean_local_only_files ensure_artifacts
 	@echo "\nNotebook tests"
@@ -148,7 +178,7 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 	cd test/booktests/ && \
 	PYTHONWARNINGS="ignore::UserWarning,ignore::DeprecationWarning,ignore::FutureWarning,ignore::ImportWarning" \
 	COVERAGE_FILE=../../$(BOOKTEST_COV_DIR)/.coverage \
-	python -W ignore -m pytest $(PYTEST_XDIST) -v tb_*.py \
+	python -W ignore -m pytest $(PYTEST_XDIST) $(PYTEST) -v tb_*.py \
 		--cov=qmcpy \
 		--cov-append \
 		--cov-report=term \
@@ -158,22 +188,35 @@ booktests_parallel_pytest: check_booktests generate_booktests clean_local_only_f
 ##########################################################
 # Combinations of Above Tests
 ##########################################################
-tests: 
+tests:
 	set -e && $(MAKE) doctests && $(MAKE) unittests && $(MAKE) coverage
 
 tests_no_docker: 
 	@echo "Running environment cleanup for invalid distributions (dry-run will be skipped, applying changes)..."
-	python scripts/cleanup_invalid_dist.py --apply || true && \
-	set -e && $(MAKE) doctests_no_docker && $(MAKE) unittests  
+	@if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
+	set -e && $(MAKE) $$DOCTESTS_TARGET && $(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS"
 
-# Fast test target: run doctests and unittests concurrently
+# Fast test target: run doctests, unittests, booktests concurrently
 tests_fast:
 	@echo "Running fast tests: doctests and unittests concurrently (splitting CPU cores)."
-	python scripts/cleanup_invalid_dist.py --apply || true
-	set -e; \
-	( $(MAKE) doctests_no_docker ) & \
-	( $(MAKE) unittests ) & \
-	( $(MAKE) booktests_parallel_no_docker ) & \
+	@make clean_local_only_files clean_coverage && \
+	if [ "$(WITH_MPMC)" = "1" ] || [ "$(HAS_MPMC)" = "1" ]; then \
+		DOCTESTS_TARGET=doctests_no_docker; \
+		UNITTESTS_ARGS=""; \
+	else \
+		DOCTESTS_TARGET=doctests_no_docker_no_mpmc; \
+		UNITTESTS_ARGS="--ignore=test/test_dd_mpmc.py"; \
+	fi && \
+	set -e && \
+	$(MAKE) $$DOCTESTS_TARGET & \
+	$(MAKE) unittests PYTEST_EXTRA_ARGS="$$UNITTESTS_ARGS" & \
+	$(MAKE) booktests_parallel_no_docker  & \
 	wait
 	$(MAKE) coverage
 
@@ -222,7 +265,7 @@ coverage_html: ensure_artifacts
 	python -m coverage html -d $(UNIT_COV_DIR)/html
 
 delcoverage:
-	@rm -f .coverage coverage.json
+	@rm -f .coverage coverage.json test/booktests/.coverage
 	@rm -rf $(COV_DIR)
 	@rm -rf .pytest_cache
 
@@ -254,20 +297,68 @@ uml:
 
 ##########################################################
 # Documentation with `mkdocs`
-# run ` mkdocs build -v` to debug
+#
+# Run ` mkdocs build -v` to debug. It generates HTML in site/ folder. 
+# You can enter `open site.index.html` to open the local pages in  browser. 
+# (However, the search function may be slow.)
+#
+# Use `mkdocs serve` to run a local server. The webpages are stored in a temporary folder and will be deleted when the server is stopped.
 ##########################################################
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
+	@rm -rf docs/paper docs/demos
 	@cp README.md docs/README.md 
+	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
+	@perl -0pi -e 's!\(docs/qmc-software\.md\)!\(qmc-software.md\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md 
+	@# Rewrite repo-root-relative link for the copied MkDocs page.
+	@perl -0pi -e 's!\(docs/good_practices\.md\)!\(good_practices.md\)!g' docs/CONTRIBUTING.md
+	@perl -0pi -e 's!\(docs/ai-assisted-contributions\.md\)!\(ai-assisted-contributions.md\)!g' docs/CONTRIBUTING.md
 	@cp community.md docs/community.md 
 	@cp -r demos docs
+	@find docs/demos -mindepth 2 -name README.md -delete
 	@cp -r paper docs
+	@rm -f docs/paper/README.md
+	@./scripts/render_paper_for_mkdocs.sh
 	@cp test/booktests/README.md docs/booktests.md
 	@cp test/README.md docs/tests.md
+	@python scripts/make_qmc_software_page.py
+	@mkdir -p docs/stats
+	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
+	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
+	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
+	@cp docs/assets/logos/qmcpy_logo.png docs/favicon.ico
+	@cp QMCPy_Shared_Leadership.md docs/
 
-runmkdocserve: 
-	@mkdocs serve
+runmkdocserve:
+	@PORT=$${MKDOCS_PORT:-8000}; \
+	while lsof -iTCP:$$PORT -sTCP:LISTEN >/dev/null 2>&1; do \
+		PORT=$$((PORT+1)); \
+	done; \
+	echo "Starting mkdocs on http://127.0.0.1:$$PORT"; \
+	NO_MKDOCS_2_WARNING=1 JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
+	NO_MKDOCS_2_WARNING=1 JUPYTER_PLATFORM_DIRS=1 mkdocs serve -a 127.0.0.1:$$PORT
 	
 doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
+
+##########################################################
+# PEP8
+##########################################################
+check_pep8:
+	@pylint qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
+
+pep8: update_pep8_badge
+
+update_pep8_badge:
+	@mkdir -p $(LOG_DIR) docs/assets
+	@make check_pep8 > $(LOG_DIR)/pylint.out
+	@python3 scripts/update_pep8_badge.py $(LOG_DIR)/pylint.out docs/assets/pep8-badge.json docs/assets/pep8-badge.svg
+
+
+##########################################################
+# Formatting
+##########################################################
+
+markdown-unwrap:
+	$(PYTHON) scripts/unwrap_markdown.py "$(MARKDOWN_UNWRAP_PATH)"

@@ -302,17 +302,15 @@ class GeometricBrownianMotion(BrownianMotion):
     ) -> Union[ndarray, Tuple[ndarray, ndarray]]:
         """
         Generate GBM samples using the parent's transform pipeline.
-
+        
         Args:
             n (int): number of samples to generate
             n_min (int): minimum index of sequence
-            n_max (int): maximum index of sequence
+            n_max (int): maximum index of sequence  
             return_weights (bool): whether to return Jacobian weights
             warn (bool): whether to warn about sample generation
-
+            
         Returns:
-            np.ndarray or tuple: GBM samples, or tuple of (samples, weights) if return_weights=True
+            samples (Union[ndarray,tuple]): GBM samples, optionally with weights if return_weights=True
         """
-        return super().gen_samples(
-            n=n, n_min=n_min, n_max=n_max, return_weights=return_weights, warn=warn
-        )
+        return super().gen_samples(n=n, n_min=n_min, n_max=n_max, return_weights=return_weights, warn=warn)

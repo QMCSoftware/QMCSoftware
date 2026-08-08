@@ -1,4 +1,3 @@
-import qmctoolscl
 import numpy as np
 import scipy.fft
 import itertools

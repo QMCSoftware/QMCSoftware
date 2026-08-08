@@ -3,6 +3,8 @@ from qmcpy.util import *
 import numpy as np
 import scipy.stats
 import unittest
+from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
+from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
 
 
 class TestTrueMeasure(unittest.TestCase):
@@ -131,6 +133,57 @@ class TestMatern(unittest.TestCase):
         kernel2 = gp.kernels.Matern(length_scale=4, nu=2.5)
         cov2 = 0.01 * kernel2.__call__(points) + 1e-6 * np.eye(m2.covariance.shape[-1])
         assert np.allclose(cov2, m2.covariance)
+
+class TestUniformTriangle(unittest.TestCase):
+    """Tests for UniformTriangle and _UniformTriangleAdapter."""
+
+    def test_basic_usage_and_dim_error(self):
+        tm = UniformTriangle(sampler=DigitalNetB2(2, seed=7))
+        x = tm(8)
+        self.assertEqual(x.shape, (8, 2))
+        self.assertTrue(np.all(x[:, 1] <= x[:, 0]))
+
+        with self.assertRaises(DimensionError):
+            tm._joint.transform(np.ones((4, 3)))
+
+    def test_adapter_transform(self):
+        adapter = _UniformTriangleAdapter()
+        u = np.array([[0.25, 0.5], [0.64, 0.75], [0.01, 0.9]])
+        x = adapter.transform(u)
+        self.assertEqual(x.shape, (3, 2))
+        # y = u2 * sqrt(u1) <= sqrt(u1) = x  always since u2 in [0,1]
+        self.assertTrue(np.all(x[:, 1] <= x[:, 0] + 1e-12))
+
+    def test_adapter_transform_dim_error(self):
+        adapter = _UniformTriangleAdapter()
+        # Wrong last dimension (3 instead of 2)
+        self.assertRaises(DimensionError, adapter.transform, np.ones((4, 3)))
+
+    def test_adapter_logpdf_inside(self):
+        adapter = _UniformTriangleAdapter()
+        # Points inside the triangle (y <= x, x in [0,1])
+        x = np.array([[0.5, 0.3], [0.8, 0.0], [1.0, 0.5]])
+        lp = adapter.logpdf(x)
+        self.assertEqual(lp.shape, (3,))
+        self.assertTrue(np.all(np.isfinite(lp)))
+
+    def test_adapter_logpdf_outside(self):
+        adapter = _UniformTriangleAdapter()
+        # Points outside the triangle (y > x)
+        x = np.array([[0.3, 0.5]])
+        lp = adapter.logpdf(x)
+        self.assertEqual(lp[0], -np.inf)
+
+    def test_adapter_logpdf_dim_error(self):
+        adapter = _UniformTriangleAdapter()
+        self.assertRaises(DimensionError, adapter.logpdf, np.ones((4, 3)))
+
+    def test_adapter_logpdf_batched(self):
+        adapter = _UniformTriangleAdapter()
+        u = np.random.default_rng(42).uniform(size=(5, 2))
+        x = adapter.transform(u)
+        lp = adapter.logpdf(x)
+        self.assertEqual(lp.shape, (5,))
 
 
 class TestGaussian(unittest.TestCase):
@@ -547,6 +600,161 @@ class TestGeometricBrownianMotion(unittest.TestCase):
             lazy_load=False,
         )
         self.assertIsNotNone(gbm_eager._log_mvn_scipy_cache)
+
+
+class TestAcceptanceRejection(unittest.TestCase):
+    """Unit tests for AcceptanceRejection and AcceptanceRejectionReal."""
+
+    def setUp(self):
+        from qmcpy.true_measure import AcceptanceRejection, AcceptanceRejectionReal
+        from scipy.stats import norm
+        self.AcceptanceRejection = AcceptanceRejection
+        self.AcceptanceRejectionReal = AcceptanceRejectionReal
+        self.norm = norm
+        self.seed = 7
+
+        def psi(x): return 2 * x[:, 0]
+        self.psi = psi
+
+        def psi_real(z): return norm.pdf(z[:, 0], loc=0, scale=1)
+        def H(z): return norm.pdf(z[:, 0], loc=0, scale=2)
+        self.psi_real = psi_real
+        self.H = H
+        self.inv_cdfs = [lambda u: norm.ppf(u, loc=0, scale=2)]
+
+    def _make_ar(self, seed=None):
+        seed = seed if seed is not None else self.seed
+        return self.AcceptanceRejection(
+            DigitalNetB2(dimension=2, seed=seed),
+            self.psi, upper_bound=2., density_integral=1.
+        )
+
+    def _make_ar_real(self, seed=None):
+        seed = seed if seed is not None else self.seed
+        return self.AcceptanceRejectionReal(
+            DigitalNetB2(dimension=2, seed=seed),
+            self.psi_real,
+            inv_cdfs=self.inv_cdfs,
+            H_func=self.H,
+            upper_bound=2., density_integral=1.
+        )
+
+    # --- AcceptanceRejection tests ---
+
+    def test_basic_shape(self):
+        """gen_samples(n=64) returns shape (64, 1)."""
+        samples = self._make_ar().gen_samples(n=64, warn=False)
+        self.assertEqual(samples.shape, (64, 1))
+
+    def test_samples_in_unit_interval(self):
+        """All accepted samples lie in [0, 1]."""
+        samples = self._make_ar().gen_samples(n=256, warn=False)
+        self.assertTrue((samples >= 0).all() and (samples <= 1).all())
+
+    def test_mean_convergence(self):
+        """Sample mean should be close to the true mean of 2/3."""
+        samples = self._make_ar().gen_samples(n=1024, warn=False)
+        self.assertAlmostEqual(samples.mean(), 2/3, delta=0.05)
+
+    def test_return_weights(self):
+        """return_weights=True gives samples and positive weights of correct shape."""
+        s, w = self._make_ar().gen_samples(n=64, return_weights=True, warn=False)
+        self.assertEqual(s.shape, (64, 1))
+        self.assertEqual(w.shape, (64,))
+        self.assertTrue(np.all(w > 0))
+
+    def test_continued_sampling_matches_single_call(self):
+        """Two batches via n_min/n_max equal one single call."""
+        m1 = self._make_ar()
+        b1 = m1.gen_samples(n_min=0, n_max=8)
+        b2 = m1.gen_samples(n_min=8, n_max=16)
+
+        m2 = self._make_ar()
+        all_at_once = m2.gen_samples(n_min=0, n_max=16)
+
+        np.testing.assert_array_almost_equal(
+            np.concatenate([b1, b2]), all_at_once
+        )
+
+    def test_n_resets_driver(self):
+        """Calling gen_samples(n=8) twice gives same result (driver resets)."""
+        m = self._make_ar()
+        s1 = m.gen_samples(n=8)
+        s2 = m.gen_samples(n=8)
+        np.testing.assert_array_equal(s1, s2)
+
+    def test_n_max_without_n_min(self):
+        """Calling with only n_max (no n_min) works and returns correct shape."""
+        s = self._make_ar().gen_samples(n_max=64, warn=False)
+        self.assertEqual(s.shape, (64, 1))
+
+    def test_error_n_min_without_prior_call(self):
+        """n_min > 0 without a prior call raises ParameterError."""
+        m = self._make_ar()
+        with self.assertRaises(ParameterError):
+            m.gen_samples(n_min=4, n_max=8)
+
+    def test_error_invalid_upper_bound(self):
+        """upper_bound <= 0 raises ParameterError."""
+        with self.assertRaises(ParameterError):
+            self.AcceptanceRejection(
+                DigitalNetB2(dimension=2, seed=self.seed),
+                self.psi, upper_bound=0., density_integral=1.
+            )
+
+    def test_error_invalid_density_integral(self):
+        """density_integral <= 0 raises ParameterError."""
+        with self.assertRaises(ParameterError):
+            self.AcceptanceRejection(
+                DigitalNetB2(dimension=2, seed=self.seed),
+                self.psi, upper_bound=2., density_integral=0.
+            )
+
+    def test_error_sampler_dimension_too_small(self):
+        """Sampler dimension < 2 raises ParameterError."""
+        with self.assertRaises(ParameterError):
+            self.AcceptanceRejection(
+                DigitalNetB2(dimension=1, seed=self.seed),
+                self.psi, upper_bound=2., density_integral=1.
+            )
+
+    # --- AcceptanceRejectionReal tests ---
+
+    def test_real_basic_shape(self):
+        """AcceptanceRejectionReal gen_samples(n=64) returns shape (64, 1)."""
+        samples = self._make_ar_real().gen_samples(n=64, warn=False)
+        self.assertEqual(samples.shape, (64, 1))
+
+    def test_real_mean_and_std(self):
+        """Sample mean and std should be close to N(0,1) values."""
+        samples = self._make_ar_real().gen_samples(n=512, warn=False)
+        self.assertAlmostEqual(samples.mean(), 0.0, delta=0.1)
+        self.assertAlmostEqual(samples.std(), 1.0, delta=0.1)
+
+    def test_real_continued_sampling_shapes(self):
+        """AcceptanceRejectionReal continued sampling returns correct shapes."""
+        m = self._make_ar_real()
+        b1 = m.gen_samples(n_min=0, n_max=8)
+        b2 = m.gen_samples(n_min=8, n_max=16)
+        self.assertEqual(b1.shape, (8, 1))
+        self.assertEqual(b2.shape, (8, 1))
+
+    def test_real_error_n_min_without_prior_call(self):
+        """AcceptanceRejectionReal n_min > 0 without prior call raises ParameterError."""
+        m = self._make_ar_real()
+        with self.assertRaises(ParameterError):
+            m.gen_samples(n_min=8, n_max=16)
+
+    def test_real_error_inv_cdfs_length_mismatch(self):
+        """inv_cdfs length != target_dim raises ParameterError."""
+        with self.assertRaises(ParameterError):
+            self.AcceptanceRejectionReal(
+                DigitalNetB2(dimension=2, seed=self.seed),
+                self.psi_real,
+                inv_cdfs=[],  # wrong length
+                H_func=self.H,
+                upper_bound=2., density_integral=1.
+            )
 
 
 if __name__ == "__main__":

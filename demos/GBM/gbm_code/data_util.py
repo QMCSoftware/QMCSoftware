@@ -254,7 +254,7 @@ def extract_comparison_data(results_df: pd.DataFrame) -> tuple:
         else None
     )
 
-    # Get QuantLib data (only available for some samplers
+    # Get QuantLib data (only available for some samplers)
     ql_error_dict = dict(
         zip(quantlib_data["Sampler"], quantlib_data["Mean Absolute Error"])
     )

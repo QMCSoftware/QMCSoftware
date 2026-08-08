@@ -192,7 +192,7 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
                     error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
                     ```
             alpha (np.ndarray): Uncertainty level in $(0,1)$.
-            ptransform (str): Periodization transform, see the options in [`AbstractIntegrand.f`][qmcpy.AbstractIntegrand.f].
+            ptransform (str): Periodization transform, see the options in `AbstractIntegrand.f`.
             errbd_type (str): Options are
 
                 - `'MLE'`: Marginal Log Likelihood.
@@ -245,9 +245,9 @@ class CubQMCBayesLatticeG(AbstractCubBayesLDG):
             elif b_order == 4:
                 bern_poly = lambda x: (((x * (1 - x)) ** 2) - 1 / 30)
             else:
-                print("Error: Bernoulli order not implemented !")
+                raise ParameterError("Bernoulli order not implemented")
 
-            kernel_func = lambda x: bern_poly(x)
+            kernel_func = bern_poly
         else:
             b = order
             kernel_func = (

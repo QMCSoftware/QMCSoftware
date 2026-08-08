@@ -1,7 +1,6 @@
 from .abstract_discrete_distribution import AbstractIIDDiscreteDistribution
 from ..util import ParameterError, ParameterWarning
 import numpy as np
-from typing import Union
 import warnings
 
 
@@ -65,7 +64,7 @@ class IIDStdUniform(AbstractIIDDiscreteDistribution):
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if n_min > 0 and warn:
-            raise warnings.warn(
+            warnings.warn(
                 "For IIDStdUniform setting n_min>0 makes no difference as new samples are generated every call regardless, e.g., calling gen_samples(n_min=0,n_max=4) twice will give different samples.",
                 ParameterWarning,
             )

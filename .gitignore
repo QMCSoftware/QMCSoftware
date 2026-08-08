@@ -1,7 +1,12 @@
 # General Python
+.cache/
+PATH
 .pdm-python
-*raw.githubusercontent.com*
+.pytest_cache/
+raw.githubusercontent.com/*
 packages.svg
+classes.svg
+*.dot
 .pypirc
 test_readme.py
 github.com/QMCSoftware/LDData/
@@ -12,8 +17,6 @@ coverage.json
 *.csv
 *hparams.yaml
 *.ipynb_checkpoints/
-demos/fgpr_figs/
-demos/GBM/images/*.png
 *__pycache__/
 qmcpy.egg-info/
 *.blg
@@ -25,12 +28,22 @@ qmcpy.egg-info/
 *.pyc
 *.vrb
 *.npy
+*.pkl
+*.gz
 .DS_Store
 .idea/
-.pytest_cache/
-demos/prob_failure_gp_ci_plots/
-raw.githubusercontent.com/*
 demos/.jupyter
+demos/prob_failure_gp_ci_plots/
+demos/fgpr_figs/
+demos/GBM/images/*.png
+demos/GBM/outputs/*.*
+
+# Generated notebook/demo images
+figures/
+*.png
+*.jpg
+*.jpeg
+*.svg
 
 # tests
 .coverage
@@ -67,6 +80,7 @@ coverage-data/*
 docs/_site
 docs/Gemfile.lock
 site/
+/.cache
 
 # Sphinx
 sphinx/_build/
@@ -79,7 +93,6 @@ sphinx/*.jpg
 
 # Jupyter Notebooks
 *checkpoint.ipynb
-*.png
 *.eps
 
 # release
@@ -113,3 +126,8 @@ _ags/*
 /sc_*
 sc_*
 
+
+/qmc-software.html
+/qmc-software_files/
+/.quarto-watch-logs/
+.venv_new/

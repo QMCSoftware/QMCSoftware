@@ -3,10 +3,9 @@ from ...util import ParameterError, ParameterWarning
 import qmctoolscl
 import numpy as np
 from numpy.lib.npyio import DataSource
-from os.path import dirname, abspath, isfile
+from os.path import dirname, abspath
 import warnings
 from copy import deepcopy
-from typing import Union
 
 
 class Lattice(AbstractLDDiscreteDistribution):

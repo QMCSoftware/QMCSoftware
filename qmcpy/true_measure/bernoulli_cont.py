@@ -1,8 +1,7 @@
 from .abstract_true_measure import AbstractTrueMeasure
-from ..util import DimensionError, ParameterError
+from ..util import DimensionError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
-from typing import Union
 
 
 class BernoulliCont(AbstractTrueMeasure):

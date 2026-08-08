@@ -32,7 +32,7 @@ def _univ_repr(qmc_object, abc_class_name, attributes):
             elif isinstance(val, list):
                 try:
                     val = np.array(val).copy()
-                except:
+                except Exception:
                     pass
             elif isinstance(val, np.ndarray):
                 val = val.copy().squeeze()

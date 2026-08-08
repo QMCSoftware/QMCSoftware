@@ -1,7 +1,7 @@
 from .abstract_integrand import AbstractIntegrand
-from ..discrete_distribution import DigitalNetB2
-from ..true_measure import Gaussian, Uniform
-import numpy as np
+from ..discrete_distribution import DigitalNetB2  #pylint: disable=unused-import
+from ..true_measure import Gaussian, Uniform  #pylint: disable=unused-import
+import numpy as np  #pylint: disable=unused-import
 
 
 class CustomFun(AbstractIntegrand):

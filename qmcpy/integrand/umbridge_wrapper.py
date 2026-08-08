@@ -64,7 +64,7 @@ class UMBridgeWrapper(AbstractIntegrand):
         [['-1.59e-08', '1.49e-04', '1.49e-04'], ['8.20e-06', '-1.38e-04'], ['-8.14e-06']]
     """
 
-    def __init__(self, true_measure, model, config={}, parallel=False):
+    def __init__(self, true_measure, model, config=None, parallel=False):
         """
         Args:
             true_measure (AbstractTrueMeasure): The true measure.
@@ -77,6 +77,8 @@ class UMBridgeWrapper(AbstractIntegrand):
 
                 Setting `parallel=True` is equivalent to `parallel = os.cpu_count()`.
         """
+        if config is None:
+            config = {}
         import umbridge
 
         self.parameters = []
@@ -129,7 +131,7 @@ class UMBridgeWrapper(AbstractIntegrand):
                 )
         return y[0] if self.total_out_elements == 1 else y
 
-    def _spawn(self, level, sampler):
+    def _spawn(self, _level, _sampler):
         return UMBridgeWrapper(
             true_measure=self.true_measure,
             model=self.model,

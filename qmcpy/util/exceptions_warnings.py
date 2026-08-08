@@ -1,4 +1,3 @@
-import warnings
 
 # def custom_formatwarning(msg, *args, **kwargs):
 #     # ignore everything except the message

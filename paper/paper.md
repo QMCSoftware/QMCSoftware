@@ -72,9 +72,9 @@ Monte Carlo (MC) methods estimate high-dimensional integrals by computing sample
 - **intuitive APIs** for (Q)MC components,
 - **flexible integrations** with `NumPy` [@harris2020array], `SciPy` [@2020SciPy-NMeth], and `PyTorch` [@NEURIPS2019_9015],
 - **robust and adaptive sampling** with theoretically grounded error estimation, and
-- **extensible (Q)MC components** enabling researchers to implement and test new algorithms.
+- **extensible components** enabling researchers to implement and test new algorithms.
 
-While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol' and Halton, `QMCPy` provides (Q)MC researchers and practitioners an end-to-end research framework with additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
+While popular modules like `scipy.stats.qmc` [@Roy2023] and `torch.quasirandom` [@NEURIPS2019_9015] provide basic (Q)MC sequences such as Sobol' and Halton, `QMCPy` provides (Q)MC researchers and practitioners an end-to-end framework with additional capabilities to enable state-of-the-art (Q)MC techniques. Advanced features unique to `QMCPy` include
 
 - customizable LD sequences with diverse randomization techniques,
 - efficient generators of LD sequences with multiple independent randomizations,
@@ -130,5 +130,7 @@ MC methods use IID $\mathbf{X}_1,\dots,\mathbf{X}_n$ and have error $|\widehat{\
 The authors acknowledge support from the U.S. National Science Foundation grant DMS-2316011 and the Department of Energy Office of Science Graduate Student Research Program. We thank the international (Q)MC research community as well as JOSS reviewers and editors for invaluable and timely feedback and support.
 
 This article has been co-authored by employees of National Technology and Engineering Solutions of Sandia, LLC under Contract No. DE-NA0003525 with the U.S. Department of Energy (DOE). The employees co-own right, title and interest in and to the article and are responsible for its contents. The United States Government retains and the publisher, by accepting the article for publication, acknowledges that the United States Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this article or allow others to do so, for United States Government purposes. The DOE will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan ([https://www.energy.gov/downloads/doe-public-access-plan](https://www.energy.gov/downloads/doe-public-access-plan)).
+
+AS is partially supported by DARPA The Right Space HR0011-25-9-0031.
 
 # References

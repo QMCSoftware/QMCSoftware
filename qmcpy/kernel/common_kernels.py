@@ -14,7 +14,6 @@ class AbstractKernelGaussianSE(AbstractKernelScaleLengthscales):
     def parsed_single_integral_01d(self, x, batch_params):
         s = batch_params["scale"][..., 0]
         l = batch_params["lengthscales"]
-        nls = l.shape[-1]
         norm_class = (
             self.npt.distributions.Normal if self.torchify else scipy.stats.norm
         )
@@ -456,9 +455,9 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
         scale=1.0,
         lengthscales=1.0,
         alpha=1.0,
-        shape_scale=[1],
+        shape_scale=None,
         shape_lengthscales=None,
-        shape_alpha=[1],
+        shape_alpha=None,
         tfs_scale=(tf_exp_eps_inv, tf_exp_eps),
         tfs_lengthscales=(tf_exp_eps_inv, tf_exp_eps),
         tfs_alpha=(tf_exp_eps_inv, tf_exp_eps),
@@ -468,7 +467,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
         requires_grad_alpha=True,
         device="cpu",
         compile_call=False,
-        comiple_call_kwargs={},
+        compile_call_kwargs=None,
     ):
         r"""
         Args:
@@ -488,8 +487,14 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_alpha (bool): If `True` and `torchify`, set `requires_grad=True` for `alpha`.
             device (torch.device): If `torchify`, put things onto this device.
             compile_call (bool): If `True`, `torch.compile` the `parsed___call__` method.
-            comiple_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
+            compile_call_kwargs (dict): When `compile_call` is `True`, pass these keyword arguments to `torch.compile`.
         """
+        if shape_scale is None:
+            shape_scale = [1]
+        if shape_alpha is None:
+            shape_alpha = [1]
+        if compile_call_kwargs is None:
+            compile_call_kwargs = {}
         super().__init__(
             d=d,
             scale=scale,
@@ -503,7 +508,7 @@ class KernelRationalQuadratic(AbstractKernelScaleLengthscales):
             requires_grad_lengthscales=requires_grad_lengthscales,
             device=device,
             compile_call=compile_call,
-            comiple_call_kwargs=comiple_call_kwargs,
+            compile_call_kwargs=compile_call_kwargs,
         )
         self.raw_alpha = self.parse_assign_param(
             pname="alpha",

@@ -4,7 +4,6 @@ Conservatively convert inline $...$ math to \(...\) in .md files and notebook ma
 Skips code fences and inline code spans. Only replaces $...$ where the interior
 contains at least one backslash, brace, caret, underscore, letter, or digit (likely math).
 """
-import io
 import json
 import re
 import sys

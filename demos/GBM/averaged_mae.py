@@ -13,8 +13,8 @@ def _compute_mae(
     sampler: str,
     sweep_type: str,
     replications: int = 5,
-    qp_seed: int = 42,
-    ql_seed: int = 7,
+    qp_seed: int = cf.QMCPY_SEED,
+    ql_seed: int = cf.QUANTLIB_SEED,
 ) -> tuple:
     """
     Compute averaged MAE for a given sweep type (paths or steps).
@@ -115,8 +115,8 @@ def compute_mae_vs_paths(
     method: str,
     sampler: str,
     replications: int = 5,
-    qp_seed: int = 42,
-    ql_seed: int = 7,
+    qp_seed: int = cf.QMCPY_SEED,
+    ql_seed: int = cf.QUANTLIB_SEED,
 ) -> tuple:
     """
     Compute averaged MAE vs number of paths for all samplers.
@@ -143,8 +143,8 @@ def compute_mae_vs_steps(
     method: str,
     sampler: str,
     replications: int = 5,
-    qp_seed: int = 42,
-    ql_seed: int = 7,
+    qp_seed: int = cf.QMCPY_SEED,
+    ql_seed: int = cf.QUANTLIB_SEED,
 ) -> tuple:
     """
     Compute averaged MAE vs number of time steps for all samplers.

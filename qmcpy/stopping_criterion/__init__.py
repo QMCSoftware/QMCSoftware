@@ -20,19 +20,19 @@ except ImportError:
 
     class PFGPCI(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ModuleNotFoundError(
                 "PFGPCI requires torch and gpytorch but no installations found"
             )
 
     class PFSampleErrorDensityAR(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ModuleNotFoundError(
                 "PFSampleErrorDensityAR requires torch and gpytorch but no installations found"
             )
 
     class SuggesterSimple(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ModuleNotFoundError(
                 "SuggesterSimple requires torch and gpytorch but no installations found"
             )
 

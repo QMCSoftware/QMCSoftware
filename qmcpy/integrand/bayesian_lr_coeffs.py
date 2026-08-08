@@ -1,10 +1,6 @@
 from .abstract_integrand import AbstractIntegrand
-from ..discrete_distribution import DigitalNetB2
-from ..true_measure import Gaussian, Lebesgue, Uniform
-from ..discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
-from ..true_measure.abstract_true_measure import AbstractTrueMeasure
+from ..discrete_distribution import DigitalNetB2  #pylint: disable=unused-import
+from ..true_measure import Gaussian
 from ..util import ParameterError
 import numpy as np
 
@@ -64,14 +60,14 @@ class BayesianLRCoeffs(AbstractIntegrand):
         obs, dm1 = self.feature_array.shape
         self.num_coeffs = dm1 + 1
         if self.num_coeffs != self.true_measure.d:
-            ParameterError(
+            raise ParameterError(
                 "sampler must have dimension one more than the number of features in the feature_array."
             )
         if (
             self.response_vector.shape != (obs,)
             or ((self.response_vector != 0) & (self.response_vector != 1)).any()
         ):
-            ParameterError(
+            raise ParameterError(
                 "response_vector must have the same length as feature_array and contain only 0 or 1 entries."
             )
         self.feature_array = np.column_stack((self.feature_array, np.ones((obs, 1))))

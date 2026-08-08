@@ -1,13 +1,9 @@
 from ..util import (
     ParameterError,
-    ParameterWarning,
     MethodImplementationError,
     _univ_repr,
-    DimensionError,
 )
-import warnings
 import numpy as np
-from typing import Union
 
 
 class AbstractDiscreteDistribution(object):

@@ -5,7 +5,6 @@ from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
-from ..true_measure import Gaussian, BrownianMotion, Uniform
 from ..integrand import FinancialOption, Linear0, AbstractIntegrand
 from ..util import MaxSamplesWarning, ParameterError
 import numpy as np
@@ -135,8 +134,8 @@ class CubMCCLT(AbstractStoppingCriterion):
         n_limit=2**30,
         inflate=1.2,
         alpha=0.01,
-        control_variates=[],
-        control_variate_means=[],
+        control_variates=None,
+        control_variate_means=None,
     ):
         r"""
         Args:
@@ -150,6 +149,10 @@ class CubMCCLT(AbstractStoppingCriterion):
             control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
             control_variate_means (np.ndarray): Means of each control variate.
         """
+        if control_variates is None:
+            control_variates = []
+        if control_variate_means is None:
+            control_variate_means = []
         self.parameters = [
             "abs_tol",
             "rel_tol",
@@ -180,27 +183,7 @@ class CubMCCLT(AbstractStoppingCriterion):
         )
         assert self.integrand.d_indv == ()
         # control variates
-        self.cv_mu = np.atleast_1d(control_variate_means)
-        self.cv = control_variates
-        if isinstance(self.cv, AbstractIntegrand):
-            self.cv = [self.cv]
-            self.cv_mu = self.cv_mu[None, ...]
-        assert isinstance(
-            self.cv, list
-        ), "cv must be a list of AbstractIntegrand objects"
-        for cv in self.cv:
-            if (
-                (not isinstance(cv, AbstractIntegrand))
-                or (cv.discrete_distrib != self.discrete_distrib)
-                or (cv.d_indv != self.integrand.d_indv)
-            ):
-                raise ParameterError(
-                    """
-                        Each control variates discrete distribution must be an AbstractIntegrand instance 
-                        with the same discrete distribution as the main integrand. d_indv must also match 
-                        that of the main integrand instance for each control variate."""
-                )
-        self.ncv = len(self.cv)
+        self._init_control_variates(control_variates, control_variate_means)
         if self.ncv > 0:
             assert self.cv_mu.shape == (
                 (self.ncv,) + self.integrand.d_indv
@@ -208,18 +191,19 @@ class CubMCCLT(AbstractStoppingCriterion):
             self.parameters += ["cv", "cv_mu"]
         self.z_star = -norm.ppf(self.alpha / 2.0)
 
-    def integrate(self):
+    def _get_main_stage_samples(self, data):
+        y = np.array(data.yfull[self.n_init :], copy=False)
+        if self.ncv == 0:
+            return y
+        ycv = np.array(data.ycvfull[:, self.n_init :], copy=False)
+        return y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
+
+    def integrate(self, resume=None):
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "bound_low",
-                "bound_high",
-                "bound_diff",
-                "n_total",
-                "time_integrate",
-            ]
-        )
+        trace = self._make_trace_logger()
+        if resume is not None:
+            raise ParameterError("CubMCCLT does not support resume.")
+        data = Data(parameters=["solution", "bound_low", "bound_high", "bound_diff", "n_total", "time_integrate"])
         data.xfull = np.empty((0, self.integrand.d))
         data.yfull = np.empty(0)
         if self.ncv > 0:
@@ -283,11 +267,10 @@ class CubMCCLT(AbstractStoppingCriterion):
         data.bound_high = data.solution + data.bound_half_width
         data.bound_diff = data.bound_high - data.bound_low
         data.n_total = self.n_init + data.n_mu
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._set_elapsed_time(data, time() - t_start)
+        trace.iteration(data)
+        self._finalize_integration_data(data, time() - t_start)
+        trace.finalize()
         return data.solution, data
 
     def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
