@@ -3,6 +3,7 @@ import numpy as np
 def lattice_vector_wssd_search(n_max, d_max, coord_weights=None, kernel=None):
     """
     CBC search method for finding a lattice rule minimizing the WSSD.
+
     Args:
         n_max (int): The maximum number of points the lattice rule is optimized for.
         d_max (int): The dimension of the lattice rule.
@@ -10,27 +11,31 @@ def lattice_vector_wssd_search(n_max, d_max, coord_weights=None, kernel=None):
         kernel (callable, optional): The kernel used to compute the discrepancy. Should accept a single argument and return a scalar. Defaults to the second Bernoulli polynomial.
     Returns:
         gen_vec (array-like): The generating vector of the lattice that minimizes the WSSD.
+
     Time cost:
         The time cost of the search is O(d_max * n_max * log(n_max)), though the contribution of d_max is smaller until around d_max = 100.
     Note:
         Uses sample weights of w_n = n for n = 1,...,n_max when calculating the WSSD.
     
     Examples:
-        >>> lattice_vector_wssd_search(n_max = 2**10, d_max = 5)
-        array([1, 403, 361, 281, 421])
-        >>> lattice_vector_wssd_search(n_max = 2**15, d_max = 10)
-        array([1, 4825, 13541, 15249, 15405, 9909, 7493, 11407, 14819, 10089])
+        >>> lattice_vector_wssd_search(n_max=2**10, d_max=5)
+        array([  1, 403, 361, 281, 421])
+        >>> lattice_vector_wssd_search(n_max=2**15, d_max=10)
+        array([    1,  4825, 13541, 15249, 15405,  9909,  7493, 11407, 14819,
+               10089])
         
         Custom coordinate weights
 
-        >>> lattice_vector_wssd_search(n_max = 2**15, d_max = 10, coord_weights = [j**(-1) for j in range(1, 6)])
-        array([1, 4825, 13541, 15249, 7311, 10339, 5933, 6307, 14729, 13037])
+        >>> lattice_vector_wssd_search(n_max=2**15, d_max=10, coord_weights=[j**(-1) for j in range(1, 11)])
+        array([    1,  4825, 13541, 15249,  7311, 10339,  5933,  6307, 14729,
+               13037])
 
         Custom kernels
 
         >>> bernoulli6 = lambda x: x**6 - 3 * x**5 + 5 / 2 * x**4 - 1 / 2 * x**2 + 1 / 42
-        >>> lattice_vector_wssd_search(n_max = 2**15, d_max = 10, coord_weights = None, kernel = bernoulli6)
-        array([1, 1635, 6875, 8665, 8531, 1361, 11771, 10987, 2805, 9961])
+        >>> lattice_vector_wssd_search(n_max=2**15, d_max=10, coord_weights=None, kernel=bernoulli6)
+        array([    1,  1635,  6875,  8665,  8531,  1361, 11771, 10987,  2805,
+                9961])
     """
 
     if kernel is None:
