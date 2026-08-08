@@ -62,8 +62,8 @@ class Uniform(AbstractTrueMeasure):
             lower_bound = np.tile(self.lower_bound, self.d)
         if np.isscalar(self.upper_bound):
             upper_bound = np.tile(self.upper_bound, self.d)
-        self.a = np.array(lower_bound)
-        self.b = np.array(upper_bound)
+        self.a = np.array(lower_bound, dtype=np.float64)
+        self.b = np.array(upper_bound, dtype=np.float64)
         if len(self.a) != self.d or len(self.b) != self.d:
             raise DimensionError(
                 "upper bound and lower bound must be of length dimension"
