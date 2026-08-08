@@ -69,7 +69,8 @@ class Hammersley(DigitalNetAnyBases):
                  dimension=1,
                  seed=None,
                  t=None,
-                 n_lim=2**32
+                 n_lim=2**32,
+                 warn = True
                 ):
         r"""
         Args:
@@ -118,6 +119,7 @@ class Hammersley(DigitalNetAnyBases):
                 warn=False)
         else:
             self.halton = None
+        self.warn = warn
 
     def _gen_samples(self, n_min, n_max, return_binary, warn):
         if return_binary:
