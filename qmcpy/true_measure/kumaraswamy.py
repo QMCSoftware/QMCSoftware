@@ -17,15 +17,21 @@ class Kumaraswamy(AbstractTrueMeasure):
                [0.0577568 , 0.36189538],
                [0.76344358, 0.0932949 ],
                [0.17065545, 0.43009386]])
-        >>> true_measure
+
+        The covariance is diagonal, so it is stored and shown in sparse form.
+
+        >>> true_measure  # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         Kumaraswamy (AbstractTrueMeasure)
             a               [1 2]
             b               [3 4]
             mean            [0.25  0.406]
             variance        [0.037 0.035]
             standard_deviation [0.194 0.187]
-            covariance      [[0.037 0.   ]
-                             [0.    0.035]]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                with 2 stored elements (1 diagonals) and shape (2, 2)>
+                Coords Values
+                (0, 0) 0.0374...
+                (1, 1) 0.0348...
 
         With independent replications
 

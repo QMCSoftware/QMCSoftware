@@ -35,6 +35,7 @@ class AbstractTrueMeasure(object):
         self._variance = self._read_only_array(variance)
         self._standard_deviation = self._read_only_array(standard_deviation)
         if sparse.issparse(covariance):
+            covariance.data.setflags(write=False)
             self._covariance = covariance
         else:
             self._covariance = self._read_only_array(covariance)
@@ -73,7 +74,7 @@ class AbstractTrueMeasure(object):
     def covariance(self):
         covariance = self._covariance
         if sparse.issparse(covariance):
-            covariance = self._read_only_array(covariance.toarray())
+            return covariance
         return self._read_only_view(covariance)
 
     def _parse_sampler(self, sampler):

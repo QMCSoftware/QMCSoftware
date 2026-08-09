@@ -2,10 +2,15 @@ from qmcpy import *
 from qmcpy.util import *
 import numpy as np
 import scipy.stats
+from scipy.sparse import issparse
 import unittest
 import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
 from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
+
+
+def dense_covariance(covariance):
+    return covariance.toarray() if issparse(covariance) else np.asarray(covariance)
 
 
 def assert_sample_mean_and_covariance(measure):
@@ -16,7 +21,7 @@ def assert_sample_mean_and_covariance(measure):
 
     np.testing.assert_allclose(sample_mean, measure.mean, rtol=0, atol=1e-5)
     np.testing.assert_allclose(
-        sample_covariance, measure.covariance, rtol=0, atol=1e-5
+        sample_covariance, dense_covariance(measure.covariance), rtol=0, atol=1e-5
     )
 
 
@@ -171,7 +176,7 @@ class TestTrueMeasure(unittest.TestCase):
                     measure.standard_deviation**2, measure.variance
                 )
                 np.testing.assert_allclose(
-                    np.diag(measure.covariance), measure.variance
+                    np.diag(dense_covariance(measure.covariance)), measure.variance
                 )
 
     def test_moment_attributes_are_read_only(self):
@@ -191,13 +196,42 @@ class TestTrueMeasure(unittest.TestCase):
                     "covariance",
                 ):
                     value = getattr(measure, parameter)
-                    self.assertFalse(value.flags.writeable)
-                    with self.assertRaises(ValueError):
-                        value.flat[0] = 9
-                    with self.assertRaises(ValueError):
-                        value.setflags(write=True)
+                    if issparse(value):
+                        # Diagonal covariances are stored sparsely; their
+                        # backing data must still be read only.
+                        self.assertFalse(value.data.flags.writeable)
+                        with self.assertRaises(ValueError):
+                            value.data[0] = 9
+                    else:
+                        self.assertFalse(value.flags.writeable)
+                        with self.assertRaises(ValueError):
+                            value.flat[0] = 9
+                        with self.assertRaises(ValueError):
+                            value.setflags(write=True)
                     with self.assertRaises(AttributeError):
                         setattr(measure, parameter, np.zeros_like(value))
+
+    def test_diagonal_covariance_is_sparse(self):
+        d = 500
+        for measure in (
+            Uniform(IIDStdUniform(d, seed=7)),
+            Kumaraswamy(IIDStdUniform(d, seed=7)),
+        ):
+            with self.subTest(measure=type(measure).__name__):
+                covariance = measure.covariance
+                self.assertTrue(issparse(covariance))
+                self.assertEqual(covariance.format, "dia")
+                self.assertEqual(covariance.shape, (d, d))
+                # Only the diagonal is stored: O(d), not O(d^2).
+                self.assertEqual(covariance.data.size, d)
+                np.testing.assert_allclose(
+                    covariance.diagonal(), measure.variance
+                )
+                # Off-diagonal entries are exactly zero.
+                dense = covariance.toarray()
+                np.testing.assert_array_equal(
+                    dense - np.diag(np.diag(dense)), np.zeros((d, d))
+                )
 
 
 class TestMatern(unittest.TestCase):
@@ -298,7 +332,7 @@ class TestUniform(unittest.TestCase):
             uniform.standard_deviation, np.sqrt([3.0, 3.0, 3.0])
         )
         np.testing.assert_allclose(
-            uniform.covariance,
+            dense_covariance(uniform.covariance),
             np.diag([3.0, 3.0, 3.0]),
         )
 
@@ -315,7 +349,7 @@ class TestUniform(unittest.TestCase):
             uniform.standard_deviation, np.sqrt([3.0, 6.75])
         )
         np.testing.assert_allclose(
-            uniform.covariance,
+            dense_covariance(uniform.covariance),
             np.diag([3.0, 6.75]),
         )
 
@@ -330,7 +364,7 @@ class TestUniform(unittest.TestCase):
         np.testing.assert_allclose(
             spawn.standard_deviation, np.full(4, np.sqrt(3.0))
         )
-        np.testing.assert_allclose(spawn.covariance, 3.0 * np.eye(4))
+        np.testing.assert_allclose(dense_covariance(spawn.covariance), 3.0 * np.eye(4))
 
 
 class TestKumaraswamy(unittest.TestCase):
@@ -352,7 +386,7 @@ class TestKumaraswamy(unittest.TestCase):
             kumaraswamy.standard_deviation, np.sqrt(expected_variance)
         )
         np.testing.assert_allclose(
-            kumaraswamy.covariance, np.diag(expected_variance)
+            dense_covariance(kumaraswamy.covariance), np.diag(expected_variance)
         )
 
     def test_moment_attributes_with_vector_parameters(self):
@@ -370,7 +404,7 @@ class TestKumaraswamy(unittest.TestCase):
             kumaraswamy.standard_deviation, np.sqrt(expected_variance)
         )
         np.testing.assert_allclose(
-            kumaraswamy.covariance, np.diag(expected_variance)
+            dense_covariance(kumaraswamy.covariance), np.diag(expected_variance)
         )
 
     def test_uniform_special_case(self):
@@ -385,7 +419,7 @@ class TestKumaraswamy(unittest.TestCase):
             kumaraswamy.standard_deviation, np.sqrt(expected_variance)
         )
         np.testing.assert_allclose(
-            kumaraswamy.covariance, np.diag(expected_variance)
+            dense_covariance(kumaraswamy.covariance), np.diag(expected_variance)
         )
 
     def test_spawn_recomputes_moment_attributes(self):
@@ -401,7 +435,7 @@ class TestKumaraswamy(unittest.TestCase):
             spawn.standard_deviation, np.sqrt(expected_variance)
         )
         np.testing.assert_allclose(
-            spawn.covariance, np.diag(expected_variance)
+            dense_covariance(spawn.covariance), np.diag(expected_variance)
         )
 
     def test_variance_shape(self):
@@ -429,12 +463,13 @@ class TestKumaraswamy(unittest.TestCase):
                 self.assertEqual(covariance.shape, (d, d))
                 self.assertEqual(covariance.ndim, 2)
                 # Independent marginals: covariance is diagonal with the
-                # per-dimension variances on the diagonal.
+                # per-dimension variances on the diagonal. It is stored sparsely.
+                dense = dense_covariance(covariance)
                 np.testing.assert_allclose(
-                    np.diag(covariance), kumaraswamy.variance
+                    np.diag(dense), kumaraswamy.variance
                 )
                 np.testing.assert_allclose(
-                    covariance, np.diag(np.diag(covariance))
+                    dense, np.diag(np.diag(dense))
                 )
 
     def test_variance_matches_closed_form(self):

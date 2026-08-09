@@ -16,15 +16,21 @@ class Uniform(AbstractTrueMeasure):
                [0.32691107, 1.5741214 ],
                [1.97352511, 0.58590959],
                [0.8591331 , 1.89690854]])
-        >>> true_measure
+
+        The covariance is diagonal, so it is stored and shown in sparse form.
+
+        >>> true_measure  # doctest: +NORMALIZE_WHITESPACE
         Uniform (AbstractTrueMeasure)
             lower_bound     [0.  0.5]
             upper_bound     [2 3]
             mean            [1.   1.75]
             variance        [0.333 0.521]
             standard_deviation [0.577 0.722]
-            covariance      [[0.333 0.   ]
-                             [0.    0.521]]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                with 2 stored elements (1 diagonals) and shape (2, 2)>
+                Coords Values
+                (0, 0) 0.3333333333333333
+                (1, 1) 0.5208333333333334
 
         With independent replications
 
