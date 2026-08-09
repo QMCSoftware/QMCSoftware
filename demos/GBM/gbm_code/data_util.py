@@ -50,6 +50,7 @@ def add_quantlib_results(
         quantlib_final: 1D array of per-replication sample means of $S_T$.
         theoretical_mean: Theoretical expected value $E[S_T]$ used as a benchmark.
         theoretical_std: Theoretical standard deviation of $S_T$ used as a benchmark.
+        ql_emp_std_avg: Average of per-replication empirical standard deviations of $S_T$.
     """
     ql_emp_mean = np.mean(quantlib_final)
     ql_mae = np.mean(np.abs(quantlib_final - theoretical_mean))
@@ -90,8 +91,8 @@ def add_qmcpy_results(
         qp_emp_mean: Overall empirical mean across all replications.
         theoretical_mean: Theoretical expected value used as a benchmark.
         theoretical_std: Theoretical standard deviation used as a benchmark.
+        qp_emp_std_avg: Average of per-replication empirical standard deviations.
     """
-    
     qp_mae = np.mean(np.abs(qmcpy_final - theoretical_mean))
 
     results_data.append(
@@ -138,30 +139,30 @@ def process_sampler_data(
 
     if sampler_type in ["IIDStdUniform", "Sobol"]:
         ql_means = np.empty(replications)
-        ql_stds = np.empty(replications)         
+        ql_stds = np.empty(replications)
         ql_seed = params_ql["seed"]
 
         for r in range(replications):
             params_ql["seed"] = ql_seed + r
             quantlib_paths, ql_gbm = qlu.generate_quantlib_paths(**params_ql)
             ql_means[r] = quantlib_paths[:, -1].mean()
-            ql_stds[r] = quantlib_paths[:, -1].std(ddof=1)     
+            ql_stds[r] = quantlib_paths[:, -1].std(ddof=1)
 
         params_ql["seed"] = ql_seed
-        ql_std_avg = ql_stds.mean()                             
+        ql_std_avg = ql_stds.mean()
     else:
         ql_means = None
-        ql_std_avg = None                                       
+        ql_std_avg = None
 
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
 
     if qmcpy_paths.ndim == 3:
         qp_means = qmcpy_paths[:, :, -1].mean(axis=1)
-        qp_stds = qmcpy_paths[:, :, -1].std(axis=1, ddof=1)     
+        qp_stds = qmcpy_paths[:, :, -1].std(axis=1, ddof=1)
     else:
         qp_means = np.array([qmcpy_paths[:, -1].mean()])
-        qp_stds = np.array([qmcpy_paths[:, -1].std(ddof=1)])    
-    qp_std_avg = qp_stds.mean()                                  
+        qp_stds = np.array([qmcpy_paths[:, -1].std(ddof=1)])
+    qp_std_avg = qp_stds.mean()
 
     if ql_means is not None:
         add_quantlib_results(
@@ -177,7 +178,7 @@ def process_sampler_data(
         results_data,
         sampler_type,
         qp_means,
-        qp_means.mean(),             
+        qp_means.mean(),
         theoretical_mean,
         theoretical_std,
         qp_std_avg
