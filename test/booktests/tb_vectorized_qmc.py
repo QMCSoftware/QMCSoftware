@@ -1,6 +1,5 @@
 import unittest, pytest
-import subprocess
-from __init__ import BaseNotebookTest
+from __init__ import BaseNotebookTest, pip_install
 
 
 @pytest.mark.slow
@@ -9,10 +8,7 @@ class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()
         # Install required packages
-        subprocess.run(
-            ["pip", "install", "-q", "matplotlib", "scipy", "scikit-learn", "pandas"],
-            check=False,
-        )
+        pip_install("matplotlib", "scipy", "scikit-learn", "pandas")
 
     def test_vectorized_qmc_notebook(self):
         notebook_path, _ = self.locate_notebook("../../demos/vectorized_qmc.ipynb")
