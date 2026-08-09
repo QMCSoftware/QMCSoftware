@@ -83,3 +83,18 @@ def test_mpmc_placeholders_report_missing_torch():
     with pytest.raises(ModuleNotFoundError, match="MPMC_net.*torch") as error:
         namespace["MPMC_net"]()
     assert error.value.name == "torch"
+
+
+def test_mpmc_placeholders_report_missing_transitive_pyg_dependency():
+    pytest.importorskip("torch")
+
+    def block_torch_scatter(name, fromlist, level):
+        if level == 1 and name == "discrete_distribution.mpmc.models":
+            return "torch_scatter"
+        return None
+
+    namespace = _execute_optional_import(block_torch_scatter)
+
+    with pytest.raises(ModuleNotFoundError, match="MPMC_net.*torch_scatter") as error:
+        namespace["MPMC_net"]()
+    assert error.value.name == "torch_scatter"

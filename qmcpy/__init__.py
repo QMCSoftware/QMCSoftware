@@ -54,6 +54,10 @@ except ImportError as error:
         "pyg_lib",
         "torch",
         "torch_geometric",
+        "torch_cluster",
+        "torch_scatter",
+        "torch_sparse",
+        "torch_spline_conv",
     }:
         raise
 
