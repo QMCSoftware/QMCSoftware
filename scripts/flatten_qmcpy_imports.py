@@ -23,6 +23,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 import tokenize
 
@@ -157,15 +158,54 @@ def _deduplicate_adjacent_star_imports(content: bytes) -> tuple[bytes, int]:
 
 
 def _load_qmcpy_public_names(repository_root: Path) -> frozenset[str] | None:
-    """Return qmcpy's public top-level names, or None if qmcpy can't be imported."""
+    """Return qmcpy public names using an optional-dependency-free import context."""
 
-    if str(repository_root) not in sys.path:
-        sys.path.insert(0, str(repository_root))
-    try:
-        import qmcpy
-    except ImportError:
+    blocklist = (
+        "torch",
+        "gpytorch",
+        "pyg_lib",
+        "torch_geometric",
+        "torch_cluster",
+        "torch_scatter",
+        "torch_sparse",
+        "torch_spline_conv",
+    )
+    probe = r"""
+import builtins
+import json
+import sys
+
+repository_root = sys.argv[1]
+blocked_roots = set(sys.argv[2:])
+real_import = builtins.__import__
+
+def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
+    root = name.split('.', 1)[0]
+    if root in blocked_roots:
+        raise ModuleNotFoundError('blocked optional dependency', name=root)
+    return real_import(name, globals, locals, fromlist, level)
+
+builtins.__import__ = guarded_import
+if repository_root not in sys.path:
+    sys.path.insert(0, repository_root)
+
+import qmcpy
+print(json.dumps(sorted(name for name in qmcpy.__dict__ if not name.startswith('_'))))
+"""
+
+    result = subprocess.run(
+        [sys.executable, "-c", probe, str(repository_root), *blocklist],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
         return None
-    return frozenset(name for name in dir(qmcpy) if not name.startswith("_"))
+    try:
+        names = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+    return frozenset(name for name in names if isinstance(name, str))
 
 
 def _names_needing_import(source: str, public_names: frozenset[str]) -> set[str] | None:

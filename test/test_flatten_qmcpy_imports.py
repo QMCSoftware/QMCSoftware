@@ -1,6 +1,11 @@
 import json
+from pathlib import Path
 
-from scripts.flatten_qmcpy_imports import flatten_imports, main
+from scripts.flatten_qmcpy_imports import (
+    _load_qmcpy_public_names,
+    flatten_imports,
+    main,
+)
 
 
 def _nested_import(module, imported):
@@ -243,3 +248,15 @@ def test_check_mode_reports_changes_without_writing(tmp_path):
     assert main([str(path)]) == 0
     assert path.read_bytes() == b"from qmcpy import Gaussian\n"
     assert main(["--check", str(path)]) == 0
+
+
+def test_load_public_names_optional_free_is_stable():
+    repository_root = Path(__file__).resolve().parent.parent
+    names = _load_qmcpy_public_names(repository_root)
+
+    assert names is not None
+    assert "Gaussian" in names
+    assert "Keister" in names
+    # Optional dependencies are blocked in the probe context, so fallback
+    # exports are part of the deterministic name set.
+    assert "PFGPCIData" in names
