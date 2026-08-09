@@ -13,7 +13,7 @@ class NotebookTests(BaseNotebookTest):
     def setUp(self):
         super().setUp()  # Call parent setUp first to initialize timing attributes
         pip_install("seaborn>=0.13.0", "tueplots")
-        # Create the JOSS2025.outputs directory that the notebook expects
+        # Create the JOSS2026.outputs directory that the notebook expects
         self.output_dir = os.path.join(self.notebook_dir, "JOSS2026.outputs")
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir, exist_ok=True)
@@ -28,7 +28,7 @@ class NotebookTests(BaseNotebookTest):
                 shutil.rmtree(self.output_dir)
         super().tearDown()
 
-    def test_joss2025_notebook(self):
+    def test_joss2026_notebook(self):
         replacements = {
             "trials = 100": "trials = 2",
             "assert os.path.isdir(OUTDIR)": "",

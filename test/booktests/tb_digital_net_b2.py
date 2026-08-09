@@ -1,4 +1,4 @@
-import unittest, pytest
+import unittest
 from __init__ import BaseNotebookTest
 
 

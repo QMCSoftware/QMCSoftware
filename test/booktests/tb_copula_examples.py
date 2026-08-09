@@ -1,12 +1,18 @@
 import unittest
-from testbook import testbook
 from __init__ import TB_TIMEOUT, BaseNotebookTest
+
 
 class NotebookTests(BaseNotebookTest):
 
-    @testbook('../../demos/copula_examples.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_copula_examples_notebook(self, tb):
-        pass
+    def test_copula_examples_notebook(self):
+        notebook_path, _ = self.locate_notebook(
+            "../../demos/copula_examples.ipynb"
+        )
+        replacements = {
+            "fig.savefig": "# fig.savefig",
+        }
+        self.run_notebook(notebook_path, replacements=replacements, timeout=TB_TIMEOUT)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

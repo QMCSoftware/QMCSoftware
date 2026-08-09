@@ -13,5 +13,6 @@ class NotebookTests(BaseNotebookTest):
         self.fix_symlinks(notebook_dir, symlinks_to_fix)
         self.run_notebook(notebook_path)
 
+
 if __name__ == '__main__':
     unittest.main()
