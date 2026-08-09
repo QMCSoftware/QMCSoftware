@@ -48,6 +48,10 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.kronecker.kronecker_search_methods.kronecker_vector_search_mobius_transform
 
+## `DummySampler`
+
+::: qmcpy.discrete_distribution.dummy_sampler.DummySampler
+
 ## `IIDStdUniform`
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
