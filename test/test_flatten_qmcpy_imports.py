@@ -12,7 +12,7 @@ def _nested_import(module, imported):
     return f"from {'qmcpy.' + module} import {imported}"
 
 
-def test_flatten_imports_preserves_imported_names_and_formatting():
+def test_flatten_imports_basic():
     source = (
         _nested_import("integrand", "Keister")
         + "\n"
@@ -31,7 +31,7 @@ def test_flatten_imports_preserves_imported_names_and_formatting():
     )
 
 
-def test_flatten_imports_preserves_private_modules_and_names():
+def test_flatten_preserves_private():
     source = (
         _nested_import("_internal._helpers", "PublicHelper")
         + "\n"
@@ -58,7 +58,7 @@ def test_flatten_imports_preserves_private_modules_and_names():
     )
 
 
-def test_private_module_import_separates_public_import_groups():
+def test_private_module_splits_groups():
     source = (
         b"from qmcpy import Zeta\n"
         b"from qmcpy._internal._helpers import PublicHelper\n"
@@ -71,7 +71,7 @@ def test_private_module_import_separates_public_import_groups():
     assert updated == source
 
 
-def test_flatten_imports_preserves_utility_imports():
+def test_flatten_preserves_util_imports():
     source = (
         b"from qmcpy.util import ParameterError\n"
         b"from qmcpy.util.transforms import tf_exp\n"
@@ -82,7 +82,7 @@ def test_flatten_imports_preserves_utility_imports():
     assert (updated, count) == (source, 0)
 
 
-def test_flatten_imports_preserves_names_not_available_at_top_level():
+def test_flatten_keeps_nonpublic_names():
     source = b"from qmcpy.stopping_criterion.pf_gp_ci import PFGPCIData\n"
 
     updated, count = flatten_imports(source, frozenset({"PFGPCI"}))
@@ -90,7 +90,7 @@ def test_flatten_imports_preserves_names_not_available_at_top_level():
     assert (updated, count) == (source, 0)
 
 
-def test_flatten_imports_preserves_nested_imports_without_public_api():
+def test_flatten_no_public_api_noop():
     source = (_nested_import("integrand", "Keister") + "\n").encode()
 
     updated, count = flatten_imports(source)
@@ -98,7 +98,7 @@ def test_flatten_imports_preserves_nested_imports_without_public_api():
     assert (updated, count) == (source, 0)
 
 
-def test_flatten_imports_preserves_import_like_text_inside_strings():
+def test_flatten_preserve_str_literals():
     source = b'text = """\nfrom qmcpy.integrand import Keister\n"""\n'
 
     updated, count = flatten_imports(source, frozenset({"Keister"}))
@@ -107,7 +107,7 @@ def test_flatten_imports_preserves_import_like_text_inside_strings():
     assert updated == source
 
 
-def test_flatten_imports_does_not_expand_star_imports():
+def test_flatten_skip_star_expansion():
     source = (
         b"from qmcpy import *\n\n"
         b"def f(Lattice):\n"
@@ -122,7 +122,7 @@ def test_flatten_imports_does_not_expand_star_imports():
     assert updated == source
 
 
-def test_flatten_imports_deduplicates_notebook_star_imports():
+def test_notebook_star_dedup():
     notebook = {
         "cells": [
             {
@@ -142,7 +142,7 @@ def test_flatten_imports_deduplicates_notebook_star_imports():
     assert json.loads(updated)["cells"][0]["source"] == ["from qmcpy import *"]
 
 
-def test_flatten_imports_combines_and_alphabetizes_named_imports():
+def test_named_imports_merge_sort():
     source = (
         b"from qmcpy import Zeta,Beta\n"
         b"from qmcpy import Alpha\n"
@@ -161,7 +161,7 @@ def test_flatten_imports_combines_and_alphabetizes_named_imports():
     assert flatten_imports(updated) == (updated, 0)
 
 
-def test_flatten_imports_combines_parenthesized_and_single_line_imports():
+def test_merge_paren_and_single_line():
     source = b"""from qmcpy import (
     KernelDigShiftInvar,
     KernelDigShiftInvarAdaptiveAlpha,
@@ -188,7 +188,7 @@ from qmcpy import tf_exp_eps, tf_exp_eps_inv
     assert flatten_imports(updated) == (updated, 0)
 
 
-def test_flatten_imports_combines_only_within_the_same_scope():
+def test_merge_same_scope_only():
     source = (
         b"if enabled:\n"
         b"    from qmcpy import Zeta\n"
@@ -212,7 +212,7 @@ def test_flatten_imports_combines_only_within_the_same_scope():
     )
 
 
-def test_flatten_imports_combines_notebook_named_imports():
+def test_notebook_named_merge():
     notebook = {
         "cells": [
             {
@@ -237,7 +237,7 @@ def test_flatten_imports_combines_notebook_named_imports():
     assert flatten_imports(updated) == (updated, 0)
 
 
-def test_check_mode_reports_changes_without_writing(tmp_path):
+def test_check_mode_no_write(tmp_path):
     path = tmp_path / "example.py"
     original = (_nested_import("true_measure", "Gaussian") + "\n").encode()
     path.write_bytes(original)
@@ -250,7 +250,7 @@ def test_check_mode_reports_changes_without_writing(tmp_path):
     assert main(["--check", str(path)]) == 0
 
 
-def test_load_public_names_optional_free_is_stable():
+def test_public_names_optional_free_stable():
     repository_root = Path(__file__).resolve().parent.parent
     names = _load_qmcpy_public_names(repository_root)
 

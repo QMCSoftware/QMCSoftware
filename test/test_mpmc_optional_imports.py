@@ -85,7 +85,7 @@ def test_mpmc_placeholders_report_missing_torch():
     assert error.value.name == "torch"
 
 
-def test_mpmc_placeholders_report_missing_transitive_pyg_dependency():
+def test_mpmc_placeholder_missing_torch_scatter():
     pytest.importorskip("torch")
 
     def block_torch_scatter(name, fromlist, level):
