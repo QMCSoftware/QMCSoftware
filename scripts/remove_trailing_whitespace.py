@@ -63,7 +63,12 @@ def _python_string_spans(text: str) -> dict[int, list[tuple[int, int | None]]]:
     spans: dict[int, list[tuple[int, int | None]]] = {}
     tokens = tokenize.generate_tokens(io.StringIO(text).readline)
     for token in tokens:
-        if token.type != tokenize.STRING:
+        token_name = tokenize.tok_name.get(token.type, "")
+        if token.type != tokenize.STRING and token_name not in {
+            "FSTRING_START",
+            "FSTRING_MIDDLE",
+            "FSTRING_END",
+        }:
             continue
         (start_row, start_col), (end_row, end_col) = token.start, token.end
         if start_row == end_row:

@@ -323,6 +323,16 @@ class TestRemoveTrailingWhitespace(unittest.TestCase):
             self.assertEqual(path.read_bytes(), expected)
             self.assertFalse(remove_trailing_whitespace(path, check=True))
 
+    def test_preserves_multiline_f_string_trailing_spaces(self):
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "example.py"
+            original = b'x = f"""hello  \nworld  \n"""\nvalue = 1  \n'
+            expected = b'x = f"""hello  \nworld  \n"""\nvalue = 1\n'
+            path.write_bytes(original)
+
+            self.assertTrue(remove_trailing_whitespace(path, check=False))
+            self.assertEqual(path.read_bytes(), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

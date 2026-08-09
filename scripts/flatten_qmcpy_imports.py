@@ -18,11 +18,13 @@ from __future__ import annotations
 import argparse
 import ast
 from collections.abc import Iterable, Iterator
+import io
 import json
 import os
 from pathlib import Path
 import re
 import sys
+import tokenize
 
 
 SUPPORTED_SUFFIXES = {".ipynb", ".md", ".py", ".pyi", ".rst", ".txt"}
@@ -85,6 +87,36 @@ COMMA_SPACING_RE = re.compile(rb",(?=\S)")
 # immediately followed by a name (e.g. "%matplotlib"); "% (x, y)" is a
 # modulo-operator continuation and must be left alone.
 MAGIC_LINE_RE = re.compile(r"^[ \t]*(?:%{1,2}[A-Za-z_]|!|\?)")
+
+
+def _python_protected_lines(content: bytes) -> set[int]:
+    """Return 1-based line numbers covered by Python string/comment tokens."""
+
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return set()
+
+    protected: set[int] = set()
+    try:
+        tokens = tokenize.generate_tokens(io.StringIO(text).readline)
+    except (SyntaxError, IndentationError, tokenize.TokenError):
+        return set()
+
+    for tok in tokens:
+        tok_name = tokenize.tok_name.get(tok.type, "")
+        if tok.type != tokenize.STRING and tok_name not in {
+            "COMMENT",
+            "FSTRING_START",
+            "FSTRING_MIDDLE",
+            "FSTRING_END",
+        }:
+            continue
+        start_row = tok.start[0]
+        end_row = tok.end[0]
+        protected.update(range(start_row, end_row + 1))
+
+    return protected
 
 
 def _star_import_context(line: bytes) -> tuple[bytes, bytes] | None:
@@ -463,9 +495,16 @@ def flatten_imports(
     """
 
     change_count = 0
+    is_notebook = _notebook_python_source(content) is not None
+    protected_lines = set() if is_notebook else _python_protected_lines(content)
+
+    def _line_number(position: int) -> int:
+        return content.count(b"\n", 0, position) + 1
 
     def replace(match: re.Match[bytes]) -> bytes:
         nonlocal change_count
+        if _line_number(match.start()) in protected_lines:
+            return match.group(0)
         module_segments = match.group("module_path").lstrip(b".").split(b".")
         if module_segments[0] == b"util" or any(
             segment.startswith(b"_") for segment in module_segments
@@ -499,20 +538,10 @@ def flatten_imports(
     updated, duplicate_count = _deduplicate_adjacent_star_imports(updated)
     change_count += duplicate_count
 
-    if public_names and STAR_IMPORT_LITERAL in updated:
-        expand = (
-            _expand_notebook_star_imports
-            if _notebook_python_source(updated) is not None
-            else _expand_text_star_imports
-        )
-        updated, expand_count = expand(updated, public_names)
-        change_count += expand_count
+    # Star-import expansion is intentionally disabled because the current
+    # file-wide name analysis is not scope/order-aware and can change semantics.
 
-    combine = (
-        _combine_notebook_named_imports
-        if _notebook_python_source(updated) is not None
-        else _combine_text_named_imports
-    )
+    combine = _combine_notebook_named_imports if is_notebook else _combine_text_named_imports
     updated, combine_count = combine(updated)
     change_count += combine_count
 

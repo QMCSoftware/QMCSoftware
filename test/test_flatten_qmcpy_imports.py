@@ -93,6 +93,30 @@ def test_flatten_imports_preserves_nested_imports_without_public_api():
     assert (updated, count) == (source, 0)
 
 
+def test_flatten_imports_preserves_import_like_text_inside_strings():
+    source = b'text = """\nfrom qmcpy.integrand import Keister\n"""\n'
+
+    updated, count = flatten_imports(source, frozenset({"Keister"}))
+
+    assert count == 0
+    assert updated == source
+
+
+def test_flatten_imports_does_not_expand_star_imports():
+    source = (
+        b"from qmcpy import *\n\n"
+        b"def f(Lattice):\n"
+        b"    return Lattice\n\n"
+        b"y = Keister(dimension=2)\n"
+        b"x = Lattice(dimension=2)\n"
+    )
+
+    updated, count = flatten_imports(source, frozenset({"Keister", "Lattice"}))
+
+    assert count == 0
+    assert updated == source
+
+
 def test_flatten_imports_deduplicates_notebook_star_imports():
     notebook = {
         "cells": [
