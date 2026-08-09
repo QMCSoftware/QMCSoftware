@@ -47,6 +47,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
+          python-version: ${{ matrix.python-version }}
           miniconda-version: "latest"
           auto-activate-base: true
           conda-remove-defaults: true
