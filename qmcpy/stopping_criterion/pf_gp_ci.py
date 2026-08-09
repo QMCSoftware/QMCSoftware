@@ -103,7 +103,7 @@ class PFGPCI(AbstractStoppingCriterion):
         ...     n_ref_approx = 2**22,
         ...     seed_ref_approx = 11)
         >>> solution,data = pfgpci.integrate(seed=7,refit=True)
-        >>> data
+        >>> data  # doctest: +NORMALIZE_WHITESPACE
         PFGPCIData (Data)
             solution        0.158
             error_bound     0.022
@@ -123,9 +123,12 @@ class PFGPCI(AbstractStoppingCriterion):
             mean            [0. 0. 0.]
             variance        [3.29 3.29 3.29]
             standard_deviation [1.814 1.814 1.814]
-            covariance      [[3.29 0.   0.  ]
-                             [0.   3.29 0.  ]
-                             [0.   0.   3.29]]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                             with 3 stored elements (1 diagonals) and shape (3, 3)>
+                              Coords Values
+                              (0, 0) 3.289868133696453
+                              (1, 1) 3.289868133696453
+                              (2, 2) 3.289868133696453
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    1
