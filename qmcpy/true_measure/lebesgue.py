@@ -20,7 +20,7 @@ class Lebesgue(AbstractTrueMeasure):
                                 covariance      [[1. 0.]
                                                  [0. 1.]]
                                 decomp_type     PCA
-        >>> Lebesgue(Uniform(DigitalNetB2(2,seed=7)))
+        >>> Lebesgue(Uniform(DigitalNetB2(2,seed=7)))  # doctest: +NORMALIZE_WHITESPACE
         Lebesgue (AbstractTrueMeasure)
             transform       Uniform (AbstractTrueMeasure)
                                 lower_bound     0
@@ -28,8 +28,11 @@ class Lebesgue(AbstractTrueMeasure):
                                 mean            [0.5 0.5]
                                 variance        [0.083 0.083]
                                 standard_deviation [0.289 0.289]
-                                covariance      [[0.083 0.   ]
-                                                 [0.    0.083]]
+                                covariance      <DIAgonal sparse matrix of dtype 'float64'
+                                                 with 2 stored elements (1 diagonals) and shape (2, 2)>
+                                                  Coords Values
+                                                  (0, 0) 0.08333333333333333
+                                                  (1, 1) 0.08333333333333333
     """
 
     def __init__(self, sampler):
