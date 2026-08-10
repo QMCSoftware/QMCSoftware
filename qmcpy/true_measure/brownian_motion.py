@@ -206,6 +206,12 @@ class BrownianMotion(Gaussian):
             self._output_order = self._get_output_order()
             self.bridge_output_times = self.time_vec[self._output_order]
             self.parameters += ["bridge_construction_times", "bridge_output_times"]
+            order = self._output_order
+            if not np.array_equal(order, np.arange(self.d)):
+                self.mean = self.mean[order]
+                self.mu = self.mu[order]
+                self.covariance = self.covariance[order][:, order]
+                self.sigma = self.sigma[order][:, order]
         if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
             warnings.warn(
                 f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.", 
