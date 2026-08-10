@@ -24,9 +24,11 @@ class Gaussian(AbstractTrueMeasure):
                [ 0.61222205,  1.48402653]])
         >>> true_measure
         Gaussian (AbstractTrueMeasure)
-            mean            [1 2]
-            covariance      [[9 4]
-                             [4 5]]
+            mean            [1. 2.]
+            variance        [9. 5.]
+            standard_deviation [3.    2.236]
+            covariance      [[9. 4.]
+                             [4. 5.]]
             decomp_type     PCA
 
         With independent replications
@@ -60,7 +62,7 @@ class Gaussian(AbstractTrueMeasure):
                 - `'PCA'` for principal component analysis, or
                 - `'Cholesky'` for cholesky decomposition.
         """
-        self.parameters = ["mean", "covariance", "decomp_type"]
+        self.parameters = ["mean", "variance", "standard_deviation", "covariance", "decomp_type"]
         # default to transform from standard uniform
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
@@ -71,8 +73,6 @@ class Gaussian(AbstractTrueMeasure):
 
     def _parse_gaussian_params(self, mean, covariance, decomp_type, lazy_decomp=False):
         self.decomp_type = decomp_type.upper()
-        self.mean = mean
-        self.covariance = covariance
         self.lazy_decomp = lazy_decomp
 
         if np.isscalar(mean):
@@ -90,6 +90,13 @@ class Gaussian(AbstractTrueMeasure):
                     mean must have length d and
                     covariance must be of shape d x d"""
             )
+        variance = np.diag(self.sigma)
+        self._set_moments(
+            mean=self.mu.astype(float, copy=False),
+            variance=variance,
+            standard_deviation=np.sqrt(variance),
+            covariance=self.sigma,
+        )
 
         # Cache for lazy loading
         self._a_cache = None

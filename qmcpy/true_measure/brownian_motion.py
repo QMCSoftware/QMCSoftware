@@ -25,6 +25,8 @@ class BrownianMotion(Gaussian):
             time_vec        [0.5 1.  1.5 2. ]
             drift           2^(1)
             mean            [1. 2. 3. 4.]
+            variance        [0.5 1.  1.5 2. ]
+            standard_deviation [0.707 1.    1.225 1.414]
             covariance      [[0.5 0.5 0.5 0.5]
                              [0.5 1.  1.  1. ]
                              [0.5 1.  1.5 1.5]
@@ -167,7 +169,15 @@ class BrownianMotion(Gaussian):
         """
         if str(decomp_type).upper() == "BRIDGE":
             decomp_type = "BrownianBridge"
-        self.parameters = ["time_vec", "drift", "mean", "covariance", "decomp_type"]
+        self.parameters = [
+            "time_vec",
+            "drift",
+            "mean",
+            "variance",
+            "standard_deviation",
+            "covariance",
+            "decomp_type",
+        ]
         # default to transform from standard uniform
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
