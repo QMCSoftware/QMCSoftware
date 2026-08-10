@@ -60,6 +60,8 @@ class BrownianMotion(Gaussian):
             time_vec        [0.25 0.5  0.75 1.  ]
             drift           0
             mean            [0. 0. 0. 0.]
+            variance        [0.25 0.5  0.75 1.  ]
+            standard_deviation [0.5   0.707 0.866 1.   ]
             covariance      [[0.25 0.25 0.25 0.25]
                              [0.25 0.5  0.5  0.5 ]
                              [0.25 0.5  0.75 0.75]
@@ -218,9 +220,9 @@ class BrownianMotion(Gaussian):
             self.parameters += ["bridge_construction_times", "bridge_output_times"]
             order = self._output_order
             if not np.array_equal(order, np.arange(self.d)):
-                self.mean = self.mean[order]
+                self._mean = self._mean[order]
                 self.mu = self.mu[order]
-                self.covariance = self.covariance[order][:, order]
+                self._covariance = self._covariance[order][:, order]
                 self.sigma = self.sigma[order][:, order]
         if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
             warnings.warn(
