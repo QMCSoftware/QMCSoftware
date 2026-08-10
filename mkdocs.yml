@@ -57,6 +57,7 @@ nav:
     - Plotting: 
       - Plotting Points Automatically: demos/plot_proj_function.ipynb 
       - Plotting Points Manually: demos/sample_scatter_plots.ipynb
+      - QMCPy Logo: demos/qmcpy-logo.ipynb
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb

@@ -41,6 +41,10 @@ demos/GBM/outputs/*.*
 # Generated notebook/demo images
 figures/
 *.png
+!docs/logos/qmcpy_logo.png
+!docs/logos/qmcpy_logo_net.png
+!docs/logos/qmcpy_logo_lattice.png
+!docs/logos/qmcpy_logo_det_net.png
 *.jpg
 *.jpeg
 *.svg
