@@ -385,9 +385,11 @@ FORMAT_PATH ?= .
 MARKDOWN_UNWRAP_PATH ?= $(FORMAT_PATH)
 
 format:
-	$(MAKE) _flatten_qmcpy_imports
+	$(MAKE) flatten_qmcpy_imports
 	$(MAKE) _markdown-unwrap MARKDOWN_UNWRAP_PATH="$(MARKDOWN_UNWRAP_PATH)"
 	$(MAKE) _rm_trailing_whitespace FORMAT_PATH="$(FORMAT_PATH)"
+
+flatten_qmcpy_imports: _flatten_qmcpy_imports
 
 _flatten_qmcpy_imports:
 	$(PYTHON) scripts/flatten_qmcpy_imports.py
