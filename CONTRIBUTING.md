@@ -33,8 +33,9 @@ We periodically release the contents of `develop` to `master`. Contact the team 
 Blog content is maintained in
 [`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website),
 not in this repository's MkDocs documentation site. Propose blog posts in that
-repository. Keep package documentation, API references, and executable demos
-for a feature in this repository.
+repository. Published articles appear on the
+[QMCSoftware Blog](https://qmcsoftware.org/blog/). Keep package documentation,
+API references, and executable demos for a feature in this repository.
 
 
 ## Installation

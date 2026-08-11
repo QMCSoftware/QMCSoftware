@@ -29,6 +29,8 @@ _revised 2026-08-10_
   - https://qmcsoftware.github.io/QMCSoftware/
 - [x] The 18 previously migrated blog posts were removed from this branch by
   owner decision on 2026-08-10
+- [x] Their preserved old `qmcpy.org` paths redirect to the corresponding posts
+  maintained by `QMCSoftware/qmcsoftware-website`
 - [x] WordPress.com nameservers remain authoritative for DNS
 - [x] `qmcpy.org` web records point to GitHub Pages
 - [x] `www.qmcpy.org` points to `qmcsoftware.github.io`
@@ -131,7 +133,10 @@ Collaborator decisions confirmed by Kang Jiangrui on 2026-07-16:
 - Retire unpublished WordPress drafts.
 - Retire old news, event, and announcement posts without a confirmed current target.
 - Remove all 18 previously migrated blog posts, their index/navigation entries,
-  author snippets, and old-path redirects (confirmed 2026-08-10).
+  and author snippets from this documentation repository (confirmed
+  2026-08-10).
+- Preserve the 18 old paths as redirect-only compatibility pages targeting the
+  canonical posts published by `QMCSoftware/qmcsoftware-website`.
 
 Inventory notes:
 
@@ -242,12 +247,15 @@ Updated on `migrate_qmcpy` on 2026-08-10:
 - Removed the 18 migrated blog posts, their local images, shared author snippets,
   and `docs/blogs/index.md`.
 - Removed the Blogs navigation and homepage links to the archive.
-- Reduced `data/redirects.yml` from 20 entries to the two contributor redirects
-  and removed the 18 generated dated-path redirect pages.
+- Kept the 18 generated dated-path pages as redirect-only compatibility pages;
+  they now target the corresponding canonical posts at
+  `https://qmcsoftware.org/blog/` instead of local MkDocs blog content.
 - Assigned blog publishing to
   [`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website);
   this repository's MkDocs documentation site will not add blog pages or blog
-  navigation.
+  navigation. Redirect-only compatibility pages do not make this repository a
+  blog publisher.
+- Confirmed all 18 canonical external targets returned HTTP 200 on 2026-08-10.
 - The local WordPress export and Jetpack backup remain the recovery sources for
   the removed content.
 

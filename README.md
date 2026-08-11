@@ -15,9 +15,12 @@ QMCPy is an open-source Python framework for Monte Carlo and quasi-Monte Carlo i
 
 [Get started](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/) | [API reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) | [Demos](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/) | [Publications](https://qmcsoftware.github.io/QMCSoftware/publications/)
 
-Blog publishing is maintained separately in
+Blog publishing and the public [QMCSoftware Blog](https://qmcsoftware.org/blog/)
+are maintained separately in
 [`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website).
-This MkDocs documentation site does not include blog posts.
+This MkDocs documentation site does not include blog posts; it keeps only
+compatibility redirects from preserved old `qmcpy.org` blog URLs to the
+canonical posts on that website.
 
 ## Installation
 
