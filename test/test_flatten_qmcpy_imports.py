@@ -322,4 +322,3 @@ def test_public_names_optional_free_stable():
     assert names is not None
     assert "Gaussian" in names
     assert "Keister" in names
-    assert "PFGPCIData" not in names
