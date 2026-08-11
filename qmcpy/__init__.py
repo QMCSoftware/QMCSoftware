@@ -22,11 +22,6 @@ from .kernel import (
     KernelMultiTask,
     KernelMultiTaskDerivs,
 )
-from .true_measure.acceptance_rejection import (
-    AcceptanceRejection,
-    AcceptanceRejectionReal,
-)
-from .true_measure.triangular import TriangularDistribution
 from .fast_transform import (
     fftbr,
     ifftbr,

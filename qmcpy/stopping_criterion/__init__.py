@@ -28,12 +28,6 @@ except ImportError:
                 "PFGPCI requires torch and gpytorch but no installations found"
             )
 
-    class PFGPCIData(object):
-        def __init__(self, *args, **kwargs):
-            raise ModuleNotFoundError(
-                "PFGPCIData requires torch and gpytorch but no installations found"
-            )
-
     class PFSampleErrorDensityAR(object):
         def __init__(self, *args, **kwargs):
             raise ModuleNotFoundError(
