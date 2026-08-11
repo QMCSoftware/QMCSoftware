@@ -226,7 +226,7 @@ class BrownianMotion(Gaussian):
                 self.sigma = self.sigma[order][:, order]
         if self.decomp_type == "BROWNIANBRIDGE" and not (self.d > 0 and (self.d & (self.d - 1)) == 0):
             warnings.warn(
-                f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.", 
+                f"BrownianBridge is most efficient when d is a power of 2 (e.g., 1, 2, 4, 8, 16). Got d={self.d}.",
                 ParameterWarning,
                 stacklevel=2
             )
@@ -239,9 +239,9 @@ class BrownianMotion(Gaussian):
             monitoring_times = self.monitoring_times
         return BrownianMotion(
             sampler,
-            t_final=self.t, 
+            t_final=self.t,
             initial_value=self.initial_value,
-            drift=self.drift, 
+            drift=self.drift,
             diffusion=self.diffusion,
             decomp_type=self.decomp_type,
             lazy_decomp=self.lazy_decomp,
@@ -281,21 +281,21 @@ class BrownianMotion(Gaussian):
             ranks = np.argsort(np.argsort(self._van_der_corput(self.d, self.t)))
             return np.sort(s)[ranks]
         return s
-    
+
     def _get_output_order(self):
         """Return array for output order"""
         if self.bridge_output_order == "increasing" or self.monitoring_times is None:
             return np.arange(self.d)
         target = np.asarray(self.monitoring_times, dtype=float).flatten()
         return np.argsort(np.argsort(target))
-    
+
     @staticmethod
     def _van_der_corput(d, t_final):
         """First d van der Corput points multiplied by t_final."""
         times = DigitalNetB2(1, randomize=False, order='GRAY')(d, warn=False).flatten()
         times[0] = 1.0
         return t_final * times
-    
+
     def _setup_bridge(self):
         """Precompute parameters (Owen Algorithm 6.1)"""
         s = self.bridge_construction_times
@@ -330,7 +330,7 @@ class BrownianMotion(Gaussian):
         self._bridge_a = a
         self._bridge_b = b
         self._bridge_w = w
-        self._increasing_order = np.argsort(s)  # increasing time 
+        self._increasing_order = np.argsort(s)  # increasing time
 
     def _bridge_transform(self, z):
         """Build Brownian Motion paths (Owen Algorithm 6.2)"""
