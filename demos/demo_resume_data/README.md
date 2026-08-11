@@ -8,8 +8,6 @@ This folder contains notebooks and helper scripts for demonstrating QMCPy's resu
 
 - `accuracy_and_resume.ipynb`:   Long-form walkthrough of the feature.
 
-- `resume_examples.ipynb`:   Compact how-to for the feature.
-
 - `check_resume.py`: Runs a cross-method comparison of:
   - a loose run followed by resume with a tighter tolerance
   - a fresh tight run from scratch
