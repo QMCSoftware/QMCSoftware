@@ -1,4 +1,12 @@
-from qmcpy import DigitalNetB2, Halton, IIDStdUniform, Lattice, KorobovLattice, LatinHypercube, Hammersley
+from qmcpy import (
+    DigitalNetB2,
+    Halton,
+    Hammersley,
+    IIDStdUniform,
+    KorobovLattice,
+    LatinHypercube,
+    Lattice,
+)
 
 from qmcpy.util import ParameterError, ParameterWarning
 import qmctoolscl
