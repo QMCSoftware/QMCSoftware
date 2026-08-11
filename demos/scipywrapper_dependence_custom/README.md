@@ -20,7 +20,7 @@ From the top level of the QMCSoftware repo, the pieces for this project are:
   - light weight validation that warns when a custom distribution looks suspicious.
 
 - `demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb`  
-  Jupyter notebook that produces all figures and printed statistics used in the blog:
+  Jupyter notebook that produces all figures and printed statistics for the demo:
   - Example 1: independent vs dependent normals,
   - Example 2: zero inflated exponential plus uniform,
   - Example 3: acceptance rejection target with iid MC and with QMC,
@@ -30,9 +30,6 @@ From the top level of the QMCSoftware repo, the pieces for this project are:
 
 - `demos/scipywrapper_dependence_custom/README.md`  
   This file.
-
-- `docs/blogs/scipywrapper/index.md`  
-  Blog describing the project at a higher level.
 
 - `test/test_scipy_wrapper_custom.py`  
   Unit tests that:
@@ -74,7 +71,7 @@ Run all cells from top to bottom. You will see:
 - console output with warnings for the intentionally broken custom distribution,
 - a marginal histogram and joint scatter plot for a dependent multivariate Student t, along with printed checks for correlation and the theoretical covariance relationship.
 
-These are the same figures that the blog refers to.
+These are the figures documented by the demo.
 
 ---
 

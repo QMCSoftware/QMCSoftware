@@ -2,7 +2,7 @@
 
 _Generated from `/Users/kangjiangrui/Downloads/qmcpy.WordPress.2026-05-26.xml` on 2026-05-26._
 
-This file supports the **Content Inventory** section of `MIGRATE_qmcpy_checklist.md`. It records the Before-MCQMC preservation, retirement, and backlink-importance decisions and the Post-MCQMC old-to-new mapping implemented on `migrate_qmcpy`.
+This file supports the **Content Inventory** section of `MIGRATE_qmcpy_checklist.md`. It records the Before-MCQMC preservation, retirement, and backlink-importance decisions and the current Post-MCQMC mapping state on `migrate_qmcpy`.
 
 ## Backup Sources Checked
 
@@ -44,7 +44,7 @@ Minimum recovery procedure:
 
 ### Inventory Reconciliation Evidence
 
-Checked on 2026-07-16 with structured XML parsing:
+Historical evidence checked on 2026-07-16 with structured XML parsing:
 
 - Export status counts: 7 published pages, 1 draft page, 40 published posts, and 2 draft posts.
 - The export contains 50 unique page/post URLs; the inventory contains the same 50 unique URLs, with no missing or extra entries.
@@ -52,16 +52,19 @@ Checked on 2026-07-16 with structured XML parsing:
 - All 18 migrated blog targets listed below exist in `docs/blogs/`.
 - All 18 migrated blog files now contain an exact `Source WordPress URL` metadata match.
 - Post-MCQMC verification on 2026-07-17 confirmed the 18 selected blog targets and exact source URL metadata after the five extra post candidates were removed from the current migration scope.
+- On 2026-08-10, the owner superseded the earlier preservation decision and
+  removed all 18 blog targets and their repository redirect entries. The local
+  backups remain available for recovery.
 
 ## Current Must-Preserve Scope
 
-Must-preserve scope confirmed by Kang Jiangrui on 2026-05-26. Retirement and backlink-importance decisions confirmed by Kang Jiangrui, the project owner and sole collaborator, on 2026-07-16.
+Must-preserve scope was confirmed by Kang Jiangrui on 2026-05-26. Retirement and backlink-importance decisions were confirmed on 2026-07-16 and updated by the owner on 2026-08-10.
 
 | Item | Preserve? | Current/new location | Status |
 |---|---|---|---|
 | Home | Yes | `README.md` | Minimum viable homepage completed and locally verified |
 | Publications | Yes | `docs/publications.md` | Stable GitHub Pages target added and locally verified |
-| Blogs | Yes | `docs/blogs/index.md` and `docs/blogs/` | Index added; 18 existing migrated posts preserved |
+| Blogs | No (in this repo) | [`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website) | Blog publishing belongs to the separate website repository; all 18 migrated posts and their MkDocs publishing artifacts were removed here by owner decision on 2026-08-10 |
 | Contributors | Yes | `community.md` | Both old contributor paths map to the current Community page |
 | GitHub | Yes | `https://github.com/QMCSoftware/QMCSoftware` | Link present in README and WordPress nav export |
 | Docs | Yes | `https://qmcsoftware.github.io/QMCSoftware/` | Link present in README and WordPress nav export |
@@ -69,9 +72,14 @@ Must-preserve scope confirmed by Kang Jiangrui on 2026-05-26. Retirement and bac
 
 Standalone Donation, Videos, and Dev Tools pages and unpublished drafts are confirmed for retirement. Contributor content is preserved in `community.md`, with both old contributor paths included in the redirect manifest.
 
+Blog responsibility now belongs to
+[`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website).
+The MkDocs documentation site in this repository will not add blog pages or
+blog navigation.
+
 ## Before-MCQMC Preservation Policies
 
-Confirmed by the project owner and sole collaborator on 2026-07-16. Updated by the project owner on 2026-07-17 to remove the five extra post candidates from the current migration scope.
+Confirmed by the project owner and sole collaborator on 2026-07-16. Updated by the project owner on 2026-07-17 to remove the five extra post candidates from the current migration scope, then superseded on 2026-08-10 for the 18 previously migrated blogs.
 
 ### Retirement Policy
 
@@ -81,9 +89,13 @@ Use a conservative classification based on whether public content has a confirme
 - Retire the three unpublished WordPress drafts.
 - Retire published news, event, announcement, poster, and talk posts that have no confirmed current target or preservation exception.
 - Preserve contributor content for later mapping to an appropriate current page.
-- Preserve all 18 already-migrated blogs.
+- Remove all 18 previously migrated blogs from the repository, navigation,
+  author snippets, and redirect manifest.
+- Maintain future blog content in `QMCSoftware/qmcsoftware-website`; do not add
+  blog pages or blog navigation to this repository's MkDocs site.
 - Do not migrate the five extra published post candidates previously selected: the MCQMC 2020 tutorial, QMCPy v1.0 announcement, QMC software article, elliptic PDE demo, and UM-Bridge article.
-- A retirement decision means that migration is not required. It does not delete source material or backups during the Before-MCQMC stage.
+- The 2026-08-10 removal applies to repository content, not the local WordPress
+  export or Jetpack backup.
 
 ### External Backlink Preservation Policy
 
@@ -94,7 +106,11 @@ Apply the following tiered requirements to the external references recorded belo
 - **Low:** retain the reference as inventory evidence; no migration action is required.
 - Low-value directory and SEO results require no preservation work.
 
-Based on the current inventory, the Illinois Tech Elevate reference is the recorded high-importance source that explicitly identifies the "Why Add Q to MC?" blog. Its old path must therefore be included in Post-MCQMC mapping. All other high- and medium-importance references currently recorded cite the main domain or general project resources.
+The Illinois Tech Elevate reference remains recorded as evidence that explicitly
+identifies the "Why Add Q to MC?" blog. Its earlier path-preservation requirement
+was superseded for this branch by the 2026-08-10 owner decision, so the path is
+no longer present in `data/redirects.yml`. All other high- and medium-importance
+references currently recorded cite the main domain or general project resources.
 
 Read-only HTTP checks on 2026-07-16 returned HTTP 200 for 9 of the 13 recorded external sources. Four automated checks were inconclusive: ResearchGate and FNAL returned HTTP 403, LinkedIn returned HTTP 405 to a HEAD request, and the IIT Undergraduate Research Journal request timed out after 30 seconds. These results indicate access-control or availability uncertainty, not confirmed content removal, so the approved preservation requirements remain unchanged.
 
@@ -102,9 +118,10 @@ This policy defines preservation requirements only. Exact targets and the redire
 
 ## Working Classification Summary
 
-### Before-MCQMC Migrated Content
+### Historical Before-MCQMC Migrated Content
 
-The following WordPress posts have clear GitHub Pages targets in `docs/blogs/`:
+The following WordPress posts had GitHub Pages targets in `docs/blogs/` before
+the 2026-08-10 owner-approved removal:
 
 - Why Add Q to MC?
 - A QMCPy Quick Start
@@ -125,12 +142,17 @@ The following WordPress posts have clear GitHub Pages targets in `docs/blogs/`:
 - Visualizing the Generated Samples Helps
 - Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions
 
+All 18 targets, their publishing metadata, and their post-specific assets have
+now been removed from this branch. The backups listed above remain the recovery
+source.
+
 ### Post-MCQMC Mapping Completion
 
 - `https://qmcpy.org/publications/` maps to `docs/publications.md`.
 - `https://qmcpy.org/` maps to the reviewed minimum viable homepage in `README.md`.
 - `https://qmcpy.org/contributors/` and `https://qmcpy.org/contributors-2/` map to `community.md`.
-- The 18 previously migrated posts have stable targets under `docs/blogs/` and path-exact redirect entries in `data/redirects.yml`.
+- The 18 previously migrated posts and their path-exact redirect entries were
+  removed by owner decision on 2026-08-10.
 - The five extra post candidates are intentionally excluded from the current migration scope.
 
 ### Confirmed Retirement Decisions
@@ -237,7 +259,8 @@ No warning was introduced by the four `Source WordPress URL` metadata changes.
 
 ### Post-MCQMC Local Implementation Verification
 
-Checked on `migrate_qmcpy` on 2026-07-17:
+Historical check on `migrate_qmcpy` on 2026-07-17; blog-specific results below
+were superseded on 2026-08-10:
 
 - `docs/blogs/index.md` links all 18 preserved posts.
 - `docs/publications.md` preserves the old publication list and adds the current QMCPy software paper from repository-visible sources.
@@ -276,31 +299,31 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 
 | Old URL | Title | Status | Current/new location | Inventory note |
 |---|---|---|---|---|
-| https://qmcpy.org/2020/06/25/why_add_q_to_mc/ | Why Add Q to MC? | publish | blogs/why-add-q-to-mc/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2020/07/06/a-qmcpy-quick-start/ | A QMCPy Quick Start | publish | blogs/a-qmcpy-quick-start/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/ | What Makes a Sequence "Low Discrepancy"? | publish | blogs/what-makes-a-sequence-low-discrepancy/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2020/07/19/qei-with-qmcpy/ | qEI with QMCPy | publish | blogs/qei-with-qmcpy/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2020/08/31/safe-handling-of-qmc-points/ | Safe Handling of QMC Points | publish | blogs/safe-handling-of-qmc-points/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2020/06/25/why_add_q_to_mc/ | Why Add Q to MC? | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2020/07/06/a-qmcpy-quick-start/ | A QMCPy Quick Start | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2020/07/08/what-makes-a-sequence-low-discrepancy/ | What Makes a Sequence "Low Discrepancy"? | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2020/07/19/qei-with-qmcpy/ | qEI with QMCPy | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2020/08/31/safe-handling-of-qmc-points/ | Safe Handling of QMC Points | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
 | https://qmcpy.org/2020/09/03/mcqmc-2020-tutorial/ | A Tutorial at MCQMC 2020 | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2020/09/03/posters/ | A Collection of QMCPy Posters | publish |  | retire: no confirmed current target |
 | https://qmcpy.org/2020/09/03/pydata-chicago-talk/ | A Seminar at PyData Chicago | publish |  | retire: no confirmed current target |
 | https://qmcpy.org/2021/02/12/qmcpy-version-1-0/ | QMCPy Version 1.0 | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2021/02/25/quasi-monte-carlo-software-article/ | Quasi-Monte Carlo Software Article | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
-| https://qmcpy.org/2021/02/25/speeding-up-qmcpy-with-distributable-c-code/ | Speeding up QMCPy with Distributable C Code | publish | blogs/speeding-up-qmcpy-with-distributable-c-code/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2021/02/25/visualizing-the-internals-of-object-classes-in-qmcpy/ | Visualizing the Internals of Object Classes in QMCPy | publish | blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2021/02/25/speeding-up-qmcpy-with-distributable-c-code/ | Speeding up QMCPy with Distributable C Code | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2021/02/25/visualizing-the-internals-of-object-classes-in-qmcpy/ | Visualizing the Internals of Object Classes in QMCPy | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
 | https://qmcpy.org/2021/03/11/monte-carlo-methods-2021/ | Monte Carlo Methods 2021 | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2021/04/27/a-presentation-at-iits-computational-mathematics-seminar/ | A Presentation at IIT's Computational Mathematics Seminar | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2021/04/27/a-talk-at-the-chicago-area-siam-student-conference/ | A Talk at the Chicago Area SIAM Student Conference | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2021/04/27/a-talk-at-the-great-lakes-siam-conference/ | A Talk at the Great Lakes SIAM Conference | publish |  | retire: old event post without a confirmed current target |
-| https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/ | Digital Sequences, the Niederreiter Construction | publish | blogs/digital-sequences-the-niederreiter-construction/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/ | Digital Sequences, the Niederreiter Construction | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
 | https://qmcpy.org/2021/06/04/elliptic-pde-demo/ | Elliptic PDE Demo | publish |  | not migrated: removed from current scope per 2026-07-17 owner instruction |
 | https://qmcpy.org/2022/02/22/qmcpy-events-coming-soon/ | QMCPy Events Coming Soon | publish |  | retire: old event announcement without a confirmed current target |
-| https://qmcpy.org/2022/05/19/bayesian-stopping-criteria/ | Bayesian Stopping Criteria | publish | blogs/bayesian-stopping-criteria/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2023/04/07/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/ | Accelerating Rare-event Reliability Simulations for CERN's Large Hadron Collider using QMCPy | publish | blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2022/05/19/bayesian-stopping-criteria/ | Bayesian Stopping Criteria | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2023/04/07/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/ | Accelerating Rare-event Reliability Simulations for CERN's Large Hadron Collider using QMCPy | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
 | https://qmcpy.org/2023/04/28/illinois-tech-receives-nsf-grant-to-offer-intensive-summer-research-program-in-computational-mathematics-and-data-science-for-undergraduates/ | Illinois Tech Receives NSF Grant to Offer Intensive Summer Research Program in Computational Mathematics and Data Science for Undergraduates | publish |  | retire: old news post without a confirmed current target |
 | https://qmcpy.org/2023/05/08/combining-the-expertise-of-the-stasasticians-and-a-commitment-to-esg-principles-to-deliver-comprehensive-wealth-management-and-investment/ | Combining the Expertise of the StaSASticians and a Commitment to ESG Principles to Deliver Comprehensive Wealth Management and Investment | publish |  | retire: old news post without a confirmed current target |
 | https://qmcpy.org/2023/05/13/boosting-numerical-efficiency-with-low-discrepancy-sampling-enhancing-estimation-and-integration-in-diverse-fields-from-fred-hickernell-and-the-qmcpy-library/ | Boosting Numerical Efficiency with Low Discrepancy Sampling: Enhancing Estimation and Integration in Diverse Fields from Fred Hickernell and the QMCPy Library | publish |  | retire: old news post without a confirmed current target |
-| https://qmcpy.org/2023/05/16/random-lattice-generators-are-not-bad/ | Random Lattice Generators are Not Bad | publish | blogs/random-lattice-generators-are-not-bad/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2023/05/16/random-lattice-generators-are-not-bad/ | Random Lattice Generators are Not Bad | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
 | https://qmcpy.org/2023/07/04/open-source-an-important-tool-to-advancing-science/ | Open Source Software: An Important Tool for Advancing Science | publish |  | retire: old news post without a confirmed current target |
 | https://qmcpy.org/2023/07/05/qmcpy-talks-at-the-14th-international-conference-on-monte-carlo-methods-and-applications/ | QMCPY talks at the 14th International Conference on Monte Carlo Methods and Applications | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2023/08/06/innovative-investment-tool-qualifies-students-for-international-hackathon/ | Innovative Investment Tool Qualifies Students for International Hackathon | publish |  | retire: old news post without a confirmed current target |
@@ -309,20 +332,26 @@ Checked after merging `origin/develop` at `a1ab9969` on 2026-07-16:
 | https://qmcpy.org/2024/05/13/exploring-the-frontiers-the-15th-international-conference-on-monte-carlo-methods-and-applications-mcm-2025-at-illinois-institute-of-technology/ | Exploring the Frontiers: The 15th International Conference on Monte Carlo Methods and Applications (MCM 2025) at Illinois Institute of Technology | publish |  | retire: old event post without a confirmed current target |
 | https://qmcpy.org/2024/05/13/karl-menger-graduate-teaching-assistant-award/ | Karl Menger Graduate Teaching Assistant Award | publish |  | retire: old news post without a confirmed current target |
 | https://qmcpy.org/2024/10/20/aleksei-secures-doe-research-fellowship/ | Aleksei Sorokin Awarded Prestigious DOE Research Fellowship | publish |  | retire: old news post without a confirmed current target |
-| https://qmcpy.org/2025/07/15/analysis-of-quasi-monte-carlo-efficiency-for-asian-option-pricing/ | Analysis of Quasi-Monte Carlo Efficiency for Asian Option Pricing | publish | blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2025/09/29/linear-matrix-scrambling-and-digital-shift-for-halton/ | Linear Matrix Scrambling and Digital Shift for Halton | publish | blogs/linear-matrix-scrambling-and-digital-shift-for-halton/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/ | Highly Efficient Geometric Brownian Motion Modeling with QMCPy | publish | blogs/gbm-qmcpy/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2025/11/29/parsl-accelerated-qmcpy-notebook-tests/ | Parsl Accelerated QMCPy Notebook Tests | publish | blogs/accelerating-qmcpy-notebook-tests-with-parsl/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2026/02/25/cubmccltvec-vectorizing-the-cubmcclt-algorithm/ | CubMCCLTVec: Vectorizing the CubMCCLT Algorithm | publish | blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2026/02/25/visualizing-the-generated-samples-helps/ | Visualizing the Generated Samples Helps | publish | blogs/visualizing-the-generated-samples-helps/index.md | already migrated: exact Source WordPress URL match |
-| https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/ | Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions | publish | blogs/scipywrapper/index.md | already migrated: exact Source WordPress URL match |
+| https://qmcpy.org/2025/07/15/analysis-of-quasi-monte-carlo-efficiency-for-asian-option-pricing/ | Analysis of Quasi-Monte Carlo Efficiency for Asian Option Pricing | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2025/09/29/linear-matrix-scrambling-and-digital-shift-for-halton/ | Linear Matrix Scrambling and Digital Shift for Halton | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2025/10/22/highly-efficient-geometric-brownian-motion-modeling-with-qmcpy/ | Highly Efficient Geometric Brownian Motion Modeling with QMCPy | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2025/11/29/parsl-accelerated-qmcpy-notebook-tests/ | Parsl Accelerated QMCPy Notebook Tests | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2026/02/25/cubmccltvec-vectorizing-the-cubmcclt-algorithm/ | CubMCCLTVec: Vectorizing the CubMCCLT Algorithm | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2026/02/25/visualizing-the-generated-samples-helps/ | Visualizing the Generated Samples Helps | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
+| https://qmcpy.org/2026/04/18/extending-scipywrapper-of-qmcpy-to-support-dependent-and-custom-distributions/ | Extending SciPyWrapper of QMCPy to Support Dependent and Custom Distributions | publish |  | retired: repository target removed by owner decision on 2026-08-10 |
 | https://qmcpy.org/?p=1670 | Visualizing Discrete Distributions and True Measures: Unveiling Insights with QMCPy Plot Projections | draft |  | retire: unpublished WordPress draft |
 | https://qmcpy.org/?p=1710 | Visualizing Discrete Distributions and True Measure Objects with QMCPy Plot Projections: Enhancing Understanding Through Graphical Representation | draft |  | retire: unpublished WordPress draft |
 
-## Confirmed Before-MCQMC Decisions
+## Current Confirmed Decisions
 
-- Preserve Home, Publications, Blogs, GitHub, Docs, PyPI, contributor content, and the 18 already migrated blog posts.
+- Preserve Home, Publications, GitHub, Docs, PyPI, and contributor content.
+- Remove all 18 previously migrated blog posts and their repository publishing
+  artifacts, as confirmed by the owner on 2026-08-10.
+- Assign future blog publishing to `QMCSoftware/qmcsoftware-website`; the MkDocs
+  documentation site in this repository remains blog-free.
 - Do not migrate the five extra published post candidates removed from the current scope on 2026-07-17.
 - Retire Donation, Videos, Dev Tools, unpublished drafts, and unmatched old news, event, and announcement posts.
-- Apply the tiered external backlink policy above; the recorded Illinois Tech Elevate deep link requires preservation of the old "Why Add Q to MC?" path.
-- Exact targets and redirect scope are implemented in `data/redirects.yml` and generated by `scripts/make_redirect_pages.py`; live deployment verification remains Final Hosting Migration work.
+- Keep the tiered external-backlink evidence above, while treating the earlier
+  "Why Add Q to MC?" path requirement as superseded by the 2026-08-10 removal.
+- `data/redirects.yml` now retains only the two contributor mappings; live
+  deployment verification remains Final Hosting Migration work.

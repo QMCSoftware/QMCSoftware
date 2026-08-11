@@ -202,7 +202,7 @@ mkdocs serve
 </tr>
 
 <tr>
-  <td><a href="https://qmcpy.org">QMCPy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various LDS and data-driven error estimation</span></td>
+  <td><a href="https://qmcsoftware.github.io/QMCSoftware/">QMCPy</a><br><span class="software-related">Related: <a href="https://github.com/QMCSoftware/QMCToolsCL">QMCToolsCL</a></span><br><span class="software-desc">Multi-purpose library featuring various LDS and data-driven error estimation</span></td>
   <td>Python</td>
   <td><span class="status-nowrap">Active<br>Collaboration welcome</span></td>
   <td>Sou-Cheng Choi<br><a href="https://github.com/fjhickernell">Fred Hickernell</a><br><a href="https://alegresor.github.io">Aleksei Sorokin</a></td>

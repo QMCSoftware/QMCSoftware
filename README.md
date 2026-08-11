@@ -13,7 +13,11 @@
 
 QMCPy is an open-source Python framework for Monte Carlo and quasi-Monte Carlo integration. It combines low-discrepancy point generators, probability measures, integrands, and stopping criteria through a common object-oriented interface. The project supports practitioners applying modern QMC methods and researchers developing new algorithms within a shared, reproducible framework.
 
-[Get started](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/) | [API reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) | [Demos](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/) | [Blogs](https://qmcsoftware.github.io/QMCSoftware/blogs/) | [Publications](https://qmcsoftware.github.io/QMCSoftware/publications/)
+[Get started](https://qmcsoftware.github.io/QMCSoftware/demos/qmcpy_intro/) | [API reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) | [Demos](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/) | [Publications](https://qmcsoftware.github.io/QMCSoftware/publications/)
+
+Blog publishing is maintained separately in
+[`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website).
+This MkDocs documentation site does not include blog posts.
 
 ## Installation
 
@@ -38,7 +42,6 @@ See the [component overview](https://qmcsoftware.github.io/QMCSoftware/component
 
 - Start with the [quickstart notebook](https://qmcsoftware.github.io/QMCSoftware/demos/quickstart/).
 - Browse the [package reference](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/) and the full collection of rendered notebook demos.
-- Read technical articles in the [QMCPy blog archive](https://qmcsoftware.github.io/QMCSoftware/blogs/).
 - Review [publications on QMCPy and related work](https://qmcsoftware.github.io/QMCSoftware/publications/).
 - Compare projects in the [QMC software ecosystem](https://qmcsoftware.github.io/QMCSoftware/qmc-software/).
 - Watch the [2023 PyData Chicago tutorial](https://www.youtube.com/watch?v=bRcKiLA2yBQ) or the [2020 MCQMC tutorial](https://www.youtube.com/watch?v=gL8M_7c-YUE).

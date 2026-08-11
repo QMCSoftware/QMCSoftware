@@ -59,22 +59,28 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 **Co-Lead:** Jiangrui Kang and Larysa Matiukha
 
 #### Key Responsibilities
+
+Repository boundary: blog publishing is owned by
+[`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website).
+The MkDocs site maintained in this repository contains package documentation,
+API references, demos, and publications, but not blog posts.
+
 - **Documentation Standards**: Ensure all pull requests (PRs) with new components include appropriate documentation for those components.
 - **Demo Integration**: Verify that demos are properly rendered into the documentation website.
 - **API Documentation**: Maintain comprehensive package reference documentation.
-- **Content Development**: Oversee the creation of blog posts, tutorials, and other content that highlights QMCPy's features, research applications, and community contributions.
-- **Editorial Oversight**: Coordinate peer reviews for blog posts and other content, ensuring quality and alignment with QMCPy's goals.
-- **Website Management**: Oversee the "Documentation" and "Blogs" sections of the QMCPy website, ensuring they are up-to-date and well-integrated with other sections like "News" and "Events."
+- **Content Development**: Oversee tutorials and documentation here, and coordinate blog content through the separate website repository.
+- **Editorial Oversight**: Coordinate peer reviews for documentation and website content, ensuring quality and alignment with QMCPy's goals.
+- **Website Management**: Maintain the documentation site here and the blog in `QMCSoftware/qmcsoftware-website` as separate publishing surfaces with clear cross-links.
 - **Content Strategy**: Develop a cohesive strategy for documentation and communication topics, aligning them with QMCPy's broader goals.
 - **Collaboration**: Work closely with other leads to ensure documentation and communication efforts complement the overall project.
-- **Community Engagement**: Use blogs, tutorials, and other content to showcase user stories, case studies, and research applications, fostering a sense of community.
+- **Community Engagement**: Use website articles, tutorials, and other content to showcase user stories, case studies, and research applications, fostering a sense of community.
 
 #### Strategic Goals
 - Ensure QMCPy's documentation is comprehensive, accessible, and user-friendly for both developers and practitioners.
 - Highlight QMCPy's capabilities and community contributions through engaging content.
-- Strengthen the connection between the "Documentation" and "Blogs" sections and other website areas, such as "News" and "Events."
+- Strengthen the connection between the documentation site and the separate website repository without mixing their publishing responsibilities.
 - Encourage team-wide participation in content creation to maintain a diverse and active presence.
-- Consider merging `qmcpy.org` with the documentation.
+- Keep `qmcpy.org` website content and the package documentation coordinated but separately maintained.
 
 ---
 
@@ -157,7 +163,6 @@ Sou-Cheng T. Choi, Fred Hickernell, Aleksei Sorokin
 4. **Proactive Communication**: Identify issues early and communicate with other leads and the broader team.
 5. **Community Building**: Foster an inclusive, welcoming environment for all contributors.
 6. **Long-term Thinking**: Consider the sustainability and scalability of processes and decisions.
-
 
 
 

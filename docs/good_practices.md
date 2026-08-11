@@ -16,7 +16,7 @@ We expect tests for every change that affects behavior, documentation, or user w
 
 - Add or update **unit tests** in `test/` for new logic, bug fixes, edge cases, invalid inputs, shapes, finite outputs, and meaningful invariants.
 - Add or update **doctests** when public docstrings, examples, or usage patterns change.
-- Add or update **notebook tests** when a demo or blog notebook changes.
+- Add or update **notebook tests** when a demo notebook changes.
 
 ### Keep Tests Stable and Meaningful
 
@@ -29,7 +29,7 @@ Run the smallest relevant checks before requesting review; see the contributing 
 
 When notebook-backed content changes:
 
-- Use the notebook-focused checks for `demos/` and blog content.
+- Use the notebook-focused checks for content under `demos/`.
 - Keep executable Python snippets under `docs/` runnable as well.
 - If one notebook cell is unusually slow, prefer skipping that cell or reducing the workload rather than skipping the entire notebook test.
 
@@ -51,7 +51,7 @@ New functionality should fit the existing QMCPy class hierarchy instead of intro
 - Typical extension points include `DiscreteDistribution`, `TrueMeasure`, `Integrand`, `StoppingCriterion`, and `AccumulateData`.
 - If a change does not fit the current hierarchy, raise that design question in an issue or draft PR before committing to a new abstraction.
 
-The [components overview](components.md) and the blog post on [object classes in QMCPy](blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md) provide useful background on the current architecture.
+The [components overview](components.md) provides useful background on the current architecture.
 
 ## Validate Links, Metadata, and CI Scope
 
@@ -81,11 +81,13 @@ Several reviews focused on avoidable cleanup that is easy to catch before reques
 - Remove unused imports, trailing whitespace, and other style-only churn before requesting review.
 - Use explicit runtime exceptions such as `ParameterError` for invalid user inputs instead of relying on `assert` statements in production code.
 
-## Add Demos or Blogs as Notebooks
+## Add Demos as Notebooks
 
 User-facing methods, new workflows, and mathematically important additions should usually come with an executable notebook.
 - Put demos and tutorials in `.ipynb` files under `demos/`.
-- If a contribution is best explained as a blog post, keep the blog content backed by a notebook when practical.
+- Propose blog articles in
+  [`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website),
+  because this MkDocs documentation site does not publish blog posts.
 - Keep notebooks lightweight, deterministic, and suitable for docs rendering and CI.
 - Include the mathematical rationale, key assumptions, validation evidence, and a minimal example.
 

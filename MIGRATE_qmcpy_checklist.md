@@ -1,6 +1,6 @@
 # QMCPy.org Transition Checklist
 
-_revised 2026-07-16_
+_revised 2026-08-10_
 
 ## Goals
 
@@ -27,7 +27,8 @@ _revised 2026-07-16_
 
 - [x] Existing GitHub Pages site exists:
   - https://qmcsoftware.github.io/QMCSoftware/
-- [x] Blog posts already migrated to GitHub
+- [x] The 18 previously migrated blog posts were removed from this branch by
+  owner decision on 2026-08-10
 - [x] WordPress.com nameservers remain authoritative for DNS
 - [x] `qmcpy.org` web records point to GitHub Pages
 - [x] `www.qmcpy.org` points to `qmcsoftware.github.io`
@@ -119,7 +120,6 @@ Current must-preserve scope:
 
 - Home
 - Publications
-- Blogs
 - GitHub
 - Docs
 - PyPI
@@ -130,6 +130,8 @@ Collaborator decisions confirmed by Kang Jiangrui on 2026-07-16:
 - Retire the standalone Donation, Videos, and Dev Tools pages.
 - Retire unpublished WordPress drafts.
 - Retire old news, event, and announcement posts without a confirmed current target.
+- Remove all 18 previously migrated blog posts, their index/navigation entries,
+  author snippets, and old-path redirects (confirmed 2026-08-10).
 
 Inventory notes:
 
@@ -193,8 +195,7 @@ Verification notes:
 Notes:
 
 - First independent homepage pass added public links for documentation, GitHub,
-  PyPI, migrated blogs, the QMC software ecosystem table, community, and
-  citation information.
+  PyPI, the QMC software ecosystem table, community, and citation information.
 - Follow-up homepage pass tightened the entry points into a `Start Here`
   section for users, developers, project background, and citation.
 - `https://qmcpy.org/publications/` has been migrated to `docs/publications.md`
@@ -208,13 +209,9 @@ Notes:
 
 Notes:
 
-- Added a visible migrated blog index to the Blogs navigation.
 - Added the migrated Publications page to Community Resources.
-- Completed a conservative navigation label/group cleanup: the homepage label
-  is `Home`, and Blogs now separates notebook/demo posts from migrated
-  WordPress posts without deleting pages or changing paths.
-- Obsolete WordPress-era structure has not been removed; any retirement or
-  deletion decision remains collaborator-dependent.
+- Removed the earlier Blogs navigation section and all 18 migrated WordPress
+  posts after the 2026-08-10 owner decision.
 
 ## URL Preservation
 
@@ -224,7 +221,8 @@ Notes:
 
 ## Implementation Evidence
 
-Completed on `migrate_qmcpy` on 2026-07-17:
+Historical implementation completed on `migrate_qmcpy` on 2026-07-17; the blog
+portions below were superseded by the 2026-08-10 owner decision:
 
 - Reworked `README.md` into the minimum viable homepage with direct entry points for installation, documentation, demos, blogs, publications, citation, community, GitHub, PyPI, and the QMC software ecosystem.
 - Added `docs/blogs/index.md` and `docs/publications.md` as stable public index targets.
@@ -238,6 +236,20 @@ Completed on `migrate_qmcpy` on 2026-07-17:
 - Browser validation confirmed 18 indexed blog posts, the Publications page, the high-priority "Why Add Q to MC?" redirect, desktop layout, and a 390 px mobile layout without horizontal overflow or console errors.
 
 These checks validate the branch implementation only. Live `qmcpy.org` verification remains part of Final Hosting Migration after publication.
+
+Updated on `migrate_qmcpy` on 2026-08-10:
+
+- Removed the 18 migrated blog posts, their local images, shared author snippets,
+  and `docs/blogs/index.md`.
+- Removed the Blogs navigation and homepage links to the archive.
+- Reduced `data/redirects.yml` from 20 entries to the two contributor redirects
+  and removed the 18 generated dated-path redirect pages.
+- Assigned blog publishing to
+  [`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website);
+  this repository's MkDocs documentation site will not add blog pages or blog
+  navigation.
+- The local WordPress export and Jetpack backup remain the recovery sources for
+  the removed content.
 
 ---
 

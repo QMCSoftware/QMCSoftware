@@ -30,7 +30,11 @@ We periodically release the contents of `develop` to `master`. Contact the team 
 
 ### Blogs
 
-If you develop a new feature, please consider writing a blog for the [QMCPy documentation](https://qmcsoftware.github.io/QMCSoftware/) including a brief summary of the mathematical rationale, key evidence (tests, benchmarks, or references), and examples.
+Blog content is maintained in
+[`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website),
+not in this repository's MkDocs documentation site. Propose blog posts in that
+repository. Keep package documentation, API references, and executable demos
+for a feature in this repository.
 
 
 ## Installation
