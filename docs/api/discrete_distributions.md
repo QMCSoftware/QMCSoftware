@@ -24,9 +24,17 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.lattice.Lattice
 
+## `KorobovLattice`
+
+::: qmcpy.discrete_distribution.korobov.KorobovLattice
+
 ## `Halton`
 
 ::: qmcpy.discrete_distribution.digital_net_any_bases.halton.Halton
+
+## `Hammersley`
+
+::: qmcpy.discrete_distribution.digital_net_any_bases.hammersley.Hammersley
 
 ## `Faure`
 
@@ -40,9 +48,14 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.kronecker.Kronecker
 
+## `LatinHypercube`
+
+::: qmcpy.discrete_distribution.latin_hypercube.LatinHypercube
+
 ## `DummySampler`
 
 ::: qmcpy.discrete_distribution.dummy_sampler.DummySampler
+
 
 ## `IIDStdUniform`
 
