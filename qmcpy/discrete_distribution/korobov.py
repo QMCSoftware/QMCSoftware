@@ -204,7 +204,7 @@ class KorobovLattice(AbstractLDDiscreteDistribution):
             p = (p * a) % n
 
         k = np.arange(n, dtype=np.int64)[:, None]           # (n, 1)
-        x = ((k * z[None, :]) % n) / n                       # (n, d) 
+        x = ((k * z[None, :]) % n) / n                       # (n, d)
         x = x[None, :, :].astype(np.float64)                 # (1, n, d) -- r_x = 1
 
         r_x = np.uint64(1)

@@ -1,6 +1,6 @@
 from qmcpy.util import ParameterError,ParameterWarning
 import numpy as np
-from qmcpy.discrete_distribution.digital_net_any_bases.halton import Halton
+from .halton import Halton
 from qmcpy.discrete_distribution.abstract_discrete_distribution import AbstractLDDiscreteDistribution
 from .digital_net_any_bases import DigitalNetAnyBases
 import warnings
@@ -102,7 +102,7 @@ class Hammersley(DigitalNetAnyBases):
         dimension = int(dimension)
         if dimension < 1:
             raise ParameterError("Hammersley requires dimension >= 1")
-        
+
         AbstractLDDiscreteDistribution.__init__(
             self, dimension, replications=None, seed=seed,
             d_limit=10**9, n_limit=n_lim,
@@ -153,4 +153,4 @@ class Hammersley(DigitalNetAnyBases):
         return Hammersley(
             dimension=dimension,
             seed=child_seed,
-        )                     
+        )
