@@ -29,6 +29,7 @@ from qmcpy import (
     CubMLMCCont,
     CubMLQMC,
     CubMLQMCCont,
+    CubQMCBayesLatticeG,
     CubQMCCLT,
     CubQMCLatticeG,
     CubQMCML,
@@ -52,10 +53,10 @@ from qmcpy.util import (
     MaxSamplesWarning,
     MethodImplementationError,
     ParameterError,
+    ParameterWarning
 )
 from qmcpy.util.data import Data
 from qmcpy.stopping_criterion.diagnostics import _IterationHistoryTable, _IterationTraceLogger, _print_diagnostic, _get_iteration_log_frame
-
 
 # Test functions and parameters
 keister_2d_exact = 1.808186429263620

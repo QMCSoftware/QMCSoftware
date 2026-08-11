@@ -1,5 +1,6 @@
-from qmcpy import DigitalNetB2, Halton, IIDStdUniform, Lattice
-from qmcpy.util import ParameterError
+from qmcpy import DigitalNetB2, Halton, IIDStdUniform, Lattice, KorobovLattice, LatinHypercube, Hammersley
+
+from qmcpy.util import ParameterError, ParameterWarning
 import qmctoolscl
 import os
 import unittest

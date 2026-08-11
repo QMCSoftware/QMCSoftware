@@ -4,12 +4,14 @@ from qmcpy import (
     DigitalNetB2,
     Gaussian,
     GeometricBrownianMotion,
+    IIDStdUniform,
     JohnsonsSU,
     Kumaraswamy,
     Lattice,
     Lebesgue,
     MaternGP,
     Uniform,
+    ZeroInflatedExpUniform,
 )
 from qmcpy.util import DimensionError, ParameterError
 import numpy as np
