@@ -8,9 +8,10 @@ from qmcpy import (
     DigitalNetB2,
     SciPyWrapper,
     StudentT,
-    TriangularDistribution,
     ZeroInflatedExpUniform,
 )
+
+from qmcpy.true_measure.triangular import TriangularDistribution
 from qmcpy.util import DimensionError, ParameterError
 
 

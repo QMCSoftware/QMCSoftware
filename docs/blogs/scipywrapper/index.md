@@ -87,7 +87,9 @@ x_joint = tm_joint(4096)
 ##### New custom-univariate workflow
 
 ```python
-from qmcpy import DigitalNetB2, SciPyWrapper, TriangularDistribution
+from qmcpy import DigitalNetB2, SciPyWrapper
+
+from qmcpy.true_measure.triangular import TriangularDistribution
 
 tri = TriangularDistribution(c=0.3, loc=-1.0, scale=2.0)
 tm_custom = SciPyWrapper(DigitalNetB2(1, seed=11), scipy_distribs=tri)
