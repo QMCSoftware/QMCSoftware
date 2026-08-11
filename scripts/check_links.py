@@ -22,13 +22,48 @@ import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
+
+import yaml
 
 HREF_RE = re.compile(r'href=["\']([^"\'#][^"\']*)["\']')
 # Only <a href="...">, not <link href="..."> (stylesheets, preconnect resource
 # hints, icons, ...) -- those aren't links a reader can click and follow.
 A_HREF_RE = re.compile(r'<a\s[^>]*href=["\']([^"\'#][^"\']*)["\']', re.IGNORECASE)
 ID_RE = re.compile(r'id=["\']([^"\']+)["\']')
+ROOT = Path(__file__).resolve().parents[1]
+MKDOCS_CONFIG = ROOT / "mkdocs.yml"
+
+
+def read_site_url(config_path: Path = MKDOCS_CONFIG) -> str | None:
+    config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    value = config.get("site_url") if isinstance(config, dict) else None
+    if value is None:
+        return None
+    return str(value).strip() or None
+
+
+def _local_href(href: str, site_url: str | None) -> str | None:
+    """Return a site-local href, stripping the deployment path when needed."""
+    parsed = urlparse(href)
+    site = urlparse(site_url) if site_url else None
+
+    if parsed.scheme:
+        if (
+            site is None
+            or parsed.scheme not in ("http", "https")
+            or (parsed.scheme, parsed.netloc) != (site.scheme, site.netloc)
+        ):
+            return None
+    elif href.startswith("//"):
+        return None
+
+    path = parsed.path
+    prefix = site.path.rstrip("/") if site is not None else ""
+    if prefix and (path == prefix or path.startswith(f"{prefix}/")):
+        path = path[len(prefix) :] or "/"
+
+    return urlunparse(("", "", path, "", parsed.query, parsed.fragment))
 
 
 def _path_for_url_target(site_dir: Path, target: str) -> Path | None:
@@ -49,7 +84,7 @@ def _path_for_url_target(site_dir: Path, target: str) -> Path | None:
     return candidate
 
 
-def check_internal(site_dir: Path) -> list[str]:
+def check_internal(site_dir: Path, site_url: str | None = None) -> list[str]:
     # Resolve once so every path derived from site_dir (including each html
     # file's .parent used as the base for relative links) shares one
     # convention -- otherwise a symlinked path (e.g. macOS /tmp -> /private/tmp)
@@ -68,11 +103,11 @@ def check_internal(site_dir: Path) -> list[str]:
     for f in html_files:
         text = f.read_text(encoding="utf-8", errors="replace")
         for href in HREF_RE.findall(text):
-            # Only same-origin, scheme-less hrefs are filesystem paths to check;
-            # this also skips data:, mailto:, tel:, javascript:, blob:, etc.
-            if urlparse(href).scheme != "" or href.startswith("//"):
+            local_href = _local_href(href, site_url)
+            if local_href is None:
                 continue
-            target_path = _path_for_url_target(f.parent, href)
+            base_dir = site_dir if local_href.startswith("/") else f.parent
+            target_path = _path_for_url_target(base_dir, local_href)
             if target_path is None:
                 continue
             try:
@@ -81,10 +116,12 @@ def check_internal(site_dir: Path) -> list[str]:
                 problems.append(f"{f.relative_to(site_dir)}: unresolvable link '{href[:80]}...' ({e})")
                 continue
             if not exists:
-                problems.append(f"{f.relative_to(site_dir)}: broken internal link '{href}'")
+                problems.append(
+                    f"{f.relative_to(site_dir)}: broken internal link '{href}'"
+                )
                 continue
-            if "#" in href:
-                anchor = href.split("#", 1)[1]
+            if "#" in local_href:
+                anchor = local_href.split("#", 1)[1]
                 if anchor and anchor not in anchors_by_file.get(target_path, set()):
                     problems.append(
                         f"{f.relative_to(site_dir)}: link '{href}' has no matching "
@@ -140,13 +177,19 @@ def _check_one(url: str, timeout: float) -> tuple[str, str] | None:
 
 
 def check_external(
-    site_dir: Path, timeout: float = 8.0, workers: int = 4
+    site_dir: Path,
+    timeout: float = 8.0,
+    workers: int = 4,
+    site_url: str | None = None,
 ) -> tuple[list[str], list[str]]:
     links: dict[str, list[Path]] = {}
     for f in sorted(site_dir.rglob("*.html")):
         text = f.read_text(encoding="utf-8", errors="replace")
         for href in A_HREF_RE.findall(text):
-            if urlparse(href).scheme in ("http", "https"):
+            if (
+                urlparse(href).scheme in ("http", "https")
+                and _local_href(href, site_url) is None
+            ):
                 links.setdefault(href, []).append(f.relative_to(site_dir))
 
     broken = []
@@ -173,13 +216,14 @@ def main() -> int:
     args = parser.parse_args()
 
     site_dir = Path(args.site_dir)
-    problems = check_internal(site_dir)
+    site_url = read_site_url()
+    problems = check_internal(site_dir, site_url=site_url)
     print(f"Checked internal links under {site_dir}: {len(problems)} problem(s).")
     for p in problems:
         print(f"  {p}")
 
     if args.external:
-        ext_broken, ext_warnings = check_external(site_dir)
+        ext_broken, ext_warnings = check_external(site_dir, site_url=site_url)
         print(
             f"\nChecked external links: {len(ext_broken)} broken link(s), "
             f"{len(ext_warnings)} warning(s)."

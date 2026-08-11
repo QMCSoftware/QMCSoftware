@@ -1,3 +1,4 @@
+site_url: "https://qmcsoftware.github.io/QMCSoftware/"
 site_name: "QMCPy"
 exclude_docs: |
   **/AGENTS.md

@@ -103,13 +103,58 @@ def test_external_results_are_separated_and_duplicate_urls_checked_once(tmp_path
     ]
 
 
+def test_internal_links_strip_site_url_deployment_path(tmp_path):
+    target = tmp_path / "target"
+    target.mkdir()
+    (target / "index.html").write_text(
+        '<h2 id="section">Target</h2>', encoding="utf-8"
+    )
+    (tmp_path / "index.html").write_text(
+        '<a href="/QMCSoftware/target/">root-relative</a>'
+        '<a href="https://qmcsoftware.github.io/QMCSoftware/target/#section">absolute</a>',
+        encoding="utf-8",
+    )
+
+    assert (
+        check_links.check_internal(
+            tmp_path, site_url="https://qmcsoftware.github.io/QMCSoftware/"
+        )
+        == []
+    )
+
+
+def test_external_check_skips_same_site_urls(tmp_path):
+    (tmp_path / "page.html").write_text(
+        '<a href="https://qmcsoftware.github.io/QMCSoftware/target/">same</a>'
+        '<a href="https://example.test/target/">external</a>',
+        encoding="utf-8",
+    )
+
+    with patch.object(check_links, "_check_one", return_value=None) as check_one:
+        broken, warnings = check_links.check_external(
+            tmp_path,
+            workers=1,
+            site_url="https://qmcsoftware.github.io/QMCSoftware/",
+        )
+
+    assert broken == []
+    assert warnings == []
+    assert check_one.call_count == 1
+    assert check_one.call_args.args[0] == "https://example.test/target/"
+
+
 def test_external_warnings_do_not_make_main_fail(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["check_links.py", str(tmp_path), "--external"])
-    monkeypatch.setattr(check_links, "check_internal", lambda _site_dir: [])
+    monkeypatch.setattr(
+        check_links, "check_internal", lambda _site_dir, site_url=None: []
+    )
     monkeypatch.setattr(
         check_links,
         "check_external",
-        lambda _site_dir: ([], ["https://example.test -- HTTP 403"]),
+        lambda _site_dir, site_url=None: (
+            [],
+            ["https://example.test -- HTTP 403"],
+        ),
     )
 
     assert check_links.main() == 0
@@ -118,11 +163,16 @@ def test_external_warnings_do_not_make_main_fail(tmp_path, monkeypatch, capsys):
 
 def test_confirmed_external_breakage_makes_main_fail(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv", ["check_links.py", str(tmp_path), "--external"])
-    monkeypatch.setattr(check_links, "check_internal", lambda _site_dir: [])
+    monkeypatch.setattr(
+        check_links, "check_internal", lambda _site_dir, site_url=None: []
+    )
     monkeypatch.setattr(
         check_links,
         "check_external",
-        lambda _site_dir: (["https://example.test -- HTTP 404"], []),
+        lambda _site_dir, site_url=None: (
+            ["https://example.test -- HTTP 404"],
+            [],
+        ),
     )
 
     assert check_links.main() == 1
