@@ -1,5 +1,11 @@
-from qmcpy import *
-from qmcpy.util.transforms import tf_exp_eps_inv,tf_exp_eps
+from qmcpy import (
+    KernelDigShiftInvar,
+    KernelDigShiftInvarAdaptiveAlpha,
+    KernelDigShiftInvarCombined,
+    KernelShiftInvar,
+    KernelShiftInvarCombined,
+)
+from qmcpy.util.transforms import tf_exp_eps, tf_exp_eps_inv
 import unittest
 
 
@@ -15,19 +21,19 @@ class KernelsTest(unittest.TestCase):
             ]:
             d = 3
             kernel = KernelClass(
-                d = d, 
+                d = d,
                 weights = [1/j**2 for j in range(1,d+1)])
             with self.assertRaises(ValueError) as ae:
                 kernel = KernelClass(
-                d = d, 
+                d = d,
                 lengthscales = [1/j**2 for j in range(1,d+1)],
                 weights = [1/j**2 for j in range(1,d+1)],)
             kernel = KernelClass(
-                d = d, 
+                d = d,
                 shape_weights = [1,])
             with self.assertRaises(ValueError) as ae:
                 kernel = KernelClass(
-                    d = d, 
+                    d = d,
                     shape_weights = [1,],
                     shape_lengthscales = [1,])
             kernel = KernelClass(
@@ -41,12 +47,12 @@ class KernelsTest(unittest.TestCase):
                 tfs_lengthscales = (tf_exp_eps_inv, tf_exp_eps),
                 )
             kernel = KernelClass(
-                d = d, 
+                d = d,
                 requires_grad_weights = True,
                 )
             with self.assertRaises(ValueError) as ae:
                 kernel = KernelClass(
-                    d = d, 
+                    d = d,
                     requires_grad_weights = True,
                     requires_grad_lengthscales = True,
                 )

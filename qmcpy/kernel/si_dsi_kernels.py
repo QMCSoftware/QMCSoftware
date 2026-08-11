@@ -46,36 +46,36 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
         if weights is not None:
             if lengthscales is not None:
                 raise ValueError("weights is an alias for lengthscales, so leave lengthscales=None if passing in weights")
-            lengthscales = weights 
-        if shape_weights is not None: 
+            lengthscales = weights
+        if shape_weights is not None:
             if shape_lengthscales is not None:
                 raise ValueError("shape_weights is an alias for shape_lengthscales, so leave shape_lengthscales=None if passing in shape_weights")
             shape_lengthscales = shape_weights
-        if tfs_weights is not None: 
+        if tfs_weights is not None:
             if tfs_lengthscales is not None:
                 raise ValueError("tfs_weights is an alias for tfs_lengthscales, so leave tfs_lengthscales=None if passing in tfs_weights")
             tfs_lengthscales = tfs_weights
-        if requires_grad_weights is not None: 
+        if requires_grad_weights is not None:
             if requires_grad_lengthscales is not None:
                 raise ValueError("requires_grad_weights is an alias for requires_grad_lengthscales, so leave requires_grad_lengthscales=None if passing in requires_grad_weights")
             requires_grad_lengthscales = requires_grad_weights
-        # default requires_grad values 
-        if requires_grad_alpha is None: 
+        # default requires_grad values
+        if requires_grad_alpha is None:
             requires_grad_alpha = True
-        if requires_grad_scale is None: 
+        if requires_grad_scale is None:
             requires_grad_scale = True
-        if requires_grad_lengthscales is None: 
+        if requires_grad_lengthscales is None:
             requires_grad_lengthscales = True
         # default lengthscales and check if None
         input_lengthscales_is_none = lengthscales is None
-        # default transforms 
+        # default transforms
         if input_lengthscales_is_none:
             lengthscales = 1.0
-        if tfs_alpha is None: 
+        if tfs_alpha is None:
             tfs_alpha = (tf_exp_eps_inv, tf_exp_eps)
-        if tfs_scale is None: 
+        if tfs_scale is None:
             tfs_scale = (tf_exp_eps_inv, tf_exp_eps)
-        if tfs_lengthscales is None: 
+        if tfs_lengthscales is None:
             tfs_lengthscales = (tf_exp_eps_inv, tf_exp_eps)
         super().__init__(
             d=d,

@@ -1,12 +1,26 @@
-from qmcpy import *
-from qmcpy.util import *
+from qmcpy import (
+    BernoulliCont,
+    BrownianMotion,
+    DigitalNetB2,
+    Gaussian,
+    GeometricBrownianMotion,
+    IIDStdUniform,
+    JohnsonsSU,
+    Kumaraswamy,
+    Lattice,
+    Lebesgue,
+    MaternGP,
+    Uniform,
+    ZeroInflatedExpUniform,
+)
+from qmcpy.util import DimensionError, ParameterError
 import numpy as np
 import scipy.stats
 from scipy.sparse import issparse
 import unittest
 import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
-from qmcpy.true_measure.scipy_wrapper import SciPyWrapper
+from qmcpy import SciPyWrapper
 
 
 def dense_covariance(covariance):
@@ -957,7 +971,7 @@ class TestBrownianMotion(unittest.TestCase):
     def test_brownian_bridge_decomp_type(self):
         """Test BrownianBridge as a decomposition type for BrownianMotion."""
         bm = BrownianMotion(
-            DigitalNetB2(4, seed=self.seed, replications=2), 
+            DigitalNetB2(4, seed=self.seed, replications=2),
             decomp_type="BrownianBridge")
         samples = bm.gen_samples(2)
         self.assertEqual(samples.shape, (2, 2, 4))
@@ -976,7 +990,7 @@ class TestBrownianMotion(unittest.TestCase):
 
         # Automated result
         automated = BrownianMotion(
-            DigitalNetB2(d, seed=self.seed, replications=reps), 
+            DigitalNetB2(d, seed=self.seed, replications=reps),
             decomp_type="BrownianBridge"
         ).gen_samples(n)
 
@@ -1023,7 +1037,7 @@ class TestBrownianMotion(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             automated = BrownianMotion(
-                DigitalNetB2(d, seed=self.seed, replications=reps), 
+                DigitalNetB2(d, seed=self.seed, replications=reps),
                 decomp_type="BrownianBridge"
             ).gen_samples(n)
 
@@ -1059,7 +1073,7 @@ class TestBrownianMotion(unittest.TestCase):
     def test_brownian_bridge_custom_monitoring_times(self):
         """Manually construct a BrownianBridge path with custom monitoring times and compare with the automated version."""
         d, n, reps = 4, 4, 2
-        # times in an order that hits all four anchor cases 
+        # times in an order that hits all four anchor cases
         times = [0.6, 1.0, 0.3, 0.8]
 
         automated = BrownianMotion(
@@ -1132,7 +1146,7 @@ class TestBrownianMotion(unittest.TestCase):
             custom_output = BrownianMotion(DigitalNetB2(4, seed=self.seed),
                 decomp_type="BrownianBridge", monitoring_times=times,
                 bridge_output_order="input").gen_samples(8)
-            
+
         np.testing.assert_allclose(
             custom_output[..., np.argsort(times)], increasing_output,
             err_msg="custom ordered output should match given input and contain equivalent values to increasing output"
@@ -1184,22 +1198,22 @@ class TestBrownianMotion(unittest.TestCase):
 
     def test_brownian_bridge_monitoring_times_exceed_t_final(self):
         with self.assertRaises(ParameterError):
-            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
-                           decomp_type="BrownianBridge", 
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0,
+                           decomp_type="BrownianBridge",
                            monitoring_times=[0.1, 0.2, 0.3, 5.0])
-            
+
     def test_brownian_bridge_monitoring_times_nan(self):
         with self.assertRaises(ParameterError):
-            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0, 
-                           decomp_type="BrownianBridge", 
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=1.0,
+                           decomp_type="BrownianBridge",
                            monitoring_times=[0.1, 0.2, np.nan, 1.0])
-            
+
     def test_brownian_motion_invalid_t_final(self):
         with self.assertRaises(ParameterError):
-            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=-8, 
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=-8,
                            decomp_type="BrownianBridge")
         with self.assertRaises(ParameterError):
-            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=np.nan, 
+            BrownianMotion(DigitalNetB2(4, seed=self.seed), t_final=np.nan,
                            decomp_type="BrownianBridge")
     def test_moment_attributes(self):
         brownian_motion = BrownianMotion(
@@ -1460,7 +1474,7 @@ class TestAcceptanceRejection(unittest.TestCase):
     """Unit tests for AcceptanceRejection and AcceptanceRejectionReal."""
 
     def setUp(self):
-        from qmcpy.true_measure import AcceptanceRejection, AcceptanceRejectionReal
+        from qmcpy import AcceptanceRejection, AcceptanceRejectionReal
         from scipy.stats import norm
         self.AcceptanceRejection = AcceptanceRejection
         self.AcceptanceRejectionReal = AcceptanceRejectionReal

@@ -3,6 +3,7 @@
 PATH
 .pdm-python
 .pytest_cache/
+.venv_new/
 raw.githubusercontent.com/*
 packages.svg
 classes.svg
@@ -123,6 +124,12 @@ jats/
 *_files/
 *_cache/
 *.ipynb_checkpoints/
+/qmc-software.html
+/qmc-software_files/
+/.quarto-watch-logs/
+
+# AI
+.claude/*
 
 ## --- User-specific  file exclusions ---
 # alegresor
@@ -137,9 +144,3 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
-
-
-/qmc-software.html
-/qmc-software_files/
-/.quarto-watch-logs/
-.venv_new/

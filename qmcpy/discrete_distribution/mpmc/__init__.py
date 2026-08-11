@@ -20,14 +20,14 @@ with installation instructions. You can check availability by running:
     python -c "import torch; import pyg_lib; import torch_geometric; print('MPMC dependencies ready')"
 """
 
-try: 
+try:
     import torch
     import pyg_lib
     import torch_geometric
     from .mpmc import MPMC
 except ImportError as e:
     _missing_dep = str(e)
-    
+
     class MPMC(object):
         """Placeholder MPMC class shown when PyTorch dependencies are missing."""
         def __init__(self, *args, **kwargs):
