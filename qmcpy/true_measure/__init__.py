@@ -18,7 +18,7 @@ from .student_t import StudentT
 from .student_t_copula import StudentTCopula
 from .uniform_triangle import UniformTriangle
 from .zero_inflated_exp_uniform import ZeroInflatedExpUniform
-from .triangular import Triangular
+from .triangular import Triangular, TriangularDistribution
 from .acceptance_rejection import AcceptanceRejection, AcceptanceRejectionReal
 from .product_measure import ProductMeasure
 
