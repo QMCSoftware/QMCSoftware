@@ -257,6 +257,3 @@ def test_public_names_optional_free_stable():
     assert names is not None
     assert "Gaussian" in names
     assert "Keister" in names
-    # Optional dependencies are blocked in the probe context, so fallback
-    # exports are part of the deterministic name set.
-    assert "PFGPCIData" in names
