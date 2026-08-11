@@ -107,6 +107,30 @@ def test_flatten_preserve_str_literals():
     assert updated == source
 
 
+def test_python_string_protection_applies_to_every_rewrite_stage():
+    string_body = (
+        b'text = """\n'
+        b"from qmcpy.integrand import Keister\n"
+        b"from qmcpy import Zeta,Beta\n"
+        b"from qmcpy import Alpha\n"
+        b"from qmcpy import *\n"
+        b"from qmcpy import *\n"
+        b'"""\n'
+    )
+    source = string_body + b"from qmcpy.integrand import Keister\n"
+
+    updated, count = flatten_imports(source, frozenset({"Keister"}))
+
+    assert count == 1
+    assert updated == string_body + b"from qmcpy import Keister\n"
+
+
+def test_python_tokenize_failure_is_fail_closed():
+    source = b'"""unterminated\nfrom qmcpy.integrand import Keister\n'
+
+    assert flatten_imports(source, frozenset({"Keister"})) == (source, 0)
+
+
 def test_flatten_skip_star_expansion():
     source = (
         b"from qmcpy import *\n\n"
@@ -237,6 +261,47 @@ def test_notebook_named_merge():
     assert flatten_imports(updated) == (updated, 0)
 
 
+def test_notebook_flattens_nested_imports_only_in_code_cells():
+    nested_import = _nested_import("integrand", "Keister") + "\n"
+    metadata_import = _nested_import("true_measure", "Gaussian") + "\n"
+    string_literal = f'text = "{nested_import.rstrip()}"\n'
+    multiline_string = ['text = """\n', nested_import, '"""\n']
+    notebook = {
+        "metadata": {"source": [metadata_import]},
+        "cells": [
+            {"cell_type": "markdown", "source": [nested_import]},
+            {"cell_type": "code", "source": [nested_import]},
+            {"cell_type": "code", "source": [string_literal]},
+            {"cell_type": "code", "source": multiline_string},
+        ]
+    }
+    source = json.dumps(notebook, indent=1).encode()
+
+    updated, count = flatten_imports(source, frozenset({"Keister"}))
+
+    cells = json.loads(updated)["cells"]
+    assert count == 1
+    assert json.loads(updated)["metadata"]["source"] == [metadata_import]
+    assert cells[0]["source"] == [nested_import]
+    assert cells[1]["source"] == ["from qmcpy import Keister\n"]
+    assert cells[2]["source"] == [string_literal]
+    assert cells[3]["source"] == multiline_string
+    assert flatten_imports(updated, frozenset({"Keister"})) == (updated, 0)
+
+
+def test_markdown_import_examples_are_flattened(tmp_path):
+    path = tmp_path / "example.md"
+    path.write_bytes(
+        b'Example with unmatched prose delimiter: """\n\n'
+        b"```python\n"
+        b"from qmcpy.integrand import Keister\n"
+        b"```\n"
+    )
+
+    assert main([str(path)]) == 0
+    assert b"from qmcpy import Keister" in path.read_bytes()
+
+
 def test_check_mode_no_write(tmp_path):
     path = tmp_path / "example.py"
     original = (_nested_import("true_measure", "Gaussian") + "\n").encode()
@@ -257,3 +322,4 @@ def test_public_names_optional_free_stable():
     assert names is not None
     assert "Gaussian" in names
     assert "Keister" in names
+    assert "PFGPCIData" not in names

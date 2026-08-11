@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remove trailing spaces and tabs from tracked source/configuration files."""
+"""Remove trailing whitespace from tracked and untracked source/config files."""
 
 from __future__ import annotations
 

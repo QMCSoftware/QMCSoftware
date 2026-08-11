@@ -55,7 +55,6 @@ QMCPY_IMPORT_RE = re.compile(
     rb"(?P<before_import>[ \t]+)import\b"
     rb"(?P<imported>[ \t]*(?:\([^)]*\)|[^\r\n]*))"
 )
-PRIVATE_NAME_RE = re.compile(rb"(?<![A-Za-z0-9_])_[A-Za-z0-9_]+")
 TEXT_STAR_IMPORT_RE = re.compile(
     rb"^(?P<indent>[ \t]*)from[ \t]+qmcpy[ \t]+import[ \t]+\*[ \t]*"
     rb"(?:\r\n|\n|\r)?$"
@@ -74,6 +73,9 @@ NOTEBOOK_SOURCE_LINE_RE = re.compile(
     rb'^(?P<json_indent>[ \t]*)(?P<string>"(?:[^"\\]|\\.)*")'
     rb"(?P<comma>,?)(?P<trailing>[ \t]*)(?P<ending>\r\n|\n|\r)?$"
 )
+NOTEBOOK_SOURCE_FIELD_RE = re.compile(
+    rb'^[ \t]*"source"[ \t]*:[ \t]*(?P<value>.*?)[ \t]*(?:\r\n|\n|\r)?$'
+)
 # Bare (already top-level) single-line "from qmcpy import ..." statements, so
 # stale comma spacing can be cleaned up even when there's no module path to
 # flatten. Anchored to line start, so notebook JSON lines (which have a
@@ -90,34 +92,223 @@ COMMA_SPACING_RE = re.compile(rb",(?=\S)")
 MAGIC_LINE_RE = re.compile(r"^[ \t]*(?:%{1,2}[A-Za-z_]|!|\?)")
 
 
-def _python_protected_lines(content: bytes) -> set[int]:
+def _python_protected_lines(content: bytes) -> set[int] | None:
     """Return 1-based line numbers covered by Python string/comment tokens."""
 
     try:
         text = content.decode("utf-8")
     except UnicodeDecodeError:
-        return set()
+        return None
 
     protected: set[int] = set()
     try:
-        tokens = tokenize.generate_tokens(io.StringIO(text).readline)
+        for tok in tokenize.generate_tokens(io.StringIO(text).readline):
+            tok_name = tokenize.tok_name.get(tok.type, "")
+            if tok.type != tokenize.STRING and tok_name not in {
+                "COMMENT",
+                "FSTRING_START",
+                "FSTRING_MIDDLE",
+                "FSTRING_END",
+            }:
+                continue
+            start_row = tok.start[0]
+            end_row = tok.end[0]
+            protected.update(range(start_row, end_row + 1))
     except (SyntaxError, IndentationError, tokenize.TokenError):
-        return set()
-
-    for tok in tokens:
-        tok_name = tokenize.tok_name.get(tok.type, "")
-        if tok.type != tokenize.STRING and tok_name not in {
-            "COMMENT",
-            "FSTRING_START",
-            "FSTRING_MIDDLE",
-            "FSTRING_END",
-        }:
-            continue
-        start_row = tok.start[0]
-        end_row = tok.end[0]
-        protected.update(range(start_row, end_row + 1))
+        return None
 
     return protected
+
+
+def _notebook_code_source_lines(content: bytes) -> set[int] | None:
+    """Return physical line indexes belonging to code-cell source arrays."""
+
+    try:
+        notebook = json.loads(content)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(notebook, dict) or not isinstance(notebook.get("cells"), list):
+        return None
+
+    cells = notebook["cells"]
+    code_lines: set[int] = set()
+    cell_index = 0
+    lines = content.splitlines(keepends=True)
+    line_index = 0
+    while line_index < len(lines) and cell_index < len(cells):
+        field_match = NOTEBOOK_SOURCE_FIELD_RE.match(lines[line_index])
+        if field_match is None:
+            line_index += 1
+            continue
+
+        cell = cells[cell_index]
+        if not isinstance(cell, dict):
+            return None
+        expected_source = cell.get("source", "")
+        value = field_match.group("value").rstrip().rstrip(b",").rstrip()
+
+        if value != b"[":
+            try:
+                inline_source = json.loads(value)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                line_index += 1
+                continue
+            if inline_source == expected_source:
+                cell_index += 1
+            line_index += 1
+            continue
+
+        source_lines: list[str] = []
+        source_line_indexes: list[int] = []
+        stop = line_index + 1
+        valid_array = True
+        while stop < len(lines) and not lines[stop].lstrip().startswith(b"]"):
+            source_match = NOTEBOOK_SOURCE_LINE_RE.match(lines[stop])
+            if source_match is None:
+                valid_array = False
+                break
+            try:
+                source_item = json.loads(source_match.group("string"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                valid_array = False
+                break
+            if not isinstance(source_item, str):
+                valid_array = False
+                break
+            source_lines.append(source_item)
+            source_line_indexes.append(stop)
+            stop += 1
+
+        if stop >= len(lines):
+            return None
+        if valid_array and source_lines == expected_source:
+            if cell.get("cell_type") == "code":
+                protected_rows = _python_protected_lines(
+                    "".join(source_lines).encode("utf-8")
+                )
+                if protected_rows is not None:
+                    source_row = 1
+                    for source_item, source_line_index in zip(
+                        source_lines, source_line_indexes
+                    ):
+                        newline_count = source_item.count("\n")
+                        is_single_line = newline_count == 0 or (
+                            newline_count == 1 and source_item.endswith("\n")
+                        )
+                        if is_single_line and source_row not in protected_rows:
+                            code_lines.add(source_line_index)
+                        source_row += newline_count
+            cell_index += 1
+        line_index = stop + 1
+
+    if cell_index != len(cells):
+        return None
+    return code_lines
+
+
+def _flatten_nested_import_match(
+    match: re.Match[bytes], public_names: frozenset[str] | None
+) -> bytes | None:
+    """Return a flattened import match, or None when it is not safe to rewrite."""
+
+    if public_names is None:
+        return None
+    module_segments = match.group("module_path").lstrip(b".").split(b".")
+    if module_segments[0] == b"util" or any(
+        segment.startswith(b"_") for segment in module_segments
+    ):
+        return None
+
+    try:
+        tree = ast.parse(match.group(0).decode("utf-8"))
+    except (SyntaxError, UnicodeDecodeError):
+        return None
+    if len(tree.body) != 1 or not isinstance(tree.body[0], ast.ImportFrom):
+        return None
+
+    statement = tree.body[0]
+    expected_module = "qmcpy" + match.group("module_path").decode("ascii")
+    if statement.level or statement.module != expected_module:
+        return None
+    if any(
+        alias.name.startswith("_")
+        or (alias.asname is not None and alias.asname.startswith("_"))
+        for alias in statement.names
+    ):
+        return None
+
+    imported_names = {alias.name for alias in statement.names}
+    if "*" not in imported_names and not imported_names <= public_names:
+        return None
+
+    return (
+        b"from"
+        + match.group("after_from")
+        + b"qmcpy"
+        + match.group("before_import")
+        + b"import"
+        + match.group("imported")
+    )
+
+
+def _flatten_notebook_nested_imports(
+    content: bytes,
+    public_names: frozenset[str] | None,
+    code_lines: set[int],
+) -> tuple[bytes, int]:
+    """Flatten nested imports only in source lines from notebook code cells."""
+
+    output: list[bytes] = []
+    change_count = 0
+    for line_index, line in enumerate(content.splitlines(keepends=True)):
+        line_match = NOTEBOOK_SOURCE_LINE_RE.match(line)
+        if line_index not in code_lines or line_match is None:
+            output.append(line)
+            continue
+
+        try:
+            source = json.loads(line_match.group("string"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            output.append(line)
+            continue
+        if not isinstance(source, str):
+            output.append(line)
+            continue
+
+        source_bytes = source.encode("utf-8")
+        protected_lines = _python_protected_lines(source_bytes)
+        if protected_lines is None:
+            output.append(line)
+            continue
+
+        line_changes = 0
+
+        def replace(match: re.Match[bytes]) -> bytes:
+            nonlocal line_changes
+            source_line = source_bytes.count(b"\n", 0, match.start()) + 1
+            if source_line in protected_lines:
+                return match.group(0)
+            replacement = _flatten_nested_import_match(match, public_names)
+            if replacement is None:
+                return match.group(0)
+            line_changes += 1
+            return replacement
+
+        updated_source = QMCPY_IMPORT_RE.sub(replace, source_bytes)
+        if not line_changes:
+            output.append(line)
+            continue
+
+        output.append(
+            line_match.group("json_indent")
+            + json.dumps(updated_source.decode("utf-8")).encode()
+            + line_match.group("comma")
+            + line_match.group("trailing")
+            + (line_match.group("ending") or b"")
+        )
+        change_count += line_changes
+
+    return b"".join(output), change_count
 
 
 def _star_import_context(line: bytes) -> tuple[bytes, bytes] | None:
@@ -137,15 +328,21 @@ def _star_import_context(line: bytes) -> tuple[bytes, bytes] | None:
     return None
 
 
-def _deduplicate_adjacent_star_imports(content: bytes) -> tuple[bytes, int]:
+def _deduplicate_adjacent_star_imports(
+    content: bytes, eligible_lines: set[int] | None = None
+) -> tuple[bytes, int]:
     """Keep the last line in each run of same-scope QMCPy star imports."""
 
     output: list[bytes] = []
     previous_context: tuple[bytes, bytes] | None = None
     removed_count = 0
 
-    for line in content.splitlines(keepends=True):
-        context = _star_import_context(line)
+    for line_index, line in enumerate(content.splitlines(keepends=True)):
+        context = (
+            _star_import_context(line)
+            if eligible_lines is None or line_index in eligible_lines
+            else None
+        )
         if context is not None and context == previous_context:
             # Keeping the last line preserves JSON comma and newline placement.
             output[-1] = line
@@ -318,7 +515,9 @@ def _parse_text_named_import(lines: list[bytes], start: int):
     return indent, names, _line_ending(lines[stop - 1]), original, stop
 
 
-def _combine_text_named_imports(content: bytes) -> tuple[bytes, int]:
+def _combine_text_named_imports(
+    content: bytes, eligible_lines: set[int] | None = None
+) -> tuple[bytes, int]:
     """Combine adjacent, same-scope public QMCPy imports in text files."""
 
     lines = content.splitlines(keepends=True)
@@ -340,6 +539,11 @@ def _combine_text_named_imports(content: bytes) -> tuple[bytes, int]:
 
     index = 0
     while index < len(lines):
+        if eligible_lines is not None and index not in eligible_lines:
+            flush()
+            output.append(lines[index])
+            index += 1
+            continue
         parsed = _parse_text_named_import(lines, index)
         if parsed is None:
             flush()
@@ -377,7 +581,9 @@ def _parse_notebook_named_import(line: bytes):
     return context, names, code_ending, match
 
 
-def _combine_notebook_named_imports(content: bytes) -> tuple[bytes, int]:
+def _combine_notebook_named_imports(
+    content: bytes, code_lines: set[int]
+) -> tuple[bytes, int]:
     """Combine adjacent public QMCPy imports in notebook source arrays."""
 
     output: list[bytes] = []
@@ -404,8 +610,12 @@ def _combine_notebook_named_imports(content: bytes) -> tuple[bytes, int]:
         change_count += int(combined != original)
         run.clear()
 
-    for line in content.splitlines(keepends=True):
-        parsed = _parse_notebook_named_import(line)
+    for line_index, line in enumerate(content.splitlines(keepends=True)):
+        parsed = (
+            _parse_notebook_named_import(line)
+            if line_index in code_lines
+            else None
+        )
         if parsed is None:
             flush()
             output.append(line)
@@ -501,12 +711,17 @@ def _expand_notebook_star_imports(content: bytes, public_names: frozenset[str]) 
     return b"".join(output), change_count
 
 
-def _normalize_comma_spacing(content: bytes) -> tuple[bytes, int]:
+def _normalize_comma_spacing(
+    content: bytes, eligible_lines: set[int] | None = None
+) -> tuple[bytes, int]:
     """Ensure a space follows each comma in single-line qmcpy import statements."""
 
     output: list[bytes] = []
     change_count = 0
-    for line in content.splitlines(keepends=True):
+    for line_index, line in enumerate(content.splitlines(keepends=True)):
+        if eligible_lines is not None and line_index not in eligible_lines:
+            output.append(line)
+            continue
         match = NAMED_IMPORT_LINE_RE.match(line)
         if match is None:
             output.append(line)
@@ -525,68 +740,89 @@ def _normalize_comma_spacing(content: bytes) -> tuple[bytes, int]:
 
 
 def flatten_imports(
-    content: bytes, public_names: frozenset[str] | None = None
+    content: bytes,
+    public_names: frozenset[str] | None = None,
+    *,
+    protect_python: bool = True,
 ) -> tuple[bytes, int]:
     """Flatten, combine, alphabetize, and deduplicate public imports.
 
     `public_names` is qmcpy's public API surface (see `_load_qmcpy_public_names`).
     When it's None, nested imports are left unchanged and existing top-level
-    star imports are deduplicated but left unexpanded.
+    star imports are deduplicated but left unexpanded. `protect_python` should
+    be true for Python files so strings and comments are never rewritten.
     """
 
     change_count = 0
-    is_notebook = _notebook_python_source(content) is not None
-    protected_lines = set() if is_notebook else _python_protected_lines(content)
+    notebook_code_lines = _notebook_code_source_lines(content)
+    is_notebook = notebook_code_lines is not None
+    protected_lines = (
+        None
+        if is_notebook
+        else _python_protected_lines(content) if protect_python else set()
+    )
+
+    def eligible_text_lines(current: bytes) -> set[int] | None:
+        if not protect_python:
+            return None
+        current_protected = _python_protected_lines(current)
+        if current_protected is None:
+            return set()
+        return {
+            index
+            for index, _ in enumerate(current.splitlines(keepends=True))
+            if index + 1 not in current_protected
+        }
 
     def _line_number(position: int) -> int:
         return content.count(b"\n", 0, position) + 1
 
     def replace(match: re.Match[bytes]) -> bytes:
         nonlocal change_count
-        if _line_number(match.start()) in protected_lines:
+        if protected_lines is None or _line_number(match.start()) in protected_lines:
             return match.group(0)
-        module_segments = match.group("module_path").lstrip(b".").split(b".")
-        if module_segments[0] == b"util" or any(
-            segment.startswith(b"_") for segment in module_segments
-        ):
+        replacement = _flatten_nested_import_match(match, public_names)
+        if replacement is None:
             return match.group(0)
-        if PRIVATE_NAME_RE.search(match.group("imported")):
-            return match.group(0)
-        if public_names is None:
-            return match.group(0)
-
-        if not match.group("imported").lstrip().startswith(b"*"):
-            try:
-                statement = ast.parse(match.group(0).decode("utf-8")).body[0]
-            except (SyntaxError, UnicodeDecodeError):
-                return match.group(0)
-            imported_names = {alias.name for alias in statement.names}
-            if not imported_names <= public_names:
-                return match.group(0)
-
         change_count += 1
-        return (
-            b"from"
-            + match.group("after_from")
-            + b"qmcpy"
-            + match.group("before_import")
-            + b"import"
-            + match.group("imported")
-        )
+        return replacement
 
-    updated = QMCPY_IMPORT_RE.sub(replace, content)
-    updated, duplicate_count = _deduplicate_adjacent_star_imports(updated)
+    if is_notebook:
+        assert notebook_code_lines is not None
+        updated, nested_count = _flatten_notebook_nested_imports(
+            content, public_names, notebook_code_lines
+        )
+        change_count += nested_count
+        notebook_code_lines = _notebook_code_source_lines(updated) or set()
+        updated, duplicate_count = _deduplicate_adjacent_star_imports(
+            updated, notebook_code_lines
+        )
+    else:
+        updated = QMCPY_IMPORT_RE.sub(replace, content)
+        updated, duplicate_count = _deduplicate_adjacent_star_imports(
+            updated, eligible_text_lines(updated)
+        )
     change_count += duplicate_count
 
     # Star-import expansion is intentionally disabled because the current
     # file-wide name analysis is not scope/order-aware and can change semantics.
 
-    combine = _combine_notebook_named_imports if is_notebook else _combine_text_named_imports
-    updated, combine_count = combine(updated)
+    if is_notebook:
+        notebook_code_lines = _notebook_code_source_lines(updated) or set()
+        updated, combine_count = _combine_notebook_named_imports(
+            updated, notebook_code_lines
+        )
+    else:
+        updated, combine_count = _combine_text_named_imports(
+            updated, eligible_text_lines(updated)
+        )
     change_count += combine_count
 
-    updated, comma_count = _normalize_comma_spacing(updated)
-    change_count += comma_count
+    if not is_notebook:
+        updated, comma_count = _normalize_comma_spacing(
+            updated, eligible_text_lines(updated)
+        )
+        change_count += comma_count
 
     return updated, change_count
 
@@ -675,7 +911,11 @@ def main(argv: list[str] | None = None) -> int:
     changed_imports = 0
     for path in targets:
         original = path.read_bytes()
-        updated, count = flatten_imports(original, public_names)
+        updated, count = flatten_imports(
+            original,
+            public_names,
+            protect_python=path.suffix.lower() in {".py", ".pyi"},
+        )
         if not count:
             continue
 
