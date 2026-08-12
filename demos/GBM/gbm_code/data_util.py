@@ -35,7 +35,7 @@ def add_quantlib_results(
     quantlib_final: npt.NDArray[np.floating],  # per replication mean
     theoretical_mean: float,
     theoretical_std: float,
-    ql_emp_std_avg: float
+    ql_stds: npt.NDArray[np.floating] # per replication std dev
 ) -> None:
     """
     Add summary statistics for QuantLib simulations based on per-replication means.
@@ -50,10 +50,14 @@ def add_quantlib_results(
         quantlib_final: 1D array of per-replication sample means of $S_T$.
         theoretical_mean: Theoretical expected value $E[S_T]$ used as a benchmark.
         theoretical_std: Theoretical standard deviation of $S_T$ used as a benchmark.
-        ql_emp_std_avg: Average of per-replication empirical standard deviations of $S_T$.
+        ql_stds: 1D array of per-replication standard deviations of $S_T$.
     """
     ql_emp_mean = np.mean(quantlib_final)
+    ql_emp_std_avg = np.mean(ql_stds)  
+
     ql_mae = np.mean(np.abs(quantlib_final - theoretical_mean))
+    ql_sde = np.mean(np.abs(ql_stds - theoretical_std))            
+
 
     results_data.append(
         {
@@ -62,7 +66,7 @@ def add_quantlib_results(
             "Mean": ql_emp_mean,
             "Std Dev": ql_emp_std_avg,
             "Mean Absolute Error": ql_mae,
-            "Std Dev Error": abs(ql_emp_std_avg - theoretical_std),
+            "Std Dev Error": ql_sde, 
         }
     )
 
@@ -74,7 +78,7 @@ def add_qmcpy_results(
     qp_emp_mean: float,
     theoretical_mean: float,
     theoretical_std: float,
-    qp_emp_std_avg: float
+    qp_stds: npt.NDArray[np.floating] # per replication std dev
 ) -> None:
     """
     Add empirical QMCPy results, computed from per-replication means, to results data.
@@ -91,9 +95,12 @@ def add_qmcpy_results(
         qp_emp_mean: Overall empirical mean across all replications.
         theoretical_mean: Theoretical expected value used as a benchmark.
         theoretical_std: Theoretical standard deviation used as a benchmark.
-        qp_emp_std_avg: Average of per-replication empirical standard deviations.
+        qp_stds: 1D array of per-replication standard deviations of $S_T$.
     """
     qp_mae = np.mean(np.abs(qmcpy_final - theoretical_mean))
+   
+    qp_emp_std_avg = np.mean(qp_stds)                            
+    qp_sde = np.mean(np.abs(qp_stds - theoretical_std))            
 
     results_data.append(
         {
@@ -102,7 +109,7 @@ def add_qmcpy_results(
             "Mean": qp_emp_mean,
             "Std Dev": qp_emp_std_avg,
             "Mean Absolute Error": qp_mae,
-            "Std Dev Error": abs(qp_emp_std_avg - theoretical_std),
+            "Std Dev Error": qp_sde,
         }
     )
 
@@ -149,10 +156,11 @@ def process_sampler_data(
             ql_stds[r] = quantlib_paths[:, -1].std(ddof=1)
 
         params_ql["seed"] = ql_seed
-        ql_std_avg = ql_stds.mean()
+        
+
     else:
         ql_means = None
-        ql_std_avg = None
+        ql_stds = None 
 
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
 
@@ -162,7 +170,7 @@ def process_sampler_data(
     else:
         qp_means = np.array([qmcpy_paths[:, -1].mean()])
         qp_stds = np.array([qmcpy_paths[:, -1].std(ddof=1)])
-    qp_std_avg = qp_stds.mean()
+    
 
     if ql_means is not None:
         add_quantlib_results(
@@ -171,7 +179,7 @@ def process_sampler_data(
             ql_means,
             theoretical_mean,
             theoretical_std,
-            ql_std_avg
+            ql_stds
         )
 
     add_qmcpy_results(
@@ -181,7 +189,7 @@ def process_sampler_data(
         qp_means.mean(),
         theoretical_mean,
         theoretical_std,
-        qp_std_avg
+        qp_stds
     )
 
     return quantlib_paths, qmcpy_paths, ql_gbm, qp_gbm, params_ql, params_qp
@@ -370,7 +378,7 @@ def collect_library_results(
     # QMCPy results
     try:
         qp_paths, _ = qpu.generate_qmcpy_paths(sampler_type=sampler, **qp_params)
-        qp_final = qp_paths[:, -1]
+        qp_final = qp_paths[..., -1]
         qp_mean = np.mean(qp_final)
         qp_std = np.std(qp_final, ddof=1)
 
