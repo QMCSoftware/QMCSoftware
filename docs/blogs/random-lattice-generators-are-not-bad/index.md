@@ -202,15 +202,9 @@ As shown in the plot, the mean of random shifts (green) outperforms the random g
 
 ## References
 
-1. Korobov, N. M. The approximate computation of multiple integrals.
-   *Doklady Akademii Nauk SSSR* 124, 1207-1210 (1959).
-2. Sloan, I. H. QMC integration: beating intractability by weighting
-the coordinate directions. In *Monte Carlo and Quasi-Monte Carlo Methods 2000* (eds. Fang, K. T., Hickernell, F. J., & Niederreiter, H.) 103-123 (Springer-Verlag, Berlin, 2002).
-3. Kuo, F. Y. Component-by-component constructions achieve the optimal
-rate of convergence for multivariate integration in weighted Korobov and Sobolev spaces. *Journal of Complexity* 19, 301-320 (2003).
-4. Nuyens, D. & Cools, R. Fast component-by-component construction. In
-*Monte Carlo and Quasi-Monte Carlo Methods 2004* (eds. Niederreiter, H. & Talay, D.) 373-387 (Springer-Verlag, Berlin, 2006).
-5. Goda, T. & L'Ecuyer, P. Construction-free median quasi-Monte Carlo
-rules for function spaces with unspecified smoothness and general weights. *SIAM Journal on Scientific Computing* 44, A2765-A2788 (2022). [https://doi.org/10.1137/22M1473625](https://doi.org/10.1137/22M1473625)
-6. Keister, B. D. Multidimensional quadrature algorithms. *Computers in
-   Physics* 10, 119-122 (1996).
+1. Korobov, N. M. The approximate computation of multiple integrals. *Doklady Akademii Nauk SSSR* 124, 1207-1210 (1959).
+2. Sloan, I. H. QMC integration: beating intractability by weighting the coordinate directions. In *Monte Carlo and Quasi-Monte Carlo Methods 2000* (eds. Fang, K. T., Hickernell, F. J., & Niederreiter, H.) 103-123 (Springer-Verlag, Berlin, 2002).
+3. Kuo, F. Y. Component-by-component constructions achieve the optimal rate of convergence for multivariate integration in weighted Korobov and Sobolev spaces. *Journal of Complexity* 19, 301-320 (2003).
+4. Nuyens, D. & Cools, R. Fast component-by-component construction. In *Monte Carlo and Quasi-Monte Carlo Methods 2004* (eds. Niederreiter, H. & Talay, D.) 373-387 (Springer-Verlag, Berlin, 2006).
+5. Goda, T. & L'Ecuyer, P. Construction-free median quasi-Monte Carlo rules for function spaces with unspecified smoothness and general weights. *SIAM Journal on Scientific Computing* 44, A2765-A2788 (2022). [https://doi.org/10.1137/22M1473625](https://doi.org/10.1137/22M1473625)
+6. Keister, B. D. Multidimensional quadrature algorithms. *Computers in Physics* 10, 119-122 (1996).

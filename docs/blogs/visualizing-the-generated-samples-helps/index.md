@@ -50,8 +50,7 @@ import qmcpy as qp
 
    ![Uniform IID object projection.](figures/iid.png)
 
-2. Here we show a two dimensional projection of a Gaussian object and how
-the axes returned by the `plot_proj` function can be manipulated by adding a horizontal and vertical line to denote the x and y axis respectively:
+2. Here we show a two dimensional projection of a Gaussian object and how the axes returned by the `plot_proj` function can be manipulated by adding a horizontal and vertical line to denote the x and y axis respectively:
 
    ```python
    d = 2
@@ -66,8 +65,7 @@ the axes returned by the `plot_proj` function can be manipulated by adding a hor
 
    ![Gaussian IID object projection.](figures/iid-gaussian.png)
 
-3. Here we show certain specified dimensional projections, with
-dimensions 1 and 2 on the x axes and dimensions 3 and 4 on the y axes, of a Uniform object with successively increasing numbers of points. The initial points are in blue. The next additional points are in orange. The final additional points are in green:
+3. Here we show certain specified dimensional projections, with dimensions 1 and 2 on the x axes and dimensions 3 and 4 on the y axes, of a Uniform object with successively increasing numbers of points. The initial points are in blue. The next additional points are in orange. The final additional points are in green:
 
    ```python
    d = 4
@@ -82,8 +80,7 @@ dimensions 1 and 2 on the x axes and dimensions 3 and 4 on the y axes, of a Unif
 
    ![Halton uniform object projection.](figures/halton-uniform.png)
 
-4. Here we show a four dimensional projection of a Halton object with
-successively increasing numbers of points. The initial points are in blue. The next additional points are in orange. The final additional points are in green:
+4. Here we show a four dimensional projection of a Halton object with successively increasing numbers of points. The initial points are in blue. The next additional points are in orange. The final additional points are in green:
 
    ```python
    d = 4
