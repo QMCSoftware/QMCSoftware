@@ -32,10 +32,17 @@ To install from source, please see the [contributing guidelines](https://qmcsoft
 
 ## Citation
 
-If you find QMCPy helpful in your work, please support us by citing the following work, which is also available as a [QMCPy BibTex citation](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib)
+If you find QMCPy helpful in your work, please support us by citing the JOSS paper and QMCPy software below, which are also available as [BibTex citations](https://github.com/QMCSoftware/QMCSoftware/blob/master/cite_qmcpy.bib):
 
 ~~~
-Sou-Cheng T. Choi, Fred J. Hickernell, Michael McCourt, Jagadeeswaran Rathinavel, Aleksei G. Sorokin,
+Aleksei G. Sorokin, Fred J. Hickernell, Sou-Cheng T. Choi, Jagadeeswaran Rathinavel, Pieterjan Robbe, and Aadit Jain,
+QMCPy: A Python Framework for (Quasi-)Monte Carlo Algorithms.
+Journal of Open Source Software, 11(117), 9705, 2026.
+https://doi.org/10.21105/joss.09705
+~~~
+
+~~~
+Sou-Cheng T. Choi, Fred J. Hickernell, Aadit Jain, Jagadeeswaran Rathinavel, Pieterjan Robbe, and Aleksei G. Sorokin,
 QMCPy: A Quasi-Monte Carlo Python Library. 2026.
 https://qmcsoftware.github.io/QMCSoftware/
 ~~~
