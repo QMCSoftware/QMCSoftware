@@ -76,7 +76,7 @@ The following code is a short example used to illustrate the declaration of a `L
 
 ```python
 import qmcpy as qp
-lattice = qp.Lattice(dimension=2, generating_vector=21, seed=120) # intialize the lattice
+lattice = qp.Lattice(dimension=2, generating_vector=21, seed=120) # initialize the lattice
 print(lattice) # print information about the lattice
 print(lattice.gen_samples(n=4)) # print the first 4 points in the lattice
 ```
