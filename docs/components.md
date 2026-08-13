@@ -20,7 +20,7 @@ Often practitioners would like to run their (Quasi-)Monte Carlo method until the
 
 ## Discrete Distributions
 
-These generates IID or LD points $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$. Supported LD sequences include
+These generate IID or LD points $\boldsymbol{x}_0,\boldsymbol{x}_1,\dots$. Supported LD sequences include
 
 - **Lattices** with
     - extensible constructions
