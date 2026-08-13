@@ -44,10 +44,10 @@ class TestDiscreteDistribution(unittest.TestCase):
             ]
             for dd in dds:
                 for _dd in [dd] + dd.spawn(1):
-                    x = _dd.gen_samples(4)
+                    x = _dd.gen_samples(4, warn=False)
                     if _dd.mimics == "StdUniform":
                         self.assertTrue((x > 0).all() and (x < 1).all())
-                    pdf = _dd.pdf(_dd.gen_samples(4))
+                    pdf = _dd.pdf(_dd.gen_samples(4, warn=False))
                     self.assertEqual(pdf.shape, (4,))
                     self.assertEqual(x.shape, (4, 3))
                     self.assertEqual(x.dtype, np.float64)
