@@ -75,4 +75,4 @@ except ImportError as error:
             _raise_missing_mpmc_dependency("MPMC_net")
 
 name = "qmcpy"
-__version__ = "2.3"
+__version__ = "2.4"
