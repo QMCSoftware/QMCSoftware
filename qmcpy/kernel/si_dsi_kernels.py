@@ -7,9 +7,8 @@ from ..util.dig_shift_invar_ops import (
     to_float,
     weighted_walsh_funcs
 )
-from ..util import ParameterError
+from ..util import ParameterError, MethodImplementationError
 import numpy as np
-from typing import Union, Tuple
 import scipy.special
 
 
@@ -142,6 +141,9 @@ class AbstractSIDSIKernel(AbstractKernelScaleLengthscales):
         else:
             v = scale * ((ind + p).prod(-1) * c).sum(-1) - sc
         return sc, v
+
+    def get_per_dim_components(self, x0, x1, beta0, beta1):
+        raise MethodImplementationError(self, "get_per_dim_components")
 
     def combine_per_dim_components(self, kparts, beta0, beta1, c, batch_params, stable):
         sc, v = self.combine_per_dim_components_raw_m1(
