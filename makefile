@@ -352,7 +352,7 @@ PYLINT_BASE ?= develop
 check_pep8:
 	@$(PYLINT) qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
 
-pylint_changed:
+check_pep8_changed:
 	@set -e; \
 	changed_files="$$( \
 		{ \
