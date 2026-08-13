@@ -113,6 +113,11 @@ Call pytest's `--doctest-modules` flag directly on the file, for example,
   python -m pytest --doctest-modules qmcpy/discrete_distribution/lattice/lattice.py
   ```
 
+#### Suppressing an expected doctest warning (`conftest.py`)
+
+For warnings intentionally triggered by a doctest, add a file-specific filter to `DOCTEST_WARNING_FILTERS` in the root-level `conftest.py`. This avoids hiding the warning globally or importing the test-only `pytest` dependency in library code.
+
+Only filter expected, documented warnings. Fix unexpected warnings at their source.
 
 ---
 
