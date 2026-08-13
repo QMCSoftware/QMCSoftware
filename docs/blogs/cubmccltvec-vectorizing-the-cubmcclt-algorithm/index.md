@@ -14,7 +14,7 @@ February 25, 2026
 This post introduces `CubMCCLTVec`, a vectorized extension of `CubMCCLT` for confidence intervals on vector-valued quantities of interest.
 
 Recent work by Aleksei G. Sorokin and Jagadeeswaran Rathinavel [1]
-discuss extending stopping criterion for a scalar mean to stopping
+discusses extending stopping criterion for a scalar mean to stopping
 criterion for vector quantities of interest formulated as functions of
 multiple means. One such scalar stopping criterion is `CubMCCLT` that
 calculates a confidence interval for \(\mu\) by using the Central Limit
