@@ -160,7 +160,6 @@ def process_sampler_data(
 
     else:
         ql_means = None
-        ql_stds = None 
 
     qmcpy_paths, qp_gbm = qpu.generate_qmcpy_paths(**params_qp)
 
