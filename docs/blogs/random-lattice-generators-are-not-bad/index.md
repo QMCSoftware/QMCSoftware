@@ -58,7 +58,7 @@ of the efficiency of both rules.
 
 ## Code Examples
 
-In this section, we will explore the basic features of the `Lattice` class and the `gen_samples` method. For further documentation, see the [QMCPy Lattice documentation](https://qmcpy.readthedocs.io/en/latest/algorithms.html#module-qmcpy.discrete_distribution.lattice.lattice).
+In this section, we will explore the basic features of the `Lattice` class and the `gen_samples` method. For further documentation, see the [QMCPy Lattice documentation](https://qmcsoftware.github.io/QMCSoftware/api/discrete_distributions/#lattice).
 
 The generating vector is the core of the `Lattice` object. Currently, QMCPy enables the following types of cubature schemes:
 
