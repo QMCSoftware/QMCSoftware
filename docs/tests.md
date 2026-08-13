@@ -107,6 +107,13 @@ Validates embedded Python code in markdown files under `docs/`.
 - **Time**: ~3–5 seconds
 - **Note**: Usually called via `doctests`; rarely used standalone
 
+#### Running doctests for a single file
+Call pytest's `--doctest-modules` flag directly on the file, for example,
+  ```bash
+  python -m pytest --doctest-modules qmcpy/discrete_distribution/lattice/lattice.py
+  ```
+
+
 ---
 
 ### Unit & Notebook Test Targets
