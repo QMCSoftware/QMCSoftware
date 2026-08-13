@@ -61,6 +61,7 @@ nav:
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
+      - Latin Hypercube, Korobov Lattice, and Hammersley Samplers: demos/korobov_hammersley_latinhypercube_demos.ipynb
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - GBM Examples: demos/GBM/gbm_examples.ipynb
       - Brownian Bridge: demos/brownian_bridge.ipynb
