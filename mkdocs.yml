@@ -4,6 +4,7 @@ nav:
   - Community Resources:
     - QMC Software Packages: qmc-software.md
     - PyPI Download Statistics: stats/pypi_downloads.md
+    - Coding Agents: AGENTS.md
   - Components: components.md
   - Contributing: CONTRIBUTING.md
   - Community: community.md
