@@ -14,7 +14,7 @@ February 25, 2026
 This post introduces `CubMCCLTVec`, a vectorized extension of `CubMCCLT` for confidence intervals on vector-valued quantities of interest.
 
 Recent work by Aleksei G. Sorokin and Jagadeeswaran Rathinavel [1]
-discuss extending stopping criterion for a scalar mean to stopping
+discusses extending a stopping criterion for a scalar mean to a stopping
 criterion for vector quantities of interest formulated as functions of
 multiple means. One such scalar stopping criterion is `CubMCCLT` that
 calculates a confidence interval for \(\mu\) by using the Central Limit
@@ -225,9 +225,6 @@ This class gives us a new and different option to find when the user-specified e
 
 ## References
 
-1. Sorokin, A. G., & Rathinavel, J. *On Bounding and Approximating
-Functions of Multiple Expectations using Quasi-Monte Carlo*. To appear in the *Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing Proceedings 2022* (2022).
-2. Sorokin, A. *Monte Carlo for Vector Functions of Integrals*. Jupyter
-Notebook. QMCPy: A quasi-Monte Carlo Python Library, 2023. [https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/pydata.chi.2023.ipynb](https://github.com/QMCSoftware/QMCSoftware/blob/master/demos/pydata.chi.2023.ipynb).
-3. Bailey, D., Borwein, J., & Crandall, R. *Box integrals*. *Journal of
-Computational and Applied Mathematics* **206**, 196-208. ISSN: 0377-0427. [https://www.sciencedirect.com/science/article/pii/S0377042706004250](https://www.sciencedirect.com/science/article/pii/S0377042706004250) (2007).
+1. Sorokin, A. G., & Rathinavel, J. *On Bounding and Approximating Functions of Multiple Expectations using Quasi-Monte Carlo*. To appear in the *Monte Carlo and Quasi-Monte Carlo Methods in Scientific Computing Proceedings 2022* (2022).
+2. Sorokin, A. *Monte Carlo for Vector Functions of Integrals*. Jupyter Notebook. QMCPy: A quasi-Monte Carlo Python Library, 2023. [https://github.com/QMCSoftware/QMCSoftware/blob/develop/demos/talk_paper_demos/pydata_chi_2023.ipynb](https://github.com/QMCSoftware/QMCSoftware/blob/develop/demos/talk_paper_demos/pydata_chi_2023.ipynb).
+3. Bailey, D., Borwein, J., & Crandall, R. *Box integrals*. *Journal of Computational and Applied Mathematics* **206**, 196-208. ISSN: 0377-0427. [https://www.sciencedirect.com/science/article/pii/S0377042706004250](https://www.sciencedirect.com/science/article/pii/S0377042706004250) (2007).

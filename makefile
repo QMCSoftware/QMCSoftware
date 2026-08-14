@@ -347,6 +347,14 @@ doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
 
+check_links: copydocs  # internal links + anchors only; fast, no network, safe for CI
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site
+
+check_links_external: copydocs  # also checks http/https links; slow and network-flaky, run locally
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site --external
+
 ##########################################################
 # PEP8
 ##########################################################
@@ -356,7 +364,7 @@ PYLINT_BASE ?= develop
 check_pep8:
 	@$(PYLINT) qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
 
-pylint_changed:
+check_pep8_changed:
 	@set -e; \
 	changed_files="$$( \
 		{ \
