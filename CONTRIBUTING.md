@@ -22,7 +22,7 @@ All improvements to QMCPy should be connected to an **issue** using a template f
 
 If you have not yet installed the QMCPy library, see [Installation](#installation) below.
 
-You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk them through the changes.
 
 After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
 

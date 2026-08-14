@@ -1,20 +1,15 @@
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
-from ..discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
-from ..discrete_distribution import Lattice, DigitalNetB2, Halton
+from ..discrete_distribution import DigitalNetB2
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
-from ..true_measure import Gaussian, Uniform
 from ..integrand.keister import Keister
 from ..integrand.box_integral import BoxIntegral
 from ..integrand.sensitivity_indices import SensitivityIndices
 from ..integrand.genz import Genz
 from ..util import (
     MaxSamplesWarning,
-    NotYetImplemented,
     ParameterWarning,
     ParameterError,
 )

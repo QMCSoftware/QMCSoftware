@@ -241,21 +241,12 @@ This example can be run in Google Colab without any installation using this [not
 
 ## References
 
-1. Hickernell, F. J. Blog: Why Add Q to MC?
-[https://qmcpy.org/2020/06/25/why_add_q_to_mc/](https://qmcpy.org/2020/06/25/why_add_q_to_mc/). 2020.
-2. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A
-quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
-3. Rathinavel, J., & Hickernell, F. Fast automatic Bayesian cubature
-using lattice sampling. *Statistics and Computing*, 29, 1215-1229 (2019).
-4. Sloan, I. H., & Joe, S. *Lattice Methods for Multiple Integration*.
-   Oxford University Press, Oxford (1994).
-5. Hickernell, F., & Niederreiter, H. The existence of good extensible
-   rank-1 lattices. *Journal of Complexity*, 19, 286-300 (2003).
-6. Cooley, J. W., & Tukey, J. W. An algorithm for the machine
-calculation of complex Fourier series. *Mathematics of Computation*, 19, 297-301 (1965).
-7. Ebert, A. Blog: Digital Sequences, the Niederreiter Construction.
-[https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/](https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/). 2021.
-8. Rathinavel, J. *Fast Automatic Bayesian Cubature Using Matching
-Kernels and Designs*. PhD thesis, Illinois Institute of Technology (2019).
-9. Fino, B. J., & Algazi, V. R. Unified matrix treatment of the fast
-Walsh-Hadamard transform. *IEEE Transactions on Computers*, C-25, 1142-1146 (1976).
+1. Hickernell, F. J. Blog: Why Add Q to MC? [https://qmcpy.org/2020/06/25/why_add_q_to_mc/](https://qmcpy.org/2020/06/25/why_add_q_to_mc/). 2020.
+2. Choi, S.-C. T., Hickernell, F., McCourt, M., & Sorokin, A. QMCPy: A quasi-Monte Carlo Python Library. [https://qmcsoftware.github.io/QMCSoftware/](https://qmcsoftware.github.io/QMCSoftware/). 2020.
+3. Rathinavel, J., & Hickernell, F. Fast automatic Bayesian cubature using lattice sampling. *Statistics and Computing*, 29, 1215-1229 (2019).
+4. Sloan, I. H., & Joe, S. *Lattice Methods for Multiple Integration*. Oxford University Press, Oxford (1994).
+5. Hickernell, F., & Niederreiter, H. The existence of good extensible rank-1 lattices. *Journal of Complexity*, 19, 286-300 (2003).
+6. Cooley, J. W., & Tukey, J. W. An algorithm for the machine calculation of complex Fourier series. *Mathematics of Computation*, 19, 297-301 (1965).
+7. Ebert, A. Blog: Digital Sequences, the Niederreiter Construction. [https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/](https://qmcpy.org/2021/06/04/digital-sequences-the-niederreiter-construction/). 2021.
+8. Rathinavel, J. *Fast Automatic Bayesian Cubature Using Matching Kernels and Designs*. PhD thesis, Illinois Institute of Technology (2019).
+9. Fino, B. J., & Algazi, V. R. Unified matrix treatment of the fast Walsh-Hadamard transform. *IEEE Transactions on Computers*, C-25, 1142-1146 (1976).

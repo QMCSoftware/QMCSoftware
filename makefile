@@ -308,6 +308,10 @@ uml:
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
 	@rm -rf docs/paper docs/demos
 	@cp README.md docs/README.md
+	@cp AGENTS.md docs/AGENTS.md
+	@perl -0pi -e 's!\(docs/good_practices\.md\)!\(good_practices.md\)!g' docs/AGENTS.md
+	@perl -0pi -e 's!\(docs/ai-assisted-contributions\.md\)!\(ai-assisted-contributions.md\)!g' docs/AGENTS.md
+	@perl -0pi -e 's!\(docs/RELEASE\.md\)!\(RELEASE.md\)!g' docs/AGENTS.md
 	@perl -0pi -e 's!\(docs/assets/pep8-badge\.svg\)!\(assets/pep8-badge.svg\)!g' docs/README.md
 	@perl -0pi -e 's!\(docs/qmc-software\.md\)!\(qmc-software.md\)!g' docs/README.md
 	@cp CONTRIBUTING.md docs/CONTRIBUTING.md
@@ -343,6 +347,14 @@ doc: uml copydocs runmkdocserve
 
 docnouml: copydocs runmkdocserve
 
+check_links: copydocs  # internal links + anchors only; fast, no network, safe for CI
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site
+
+check_links_external: copydocs  # also checks http/https links; slow and network-flaky, run locally
+	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
+	@python scripts/check_links.py site --external
+
 ##########################################################
 # PEP8
 ##########################################################
@@ -352,7 +364,7 @@ PYLINT_BASE ?= develop
 check_pep8:
 	@$(PYLINT) qmcpy --exit-zero --disable=R,C,E0401 --ignored-modules=qmctoolscl
 
-pylint_changed:
+check_pep8_changed:
 	@set -e; \
 	changed_files="$$( \
 		{ \

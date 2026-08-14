@@ -5,11 +5,18 @@ from qmcpy import (
     KernelShiftInvar,
     KernelShiftInvarCombined,
 )
+from qmcpy.kernel.si_dsi_kernels import AbstractSIDSIKernel
+from qmcpy.util import MethodImplementationError
 from qmcpy.util.transforms import tf_exp_eps, tf_exp_eps_inv
 import unittest
 
 
 class KernelsTest(unittest.TestCase):
+
+    def test_get_per_dim_components_raises_on_abstract_base(self):
+        kernel = KernelShiftInvar(d=2)
+        with self.assertRaises(MethodImplementationError):
+            AbstractSIDSIKernel.get_per_dim_components(kernel, None, None, None, None)
 
     def test_si_dsi_kernel_weights_alias_lengthscales(self):
         for KernelClass in [
