@@ -11,6 +11,10 @@ else:  # Compatibility symlink imported with demos/GBM on sys.path.
     import qmcpy_util as qpu
     import quantlib_util as qlu
 
+# Speedups are only reported between runs that share a sampler, so the column
+# name states that explicitly; see create_timing_dataframe().
+SPEEDUP_COLUMN = "Speedup (same sampler)"
+
 
 def add_theoretical_results(
     results_data: list, theoretical_mean: float, theoretical_std: float
@@ -201,18 +205,22 @@ def process_sampler_data(
 
 
 def create_timing_dataframe(
-    quantlib_results: dict, qmcpy_results: dict, baseline_sampler: str
+    quantlib_results: dict, qmcpy_results: dict
 ) -> pd.DataFrame:
     """
     Create comprehensive timing comparison table from benchmark results.
 
+    The speedup of a QMCPy row is computed against the QuantLib run that uses
+    the *same* sampler, so the ratio is like-for-like. Samplers that QuantLib
+    is not benchmarked with here (e.g. Lattice, Halton) have no counterpart and
+    report "-" rather than a ratio against an unrelated QuantLib run.
+
     Args:
         quantlib_results: Dictionary mapping sampler names to timing results
         qmcpy_results: Dictionary mapping sampler names to timing results
-        baseline_sampler: Sampler to use as baseline for speedup calculation
 
     Returns:
-        DataFrame with timing statistics and speedup comparisons
+        DataFrame with timing statistics and same-sampler speedup comparisons
     """
     timing_data = []
 
@@ -224,21 +232,25 @@ def create_timing_dataframe(
                 "Sampler": sampler_type,
                 "Mean Time (s)": result["average"],
                 "Std Dev (s)": result["stdev"],
-                "Speedup": "-",
+                SPEEDUP_COLUMN: "-",
             }
         )
 
-    # Add QMCPy data with speedup calculation
-    baseline_time = quantlib_results[baseline_sampler]["average"]
+    # Add QMCPy data with same-sampler speedup calculation
     for sampler_type, result in qmcpy_results.items():
-        speedup = baseline_time / result["average"]
+        quantlib_result = quantlib_results.get(sampler_type)
+        speedup = (
+            quantlib_result["average"] / result["average"]
+            if quantlib_result is not None
+            else "-"
+        )
         timing_data.append(
             {
                 "Method": "QMCPy",
                 "Sampler": sampler_type,
                 "Mean Time (s)": result["average"],
                 "Std Dev (s)": result["stdev"],
-                "Speedup": speedup,
+                SPEEDUP_COLUMN: speedup,
             }
         )
 

@@ -96,7 +96,7 @@ def plot_performance_comparison(
             for i, (qmc_time, ql_time) in enumerate(zip(qmcpy_times, quantlib_times)):
                 if ql_time is not None:
                     speedup = ql_time / qmc_time
-                    annotation_height = qmc_time + max(qmcpy_times) * 0.3
+                    annotation_height = qmc_time + max(qmcpy_times) * 0.5
                     # Position arrow at center of QMCPy bar (i + width/2)
                     ax.annotate(
                         f"{speedup:.1f}x faster",
