@@ -1,9 +1,15 @@
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-import quantlib_util as qlu
-import qmcpy_util as qpu
-import config as cf
+
+if __package__:  # Imported as demos.GBM.gbm_code.data_util (e.g. by pytest)
+    from . import config as cf
+    from . import qmcpy_util as qpu
+    from . import quantlib_util as qlu
+else:  # Compatibility symlink imported with demos/GBM on sys.path.
+    import config as cf
+    import qmcpy_util as qpu
+    import quantlib_util as qlu
 
 
 def add_theoretical_results(
