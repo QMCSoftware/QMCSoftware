@@ -53,10 +53,10 @@ def add_quantlib_results(
         ql_stds: 1D array of per-replication standard deviations of $S_T$.
     """
     ql_emp_mean = np.mean(quantlib_final)
-    ql_emp_std_avg = np.mean(ql_stds)  
+    ql_emp_std_avg = np.mean(ql_stds)
 
     ql_mae = np.mean(np.abs(quantlib_final - theoretical_mean))
-    ql_sde = np.mean(np.abs(ql_stds - theoretical_std))            
+    ql_sde = np.mean(np.abs(ql_stds - theoretical_std))
 
 
     results_data.append(
@@ -66,7 +66,7 @@ def add_quantlib_results(
             "Mean": ql_emp_mean,
             "Std Dev": ql_emp_std_avg,
             "Mean Absolute Error": ql_mae,
-            "Std Dev Error": ql_sde, 
+            "Std Dev Error": ql_sde,
         }
     )
 
@@ -98,9 +98,9 @@ def add_qmcpy_results(
         qp_stds: 1D array of per-replication standard deviations of $S_T$.
     """
     qp_mae = np.mean(np.abs(qmcpy_final - theoretical_mean))
-   
-    qp_emp_std_avg = np.mean(qp_stds)                            
-    qp_sde = np.mean(np.abs(qp_stds - theoretical_std))            
+
+    qp_emp_std_avg = np.mean(qp_stds)
+    qp_sde = np.mean(np.abs(qp_stds - theoretical_std))
 
     results_data.append(
         {
@@ -156,7 +156,7 @@ def process_sampler_data(
             ql_stds[r] = quantlib_paths[:, -1].std(ddof=1)
 
         params_ql["seed"] = ql_seed
-        
+
 
     else:
         ql_means = None
@@ -169,7 +169,7 @@ def process_sampler_data(
     else:
         qp_means = np.array([qmcpy_paths[:, -1].mean()])
         qp_stds = np.array([qmcpy_paths[:, -1].std(ddof=1)])
-    
+
 
     if ql_means is not None:
         add_quantlib_results(
