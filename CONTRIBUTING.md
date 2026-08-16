@@ -22,7 +22,7 @@ All improvements to QMCPy should be connected to an **issue** using a template f
 
 If you have not yet installed the QMCPy library, see [Installation](#installation) below.
 
-You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk us through.
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk them through the changes.
 
 After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
 
@@ -30,12 +30,26 @@ We periodically release the contents of `develop` to `master`. Contact the team 
 
 ### Blogs
 
-Blog content is maintained in
-[`QMCSoftware/qmcsoftware-website`](https://github.com/QMCSoftware/qmcsoftware-website),
-not in this repository's MkDocs documentation site. Propose blog posts in that
-repository. Published articles appear on the
-[QMCSoftware Blog](https://qmcsoftware.org/blog/). Keep package documentation,
-API references, and executable demos for a feature in this repository.
+Blog prose is maintained in
+[`QMCSoftware/QMCSoftware.github.io`](https://github.com/QMCSoftware/QMCSoftware.github.io),
+not in this repository's MkDocs documentation site. Propose and publish blog
+posts there; published articles appear on the
+[QMCSoftware Blog](https://qmcsoftware.org/blog/).
+
+Runnable examples remain in this repository. For every article backed by a
+notebook:
+
+1. Keep the executable notebook under `demos/` as the reproducible source and
+   link the article to that exact repository path. Moving the article prose to
+   the website is not a reason to delete its notebook.
+2. Edit and execute the notebook in the QMCPy development environment, from its
+   containing directory when it uses relative imports or helper files.
+3. Add or update the matching `test/booktests/tb_*.py` test and run that focused
+   test before updating the website article. See
+   [`test/booktests/README.md`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/test/booktests/README.md)
+   for commands.
+4. Update the website article separately, then verify that its source-notebook
+   link still resolves.
 
 
 ## Installation

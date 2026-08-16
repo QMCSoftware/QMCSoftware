@@ -1,3 +1,4 @@
+site_url: "https://qmcsoftware.github.io/QMCSoftware/"
 site_name: "QMCPy"
 nav:
   - Quasi Monte Carlo Software: README.md
@@ -22,8 +23,6 @@ nav:
       - Quickstart: demos/quickstart.ipynb
       - Pricing Options: demos/pricing_options.ipynb
       - Lebesgue Integration: demos/lebesgue_integration.ipynb
-    - Resume:
-      - Accuracy and Resume: demos/demo_resume_data/accuracy_and_resume.ipynb
     - Publication Notebooks:
       - 2026 Random LD Seq., QMC, and Fast Kernel Methods: demos/talk_paper_demos/Sorokin_random_LD_seq_QMC_fast_kernel_methods_2026/Sorokin_random_LD_seq_QMC_fast_kernel_methods_2026.ipynb
       - 2026 JOSS Paper: demos/talk_paper_demos/JOSS2026/joss2026.ipynb
@@ -62,6 +61,7 @@ nav:
     - Algorithm Testing:
       - Digital Nets in Base 2 and their Randomizations: demos/digital_net_b2.ipynb
       - Halton Points and their Randomizations: demos/linear-scrambled-halton.ipynb
+      - Latin Hypercube, Korobov Lattice, and Hammersley Samplers: demos/korobov_hammersley_latinhypercube_demos.ipynb
       - Geometric Brownian Motion: demos/GBM/gbm_demo.ipynb
       - GBM Examples: demos/GBM/gbm_examples.ipynb
       - Brownian Bridge: demos/brownian_bridge.ipynb
@@ -84,6 +84,7 @@ nav:
       - CI testing and cost control: ci-testing.md
       - QMCPy MPMC compatibility matrix: mpmc-compatibility.md
       - Unit tests on Jupyter Notebooks: booktests.md
+      - Coding Agents: AGENTS.md
     - JOSS 2026 Paper: paper/paper.md
 
 
