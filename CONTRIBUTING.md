@@ -34,7 +34,7 @@ Blog prose is maintained in
 [`QMCSoftware/QMCSoftware.github.io`](https://github.com/QMCSoftware/QMCSoftware.github.io),
 not in this repository's MkDocs documentation site. Propose and publish blog
 posts there; published articles appear on the
-[QMCSoftware Blog](https://qmcsoftware.org/blog/).
+[QMCSoftware Blog](https://qmcsoftware.org/blogs/).
 
 Runnable examples remain in this repository. For every article backed by a
 notebook:

@@ -31,8 +31,8 @@ This folder contains notebooks and helper scripts for demonstrating QMCPy's resu
 ## Reproducing the Website Articles
 
 The website articles on the
-[resume feature](https://qmcsoftware.org/blog/resume-feature/) and
-[iteration logs](https://qmcsoftware.org/blog/iteration-log/) summarize the
+[resume feature](https://qmcsoftware.org/blogs/resume-feature/) and
+[iteration logs](https://qmcsoftware.org/blogs/iteration-log/) summarize the
 material, while the three notebooks above are the executable sources. To check
 an update, execute all cells in the relevant notebook using the QMCPy
 development environment, then run its focused booktest from the repository
