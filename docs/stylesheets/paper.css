@@ -54,3 +54,41 @@
 .paper-render #refs a {
   overflow-wrap: anywhere;
 }
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.qmc-software-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.qmc-software-table th {
+  background-color: #222;
+  color: white;
+  text-align: left;
+  padding: 0.6rem;
+}
+
+.qmc-software-table td {
+  vertical-align: top;
+  padding: 0.6rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.qmc-software-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.software-desc,
+.software-related {
+  font-size: 0.9em;
+  color: var(--md-default-fg-color--light);
+}
+
+.status-nowrap {
+  white-space: normal;
+}
