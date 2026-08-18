@@ -149,27 +149,6 @@ plugins:
       shadow: true
       manual: false
   - autorefs  # explicitly listed so print-site stays last (mkdocstrings auto-injects this)
-  - redirects:  # pages that moved to https://qmcsoftware.org/blogs/; keeps their old
-                # URLs answering instead of 404ing. Audited by make check_removed_urls.
-      redirect_maps:
-        blogs/a-qmcpy-quick-start/index.md: https://qmcsoftware.org/blogs/a-qmcpy-quick-start/
-        blogs/accelerating-qmcpy-notebook-tests-with-parsl/index.md: https://qmcsoftware.org/blogs/accelerating-qmcpy-notebook-tests-with-parsl/
-        blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/index.md: https://qmcsoftware.org/blogs/accelerating-rare-event-reliability-simulations-for-cerns-large-hadron-collider-using-qmcpy/
-        blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/index.md: https://qmcsoftware.org/blogs/analysis-of-qmc-efficiency-for-asian-option-pricing/
-        blogs/bayesian-stopping-criteria/index.md: https://qmcsoftware.org/blogs/bayesian-stopping-criteria/
-        blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/index.md: https://qmcsoftware.org/blogs/cubmccltvec-vectorizing-the-cubmcclt-algorithm/
-        blogs/digital-sequences-the-niederreiter-construction/index.md: https://qmcsoftware.org/blogs/digital-sequences-the-niederreiter-construction/
-        blogs/gbm-qmcpy/index.md: https://qmcsoftware.org/blogs/gbm-qmcpy/
-        blogs/linear-matrix-scrambling-and-digital-shift-for-halton/index.md: https://qmcsoftware.org/blogs/linear-matrix-scrambling-and-digital-shift-for-halton/
-        blogs/qei-with-qmcpy/index.md: https://qmcsoftware.org/blogs/qei-with-qmcpy/
-        blogs/random-lattice-generators-are-not-bad/index.md: https://qmcsoftware.org/blogs/random-lattice-generators-are-not-bad/
-        blogs/safe-handling-of-qmc-points/index.md: https://qmcsoftware.org/blogs/safe-handling-of-qmc-points/
-        blogs/scipywrapper/index.md: https://qmcsoftware.org/blogs/scipywrapper/
-        blogs/speeding-up-qmcpy-with-distributable-c-code/index.md: https://qmcsoftware.org/blogs/speeding-up-qmcpy-with-distributable-c-code/
-        blogs/visualizing-the-generated-samples-helps/index.md: https://qmcsoftware.org/blogs/visualizing-the-generated-samples-helps/
-        blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md: https://qmcsoftware.org/blogs/visualizing-the-internals-of-object-classes-in-qmcpy/
-        blogs/what-makes-a-sequence-low-discrepancy/index.md: https://qmcsoftware.org/blogs/what-makes-a-sequence-low-discrepancy/
-        blogs/why-add-q-to-mc/index.md: https://qmcsoftware.org/blogs/why-add-q-to-mc/
   # I have commented out the following as it requires storing over 100mb of data, which GitHub throws an error for:
   #         remote: error: File print_page/index.html is 103.75 MB; this exceeds GitHub's file size limit of 100.00 MB
   # - print-site:  # Enables PDF generation (saves docs to print_page/). See https://tinyurl.com/52ba83ax
