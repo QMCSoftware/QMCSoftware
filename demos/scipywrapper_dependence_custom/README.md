@@ -31,7 +31,7 @@ From the top level of the QMCSoftware repo, the pieces for this project are:
 - `demos/scipywrapper_dependence_custom/README.md`  
   This file.
 
-- `docs/blogs/scipywrapper/index.md`  
+- [SciPyWrapper article on the QMCSoftware Blog](https://qmcsoftware.org/blogs/scipywrapper/)
   Blog describing the project at a higher level.
 
 - `test/test_scipy_wrapper_custom.py`  

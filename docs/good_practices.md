@@ -51,7 +51,9 @@ New functionality should fit the existing QMCPy class hierarchy instead of intro
 - Typical extension points include `DiscreteDistribution`, `TrueMeasure`, `Integrand`, `StoppingCriterion`, and `AccumulateData`.
 - If a change does not fit the current hierarchy, raise that design question in an issue or draft PR before committing to a new abstraction.
 
-The [components overview](components.md) and the blog post on [object classes in QMCPy](blogs/visualizing-the-internals-of-object-classes-in-qmcpy/index.md) provide useful background on the current architecture.
+The [components overview](components.md) and the QMCSoftware blog post on
+[object classes in QMCPy](https://qmcsoftware.org/blogs/visualizing-the-internals-of-object-classes-in-qmcpy/)
+provide useful background on the current architecture.
 
 ## Validate Links, Metadata, and CI Scope
 
