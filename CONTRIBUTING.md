@@ -30,26 +30,14 @@ We periodically release the contents of `develop` to `master`. Contact the team 
 
 ### Blogs
 
-Blog prose is maintained in
-[`QMCSoftware/QMCSoftware.github.io`](https://github.com/QMCSoftware/QMCSoftware.github.io),
-not in this repository's MkDocs documentation site. Propose and publish blog
-posts there; published articles appear on the
-[QMCSoftware Blog](https://qmcsoftware.org/blogs/).
+Blog prose is maintained in [`QMCSoftware/QMCSoftware.github.io`](https://github.com/QMCSoftware/QMCSoftware.github.io), not in this repository's MkDocs documentation site. Propose and publish blog posts there; published articles appear on the [QMCSoftware Blog](https://qmcsoftware.org/blogs/).
 
-Runnable examples remain in this repository. For every article backed by a
-notebook:
+Runnable examples remain in this repository. For every article backed by a notebook:
 
-1. Keep the executable notebook under `demos/` as the reproducible source and
-   link the article to that exact repository path. Moving the article prose to
-   the website is not a reason to delete its notebook.
-2. Edit and execute the notebook in the QMCPy development environment, from its
-   containing directory when it uses relative imports or helper files.
-3. Add or update the matching `test/booktests/tb_*.py` test and run that focused
-   test before updating the website article. See
-   [`test/booktests/README.md`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/test/booktests/README.md)
-   for commands.
-4. Update the website article separately, then verify that its source-notebook
-   link still resolves.
+1. Keep the executable notebook under `demos/` as the reproducible source and link the article to that exact repository path. Moving the article prose to the website is not a reason to delete its notebook.
+2. Edit and execute the notebook in the QMCPy development environment, from its containing directory when it uses relative imports or helper files.
+3. Add or update the matching `test/booktests/tb_*.py` test and run that focused test before updating the website article. See [`test/booktests/README.md`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/test/booktests/README.md) for commands.
+4. Update the website article separately, then verify that its source-notebook link still resolves.
 
 
 ## Installation

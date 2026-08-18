@@ -150,7 +150,7 @@ plugins:
       manual: false
   - autorefs  # explicitly listed so print-site stays last (mkdocstrings auto-injects this)
   # I have commented out the following as it requires storing over 100mb of data, which GitHub throws an error for:
-  #         remote: error: File print_page/index.html is 103.75 MB; this exceeds GitHub's file size limit of 100.00 MB        
+  #         remote: error: File print_page/index.html is 103.75 MB; this exceeds GitHub's file size limit of 100.00 MB
   # - print-site:  # Enables PDF generation (saves docs to print_page/). See https://tinyurl.com/52ba83ax
   #     add_to_navigation: true
 
