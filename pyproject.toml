@@ -52,6 +52,9 @@ dependencies = [
     "qmctoolscl >= 1.2.1",
     ]
 
+[project.scripts]
+qmcpy-install-mpmc = "qmcpy.util.install_mpmc_pyg:main"
+
 [project.optional-dependencies]
 torch = [
     "torch >= 2.2.0",
@@ -66,8 +69,7 @@ umbridge = [
     "umbridge >= 1.2.1",
     ]
 mpmc = [
-    "torch >= 2.2.0, < 2.13", # PyG publishes pyg_lib wheels only through torch 2.12 (https://data.pyg.org/whl/); raise when 2.13+ wheels ship
-    "pyg_lib >= 0.6.0",
+    "torch >= 2.10.0, < 2.13", # PyG publishes pyg_lib >= 0.6 wheels for torch 2.10-2.12 (https://data.pyg.org/whl/)
     "torch-geometric >= 2.6.1",
 ]
 test = [
@@ -103,8 +105,7 @@ test_umbridge = [
     "umbridge >= 1.2.4",
     ]
 test_mpmc = [
-    "torch >= 2.2.0, < 2.13", # PyG publishes pyg_lib wheels only through torch 2.12 (https://data.pyg.org/whl/); raise when 2.13+ wheels ship
-    "pyg_lib >= 0.6.0",
+    "torch >= 2.10.0, < 2.13", # kept in sync with the mpmc extra
     "torch-geometric >= 2.6.1",
     ]
 docs = [  # brew install weasyprint
@@ -129,7 +130,7 @@ docs = [  # brew install weasyprint
     "pylint >= 4.0.5",
 ]
 dev = [ # brew install weasyprint
-    "qmcpy[docs,test,torch,gpytorch,botorch,umbridge]",
+    "qmcpy[docs,test,torch,gpytorch,botorch,umbridge,mpmc]",
     "jupyterlab >= 4.0.0",
     "jupyterlab_execute_time >= 3.2.0",
     "ipynbname >= 2025.8.0.0",

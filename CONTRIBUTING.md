@@ -60,6 +60,22 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
+The `dev` extra includes QMCPy's PyPI-hosted MPMC dependencies. MPMC additionally
+requires a platform-specific `pyg_lib` wheel that is not available from PyPI.
+After installing `dev`, let the QMCPy installer select the wheel page matching
+the installed PyTorch build:
+
+~~~bash
+qmcpy-install-mpmc
+~~~
+
+For an MPMC installation without the complete development environment, use:
+
+~~~bash
+pip install -e ".[mpmc]"
+qmcpy-install-mpmc
+~~~
+
 ## 📚 Using `qmcpy` In Courses (`class` Extra)
 
 `qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
