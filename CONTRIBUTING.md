@@ -38,6 +38,7 @@ Runnable examples remain in this repository. For every article backed by a noteb
 2. Edit and execute the notebook in the QMCPy development environment, from its containing directory when it uses relative imports or helper files.
 3. Add or update the matching `test/booktests/tb_*.py` test and run that focused test before updating the website article. See [`test/booktests/README.md`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/test/booktests/README.md) for commands.
 4. Update the website article separately, then verify that its source-notebook link still resolves.
+5. If the article had a page on this repository's MkDocs site, do not just delete it: add a `redirect_maps` entry for its old path under the `redirects` plugin in `mkdocs.yml`, then confirm with `make check_removed_urls`.
 
 
 ## Installation
