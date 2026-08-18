@@ -108,7 +108,7 @@ test_mpmc = [
     "torch-geometric >= 2.6.1",
     ]
 docs = [  # brew install weasyprint
-    "qmcpy[test,test_torch,test_gpytorch,test_botorch,test_umbridge,test_mpmc]",
+    "qmcpy[test,test_torch,test_gpytorch,test_botorch,test_umbridge]",
     "nbval >= 0.10.0",
     "attrs >= 21.0.0",
     "pyyaml >= 6.0",
