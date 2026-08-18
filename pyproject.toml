@@ -127,7 +127,7 @@ docs = [  # brew install weasyprint
     "pylint >= 4.0.5",
 ]
 dev = [ # brew install weasyprint
-    "qmcpy[docs,test,torch,gpytorch,botorch,umbridge]",
+    "qmcpy[docs,test,torch,gpytorch,botorch,umbridge,mpmc]",
     "jupyterlab >= 4.0.0",
     "jupyterlab_execute_time >= 3.2.0",
     "ipynbname >= 2025.8.0.0",
