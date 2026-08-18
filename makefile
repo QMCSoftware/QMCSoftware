@@ -355,6 +355,14 @@ check_links_external: copydocs  # also checks http/https links; slow and network
 	@NO_MKDOCS_2_WARNING=1 mkdocs build -q -d site
 	@python scripts/check_links.py site --external
 
+# The targets above check links inside the new site; these check the other
+# direction -- already-published URLs that would 404 after the next deploy.
+check_removed_urls: copydocs  # fetches the deployed sitemap.xml; needs network
+	@python scripts/check_removed_urls.py
+
+check_removed_urls_verify: copydocs  # also HTTP-checks every redirect target
+	@python scripts/check_removed_urls.py --verify-redirects
+
 ##########################################################
 # PEP8
 ##########################################################
