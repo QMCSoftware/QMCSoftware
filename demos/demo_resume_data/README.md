@@ -8,11 +8,9 @@ This folder contains notebooks and helper scripts for demonstrating QMCPy's resu
 
 - `accuracy_and_resume.ipynb`:   Long-form walkthrough of the feature.
 
-- `resume_examples.ipynb`: Compact, recipe-style walkthrough of the resume
-  workflow.
+- `resume_examples.ipynb`: Compact, recipe-style walkthrough of the resume workflow.
 
-- `Iteration_Log_Tolerance_Demo.ipynb`: Focused demonstration of tolerance
-  changes and the iteration log.
+- `Iteration_Log_Tolerance_Demo.ipynb`: Focused demonstration of tolerance changes and the iteration log.
 
 - `check_resume.py`: Runs a cross-method comparison of:
   - a loose run followed by resume with a tighter tolerance
@@ -30,13 +28,7 @@ This folder contains notebooks and helper scripts for demonstrating QMCPy's resu
 
 ## Reproducing the Website Articles
 
-The website articles on the
-[resume feature](https://qmcsoftware.org/blogs/resume-feature/) and
-[iteration logs](https://qmcsoftware.org/blogs/iteration-log/) summarize the
-material, while the three notebooks above are the executable sources. To check
-an update, execute all cells in the relevant notebook using the QMCPy
-development environment, then run its focused booktest from the repository
-root:
+The website articles on the [resume feature](https://qmcsoftware.org/blogs/resume-feature/) and [iteration logs](https://qmcsoftware.org/blogs/iteration-log/) summarize the material, while the three notebooks above are the executable sources. To check an update, execute all cells in the relevant notebook using the QMCPy development environment, then run its focused booktest from the repository root:
 
 ```bash
 cd test/booktests
@@ -45,9 +37,7 @@ python -m pytest tb_accuracy_and_resume.py \
   tb_Iteration_Log_Tolerance_Demo.py -v
 ```
 
-Keep the notebook, any local helper files, and its `tb_*.py` booktest together
-when the corresponding website article changes. The article should link back to
-the notebook in this directory so readers can rerun the complete example.
+Keep the notebook, any local helper files, and its `tb_*.py` booktest together when the corresponding website article changes. The article should link back to the notebook in this directory so readers can rerun the complete example.
   
 ## Generated Reports
 

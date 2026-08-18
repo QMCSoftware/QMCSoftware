@@ -119,6 +119,9 @@ docs = [  # brew install weasyprint
     "mkdocstrings-python >= 1.16.0",
     "mkdocs-with-pdf >= 0.9.3",
     "mkdocs-glightbox >= 0.4.0",
+    # Ceiling: 1.2.3 moved to the ProperDocs fork, adding a `properdocs` dependency
+    # (a second full MkDocs engine) and capping `mkdocs <= 1.6.1`.
+    # "mkdocs-redirects >= 1.2.2, < 1.2.3",
     "graphviz >= 0.20.0",
     "phmutest >= 1.0.1",
     "mkpdfs-mkdocs >= 1.0.1",
