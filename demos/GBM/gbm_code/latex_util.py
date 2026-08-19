@@ -30,7 +30,7 @@ def generate_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
     header = (
         "Method & Sampler & Mean & Std Dev & Mean Absolute & Std Dev  & "
         "Mean Time (s)  & Std Dev (s) & Speedup \\\\\n &  &  &   &  "
-        "Error &  Error &   & &  \\\\"
+        "Error &  Error &   & & (same sampler) \\\\"
     )
 
     latex_table = df.style.hide(axis="index").to_latex(

@@ -1,0 +1,17 @@
+\begin{table}[tbp]
+\caption{GBM Final Value Statistics and Performance Comparison}
+\label{tab2}
+\begin{tabular}{ll@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r@{\hspace{0.4em}}r}
+\toprule
+Method & Sampler & Mean & Std Dev & Mean Absolute & Std Dev  & Mean Time (s)  & Std Dev (s) & Speedup \\
+ &  &  &   &  Error &  Error &   & & (same sampler) \\
+\midrule
+QuantLib & IIDStdUniform & 105.11303192 & 21.36718877 & 0.18351598 & 0.15899591 & 0.63380418 & 0.00161494 & - \\
+QMCPy & IIDStdUniform & 105.10038021 & 21.30566056 & 0.11309393 & 0.08490085 & 0.06230253 & 0.00088295 & 10.17300847 \\
+QuantLib & Sobol & 105.14277619 & 21.33131514 & 0.01873630 & 0.10979683 & 0.17632570 & 0.00019854 & - \\
+QMCPy & Sobol & 105.12698793 & 21.24087984 & 0.00060724 & 0.00566480 & 0.05969414 & 0.00087956 & 2.95381933 \\
+QMCPy & Lattice & 105.12707776 & 21.23535755 & 0.00528692 & 0.01626092 & 0.05913754 & 0.00010269 & - \\
+QMCPy & Halton & 105.12751671 & 21.24077321 & 0.00092510 & 0.00998311 & 1.71934573 & 0.00829316 & - \\
+\bottomrule
+\end{tabular}
+\end{table}
