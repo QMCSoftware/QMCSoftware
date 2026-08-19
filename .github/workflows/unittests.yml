@@ -21,23 +21,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:
+            # These versions are real: python-version is passed to
+            # setup-miniconda and asserted by the "Verify interpreter" step.
+            # Floor is 3.10 -- the `test` extra needs pytest >= 9.0.3 and
+            # parsl >= 2026.01.05, which both require 3.10+. Older interpreters
+            # run in the core-tests job below. Each version appears once; the
+            # full install set resolves on all three OSes for 3.10-3.14.
             include:
-              - os: macos-latest
-                python-version: '3.5'
-              - os: macos-latest
-                python-version: '3.8'
               - os: macos-latest
                 python-version: '3.11'
               - os: macos-latest
                 python-version: '3.14'
               - os: ubuntu-latest
-                python-version: '3.6'
-              - os: ubuntu-latest
-                python-version: '3.9'
-              - os: ubuntu-latest
                 python-version: '3.12'
-              - os: windows-latest
-                python-version: '3.7'
               - os: windows-latest
                 python-version: '3.10'
               - os: windows-latest
@@ -48,9 +44,26 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
-          auto-activate-base: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          auto-activate-base: false
           conda-remove-defaults: true
-          use-only-tar-bz2: true
+
+      # Guards the failure mode this matrix used to have: the job name claimed a
+      # Python version while every job actually ran the conda base interpreter.
+      # Steps that touch Python must use a profile-loading shell (bash -el / pwsh)
+      # or they will see base rather than the activated env.
+      - name: Verify interpreter matches the matrix (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: |
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got); print(sys.version)"
+
+      - name: Verify interpreter matches the matrix (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got); print(sys.version)"
 
       # -----------------------------------------------------------
       # Clean old coverage files
@@ -194,21 +207,25 @@ jobs:
 
       - name: Build and cache wheels (Linux)
         if: runner.os == 'Linux'
+        shell: bash -el {0}
         run: |
-          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch,test_umbridge] || true
+          python -m pip wheel -w ./.wheels ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]" || true
 
       - name: Install Python dependencies (Linux)
         if: runner.os == 'Linux'
+        shell: bash -el {0}
         run: |
           pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]"
 
       - name: Build and cache wheels (macOS)
         if: runner.os == 'macOS'
+        shell: bash -el {0}
         run: |
-          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || true
+          python -m pip wheel -w ./.wheels ".[test,test_torch,test_gpytorch,test_botorch]" || true
 
       - name: Install Python dependencies (macOS)
         if: runner.os == 'macOS'
+        shell: bash -el {0}
         run: |
           pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch]"
 
@@ -227,5 +244,72 @@ jobs:
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------
-      - name: Run unittests (parallel)
+      - name: Run unittests (parallel, Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
         run: make unittests
+
+      - name: Run unittests (parallel, Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: make unittests
+
+  # Interpreters below the `test` extra's 3.10 floor. `unittests_core` runs
+  # test/test_*.py against the slim `test_core` extra; modules needing an
+  # optional stack skip themselves via pytest.importorskip.
+  # `strict: false` versions are probes -- qmcpy's source is 3.6-clean but
+  # `qmctoolscl` fails to build below 3.9, so they warn instead of failing.
+  # This measures the real floor each run: if qmctoolscl starts building on
+  # 3.8, that job goes green and can be promoted to strict.
+  core-tests:
+    name: Core Unit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+        fail-fast: false
+        matrix:
+            include:
+              - python-version: '3.6'
+                strict: false
+              - python-version: '3.7'
+                strict: false
+              - python-version: '3.8'
+                strict: false
+              - python-version: '3.9'
+                strict: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          auto-activate-base: false
+          activate-environment: qmcpy-core
+          conda-remove-defaults: true
+
+      - name: Report interpreter
+        shell: bash -el {0}
+        run: python -VV
+
+      - name: Install qmcpy and minimal test dependencies
+        id: install
+        shell: bash -el {0}
+        continue-on-error: ${{ !matrix.strict }}
+        run: pip install -e ".[test_core]"
+
+      - name: Run core unit tests
+        if: steps.install.outcome == 'success'
+        shell: bash -el {0}
+        run: make unittests_core
+
+      - name: Report interpreter below the installable floor
+        if: steps.install.outcome != 'success'
+        shell: bash -el {0}
+        run: |
+          echo "::warning title=Python ${{ matrix.python-version }} not installable::\
+          qmcpy could not be installed on Python ${{ matrix.python-version }}. \
+          The qmcpy source itself is 3.6-clean; the blocker is a dependency -- \
+          qmctoolscl fails to build on 3.8 and below, and on 3.6 the test_core \
+          pins (scikit-learn, pandas) do not resolve either. See the install log \
+          above and 'Minimum Python Version by Role' in CONTRIBUTING.md."

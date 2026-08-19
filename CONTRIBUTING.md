@@ -60,10 +60,7 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
-The `dev` extra includes QMCPy's PyPI-hosted MPMC dependencies. MPMC additionally
-requires a platform-specific `pyg_lib` wheel that is not available from PyPI.
-After installing `dev`, let the QMCPy installer select the wheel page matching
-the installed PyTorch build:
+The `dev` extra includes QMCPy's PyPI-hosted MPMC dependencies. MPMC additionally requires a platform-specific `pyg_lib` wheel that is not available from PyPI. After installing `dev`, let the QMCPy installer select the wheel page matching the installed PyTorch build:
 
 ~~~bash
 qmcpy-install-mpmc
@@ -75,6 +72,26 @@ For an MPMC installation without the complete development environment, use:
 pip install -e ".[mpmc]"
 qmcpy-install-mpmc
 ~~~
+
+### Minimum Python Version by Role
+
+`requires-python` covers a bare install; the optional dependency groups in `pyproject.toml` raise it. Each row shows the strictest floor among that role's pinned dependencies.
+
+| Role | Install command | Binding dependency | Minimum Python |
+|---|---|---|---|
+| Application user | `pip install qmcpy` | f-strings in the `qmcpy` source | 3.6 declared, 3.9 real\* |
+| + torch / GP features | `pip install "qmcpy[torch,gpytorch,mpmc]"` | `torch >= 2.2.0` | 3.8 |
+| + Bayesian optimization | `pip install "qmcpy[botorch]"` | `botorch >= 0.10.0` | 3.9 |
+| Course instructor (`class`) | `pip install -e ".[class]"` | `arviz >= 0.17`, `matplotlib >= 3.9.0`, `statsmodels >= 0.14.3` | 3.9 |
+| Test developer | `pip install -e ".[test]"` | `pytest >= 9.0.3`, `parsl >= 2026.01.05` | 3.10 |
+| Documentation developer | `pip install -e ".[docs]"` | inherits `test`; `pylint >= 4.0.5` | 3.10 |
+| Release / core developer | `pip install -e ".[dev]"` | inherits `docs` / `test` | 3.10 |
+
+Using `qmcpy` needs 3.6+; contributing code, running tests, or building docs needs **3.10+**. We recommend 3.13 for development.
+
+\*`requires-python` is `>= 3.6` because the source uses f-strings and no later syntax, but the lowest interpreter that can complete `pip install qmcpy` today is **3.9**: `qmctoolscl` ships wheels only for CPython 3.12, and its sdist build fails on 3.8 and below, where setuptools rejects its package metadata.
+
+CI measures the lower tier rather than assuming it: `unittests.yml`'s `core-tests` job runs `make unittests_core` (slim `test_core` extra, no notebook stack) on 3.6-3.9, where 3.9 must pass and 3.6-3.8 are probes that warn if installation fails. Its main `tests` job runs the full suite on 3.10-3.14, each version on one operating system, with the interpreter pinned from the matrix and asserted before any test runs. Test modules self-skip via `pytest.importorskip` when an optional stack (torch, gpytorch, PyG) is absent, so each interpreter runs what applies to it.
 
 ## 📚 Using `qmcpy` In Courses (`class` Extra)
 

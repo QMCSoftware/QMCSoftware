@@ -6,9 +6,10 @@ This page summarizes QMCPy's current GitHub Actions CI layout.
 
 | Workflow | Trigger | Runner / Python | Main work |
 |---|---|---|---|
-| `alltests.yml` | Feature-branch `push` | `ubuntu`, Python `3.13` | <ul><li>Non-Docker doctests</li><li>`unittests`</li><li>Coverage upload</li></ul> |
-| `alltests.yml` | `push` to `develop` or `master`; PR into `develop` or `master`; `workflow_dispatch` | `ubuntu`, `macos`, `windows`; Python `3.13` | <ul><li>Doctests</li><li>`unittests`</li><li>Coverage upload</li><li>Booktests</li><li>Linux-only UMBridge doctests when Docker is available</li></ul> |
-| `unittests.yml` | `push` to `develop` or `master`; PR into `develop` or `master`; `workflow_dispatch` | `ubuntu`, `macos`, `windows`; Python `3.5` to `3.14` | <ul><li>Install test and optional extras</li><li>Run `unittests`</li></ul> |
+| `alltests.yml` | Feature-branch `push` | `ubuntu`, Python `3.13` | <ul><li>Non-Docker doctests</li><li>MPMC doctests and unit tests (Ubuntu only)</li><li>`unittests`</li><li>Coverage upload</li></ul> |
+| `alltests.yml` | `push` to `develop` or `master`; PR into `develop` or `master`; branch name ending in `choi`; `workflow_dispatch` | `ubuntu`, `macos`, `windows`; Python `3.13` | <ul><li>Doctests</li><li>MPMC doctests and unit tests on all three OSes</li><li>`unittests`</li><li>Coverage upload</li><li>Booktests</li><li>Linux-only UMBridge doctests when Docker is available</li></ul> |
+| `unittests.yml` (`tests` job) | `push` to `develop` or `master`; PR into `develop` or `master`; `workflow_dispatch` | `ubuntu`, `macos`, `windows`; Python `3.10` to `3.14` | <ul><li>Install test and optional extras</li><li>Run `unittests`</li><li>No MPMC stack installed, so MPMC unit tests skip</li></ul> |
+| `unittests.yml` (`core-tests` job) | same as above | `ubuntu`; Python `3.6` to `3.9` | <ul><li>Install `test_core` extra only</li><li>Run `unittests_core` (no booktests)</li><li>`3.9` must pass; `3.6`-`3.8` are install probes that warn instead of failing</li></ul> |
 | `docs.yml` | `push` to `master` | `ubuntu`, Python `3.13` | <ul><li>`uml`</li><li>`copydocs`</li><li>`mkdocs gh-deploy --force`</li></ul> |
 | `pep8.yml` | `push` to `develop` or `master`; `workflow_dispatch` | `ubuntu`, Python `3.13` | <ul><li>`check_pep8`</li><li>Open a badge-update pull request if badge assets change</li></ul> |
 | `pypi-stats.yml` | Weekly schedule; `workflow_dispatch` | `ubuntu`, Python `3.13` | <ul><li>Regenerate PyPI download statistics</li><li>Publish updated files</li></ul> |
@@ -18,12 +19,27 @@ There is no nightly CI schedule.
 ## Policy
 
 - Linux is the default feedback path and runs on every push.
-- macOS and Windows in `alltests.yml` are reserved for `develop`/`master` pushes, pull requests into those branches, and manual runs.
+- macOS and Windows in `alltests.yml` are reserved for `develop`/`master` pushes, pull requests into those branches, branches whose name ends in `choi`, and manual runs.
 - `concurrency` cancels superseded runs in both workflows; in `alltests.yml`, `push` and `pull_request` use separate groups so a PR does not inherit cancelled sibling checks from a same-SHA push.
-- `alltests.yml` pins Miniconda base Python to `3.13`; `unittests.yml` still uses the base environment without explicitly passing `matrix.python-version` into `setup-miniconda`.
+- `unittests.yml` passes `matrix.python-version` to `setup-miniconda` and asserts the running interpreter before testing, so its version labels are real. `alltests.yml` does **not**: it declares Python `3.13` but never passes it, so those jobs run whatever the Miniconda base ships.
 - Booktests are skipped on feature-branch pushes and run only in the full sweep.
+- `unittests.yml` is tiered: the `tests` job installs the full `test` extra (which needs Python `3.10`+ via `pytest >= 9.0.3` and `parsl >= 2026.01.05`), while `core-tests` installs the slim `test_core` extra so the published `requires-python` floor is exercised. Test modules self-skip through `pytest.importorskip` when an optional stack is missing.
 - UMBridge doctests run only on Linux full sweeps with Docker available.
+- MPMC steps in `alltests.yml` are **not** OS-gated: they run on every OS the matrix selects. See [MPMC Coverage by OS](#mpmc-coverage-by-os).
 - `workflow_dispatch` means manually triggered workflow.
+
+## MPMC Coverage by OS
+
+MPMC needs a platform-specific `pyg_lib` wheel that PyPI does not carry, installed separately by `qmcpy-install-mpmc`. Only `alltests.yml` does that, and its MPMC steps carry no `if: runner.os` condition, so they run on every OS the matrix selects.
+
+| Workflow / trigger | Python | Ubuntu | macOS | Windows |
+|---|---|---|---|---|
+| `alltests.yml`, full sweep | `3.13` | Run | Run | Run |
+| `alltests.yml`, feature-branch `push` | `3.13` | Run | Not in matrix | Not in matrix |
+| `unittests.yml` (`tests`) | `3.10`-`3.14` | Skipped | Skipped | Skipped |
+| `unittests.yml` (`core-tests`) | `3.6`-`3.9` | Skipped | Not in matrix | Not in matrix |
+
+"Run" covers both the MPMC doctests (`make doctests_mpmc`) and the MPMC unit tests in `test/test_dd_mpmc.py`. `unittests.yml` never calls `qmcpy-install-mpmc`, so those tests skip there via `pytest.importorskip("pyg_lib")` and its jobs pass without exercising MPMC — treat `alltests.yml` as the only source of MPMC signal. See [mpmc-compatibility.md](mpmc-compatibility.md) for the version-support policy behind this split.
 
 ## Related Docs
 
