@@ -21,7 +21,7 @@ There is no nightly CI schedule.
 - Linux is the default feedback path and runs on every push.
 - macOS and Windows in `alltests.yml` are reserved for `develop`/`master` pushes, pull requests into those branches, branches whose name ends in `choi`, and manual runs.
 - `concurrency` cancels superseded runs in both workflows; in `alltests.yml`, `push` and `pull_request` use separate groups so a PR does not inherit cancelled sibling checks from a same-SHA push.
-- `unittests.yml` passes `matrix.python-version` to `setup-miniconda` and asserts the running interpreter before testing, so its version labels are real. `alltests.yml` does **not**: it declares Python `3.13` but never passes it, so those jobs run whatever the Miniconda base ships.
+- Both `unittests.yml` and `alltests.yml` pass `matrix.python-version` to `setup-miniconda` and assert the running interpreter before any test runs, so their version labels are real. Steps that touch Python use a profile-loading shell (`bash -el {0}` on Unix, `pwsh` on Windows); the default non-login shell silently falls back to the conda base interpreter, which is how these matrices previously went green without testing the versions they named.
 - Booktests are skipped on feature-branch pushes and run only in the full sweep.
 - `unittests.yml` is tiered: the `tests` job installs the full `test` extra (which needs Python `3.10`+ via `pytest >= 9.0.3` and `parsl >= 2026.01.05`), while `core-tests` installs the slim `test_core` extra so the published `requires-python` floor is exercised. Test modules self-skip through `pytest.importorskip` when an optional stack is missing.
 - UMBridge doctests run only on Linux full sweeps with Docker available.

@@ -68,9 +68,25 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
-          auto-activate-base: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          auto-activate-base: false
           conda-remove-defaults: true
-          use-only-tar-bz2: true
+
+      # Without python-version above, matrix.python-version reached only the job
+      # name and every job ran the conda base interpreter. Steps touching Python
+      # must use a profile-loading shell (bash -el / pwsh) to see the env.
+      - name: Verify interpreter matches the matrix (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: |
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got); print(sys.version)"
+
+      - name: Verify interpreter matches the matrix (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got); print(sys.version)"
 
       # -----------------------------------------------------------
       # Clean old coverage files
@@ -222,18 +238,22 @@ jobs:
 
       - name: Build and cache wheels (Linux)
         if: runner.os == 'Linux'
+        shell: bash -el {0}
         run: |
-          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch,test_umbridge] || true
+          python -m pip wheel -w ./.wheels ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]" || true
       - name: Install Python dependencies (Linux)
         if: runner.os == 'Linux'
+        shell: bash -el {0}
         run: |
           pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch,test_umbridge]"
       - name: Build and cache wheels (macOS)
         if: runner.os == 'macOS'
+        shell: bash -el {0}
         run: |
-          python -m pip wheel -w ./.wheels .[test,test_torch,test_gpytorch,test_botorch] || true
+          python -m pip wheel -w ./.wheels ".[test,test_torch,test_gpytorch,test_botorch]" || true
       - name: Install Python dependencies (macOS)
         if: runner.os == 'macOS'
+        shell: bash -el {0}
         run: |
           pip install --find-links ./.wheels -e ".[test,test_torch,test_gpytorch,test_botorch]"
       - name: Build and cache wheels (Windows)
@@ -246,12 +266,25 @@ jobs:
         shell: pwsh
         run: |
           pip install --find-links ./.wheels -e '.[test,test_torch,test_gpytorch,test_botorch]'
-      - name: Install MPMC dependencies
-        run: |
-          qmcpy-install-mpmc
-      - name: Validate MPMC dependencies
-        run: |
-          python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
+      - name: Install MPMC dependencies (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: qmcpy-install-mpmc
+
+      - name: Install MPMC dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: qmcpy-install-mpmc
+
+      - name: Validate MPMC dependencies (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
+
+      - name: Validate MPMC dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python -c "import torch, pyg_lib, torch_geometric; print(f'torch={torch.__version__}'); print('MPMC dependencies ready')"
       # -----------------------------------------------------------
       # Install minimal LaTeX required by Jupyter notebooks (OS-specific)
       # -----------------------------------------------------------
@@ -393,12 +426,60 @@ jobs:
       # -----------------------------------------------------------
       # Run doctests (OS-specific)
       # -----------------------------------------------------------
-      - run: pip freeze
-      - run: make doctests_minimal
-      - run: make doctests_torch
-      - run: make doctests_gpytorch
-      - run: make doctests_botorch
-      - run: make doctests_markdown
+      - name: pip freeze (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: pip freeze
+
+      - name: pip freeze (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: pip freeze
+      - name: doctests_minimal (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make doctests_minimal
+
+      - name: doctests_minimal (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: make doctests_minimal
+      - name: doctests_torch (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make doctests_torch
+
+      - name: doctests_torch (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: make doctests_torch
+      - name: doctests_gpytorch (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make doctests_gpytorch
+
+      - name: doctests_gpytorch (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: make doctests_gpytorch
+      - name: doctests_botorch (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make doctests_botorch
+
+      - name: doctests_botorch (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: make doctests_botorch
+      - name: doctests_markdown (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make doctests_markdown
+
+      - name: doctests_markdown (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: make doctests_markdown
       - name: Run umbridge doctests on Linux full sweeps when Docker is available
         shell: bash -l {0}
         run: |
@@ -411,12 +492,26 @@ jobs:
           else
             echo "Skipping umbridge doctests because Docker is not available on this runner"
           fi
-      - name: Run MPMC doctests
+      - name: Run MPMC doctests (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make doctests_mpmc
+
+      - name: Run MPMC doctests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: make doctests_mpmc
       # -----------------------------------------------------------
       # Run unittests for Python source files
       # -----------------------------------------------------------
-      - name: Run unittests (parallel)
+      - name: Run unittests (parallel, Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: make unittests
+
+      - name: Run unittests (parallel, Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: make unittests
 
       # -----------------------------------------------------------
