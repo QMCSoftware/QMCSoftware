@@ -8,6 +8,13 @@ on:
       - master
   workflow_dispatch:
 
+# CodeQL "Workflow does not contain permissions": restrict the GITHUB_TOKEN to
+# the minimum. These jobs only read the repo -- checkout, conda/python setup,
+# caching, and tests. Codecov uploads authenticate with CODECOV_TOKEN, not the
+# GITHUB_TOKEN, so no write scope is needed.
+permissions:
+  contents: read
+
 concurrency:
   # Keep push and pull_request runs separate so same-SHA PR updates do not inherit cancelled push checks.
   group: alltests-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}

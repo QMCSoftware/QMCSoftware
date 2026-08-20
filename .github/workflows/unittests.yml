@@ -11,6 +11,13 @@ on:
       - master
   workflow_dispatch:
 
+# CodeQL "Workflow does not contain permissions": restrict the GITHUB_TOKEN to
+# the minimum. These jobs only read the repo -- checkout, conda/python setup,
+# caching, and tests. Codecov uploads authenticate with CODECOV_TOKEN, not the
+# GITHUB_TOKEN, so no write scope is needed.
+permissions:
+  contents: read
+
 concurrency:
   group: unittests-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
