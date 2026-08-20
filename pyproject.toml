@@ -53,8 +53,8 @@ keywords=[
     ]
 license = {file = "LICENSE"}
 dynamic = ["version"]
-# Bare-install floor: qmctoolscl does not build below 3.9. Extras may raise this;
-# see CONTRIBUTING.md for the full table.
+# Deliberate QMCPy support-policy floor, not a source-language or transitive
+# dependency floor. CI verifies the built wheel on 3.9; see CONTRIBUTING.md.
 requires-python = ">= 3.9"
 dependencies = [
     "numpy >= 1.17.0",

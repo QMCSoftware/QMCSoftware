@@ -273,9 +273,9 @@ jobs:
         run: make unittests
 
   # Exercise the supported 3.9 floor without the `test` extra's Python 3.10+
-  # dependencies. `unittests_core` runs test/test_*.py against the slim
-  # `test_core` extra; modules needing an optional stack skip themselves via
-  # pytest.importorskip.
+  # dependencies. First verify the built wheel as a user would install it;
+  # then run test/test_*.py against the slim `test_core` extra. Modules needing
+  # an optional stack skip themselves via pytest.importorskip.
   core-tests:
     name: Core Unit Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
@@ -304,9 +304,18 @@ jobs:
           python -c "import sys; print('prefix:',sys.prefix); print(sys.version)"
           python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got)"
 
+      - name: Build and test the user wheel
+        shell: bash -el {0}
+        run: |
+          python -m pip install build
+          python -m build --wheel
+          python -m pip install dist/*.whl
+          python -m pip check
+          python -c "import os,tempfile; os.chdir(tempfile.gettempdir()); import qmcpy; print(qmcpy.__file__)"
+
       - name: Install qmcpy and minimal test dependencies
         shell: bash -el {0}
-        run: pip install -e ".[test_core]"
+        run: python -m pip install -e ".[test_core]"
 
       - name: Run core unit tests
         shell: bash -el {0}
