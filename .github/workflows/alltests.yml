@@ -71,6 +71,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
           auto-activate-base: false
+          # Name the env explicitly: without this the active environment is
+          # ambiguous (base vs the auto-created `test`), which can leave pip
+          # and python pointing at different prefixes.
+          activate-environment: qmcpy-ci
           conda-remove-defaults: true
 
       # Without python-version above, matrix.python-version reached only the job
@@ -80,13 +84,20 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash -el {0}
         run: |
-          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got); print(sys.version)"
+          echo "which python : $(which python)"
+          echo "which pip    : $(which pip)"
+          conda info --envs || true
+          python -c "import sys; print('prefix:',sys.prefix); print(sys.version)"
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got)"
 
       - name: Verify interpreter matches the matrix (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got); print(sys.version)"
+          Get-Command python | Format-List
+          conda info --envs
+          python -c "import sys; print('prefix:',sys.prefix); print(sys.version)"
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got)"
 
       # -----------------------------------------------------------
       # Clean old coverage files
