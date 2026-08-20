@@ -28,7 +28,7 @@ The [QMCPy documentation](https://QMCSoftware.github.io/QMCSoftware/) contains a
 pip install qmcpy
 ```
 
-Requires Python >= 3.6 as declared, though 3.9 is the lowest version that installs today. Contributing code, running tests, or building the documentation requires Python >= 3.10 — see the [Minimum Python Version by Role](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/#minimum-python-version-by-role) table in the contributing guidelines for the full breakdown.
+Requires Python >= 3.9. Contributing code, running tests, or building the documentation requires Python >= 3.10 — see the [Minimum Python Version by Role](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/#minimum-python-version-by-role) table in the contributing guidelines for the full breakdown.
 
 To install from source, please see the [contributing guidelines](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/).
 

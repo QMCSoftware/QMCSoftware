@@ -9,7 +9,7 @@ This page summarizes QMCPy's current GitHub Actions CI layout.
 | `alltests.yml` | Feature-branch `push` | `ubuntu`, Python `3.13` | <ul><li>Non-Docker doctests</li><li>MPMC doctests and unit tests (Ubuntu only)</li><li>`unittests`</li><li>Coverage upload</li></ul> |
 | `alltests.yml` | `push` to `develop` or `master`; PR into `develop` or `master`; branch name ending in `choi`; `workflow_dispatch` | `ubuntu`, `macos`, `windows`; Python `3.13` | <ul><li>Doctests</li><li>MPMC doctests and unit tests on all three OSes</li><li>`unittests`</li><li>Coverage upload</li><li>Booktests</li><li>Linux-only UMBridge doctests when Docker is available</li></ul> |
 | `unittests.yml` (`tests` job) | `push` to `develop` or `master`; PR into `develop` or `master`; `workflow_dispatch` | `ubuntu`, `macos`, `windows`; Python `3.10` to `3.14` | <ul><li>Install test and optional extras</li><li>Run `unittests`</li><li>No MPMC stack installed, so MPMC unit tests skip</li></ul> |
-| `unittests.yml` (`core-tests` job) | same as above | `ubuntu`; Python `3.6` to `3.9` | <ul><li>Install `test_core` extra only</li><li>Run `unittests_core` (no booktests)</li><li>`3.9` must pass; `3.6`-`3.8` are install probes that warn instead of failing</li></ul> |
+| `unittests.yml` (`core-tests` job) | same as above | `ubuntu`; Python `3.9` | <ul><li>Install `test_core` extra only</li><li>Run `unittests_core` (no booktests)</li><li>Blocking test of the declared Python floor</li></ul> |
 | `unittests.yml` (`prerelease-tests` job) | same as above | `ubuntu`; Python `3.15.0-rc.1` | <ul><li>Uses `actions/setup-python` with `allow-prereleases` (conda-forge has no 3.15)</li><li>Install `test_core`, run `unittests_core`</li><li>Non-blocking: expected to fail until `scipy` and `scikit-learn` ship cp315 wheels</li></ul> |
 | `docs.yml` | `push` to `master` | `ubuntu`, Python `3.13` | <ul><li>`uml`</li><li>`copydocs`</li><li>`mkdocs gh-deploy --force`</li></ul> |
 | `pep8.yml` | `push` to `develop` or `master`; `workflow_dispatch` | `ubuntu`, Python `3.13` | <ul><li>`check_pep8`</li><li>Open a badge-update pull request if badge assets change</li></ul> |
@@ -39,7 +39,7 @@ MPMC needs a platform-specific `pyg_lib` wheel that PyPI does not carry, install
 | `alltests.yml`, full sweep | `3.13` | Run | Run | Run |
 | `alltests.yml`, feature-branch `push` | `3.13` | Run | Not in matrix | Not in matrix |
 | `unittests.yml` (`tests`) | `3.10`-`3.14` | Skipped | Skipped | Skipped |
-| `unittests.yml` (`core-tests`) | `3.6`-`3.9` | Skipped | Not in matrix | Not in matrix |
+| `unittests.yml` (`core-tests`) | `3.9` | Skipped | Not in matrix | Not in matrix |
 
 "Run" covers both the MPMC doctests (`make doctests_mpmc`) and the MPMC unit tests in `test/test_dd_mpmc.py`. `unittests.yml` never calls `qmcpy-install-mpmc`, so those tests skip there via `pytest.importorskip("pyg_lib")` and its jobs pass without exercising MPMC — treat `alltests.yml` as the only source of MPMC signal. See [mpmc-compatibility.md](mpmc-compatibility.md) for the version-support policy behind this split.
 

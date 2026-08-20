@@ -27,9 +27,8 @@ classifiers= [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
-    # 3.6-3.8 are omitted deliberately: `requires-python` still allows them
-    # (the source is 3.6-clean) but qmctoolscl does not build there, so
-    # advertising support would be false. See CONTRIBUTING.md.
+    # Keep these aligned with `requires-python` and the tested interpreter
+    # matrix. See CONTRIBUTING.md.
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -54,9 +53,9 @@ keywords=[
     ]
 license = {file = "LICENSE"}
 dynamic = ["version"]
-# Bare-install floor: the source uses f-strings (3.6+). Extras raise this, and
-# qmctoolscl does not build below 3.9 -- see CONTRIBUTING.md for the full table.
-requires-python = ">= 3.6"
+# Bare-install floor: qmctoolscl does not build below 3.9. Extras may raise this;
+# see CONTRIBUTING.md for the full table.
+requires-python = ">= 3.9"
 dependencies = [
     "numpy >= 1.17.0",
     "scipy >= 1.1.0",
