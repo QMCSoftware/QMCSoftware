@@ -313,3 +313,51 @@ jobs:
           qmctoolscl fails to build on 3.8 and below, and on 3.6 the test_core \
           pins (scikit-learn, pandas) do not resolve either. See the install log \
           above and 'Minimum Python Version by Role' in CONTRIBUTING.md."
+
+  # Early-warning job for the next Python. 3.15.0-rc.1 is published in
+  # actions/python-versions but NOT in conda-forge, so this uses setup-python
+  # rather than setup-miniconda like the jobs above.
+  #
+  # Non-blocking by design: at time of writing scipy (a core dependency) and
+  # scikit-learn publish no cp315 wheels, so the install is expected to fail
+  # until the scientific stack catches up. The job exists to tell us the day
+  # that changes -- when it goes green, promote 3.15 into the `tests` matrix.
+  prerelease-tests:
+    name: Core Unit Tests (Python ${{ matrix.python-version }}, pre-release)
+    runs-on: ubuntu-latest
+    # Never gate a merge on an unreleased interpreter.
+    continue-on-error: true
+    strategy:
+        fail-fast: false
+        matrix:
+            python-version: ['3.15.0-rc.1']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      - name: Report interpreter
+        run: python -VV
+
+      # Step-level continue-on-error is still needed: without it a failed
+      # install would skip the reporting step below.
+      - name: Install qmcpy and minimal test dependencies
+        id: install
+        continue-on-error: true
+        run: pip install -e ".[test_core]"
+
+      - name: Run core unit tests
+        if: steps.install.outcome == 'success'
+        run: make unittests_core
+
+      - name: Report pre-release ecosystem not ready
+        if: steps.install.outcome != 'success'
+        run: |
+          echo "::warning title=Python ${{ matrix.python-version }} not installable::\
+          qmcpy could not be installed on Python ${{ matrix.python-version }}. \
+          This is expected while the scientific stack lacks cp315 wheels (scipy \
+          and scikit-learn in particular). See the install log above; when this \
+          job passes, promote 3.15 into the tests matrix."
