@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import scipy.sparse as sp
 import scipy.stats as stats
 
 from qmcpy import (
@@ -60,14 +61,18 @@ def test_product_measure_statistics_for_multiple_1d_marginals():
     np.testing.assert_allclose(
         tm.standard_deviation, [np.sqrt(4.0 / 3.0), np.sqrt(3.0)]
     )
-    np.testing.assert_allclose(tm.covariance, np.diag([4.0 / 3.0, 3.0]))
+    cov = tm.covariance
+    cov_dense = cov.toarray() if sp.issparse(cov) else cov
+    np.testing.assert_allclose(cov_dense, np.diag([4.0 / 3.0, 3.0]))
 
     assert tm.mean.shape == (2,)
     assert tm.variance.shape == (2,)
     assert tm.standard_deviation.shape == (2,)
     assert tm.covariance.shape == (2, 2)
     for statistic in ("mean", "variance", "standard_deviation", "covariance"):
-        assert not getattr(tm, statistic).flags.writeable
+        value = getattr(tm, statistic)
+        flags = value.data.flags if sp.issparse(value) else value.flags
+        assert not flags.writeable
 
 
 def test_product_measure_normalizes_scalar_1d_statistics():
