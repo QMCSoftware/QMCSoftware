@@ -238,9 +238,8 @@ class ProductMeasure(AbstractTrueMeasure):
             block = self._marginal_statistic(
                 marginal, marginal_index, "covariance"
             )
-            if sparse.issparse(block):
-                block = block.toarray()
-            block = np.atleast_2d(np.asarray(block))
+            if not sparse.issparse(block):
+                block = np.atleast_2d(np.asarray(block))
             expected_shape = (marginal.d, marginal.d)
             if block.shape != expected_shape:
                 raise DimensionError(
@@ -250,11 +249,18 @@ class ProductMeasure(AbstractTrueMeasure):
                 )
             blocks.append(block)
 
+        if all(sparse.issparse(b) for b in blocks):
+            covariance = sparse.block_diag(blocks, format="dia")
+            covariance.data.setflags(write=False)
+            return covariance
+
+        dense_blocks = [b.toarray() if sparse.issparse(b) else b for b in blocks]
         covariance = np.zeros(
-            (self.d, self.d), dtype=np.result_type(*[block.dtype for block in blocks])
+            (self.d, self.d),
+            dtype=np.result_type(*[b.dtype for b in dense_blocks]),
         )
         start = 0
-        for block in blocks:
+        for block in dense_blocks:
             stop = start + block.shape[0]
             covariance[start:stop, start:stop] = block
             start = stop
