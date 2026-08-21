@@ -276,12 +276,16 @@ jobs:
   # dependencies. First verify the built wheel as a user would install it;
   # then run test/test_*.py against the slim `test_core` extra. Modules needing
   # an optional stack skip themselves via pytest.importorskip.
+  # The 3.9 support claim is OS-independent, so prove it on every OS we ship
+  # for. qmctoolscl publishes exactly one wheel (cp312, win_amd64), so all three
+  # legs build it from its sdist -- which is precisely the risk being covered.
   core-tests:
-    name: Core Unit Tests (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: Core Unit Tests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
         fail-fast: false
         matrix:
+            os: [ubuntu-latest, macos-latest, windows-latest]
             python-version: ['3.9']
     steps:
       - uses: actions/checkout@v4
@@ -295,16 +299,25 @@ jobs:
           activate-environment: qmcpy-core
           conda-remove-defaults: true
 
-      - name: Verify interpreter matches the matrix
+      - name: Verify interpreter matches the matrix (Unix)
+        if: runner.os != 'Windows'
         shell: bash -el {0}
         run: |
           echo "which python : $(which python)"
-          echo "which pip    : $(which pip)"
           conda info --envs || true
           python -c "import sys; print('prefix:',sys.prefix); print(sys.version)"
           python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got)"
 
-      - name: Build and test the user wheel
+      - name: Verify interpreter matches the matrix (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          conda info --envs
+          python -c "import sys; print('prefix:',sys.prefix); print(sys.version)"
+          python -c "import sys; got='.'.join(map(str,sys.version_info[:2])); want='${{ matrix.python-version }}'; assert got==want, 'matrix says %s but interpreter is %s'%(want,got)"
+
+      - name: Build and test the user wheel (Unix)
+        if: runner.os != 'Windows'
         shell: bash -el {0}
         run: |
           python -m pip install build
@@ -313,12 +326,35 @@ jobs:
           python -m pip check
           python -c "import os,tempfile; os.chdir(tempfile.gettempdir()); import qmcpy; print(qmcpy.__file__)"
 
-      - name: Install qmcpy and minimal test dependencies
+      - name: Build and test the user wheel (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install build
+          python -m build --wheel
+          $wheel = (Get-ChildItem dist/*.whl | Select-Object -First 1).FullName
+          python -m pip install $wheel
+          python -m pip check
+          python -c "import os,tempfile; os.chdir(tempfile.gettempdir()); import qmcpy; print(qmcpy.__file__)"
+
+      - name: Install qmcpy and minimal test dependencies (Unix)
+        if: runner.os != 'Windows'
         shell: bash -el {0}
         run: python -m pip install -e ".[test_core]"
 
-      - name: Run core unit tests
+      - name: Install qmcpy and minimal test dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python -m pip install -e ".[test_core]"
+
+      - name: Run core unit tests (Unix)
+        if: runner.os != 'Windows'
         shell: bash -el {0}
+        run: make unittests_core
+
+      - name: Run core unit tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: make unittests_core
 
   # Early-warning job for the next Python. 3.15.0-rc.1 is published in
