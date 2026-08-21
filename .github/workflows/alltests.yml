@@ -426,7 +426,7 @@ jobs:
             Invoke-WithRetry -Description "Refresh MiKTeX package database" -Script {
               mpm --admin --update-db
             }
-            $packages = @('latexmk','dvipng','cm-super','lmodern','type1cm','tex-gyre')
+            $packages = @('latexmk','dvipng','cm-super','lmodern','type1cm','tex-gyre','l3backend')
             foreach ($pkg in $packages) {
               Invoke-WithRetry -Description "Install MiKTeX package $pkg" -Script {
                 mpm --admin --install=$pkg
@@ -436,6 +436,10 @@ jobs:
 
           Invoke-WithRetry -Description "Refresh MiKTeX filename database" -Script {
             initexmf --admin --update-fndb
+          }
+          $L3BackendPath = kpsewhich l3backend-dvips.def
+          if ([string]::IsNullOrWhiteSpace($L3BackendPath)) {
+            throw "MiKTeX install did not provide l3backend-dvips.def"
           }
           latex --version
           latexmk -v
