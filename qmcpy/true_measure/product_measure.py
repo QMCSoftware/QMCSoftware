@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import sparse
 
 from .abstract_true_measure import AbstractTrueMeasure
 from ..discrete_distribution.abstract_discrete_distribution import (
@@ -46,6 +47,9 @@ class ProductMeasure(AbstractTrueMeasure):
 
     Notes
     -----
+    For independent marginal blocks, means, variances, and standard deviations
+    are concatenated in marginal order, while covariance is block diagonal.
+
     Exact product weights are supported for direct marginal true measures. For
     recursively composed marginal measures, sampling is supported through
     QMCPy's recursive transform helper, but exact final-space product weights
@@ -176,6 +180,91 @@ class ProductMeasure(AbstractTrueMeasure):
         )
 
         super(ProductMeasure, self).__init__()
+
+        for statistic in (
+            "mean",
+            "variance",
+            "standard_deviation",
+            "covariance",
+        ):
+            if all(hasattr(marginal, statistic) for marginal in self.marginals):
+                self.parameters.append(statistic)
+
+    def _marginal_statistic(self, marginal, marginal_index, statistic):
+        """Return a statistic or identify the marginal that does not provide it."""
+        try:
+            return getattr(marginal, statistic)
+        except AttributeError as error:
+            raise AttributeError(
+                f"ProductMeasure marginal {marginal_index} "
+                f"({type(marginal).__name__}) does not provide {statistic}."
+            ) from error
+
+    def _concatenate_marginal_statistic(self, statistic):
+        """Concatenate a coordinate-wise statistic in marginal order."""
+        values = []
+        for marginal_index, marginal in enumerate(self.marginals):
+            value = self._marginal_statistic(
+                marginal, marginal_index, statistic
+            )
+            value = np.atleast_1d(np.asarray(value))
+            if value.shape != (marginal.d,):
+                raise DimensionError(
+                    f"ProductMeasure marginal {marginal_index} "
+                    f"({type(marginal).__name__}) {statistic} must have shape "
+                    f"({marginal.d},), got {value.shape}."
+                )
+            values.append(value)
+
+        combined = self._read_only_array(np.concatenate(values))
+        return self._scalar_if_univariate(combined)
+
+    @property
+    def mean(self):
+        return self._concatenate_marginal_statistic("mean")
+
+    @property
+    def variance(self):
+        return self._concatenate_marginal_statistic("variance")
+
+    @property
+    def standard_deviation(self):
+        return self._concatenate_marginal_statistic("standard_deviation")
+
+    @property
+    def covariance(self):
+        blocks = []
+        for marginal_index, marginal in enumerate(self.marginals):
+            block = self._marginal_statistic(
+                marginal, marginal_index, "covariance"
+            )
+            if not sparse.issparse(block):
+                block = np.atleast_2d(np.asarray(block))
+            expected_shape = (marginal.d, marginal.d)
+            if block.shape != expected_shape:
+                raise DimensionError(
+                    f"ProductMeasure marginal {marginal_index} "
+                    f"({type(marginal).__name__}) covariance must have shape "
+                    f"{expected_shape}, got {block.shape}."
+                )
+            blocks.append(block)
+
+        if all(sparse.issparse(b) for b in blocks):
+            covariance = sparse.block_diag(blocks, format="dia")
+            covariance.data.setflags(write=False)
+            return covariance
+
+        dense_blocks = [b.toarray() if sparse.issparse(b) else b for b in blocks]
+        covariance = np.zeros(
+            (self.d, self.d),
+            dtype=np.result_type(*[b.dtype for b in dense_blocks]),
+        )
+        start = 0
+        for block in dense_blocks:
+            stop = start + block.shape[0]
+            covariance[start:stop, start:stop] = block
+            start = stop
+        return self._read_only_array(covariance)
 
     @staticmethod
     def _expand_bounds(bounds, dimension, name):

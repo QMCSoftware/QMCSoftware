@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import scipy.sparse as sp
 import scipy.stats as stats
 
 from qmcpy import (
@@ -46,6 +47,106 @@ def test_product_measure_replication_shape():
     x = tm(n)
 
     assert x.shape == (r, n, 2)
+
+
+def test_product_measure_statistics_for_multiple_1d_marginals():
+    marginals = [
+        Uniform(DummySampler(1), lower_bound=8.0, upper_bound=12.0),
+        Uniform(DummySampler(1), lower_bound=-1.0, upper_bound=5.0),
+    ]
+    tm = ProductMeasure(sampler=DigitalNetB2(2, seed=23), marginals=marginals)
+
+    np.testing.assert_allclose(tm.mean, [10.0, 2.0])
+    np.testing.assert_allclose(tm.variance, [4.0 / 3.0, 3.0])
+    np.testing.assert_allclose(
+        tm.standard_deviation, [np.sqrt(4.0 / 3.0), np.sqrt(3.0)]
+    )
+    cov = tm.covariance
+    cov_dense = cov.toarray() if sp.issparse(cov) else cov
+    np.testing.assert_allclose(cov_dense, np.diag([4.0 / 3.0, 3.0]))
+
+    assert tm.mean.shape == (2,)
+    assert tm.variance.shape == (2,)
+    assert tm.standard_deviation.shape == (2,)
+    assert tm.covariance.shape == (2, 2)
+    for statistic in ("mean", "variance", "standard_deviation", "covariance"):
+        value = getattr(tm, statistic)
+        flags = value.data.flags if sp.issparse(value) else value.flags
+        assert not flags.writeable
+
+
+def test_product_measure_normalizes_scalar_1d_statistics():
+    marginals = [
+        Uniform(DummySampler(1), lower_bound=8.0, upper_bound=12.0),
+        Gaussian(DummySampler(1), mean=2.0, covariance=9.0),
+    ]
+    for marginal in marginals:
+        assert isinstance(marginal.mean, float)
+        assert isinstance(marginal.variance, float)
+        assert isinstance(marginal.standard_deviation, float)
+
+    tm = ProductMeasure(sampler=DigitalNetB2(2, seed=29), marginals=marginals)
+
+    np.testing.assert_allclose(tm.mean, [10.0, 2.0])
+    np.testing.assert_allclose(tm.variance, [4.0 / 3.0, 9.0])
+    np.testing.assert_allclose(
+        tm.standard_deviation, [np.sqrt(4.0 / 3.0), 3.0]
+    )
+    np.testing.assert_allclose(tm.covariance, np.diag([4.0 / 3.0, 9.0]))
+    assert tm.mean.shape == (2,)
+    assert tm.variance.shape == (2,)
+    assert tm.standard_deviation.shape == (2,)
+    assert tm.covariance.shape == (2, 2)
+
+
+def test_product_measure_statistics_preserve_order_and_covariance_blocks():
+    marginals = [
+        Uniform(DummySampler(1), lower_bound=8.0, upper_bound=12.0),
+        Gaussian(
+            DummySampler(2),
+            mean=[2.0, 5.0],
+            covariance=[[2.0, 0.5], [0.5, 3.0]],
+        ),
+    ]
+    tm = ProductMeasure(sampler=DigitalNetB2(3, seed=31), marginals=marginals)
+    expected_covariance = np.array(
+        [
+            [4.0 / 3.0, 0.0, 0.0],
+            [0.0, 2.0, 0.5],
+            [0.0, 0.5, 3.0],
+        ]
+    )
+
+    np.testing.assert_allclose(tm.mean, [10.0, 2.0, 5.0])
+    np.testing.assert_allclose(tm.variance, [4.0 / 3.0, 2.0, 3.0])
+    np.testing.assert_allclose(
+        tm.standard_deviation,
+        [np.sqrt(4.0 / 3.0), np.sqrt(2.0), np.sqrt(3.0)],
+    )
+    np.testing.assert_allclose(tm.covariance, expected_covariance)
+
+    assert tm.mean.shape == (3,)
+    assert tm.variance.shape == (3,)
+    assert tm.standard_deviation.shape == (3,)
+    assert tm.covariance.shape == (3, 3)
+    assert np.array_equal(tm.covariance[:1, 1:], np.zeros((1, 2)))
+    assert np.array_equal(tm.covariance[1:, :1], np.zeros((2, 1)))
+
+
+def test_product_measure_missing_marginal_statistic_is_identified():
+    marginals = [
+        ZeroInflatedExpUniform(DummySampler(1), p_zero=0.4, lam=1.5),
+        Uniform(DummySampler(1), lower_bound=2.0, upper_bound=5.0),
+    ]
+    tm = ProductMeasure(sampler=DigitalNetB2(2, seed=23), marginals=marginals)
+
+    np.testing.assert_allclose(tm.mean, [0.4, 3.5])
+    assert "covariance" not in tm.parameters
+    with pytest.raises(
+        AttributeError,
+        match=r"marginal 0 \(ZeroInflatedExpUniform\) does not provide covariance",
+    ):
+        _ = tm.covariance
 
 
 def test_product_measure_marginals_with_different_dimensions():
