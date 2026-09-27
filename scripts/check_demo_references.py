@@ -23,10 +23,7 @@ from check_ref_style import _MD_BOLD_HEADING, _MD_HEADING, _changed_files, _disp
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEMOS_DIR = REPO_ROOT / "demos"
-PROMPT = (
-    "Any references you have come across as helpful in the research? "
-    "If so, could you include them in the end of the notebook?"
-)
+PROMPT = "Any references worth citing? Consider adding them at the end of the notebook."
 
 
 def _has_references_near_end(path, tail=5):
