@@ -1,8 +1,16 @@
 import warnings
+from typing import Callable, Tuple, Union
 
 import numpy as np
 
-def kronecker_vector_search_mobius_transform(n_max, d_max, searchsize, kernel=None, coord_weights=None, gen_vec_init=None):
+def kronecker_vector_search_mobius_transform(
+    n_max: int,
+    d_max: int,
+    searchsize: int,
+    kernel: Union[None, Callable] = None,
+    coord_weights: Union[None, list, np.ndarray] = None,
+    gen_vec_init: Union[None, float] = None,
+) -> Tuple[np.ndarray, float, np.ndarray, np.ndarray]:
     """
     Note that the sympy package is highly recommended for this search method, though not required.
 
@@ -14,10 +22,10 @@ def kronecker_vector_search_mobius_transform(n_max, d_max, searchsize, kernel=No
     Args:
         n_max (int): The maximum sample size to be searched over.
         d_max (int): The maximum dimension for which to find the generating vector.
-        kernel (callable): The kernel function to use in the search.
         searchsize (int): The number of primes to search over for each component of the generating vector.
-        coord_weights (array-like, optional): An array of coordinate weights to use in the search. If None, weights are set to j^(-2).
-        gen_vec_init (array-like, optional): The initial value for the generating vector. If None, the golden ratio is used for the first component. Note that gen_vec_init is taken mod 1.
+        kernel (Union[None, Callable]): The kernel function to use in the search.
+        coord_weights (Union[None, list, np.ndarray]): An array of coordinate weights to use in the search. If None, weights are set to j^(-2).
+        gen_vec_init (Union[None, float]): The initial value for the generating vector. If None, the golden ratio is used for the first component. Note that gen_vec_init is taken mod 1.
     
     Returns:
         generating_vector, wssd, discrepancies, coeff (tuple):

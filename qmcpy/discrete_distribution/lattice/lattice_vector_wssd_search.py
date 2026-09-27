@@ -1,14 +1,21 @@
+from typing import Callable, Union
+
 import numpy as np
 
-def lattice_vector_wssd_search(n_max, d_max, coord_weights=None, kernel=None):
+def lattice_vector_wssd_search(
+    n_max: int,
+    d_max: int,
+    coord_weights: Union[None, list, np.ndarray] = None,
+    kernel: Union[None, Callable] = None,
+) -> np.ndarray:
     """
     CBC search method for finding a lattice rule minimizing the WSSD.
 
     Args:
         n_max (int): The maximum number of points the lattice rule is optimized for.
         d_max (int): The dimension of the lattice rule.
-        coord_weights (array-like, optional): The coordinate weights used to compute the discrepancy. Defaults to j^(-2) for j=1,...,d_max.
-        kernel (callable, optional): The kernel used to compute the discrepancy. Should accept a single argument and return a scalar. Defaults to the second Bernoulli polynomial.
+        coord_weights (Union[None, list, np.ndarray]): The coordinate weights used to compute the discrepancy. Defaults to j^(-2) for j=1,...,d_max.
+        kernel (Union[None, Callable]): The kernel used to compute the discrepancy. Should accept a single argument and return a scalar. Defaults to the second Bernoulli polynomial.
 
     Returns:
         gen_vec (array-like): The generating vector of the lattice that minimizes the WSSD.
