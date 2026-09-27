@@ -23,6 +23,8 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
     credible-interval error bound.
     """
 
+    order: int
+
     _RESUME_REQUIRED_FIELDS = (
         "solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n", "n_max", "xfull", "yfull"
     )
