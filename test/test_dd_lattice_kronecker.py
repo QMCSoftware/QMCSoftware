@@ -264,5 +264,6 @@ class TestLatKron(unittest.TestCase):
             ),
         ]
         for kwargs, message in cases:
-            with self.subTest(**kwargs), self.assertRaisesRegex(ValueError, message):
+            # xdist serializes subtest metadata; keep NumPy inputs in kwargs only.
+            with self.subTest(case=message), self.assertRaisesRegex(ValueError, message):
                 kronecker_vector_search_mobius_transform(**kwargs)
