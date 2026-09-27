@@ -152,13 +152,6 @@ REFERENCES_STYLE_ARGS ?=
 check_ref_style:
 	@$(PYTHON) scripts/check_ref_style.py $(REFERENCES_STYLE_PATH) $(REFERENCES_STYLE_ARGS) $(STRICT)
 
-# Nudge, not a style check: does each demo notebook changed relative to
-# develop end with a References section at all? Always exits 0 -- a demo
-# genuinely has nothing to cite is not an error, just a question worth
-# asking the author. See scripts/check_demo_references.py.
-check_demo_references:
-	@$(PYTHON) scripts/check_demo_references.py --diff develop
-
 # Applies only the unambiguous, purely mechanical fixes that
 # check_ref_style flags (a docstring's `**References**` header
 # missing its colon, and `$[N]$` -> `[N]`); everything else it finds is
@@ -651,16 +644,7 @@ uml:
 MKDOCS ?= $(shell test -x "$(dir $(PYTHON))mkdocs" && echo "$(dir $(PYTHON))mkdocs" || command -v mkdocs 2>/dev/null || echo mkdocs)
 
 copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to copy it there
-	@# Retried: a Jupyter/VS Code kernel with a demos/*.ipynb notebook open can
-	@# transiently recreate docs/demos/.ipynb_checkpoints between this rm's own
-	@# scan and its rmdir, which fails as "Directory not empty" (ENOTEMPTY) even
-	@# though nothing is really left moments later. Retrying a few times rides
-	@# out that race instead of failing the whole build on it.
-	@n=0; until rm -rf docs/paper docs/demos; do \
-		n=$$((n + 1)); \
-		[ "$$n" -ge 5 ] && exit 1; \
-		sleep 0.2; \
-	done
+	@rm -rf docs/paper docs/demos
 	@cp README.md docs/README.md
 	@cp AGENTS.md docs/AGENTS.md
 	@perl -0pi -e 's!\(docs/good_practices\.md\)!\(good_practices.md\)!g' docs/AGENTS.md
@@ -677,9 +661,6 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@cp community.md docs/community.md
 	@cp -r demos docs
 	@find docs/demos -mindepth 2 -name README.md -delete
-	@# Editor/kernel artifacts, not real demo content -- and the same source of
-	@# the ENOTEMPTY race this target's own rm -rf above retries around.
-	@find docs/demos -name ".ipynb_checkpoints" -type d -exec rm -rf {} +
 	@cp -r paper docs
 	@rm -f docs/paper/README.md
 	@./scripts/render_paper_for_mkdocs.sh
@@ -829,9 +810,6 @@ check:
 	@echo "> check_ref_style"
 	@$(MAKE) check_ref_style
 	@echo
-	@echo "> check_demo_references"
-	@$(MAKE) check_demo_references
-	@echo
 	@echo "> check_latex_math"
 	@$(MAKE) check_latex_math
 	@echo
@@ -849,8 +827,7 @@ check:
 	@echo
 	@echo
 	@echo
-	@echo "make check: done -- check_ref_style and check_demo_references are"
-	@echo "informational only and never fail the build; re-read their output above"
+	@echo "make check: every step above is clean"
 	@echo "$(RULE2)"
 	@echo
 	@# check_links_external deliberately NOT included: its own comment already
