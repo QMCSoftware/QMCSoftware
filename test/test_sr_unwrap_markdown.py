@@ -1,6 +1,12 @@
+from contextlib import redirect_stderr
+from io import StringIO
+from pathlib import Path
+import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 
-from scripts.unwrap_markdown import unwrap_markdown_text
+from scripts.unwrap_markdown import iter_targets, main, unwrap_markdown_text
 
 
 class TestUnwrapMarkdown(unittest.TestCase):
