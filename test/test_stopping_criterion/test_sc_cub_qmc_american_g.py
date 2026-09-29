@@ -66,7 +66,7 @@ class TestCubQMCAmericanG(unittest.TestCase):
             prices.append(sol)
         
         # Differences across training sizes should be small
-        self.assertLess(abs(prices[-1] - prices[-2]), 0.2)
+        self.assertLess(max(prices) - min(prices), 0.2)
 
 
 if __name__ == "__main__":

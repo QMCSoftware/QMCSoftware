@@ -63,7 +63,8 @@ class CubQMCAmericanG(AbstractStoppingCriterion):
         self.n_init = n_init
         self.n_limit = n_limit
         self.n_train = int(n_train)
-        assert self.n_train > 0, "n_train must be a positive integer"
+        if not (self.n_train > 0):
+            raise AssertionError("n_train must be a positive integer")
         self.stopping_criterion_custom = stopping_criterion
         self.inner_kwargs = kwargs
 
@@ -137,15 +138,6 @@ class CubQMCAmericanG(AbstractStoppingCriterion):
             )
         elif isinstance(distrib, Lattice) and distrib.no_replications:
             return CubQMCLatticeG(
-                self.integrand,
-                abs_tol=self.abs_tol,
-                rel_tol=self.rel_tol,
-                n_init=self.n_init,
-                n_limit=self.n_limit,
-                **self.inner_kwargs
-            )
-        elif distrib.replications > 1:
-            return CubQMCRepStudentT(
                 self.integrand,
                 abs_tol=self.abs_tol,
                 rel_tol=self.rel_tol,
@@ -242,7 +234,8 @@ class CubQMCAmericanG(AbstractStoppingCriterion):
             rel_tol (Union[None, float], optional): Relative error tolerance.
             rmse_tol (Union[None, float], optional): RMSE error tolerance (not supported).
         """
-        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
+        if rmse_tol is not None:
+            raise ParameterError("rmse_tol not supported by this stopping criterion.")
         if abs_tol is not None:
             self.abs_tol = abs_tol
         if rel_tol is not None:
