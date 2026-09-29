@@ -827,7 +827,7 @@ class TestSimplexTransform(unittest.TestCase):
                 transformer = SimplexTransform(dimension=dim)
                 result = transformer.root(points)
                 np.testing.assert_allclose(result, expected, atol=1e-8)
-        # Pillards & Cools (2005) Sec. 4.3.5's own 2D worked example.
+        # Pillards & Cools (2005), Sec. 2.5, and Pillards (2006), Sec. 4.3.5.
         transformer = SimplexTransform(dimension=2)
         np.testing.assert_allclose(transformer.root(np.array([0.5, 0.01])), [[0.05, 0.1]])
         np.testing.assert_allclose(transformer.root(np.array([0.5, 0.99])), [[0.497494, 0.994987]], atol=1e-6)
@@ -895,6 +895,62 @@ class TestSimplexTransform(unittest.TestCase):
                     result = transformer.mirror(points)
                     self.assertTrue(np.all((result >= 0) & (result < 1)))
                     self.assertTrue(np.all(result[:, :-1] <= result[:, 1:] + 1e-12))
+
+    def test_replicated_points_use_last_axis(self):
+        points = DigitalNetB2(3, seed=7, replications=2).gen_samples(4)
+        transformer = SimplexTransform(dimension=3)
+        for name, kwargs in [
+            ("sort", {}),
+            ("root", {}),
+            ("mirror", {}),
+            ("origami", {"base": 2, "depth": 1}),
+            ("shift", {}),
+        ]:
+            with self.subTest(transform=name):
+                result = getattr(transformer, name)(points, **kwargs)
+                self.assertEqual(result.shape, points.shape)
+                self.assertTrue(
+                    np.all(result[..., :-1] <= result[..., 1:] + 1e-12)
+                )
+
+        mask = np.all(points[..., :-1] <= points[..., 1:], axis=-1)
+        expected = points.reshape(-1, 3)[mask.reshape(-1)]
+        np.testing.assert_allclose(transformer.drop(points), expected)
+
+    def test_dimension_and_domain_validation(self):
+        with self.assertRaises(ParameterError):
+            SimplexTransform(dimension=0)
+        transformer = SimplexTransform(dimension=2)
+        for points in (
+            np.array([[0.1, 0.2, 0.3]]),
+            np.array([[1.1, 0.2]]),
+            np.array([[np.nan, 0.2]]),
+        ):
+            with self.subTest(points=points), self.assertRaises(ParameterError):
+                transformer.root(points)
+        with self.assertRaises(ParameterError):
+            transformer.origami(np.array([[0.1, 0.2]]), base=1)
+        with self.assertRaises(ParameterError):
+            transformer.origami(np.array([[0.1, 0.2]]), depth=-1)
+
+    def test_uniform_simplex_moments(self):
+        rng = np.random.default_rng(0)
+        n, dim = 2**16, 4
+        points = rng.random((n, dim))
+        transformer = SimplexTransform(dimension=dim)
+        expected = np.arange(1, dim + 1) / (dim + 1)
+        variances = (
+            np.arange(1, dim + 1)
+            * np.arange(dim, 0, -1)
+            / ((dim + 1) ** 2 * (dim + 2))
+        )
+        for name in ("sort", "root", "shift"):
+            with self.subTest(transform=name):
+                result = getattr(transformer, name)(points)
+                z_scores = np.abs(result.mean(axis=0) - expected) / np.sqrt(
+                    variances / n
+                )
+                self.assertLess(np.max(z_scores), 4)
 
 
 if __name__ == "__main__":
