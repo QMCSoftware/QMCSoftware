@@ -1,25 +1,27 @@
+from typing import Union
 import numpy as np
+from scipy import sparse
 
 from .abstract_true_measure import AbstractTrueMeasure
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
-from ..util import DimensionError, ParameterError
+from ..util import DimensionError, ParameterError, _univ_repr
 
 
 class ProductMeasure(AbstractTrueMeasure):
-    r"""
-    Product true measure for independent composition of marginal true measures.
+    r"""Product true measure for independent composition of marginal true
+    measures.
 
     ``ProductMeasure`` represents an independent product of smaller true
     measures. Each marginal may be one-dimensional or multidimensional. If the
     marginal true measures have dimensions
 
-    d_1, d_2, ..., d_k,
+    $$d_1, d_2, \ldots, d_k,$$
 
     then the product measure has total dimension
 
-    d = d_1 + d_2 + ... + d_k.
+    $$d = d_1 + d_2 + \cdots + d_k.$$
 
     A single d-dimensional outer sampler is used. Its unit-cube samples are
     split into coordinate blocks, one block for each marginal true measure.
@@ -32,8 +34,8 @@ class ProductMeasure(AbstractTrueMeasure):
         marginal 2: 1D zero-inflated exponential
 
     then ``ProductMeasure`` uses a 3D sampler and returns samples with three
-    coordinates. The first two coordinates come from the Gaussian marginal,
-    and the third coordinate comes from the zero-inflated exponential marginal.
+    coordinates. The first two coordinates come from the Gaussian marginal, and
+    the third coordinate comes from the zero-inflated exponential marginal.
 
     The marginal true measures still have their own samplers because QMCPy's
     current ``AbstractTrueMeasure`` API requires every true measure to be
@@ -44,82 +46,81 @@ class ProductMeasure(AbstractTrueMeasure):
     samplerless/template true-measure mode may be useful, but that is separate
     from this class.
 
-    Notes
-    -----
-    Exact product weights are supported for direct marginal true measures. For
-    recursively composed marginal measures, sampling is supported through
-    QMCPy's recursive transform helper, but exact final-space product weights
-    are not currently implemented here.
+    Notes:
+        For independent marginal blocks, means, variances, and standard deviations
+        are concatenated in marginal order, while covariance is block diagonal.
 
-    Examples
-    --------
-    Combine two one-dimensional uniform true measures:
+        Exact product weights are supported for direct marginal true measures. For
+        recursively composed marginal measures, sampling is supported through
+        QMCPy's recursive transform helper, but exact final-space product weights
+        are not currently implemented here.
 
-    >>> from qmcpy import DigitalNetB2, DummySampler, ProductMeasure, Uniform
-    >>> marginals = [
-    ...     Uniform(DummySampler(1), lower_bound=0, upper_bound=2),
-    ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
-    ... ]
-    >>> pm = ProductMeasure(sampler=DigitalNetB2(2, seed=9), marginals=marginals)
-    >>> x = pm(4)
-    >>> x.shape
-    (4, 2)
-    >>> bool(((0 <= x[:, 0]) & (x[:, 0] <= 2)).all())
-    True
+    Examples:
+        Combine two one-dimensional uniform true measures:
 
-    The outer sampler controls replications:
+        >>> from qmcpy import DigitalNetB2, DummySampler, ProductMeasure, Uniform
+        >>> marginals = [
+        ...     Uniform(DummySampler(1), lower_bound=0, upper_bound=2),
+        ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
+        ... ]
+        >>> pm = ProductMeasure(sampler=DigitalNetB2(2, seed=9), marginals=marginals)
+        >>> x = pm(4)
+        >>> x.shape
+        (4, 2)
+        >>> bool(((0 <= x[:, 0]) & (x[:, 0] <= 2)).all())
+        True
 
-    >>> pm = ProductMeasure(
-    ...     sampler=DigitalNetB2(2, seed=9, replications=3),
-    ...     marginals=marginals,
-    ... )
-    >>> pm(4).shape
-    (3, 4, 2)
+        The outer sampler controls replications:
 
-    The ``DummySampler`` marginal samplers are only construction placeholders
-    required by the current ``AbstractTrueMeasure`` interface.
-    ``ProductMeasure`` samples from its own outer sampler.
+        >>> pm = ProductMeasure(
+        ...     sampler=DigitalNetB2(2, seed=9, replications=3),
+        ...     marginals=marginals,
+        ... )
+        >>> pm(4).shape
+        (3, 4, 2)
 
-    Marginals may have different dimensions:
+        The ``DummySampler`` marginal samplers are only construction placeholders
+        required by the current ``AbstractTrueMeasure`` interface.
+        ``ProductMeasure`` samples from its own outer sampler.
 
-    >>> import numpy as np
-    >>> from qmcpy import Gaussian
-    >>> marginals = [
-    ...     Gaussian(
-    ...         DummySampler(2),
-    ...         mean=[0, 0],
-    ...         covariance=np.eye(2),
-    ...     ),
-    ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
-    ... ]
-    >>> pm = ProductMeasure(sampler=DigitalNetB2(3, seed=12), marginals=marginals)
-    >>> pm(4).shape
-    (4, 3)
+        Marginals may have different dimensions:
+
+        >>> import numpy as np
+        >>> from qmcpy import Gaussian
+        >>> marginals = [
+        ...     Gaussian(
+        ...         DummySampler(2),
+        ...         mean=[0, 0],
+        ...         covariance=np.eye(2),
+        ...     ),
+        ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
+        ... ]
+        >>> pm = ProductMeasure(sampler=DigitalNetB2(3, seed=12), marginals=marginals)
+        >>> pm(4).shape
+        (4, 3)
     """
 
-    def __init__(self, sampler, marginals):
-        """
-        Initialize a product measure from one sampler and several marginals.
+    def __init__(self, sampler: AbstractDiscreteDistribution, marginals: Union[list, tuple]) -> None:
+        r"""Initialize a product measure from one sampler and several
+        marginals.
 
-        Parameters
-        ----------
-        sampler : AbstractDiscreteDistribution
-            The sampler for the whole product measure. Its dimension must
-            equal the sum of the marginal dimensions.
+        Args:
+            sampler (AbstractDiscreteDistribution): The sampler for the whole
+                product measure. Its dimension must equal the sum of the
+                marginal dimensions.
+            marginals (Union[list, tuple]): Independent true
+                measures to place side by side. A marginal may itself be
+                multidimensional.
 
-        marginals : list or tuple of AbstractTrueMeasure
-            Independent true measures to place side by side. A marginal may
-            itself be multidimensional.
+        Notes:
+            Why one sampler? The product measure should be driven by one
+            total-dimensional QMC point set. We do not generate separate QMC
+            samples from each marginal. Instead, one sample $u \in [0,1]^d$
+            is split into blocks:
 
-        Why one sampler?
-        ----------------
-        The product measure should be driven by one total-dimensional QMC
-        point set. We do not generate separate QMC samples from each marginal.
-        Instead, one sample u in [0,1]^d is split into blocks:
+            $$u = (u_{\text{marginal},1}, u_{\text{marginal},2}, \ldots, u_{\text{marginal},k}).$$
 
-            u = (u_marginal_1, u_marginal_2, ..., u_marginal_k).
-
-        This preserves the intended total-dimensional QMC construction.
+            This preserves the intended total-dimensional QMC construction.
         """
         if not isinstance(marginals, (list, tuple)) or len(marginals) == 0:
             raise ParameterError("ProductMeasure requires a nonempty list of marginals.")
@@ -177,14 +178,165 @@ class ProductMeasure(AbstractTrueMeasure):
 
         super(ProductMeasure, self).__init__()
 
+        self._mean_cache = None
+        self._variance_cache = None
+        self._standard_deviation_cache = None
+        self._covariance_cache = None
+
+        for statistic in (
+            "mean",
+            "variance",
+            "standard_deviation",
+            "covariance",
+        ):
+            if all(hasattr(marginal, statistic) for marginal in self.marginals):
+                self.parameters.append(statistic)
+
+    def _marginal_statistic(self, marginal, marginal_index, statistic):
+        """Return a statistic or identify the marginal that does not provide
+        it.
+        """
+        try:
+            return getattr(marginal, statistic)
+        except AttributeError as error:
+            raise AttributeError(
+                f"ProductMeasure marginal {marginal_index} "
+                f"({type(marginal).__name__}) does not provide {statistic}."
+            ) from error
+
+    def _concatenate_marginal_statistic(self, statistic):
+        """Concatenate a coordinate-wise statistic in marginal order."""
+        values = []
+        for marginal_index, marginal in enumerate(self.marginals):
+            value = self._marginal_statistic(
+                marginal, marginal_index, statistic
+            )
+            value = np.atleast_1d(np.asarray(value))
+            if value.shape != (marginal.d,):
+                raise DimensionError(
+                    f"ProductMeasure marginal {marginal_index} "
+                    f"({type(marginal).__name__}) {statistic} must have shape "
+                    f"({marginal.d},), got {value.shape}."
+                )
+            values.append(value)
+
+        combined = self._read_only_array(np.concatenate(values))
+        return self._scalar_if_univariate(combined)
+
+    @property
+    def mean(self):
+        """np.ndarray: The measure's mean, concatenated from each marginal's
+        `mean` in marginal order and cached after first access.
+        """
+        if self._mean_cache is None:
+            self._mean_cache = self._concatenate_marginal_statistic("mean")
+        return self._mean_cache
+
+    @property
+    def variance(self):
+        """np.ndarray: The measure's variance, concatenated from each
+        marginal's `variance` in marginal order and cached after first
+        access.
+        """
+        if self._variance_cache is None:
+            self._variance_cache = self._concatenate_marginal_statistic("variance")
+        return self._variance_cache
+
+    @property
+    def standard_deviation(self):
+        """np.ndarray: The measure's standard deviation, concatenated from
+        each marginal's `standard_deviation` in marginal order and cached
+        after first access.
+        """
+        if self._standard_deviation_cache is None:
+            self._standard_deviation_cache = self._concatenate_marginal_statistic(
+                "standard_deviation"
+            )
+        return self._standard_deviation_cache
+
+    def _compute_covariance(self):
+        """Build and protect the block-diagonal marginal covariance."""
+        blocks = []
+        for marginal_index, marginal in enumerate(self.marginals):
+            block = self._marginal_statistic(
+                marginal, marginal_index, "covariance"
+            )
+            if not sparse.issparse(block):
+                block = np.atleast_2d(np.asarray(block))
+            expected_shape = (marginal.d, marginal.d)
+            if block.shape != expected_shape:
+                raise DimensionError(
+                    f"ProductMeasure marginal {marginal_index} "
+                    f"({type(marginal).__name__}) covariance must have shape "
+                    f"{expected_shape}, got {block.shape}."
+                )
+            blocks.append(block)
+
+        if any(sparse.issparse(block) for block in blocks):
+            covariance = sparse.block_diag(blocks, format="csr")
+            # Rebuild from a read-only base so writes cannot be re-enabled.
+            data = self._read_only_array(covariance.data)
+            return sparse.csr_matrix(
+                (data, covariance.indices, covariance.indptr),
+                shape=covariance.shape,
+                copy=False,
+            )
+
+        covariance = np.zeros(
+            (self.d, self.d),
+            dtype=np.result_type(*[block.dtype for block in blocks]),
+        )
+        start = 0
+        for block in blocks:
+            stop = start + block.shape[0]
+            covariance[start:stop, start:stop] = block
+            start = stop
+        covariance.setflags(write=False)
+        return self._read_only_view(covariance)
+
+    @property
+    def covariance(self):
+        """Union[np.ndarray, scipy.sparse.spmatrix]: The measure's
+        block-diagonal covariance, built from each marginal's `covariance`
+        and cached after first access. Sparse if any marginal's covariance
+        is sparse, dense otherwise.
+        """
+        if self._covariance_cache is None:
+            self._covariance_cache = self._compute_covariance()
+        return self._covariance_cache
+
+    def __repr__(self):
+        """Represent ProductMeasure without expanding marginal sparse
+        matrices.
+        """
+        lines = [f"{type(self).__name__} (AbstractTrueMeasure)"]
+        for parameter in dict.fromkeys(self.parameters):
+            if parameter == "marginals":
+                marginals = ", ".join(
+                    f"{type(marginal).__name__}(d={marginal.d})"
+                    for marginal in self.marginals
+                )
+                lines.append(f"    {parameter:<15} [{marginals}]")
+            elif parameter == "covariance" and sparse.issparse(self.covariance):
+                covariance = self.covariance
+                summary = (
+                    f"sparse {covariance.format.upper()}, "
+                    f"shape={covariance.shape}, nnz={covariance.nnz}"
+                )
+                lines.append(f"    {parameter:<15} {summary}")
+            else:
+                formatted = _univ_repr(self, "AbstractTrueMeasure", [parameter])
+                lines.extend(formatted.splitlines()[1:])
+        return "\n".join(lines)
+
     @staticmethod
     def _expand_bounds(bounds, dimension, name):
-        """
-        Expand a marginal's bounds so they have one row per output coordinate.
+        """Expand a marginal's bounds so they have one row per output
+        coordinate.
 
-        Some true measures store bounds as shape (1, 2), meaning the same
-        bound applies to all coordinates. Others store bounds as shape
-        (dimension, 2), meaning each coordinate has its own bound.
+        Some true measures store bounds as shape (1, 2), meaning the same bound
+        applies to all coordinates. Others store bounds as shape (dimension,
+        2), meaning each coordinate has its own bound.
 
         ProductMeasure needs all marginal ranges stacked together, so every
         marginal range must be represented as shape (dimension, 2).
@@ -203,20 +355,18 @@ class ProductMeasure(AbstractTrueMeasure):
 
     @property
     def _has_recursive_marginal(self):
-        """
-        Check whether any marginal is itself recursively composed.
+        """Check whether any marginal is itself recursively composed.
 
         In QMCPy, a true measure can sometimes be built on top of another true
         measure. Sampling can still be handled by the recursive transform
         helper, but exact product weights in the final transformed space are
-        more delicate. For now, ProductMeasure only computes exact weights
-        when all marginals are direct true measures.
+        more delicate. For now, ProductMeasure only computes exact weights when
+        all marginals are direct true measures.
         """
         return any(marginal.transform != marginal for marginal in self.marginals)
 
     def _split_blocks(self, x):
-        """
-        Split an input array into marginal coordinate blocks.
+        """Split an input array into marginal coordinate blocks.
 
         The split always happens along the final axis, so this works for both
         ordinary samples with shape (n, d) and replicated samples with shape
@@ -232,18 +382,16 @@ class ProductMeasure(AbstractTrueMeasure):
         return np.split(x, self._split_indices, axis=-1)
 
     def _transform(self, x):
-        """
-        Transform unit-cube samples into product-measure samples.
+        """Transform unit-cube samples into product-measure samples.
 
-        Steps
-        -----
+        Steps:
         1. Split the full unit-cube sample into marginal blocks.
         2. Send each block to the matching marginal true measure.
         3. Concatenate the transformed marginal outputs.
 
         This implements
 
-            T(u) = (T_1(u_1), T_2(u_2), ..., T_k(u_k)),
+        T(u) = (T_1(u_1), T_2(u_2), ..., T_k(u_k)),
 
         where each marginal T_j acts only on its own coordinate block.
         """
@@ -257,17 +405,16 @@ class ProductMeasure(AbstractTrueMeasure):
         return np.concatenate(transformed_blocks, axis=-1)
 
     def _weight(self, x):
-        """
-        Compute the product density/weight for independent marginals.
+        """Compute the product density/weight for independent marginals.
 
         For independent components, the joint weight is the product of the
         marginal weights:
 
             w(x) = w_1(x_1) * w_2(x_2) * ... * w_k(x_k).
 
-        This method supports direct marginal true measures. Recursive
-        marginals are blocked for now because their final-space weights need
-        more careful handling.
+        This method supports direct marginal true measures. Recursive marginals
+        are blocked for now because their final-space weights need more careful
+        handling.
         """
         if self._has_recursive_marginal:
             raise ParameterError(
@@ -284,8 +431,7 @@ class ProductMeasure(AbstractTrueMeasure):
         return weight
 
     def _spawn(self, sampler, dimension):
-        """
-        Spawn a new ProductMeasure with a new outer sampler.
+        """Spawn a new ProductMeasure with a new outer sampler.
 
         QMCPy's spawn mechanism creates new randomized copies of a sampler or
         true measure. ProductMeasure preserves the same marginal structure and
