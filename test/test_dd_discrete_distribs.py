@@ -921,12 +921,12 @@ class TestSimplexTransform(unittest.TestCase):
         with self.assertRaises(ParameterError):
             SimplexTransform(dimension=0)
         transformer = SimplexTransform(dimension=2)
-        for points in (
-            np.array([[0.1, 0.2, 0.3]]),
-            np.array([[1.1, 0.2]]),
-            np.array([[np.nan, 0.2]]),
+        for case, points in (
+            ("wrong dimension", np.array([[0.1, 0.2, 0.3]])),
+            ("outside unit cube", np.array([[1.1, 0.2]])),
+            ("nonfinite value", np.array([[np.nan, 0.2]])),
         ):
-            with self.subTest(points=points), self.assertRaises(ParameterError):
+            with self.subTest(case=case), self.assertRaises(ParameterError):
                 transformer.root(points)
         with self.assertRaises(ParameterError):
             transformer.origami(np.array([[0.1, 0.2]]), base=1)
