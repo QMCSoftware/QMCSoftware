@@ -688,9 +688,9 @@ copydocs:  # mkdocs only looks for content in the docs/ folder, so we have to co
 	@$(PYTHON) scripts/make_qmc_software_page.py
 	@mkdir -p docs/stats
 	@cp stats/pypi_downloads.md docs/stats/pypi_downloads.md
-	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon.png
-	@cp docs/assets/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
-	@cp docs/assets/logos/qmcpy_logo.png docs/favicon.ico
+	@cp docs/logos/qmcpy_logo.png docs/apple-touch-icon.png
+	@cp docs/logos/qmcpy_logo.png docs/apple-touch-icon-precomposed.png
+	@cp docs/logos/qmcpy_logo.png docs/favicon.ico
 	@cp QMCPy_Shared_Leadership.md docs/
 
 runmkdocserve:

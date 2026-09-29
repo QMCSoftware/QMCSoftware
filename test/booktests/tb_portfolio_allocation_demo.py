@@ -40,6 +40,9 @@ class NotebookTests(BaseNotebookTest):
             "num_ports = 2**14": "num_ports = 2**5",
             f'tickers1 = ["AAPL", "AMZN", {old_tick1}]': 'tickers1 = ["AAPL", "AMZN"]',
             f'description1 = ["Apple", "Amazon", {old_desc1}]': 'description1 = ["Apple", "Amazon"]',
+            # The backtest cell hardcodes n_tickers instead of deriving it from
+            # len(tickers1); keep it in sync with the tickers1 shrink above.
+            "n_tickers = 10": "n_tickers = 2",
             f'tickers2 = ["AAPL", "AMZN", "CSCO",{old_tick2}]': 'tickers2 = ["AAPL", "AMZN", "CSCO"]',
             f'description2 = ["Apple", "Amazon", "CISCO", {old_desc2}]': 'description2 = ["Apple", "Amazon", "CISCO"]',
         }
