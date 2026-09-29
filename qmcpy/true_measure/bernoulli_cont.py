@@ -82,6 +82,14 @@ class BernoulliCont(AbstractTrueMeasure):
             )
         return tf
 
+    def _map_effective_range(self, input_range):
+        if np.any((self.l <= 0) | (self.l >= 1)):
+            return None
+        bounds = self._broadcast_box(input_range, self.d)
+        if bounds is None:
+            return None
+        return self._transform(bounds.T).T
+
     def _weight(self, x):
         in_support = np.all((0 <= x) & (x <= 1), axis=-1)
         w = np.zeros(x.shape, dtype=float)

@@ -3,6 +3,7 @@ from typing import Union
 import numpy as np
 
 from .abstract_true_measure import AbstractTrueMeasure
+from .lebesgue import Lebesgue
 from ..util import DimensionError, ParameterError
 
 
@@ -12,8 +13,7 @@ class ImportanceSampling(AbstractTrueMeasure):
 
     The ``target`` defines the weight in the desired integral, while the
     ``proposal`` generates the samples. The target support must be contained
-    in the proposal support according to the measures' available ``range``
-    metadata.
+    in the proposal's certified ``effective_range``.
 
     ``ImportanceSampling`` is terminal: it cannot be used as the sampler for
     an ordinary ``TrueMeasure``, or nested as the target or proposal of another
@@ -54,7 +54,7 @@ class ImportanceSampling(AbstractTrueMeasure):
             proposal (AbstractTrueMeasure): Measure used to generate samples.
 
         Raises:
-            ParameterError: If `target` or `proposal` is not an `AbstractTrueMeasure`, if either is itself an `ImportanceSampling` object, or if the target range is not contained within the proposal range.
+            ParameterError: If `target` or `proposal` is not an `AbstractTrueMeasure`, if either is itself an `ImportanceSampling` object, if an exact support cannot be certified, or if the target support is not contained within the proposal support.
             DimensionError: If `target` and `proposal` have different dimensions.
         """
         if not isinstance(target, AbstractTrueMeasure):
@@ -71,9 +71,28 @@ class ImportanceSampling(AbstractTrueMeasure):
             )
         if target.d != proposal.d:
             raise DimensionError("target and proposal must have matching dimensions")
-        if not self._range_in_domain(target.range, proposal.range):
+        proposal_effective_range = proposal.effective_range
+        if proposal_effective_range is None:
             raise ParameterError(
-                "target range must be contained within proposal range for importance sampling"
+                "proposal effective range must be exactly certified for importance sampling"
+            )
+        if isinstance(target, Lebesgue):
+            target_support = target.effective_range
+        elif target.transform is not target:
+            raise ParameterError(
+                "ordinary composed targets are not supported for importance sampling"
+            )
+        else:
+            target_support = target.effective_range
+        if target_support is None:
+            raise ParameterError(
+                "target support must be exactly certified for importance sampling"
+            )
+        if not self._range_in_domain(
+            target_support, proposal_effective_range
+        ):
+            raise ParameterError(
+                "target support must be contained within proposal effective range for importance sampling"
             )
 
         self.parameters = ["target", "proposal"]
@@ -83,6 +102,7 @@ class ImportanceSampling(AbstractTrueMeasure):
         self.discrete_distrib = proposal.discrete_distrib
         self.transform = self
         self.sub_compatibility_error = False
+        self._sub_compatibility_error_reason = None
         self.domain = proposal.domain
         self.range = proposal.range
         super(ImportanceSampling, self).__init__()

@@ -227,6 +227,144 @@ class TestTrueMeasure(unittest.TestCase):
                 if name.startswith("1(d)"):
                     np.testing.assert_array_equal(inner.range, outer.domain)
 
+    def test_effective_range_preserves_local_range_for_supported_chains(self):
+        points = np.array([[0.1], [0.25], [0.5], [0.75], [0.9]])
+        inner = Uniform(
+            DigitalNetB2(1, seed=7), lower_bound=0.25, upper_bound=0.75
+        )
+
+        uniform_outer = Uniform(
+            inner, lower_bound=0.25, upper_bound=0.75
+        )
+        np.testing.assert_array_equal(uniform_outer.range, [[0.25, 0.75]])
+        np.testing.assert_allclose(
+            uniform_outer.effective_range, [[0.375, 0.625]]
+        )
+        np.testing.assert_allclose(
+            uniform_outer._jacobian_transform_r(points, False),
+            0.375 + 0.25 * points,
+        )
+
+        kumaraswamy_outer = Kumaraswamy(inner, a=2.0, b=3.0)
+        np.testing.assert_array_equal(kumaraswamy_outer.range, [[0, 1]])
+        expected_kumaraswamy = kumaraswamy_outer._transform(
+            np.array([[0.25], [0.75]])
+        ).T
+        np.testing.assert_allclose(
+            kumaraswamy_outer.effective_range, expected_kumaraswamy
+        )
+
+        gaussian_outer = Gaussian(inner)
+        np.testing.assert_array_equal(
+            gaussian_outer.range, [[-np.inf, np.inf]]
+        )
+        np.testing.assert_allclose(
+            gaussian_outer.effective_range,
+            [scipy.stats.norm.ppf([0.25, 0.75])],
+        )
+        self.assertFalse(gaussian_outer.effective_range.flags.writeable)
+        with self.assertRaises(ValueError):
+            gaussian_outer.effective_range[0, 0] = 0
+
+    def test_effective_range_propagates_through_three_layers(self):
+        inner = Uniform(
+            DigitalNetB2(1, seed=7), lower_bound=0.25, upper_bound=0.75
+        )
+        middle = Uniform(inner, lower_bound=0.25, upper_bound=0.75)
+        outer = Kumaraswamy(middle, a=2.0, b=3.0)
+
+        expected = outer._transform(np.array([[0.375], [0.625]])).T
+        np.testing.assert_allclose(middle.effective_range, [[0.375, 0.625]])
+        np.testing.assert_allclose(outer.effective_range, expected)
+
+    def test_effective_range_avoids_false_rejection(self):
+        restricted_uniform = Uniform(
+            DigitalNetB2(1, seed=7), lower_bound=0.5, upper_bound=0.75
+        )
+        gaussian = Gaussian(restricted_uniform)
+        outer = Kumaraswamy(gaussian)
+
+        np.testing.assert_array_equal(gaussian.range, [[-np.inf, np.inf]])
+        np.testing.assert_allclose(
+            gaussian.effective_range,
+            [[0.0, scipy.stats.norm.ppf(0.75)]],
+        )
+        self.assertFalse(outer.sub_compatibility_error)
+        self.assertTrue(np.isfinite(outer.gen_samples(8)).all())
+
+    def test_unknown_effective_range_is_deferred_and_cannot_be_extended(self):
+        restricted_uniform = Uniform(
+            DigitalNetB2(2, seed=7), lower_bound=0.25, upper_bound=0.75
+        )
+        gaussian = Gaussian(
+            restricted_uniform,
+            covariance=[[1.0, 0.5], [0.5, 1.0]],
+        )
+        outer = Kumaraswamy(gaussian)
+
+        self.assertIsNone(gaussian.effective_range)
+        self.assertTrue(outer.sub_compatibility_error)
+        with self.assertRaisesRegex(
+            ParameterError,
+            "sub-transform effective range cannot be established",
+        ):
+            outer.gen_samples(8)
+        with self.assertRaisesRegex(
+            ParameterError,
+            "nested sub-transform effective range cannot be established",
+        ):
+            Kumaraswamy(outer)
+
+    def test_scipy_wrapper_effective_range_is_unknown_in_recursive_chain(self):
+        scipy_wrapper = SciPyWrapper(
+            DigitalNetB2(2, seed=7),
+            [scipy.stats.triang(c=0.1), scipy.stats.uniform()],
+        )
+        kumaraswamy = Kumaraswamy(scipy_wrapper)
+
+        self.assertIsNone(scipy_wrapper.effective_range)
+        self.assertIsNone(kumaraswamy.effective_range)
+        with self.assertRaisesRegex(
+            ParameterError,
+            "sub-transform effective range cannot be established",
+        ):
+            kumaraswamy.gen_samples(8)
+        with self.assertRaisesRegex(
+            ParameterError,
+            "nested sub-transform effective range cannot be established",
+        ):
+            Uniform(kumaraswamy)
+
+    def test_effective_range_spawn_recomputes_supported_chain(self):
+        measure = Kumaraswamy(
+            Uniform(
+                DigitalNetB2(1, seed=7),
+                lower_bound=0.25,
+                upper_bound=0.75,
+            ),
+            a=2.0,
+            b=3.0,
+        )
+
+        spawned = measure.spawn(s=2, dimensions=[1, 2])
+
+        np.testing.assert_allclose(
+            spawned[0].effective_range, measure.effective_range
+        )
+        np.testing.assert_allclose(
+            spawned[1].effective_range,
+            np.tile(measure.effective_range, (2, 1)),
+        )
+
+    def test_exact_marginal_effective_ranges(self):
+        bernoulli = BernoulliCont(DigitalNetB2(1, seed=7), lam=0.9)
+        johnsons_su = JohnsonsSU(DigitalNetB2(1, seed=7))
+
+        np.testing.assert_allclose(bernoulli.effective_range, [[0.0, 1.0]])
+        np.testing.assert_array_equal(
+            johnsons_su.effective_range, [[-np.inf, np.inf]]
+        )
+
     def test_unrandomized_inverse_cdf_paths_are_finite(self):
         cases = [
             (
@@ -335,7 +473,7 @@ class TestTrueMeasure(unittest.TestCase):
         with self.assertRaisesRegex(
             ParameterError,
             re.escape(
-                "The sub-transform range must be contained within the transform domain."
+                "The sub-transform effective range must be contained within the transform domain."
             ),
         ):
             incompatible.gen_samples(8)
@@ -343,7 +481,7 @@ class TestTrueMeasure(unittest.TestCase):
         with self.assertRaisesRegex(
             ParameterError,
             re.escape(
-                "The nested sub-transform range must be contained within its transform domain."
+                "The nested sub-transform effective range must be contained within its transform domain."
             ),
         ):
             Kumaraswamy(incompatible)

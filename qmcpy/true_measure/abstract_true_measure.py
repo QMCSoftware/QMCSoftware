@@ -94,6 +94,46 @@ class AbstractTrueMeasure(object):
         upper_bounds_valid = np.all(transform_range[:, 1] <= domain[:, 1])
         return bool(lower_bounds_valid and upper_bounds_valid)
 
+    @staticmethod
+    def _broadcast_box(bounds, dimension):
+        """Broadcast interval/box bounds to shape ``(dimension, 2)``."""
+        try:
+            bounds = np.asarray(bounds, dtype=float)
+            return np.array(np.broadcast_to(bounds, (dimension, 2)), copy=True)
+        except (TypeError, ValueError):
+            return None
+
+    @property
+    def effective_range(self):
+        """Exact box reached by the full recursive transform, when certified.
+
+        ``None`` means that an exact axis-aligned box is not available.  The
+        local/standalone ``range`` metadata is intentionally unchanged.
+        """
+        input_range = (
+            self.domain
+            if self.transform is self
+            else self.transform.effective_range
+        )
+        if input_range is None or not self._range_in_domain(
+            input_range, self.domain
+        ):
+            return None
+        result = self._map_effective_range(input_range)
+        if result is None:
+            return None
+        result = np.asarray(result)
+        if (
+            not self._range_in_domain(result, result)
+            or self._broadcast_box(result, self.d) is None
+        ):
+            return None
+        return self._read_only_array(result)
+
+    def _map_effective_range(self, input_range):
+        """Map a certified input box to an exact output box, if supported."""
+        return None
+
     def _set_moments(self, mean, variance, standard_deviation, covariance):
         self._mean = self._read_only_array(mean)
         self._variance = self._read_only_array(variance)
@@ -163,6 +203,7 @@ class AbstractTrueMeasure(object):
 
     def _parse_sampler(self, sampler):
         self.sub_compatibility_error = False
+        self._sub_compatibility_error_reason = None
         if isinstance(sampler, AbstractDiscreteDistribution):
             self.transform = self  # this is the initial transformation, \Psi_0
             self.d = sampler.d  # take the dimension from the discrete distribution
@@ -188,12 +229,23 @@ class AbstractTrueMeasure(object):
                 sampler.d
             )  # take the dimension from the sub-sampler (composed transform)
             self.discrete_distrib = self.transform.discrete_distrib
-            if not self._range_in_domain(self.transform.range, self.domain):
-                self.sub_compatibility_error = True
             if self.transform.sub_compatibility_error:
+                if self.transform._sub_compatibility_error_reason == "unknown":
+                    raise ParameterError(
+                        "The nested sub-transform effective range cannot be established for this composition."
+                    )
                 raise ParameterError(
-                    "The nested sub-transform range must be contained within its transform domain."
+                    "The nested sub-transform effective range must be contained within its transform domain."
                 )
+            transform_effective_range = self.transform.effective_range
+            if transform_effective_range is None:
+                self.sub_compatibility_error = True
+                self._sub_compatibility_error_reason = "unknown"
+            elif not self._range_in_domain(
+                transform_effective_range, self.domain
+            ):
+                self.sub_compatibility_error = True
+                self._sub_compatibility_error_reason = "outside"
         else:
             raise ParameterError(
                 "sampler input should either be a AbstractDiscreteDistribution or AbstractTrueMeasure"
@@ -240,8 +292,12 @@ class AbstractTrueMeasure(object):
         r"""Recursive Jacobian transform."""
         jac = None
         if self.sub_compatibility_error:
+            if self._sub_compatibility_error_reason == "unknown":
+                raise ParameterError(
+                    "The sub-transform effective range cannot be established for this composition."
+                )
             raise ParameterError(
-                "The sub-transform range must be contained within the transform domain."
+                "The sub-transform effective range must be contained within the transform domain."
             )
         if self.transform == self:  # is \Psi_0
             if return_weights:

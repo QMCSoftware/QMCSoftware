@@ -1,7 +1,6 @@
 from qmcpy import (
     BayesianLRCoeffs,
     BoxIntegral,
-    BrownianMotion,
     CustomFun,
     DigitalNetB2,
     FinancialOption,
@@ -15,7 +14,6 @@ from qmcpy import (
     Kumaraswamy,
     Linear0,
     Multimodal2d,
-    SciPyWrapper,
     Sin1d,
     Uniform,
 )
@@ -24,7 +22,6 @@ import numpy as np
 import sys
 import types
 import unittest
-import scipy.stats
 from unittest.mock import Mock, patch
 
 
@@ -62,16 +59,16 @@ class TestIntegrand(unittest.TestCase):
             ),
             proposal=gaussian_proposal,
         )
-        brownian_proposal = BrownianMotion(
+        composed_gaussian_proposal = Gaussian(
             Kumaraswamy(DigitalNetB2(d, seed=7))
         )
-        brownian_importance_sampler = ImportanceSampling(
+        composed_gaussian_importance_sampler = ImportanceSampling(
             target=Gaussian(
-                brownian_proposal.discrete_distrib,
+                composed_gaussian_proposal.discrete_distrib,
                 mean=0,
                 covariance=1 / 2,
             ),
-            proposal=brownian_proposal,
+            proposal=composed_gaussian_proposal,
         )
         integrands = [
             FinancialOption(
@@ -112,10 +109,7 @@ class TestIntegrand(unittest.TestCase):
             CustomFun(
                 Uniform(
                     Kumaraswamy(
-                        SciPyWrapper(
-                            DigitalNetB2(d, seed=7),
-                            [scipy.stats.triang(c=0.1), scipy.stats.uniform()],
-                        )
+                        Kumaraswamy(DigitalNetB2(d, seed=7))
                     )
                 ),
                 lambda x: x.prod(1),
@@ -131,7 +125,7 @@ class TestIntegrand(unittest.TestCase):
             FinancialOption(DigitalNetB2(d, seed=7), option="EUROPEAN", call_put="put"),
             Keister(DigitalNetB2(d, seed=7)),
             Keister(gaussian_importance_sampler),
-            Keister(brownian_importance_sampler),
+            Keister(composed_gaussian_importance_sampler),
             Linear0(DigitalNetB2(d, seed=7)),
         ]
         spawned_integrands = [integrand.spawn(levels=0)[0] for integrand in integrands]

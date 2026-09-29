@@ -157,6 +157,12 @@ class Kumaraswamy(AbstractTrueMeasure):
     def _transform(self, x):
         return (1 - (1 - x) ** (1 / self.beta)) ** (1 / self.alpha)
 
+    def _map_effective_range(self, input_range):
+        bounds = self._broadcast_box(input_range, self.d)
+        if bounds is None:
+            return None
+        return self._transform(bounds.T).T
+
     def _weight(self, x):
         in_support = np.all((0 <= x) & (x <= 1), axis=-1)
         x_in_support = np.clip(x, 0, 1)

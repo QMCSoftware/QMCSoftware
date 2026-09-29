@@ -55,6 +55,14 @@ class Lebesgue(AbstractTrueMeasure):
         self._parse_sampler(sampler)
         super(Lebesgue, self).__init__()
 
+    @property
+    def effective_range(self):
+        """Certified integration region supplied by the wrapped measure."""
+        effective_range = self.transform.effective_range
+        if effective_range is None:
+            return None
+        return self._read_only_array(effective_range)
+
     def _weight(self, x):
         return np.ones(x.shape[:-1], dtype=float)
 

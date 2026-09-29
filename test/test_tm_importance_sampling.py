@@ -2,7 +2,15 @@ import unittest
 
 import numpy as np
 
-from qmcpy import DigitalNetB2, Gaussian, ImportanceSampling, Lebesgue, Uniform
+from qmcpy import (
+    BrownianMotion,
+    DigitalNetB2,
+    Gaussian,
+    ImportanceSampling,
+    Kumaraswamy,
+    Lebesgue,
+    Uniform,
+)
 from qmcpy.util import DimensionError, ParameterError
 
 
@@ -217,7 +225,7 @@ class TestImportanceSampling(unittest.TestCase):
 
         with self.assertRaisesRegex(
             ParameterError,
-            "target range must be contained within proposal range",
+            "target support must be contained within proposal effective range",
         ):
             ImportanceSampling(
                 target=wider_target,
@@ -235,6 +243,121 @@ class TestImportanceSampling(unittest.TestCase):
         )
         self.assertIs(importance_sampling.target, contained_target)
         self.assertIs(importance_sampling.proposal, proposal)
+
+    def test_certified_composed_proposal_support_validation(self):
+        inner = Uniform(
+            DigitalNetB2(1, seed=7),
+            lower_bound=0.25,
+            upper_bound=0.75,
+        )
+        proposal = Uniform(
+            inner,
+            lower_bound=0.25,
+            upper_bound=0.75,
+        )
+        contained_target = Uniform(
+            proposal.discrete_distrib,
+            lower_bound=0.4,
+            upper_bound=0.6,
+        )
+
+        importance_sampling = ImportanceSampling(
+            target=contained_target,
+            proposal=proposal,
+        )
+
+        np.testing.assert_array_equal(proposal.range, [[0.25, 0.75]])
+        np.testing.assert_allclose(proposal.effective_range, [[0.375, 0.625]])
+        samples, weights = importance_sampling.gen_samples(
+            8, return_weights=True
+        )
+        self.assertTrue(np.isfinite(samples).all())
+        self.assertTrue(np.isfinite(weights).all())
+
+        target_outside_effective_range = Uniform(
+            proposal.discrete_distrib,
+            lower_bound=0.3,
+            upper_bound=0.7,
+        )
+        with self.assertRaisesRegex(
+            ParameterError,
+            "target support must be contained within proposal effective range",
+        ):
+            ImportanceSampling(
+                target=target_outside_effective_range,
+                proposal=proposal,
+            )
+
+    def test_unknown_composed_proposal_is_rejected(self):
+        proposal = Gaussian(
+            Uniform(
+                DigitalNetB2(2, seed=7),
+                lower_bound=0.25,
+                upper_bound=0.75,
+            ),
+            covariance=[[1.0, 0.5], [0.5, 1.0]],
+        )
+        target = Gaussian(proposal.discrete_distrib)
+
+        self.assertIsNone(proposal.effective_range)
+        with self.assertRaisesRegex(
+            ParameterError,
+            "proposal effective range must be exactly certified",
+        ):
+            ImportanceSampling(target=target, proposal=proposal)
+
+    def test_composed_brownian_proposal_with_unknown_effective_range_is_rejected(
+        self,
+    ):
+        proposal = BrownianMotion(
+            Kumaraswamy(DigitalNetB2(2, seed=7))
+        )
+        target = Gaussian(
+            proposal.discrete_distrib,
+            mean=0,
+            covariance=1 / 2,
+        )
+
+        self.assertIsNone(proposal.effective_range)
+        with self.assertRaisesRegex(
+            ParameterError,
+            "proposal effective range must be exactly certified",
+        ):
+            ImportanceSampling(target=target, proposal=proposal)
+
+    def test_ordinary_composed_target_is_rejected(self):
+        proposal = Uniform(DigitalNetB2(1, seed=7))
+        target = Kumaraswamy(Uniform(proposal.discrete_distrib))
+
+        with self.assertRaisesRegex(
+            ParameterError,
+            "ordinary composed targets are not supported",
+        ):
+            ImportanceSampling(target=target, proposal=proposal)
+
+    def test_lebesgue_target_accepts_certified_composed_proposal(self):
+        proposal = Uniform(
+            Uniform(
+                DigitalNetB2(1, seed=7),
+                lower_bound=0.25,
+                upper_bound=0.75,
+            ),
+            lower_bound=0.25,
+            upper_bound=0.75,
+        )
+        target = Lebesgue(proposal)
+
+        importance_sampling = ImportanceSampling(
+            target=target,
+            proposal=proposal,
+        )
+        samples, weights = importance_sampling.gen_samples(
+            8, return_weights=True
+        )
+
+        np.testing.assert_allclose(target.effective_range, [[0.375, 0.625]])
+        self.assertTrue(np.isfinite(samples).all())
+        self.assertTrue(np.isfinite(weights).all())
 
     def test_constructor_and_input_dimension_validation(self):
         one_dimensional = Uniform(DigitalNetB2(1, seed=7))
