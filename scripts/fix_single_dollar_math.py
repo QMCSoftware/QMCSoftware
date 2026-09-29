@@ -4,14 +4,15 @@ Conservatively convert inline $...$ math to \(...\) in .md files and notebook ma
 Skips code fences and inline code spans. Only replaces $...$ where the interior
 contains at least one backslash, brace, caret, underscore, letter, or digit (likely math).
 """
-import io
 import json
 import re
 import sys
 from pathlib import Path
 
 # pattern: match single-dollar inline math (not $$), with interior containing math-like chars
-INLINE_MATH_RE = re.compile(r"(?<!\$)\$(?!\$)(?=[^\n]*[\\{}\^_A-Za-z0-9])([^\n]*?)(?<!\$)\$(?!\$)")
+INLINE_MATH_RE = re.compile(
+    r"(?<!\$)\$(?!\$)(?=[^\n]*[\\{}\^_A-Za-z0-9])([^\n]*?)(?<!\$)\$(?!\$)"
+)
 
 CODE_FENCE_RE = re.compile(r"^(```|~~~)")
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
@@ -40,7 +41,7 @@ def convert_md_text(text: str) -> str:
         parts = []
         last = 0
         for im in INLINE_CODE_RE.finditer(line):
-            seg = line[last:im.start()]
+            seg = line[last : im.start()]
             seg = INLINE_MATH_RE.sub(r"\\(\1\\)", seg)
             parts.append(seg)
             parts.append(im.group(0))
@@ -75,7 +76,9 @@ def process_ipynb(path: Path) -> bool:
             cell["source"] = new.splitlines(keepends=True)
             changed = True
     if changed:
-        path.write_text(json.dumps(j, indent=1, ensure_ascii=False)+"\n", encoding="utf8")
+        path.write_text(
+            json.dumps(j, indent=1, ensure_ascii=False) + "\n", encoding="utf8"
+        )
         print(f"Patched notebook markdown: {path}")
     return changed
 

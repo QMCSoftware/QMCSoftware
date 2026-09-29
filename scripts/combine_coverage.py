@@ -42,9 +42,15 @@ def run(cmd, check=True, **kwargs):
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", default="coverage-data", help="Directory with downloaded artifacts")
-    parser.add_argument("--outdir", default="coverage_html", help="HTML output directory")
-    parser.add_argument("--keep", action="store_true", help="Pass --keep to coverage combine")
+    parser.add_argument(
+        "--dir", default="coverage-data", help="Directory with downloaded artifacts"
+    )
+    parser.add_argument(
+        "--outdir", default="coverage_html", help="HTML output directory"
+    )
+    parser.add_argument(
+        "--keep", action="store_true", help="Pass --keep to coverage combine"
+    )
     args = parser.parse_args(argv)
 
     root = Path(args.dir)

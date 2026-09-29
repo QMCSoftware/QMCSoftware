@@ -1,12 +1,13 @@
+from ..integrand.abstract_integrand import AbstractIntegrand
+from typing import Union, Callable
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
-from ..discrete_distribution import IIDStdUniform
+from ..discrete_distribution import IIDStdUniform  #pylint: disable=unused-import
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
-from ..true_measure import Gaussian, Uniform
-from ..integrand import Keister, BoxIntegral, CustomFun, Genz, SensitivityIndices
+from ..integrand import Keister, BoxIntegral, CustomFun, Genz, SensitivityIndices  #pylint: disable=unused-import
 from ..util import MaxSamplesWarning, ParameterWarning, ParameterError
 import numpy as np
 from time import time
@@ -15,8 +16,8 @@ import warnings
 
 
 class CubMCCLTVec(AbstractStoppingCriterion):
-    r"""
-    IID Monte Carlo stopping criterion stopping criterion based on the Central Limit Theorem with doubling sample sizes.
+    r"""IID Monte Carlo stopping criterion stopping criterion based on the
+    Central Limit Theorem with doubling sample sizes.
 
     Examples:
         >>> k = Keister(IIDStdUniform(seed=7))
@@ -44,6 +45,8 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         Keister (AbstractIntegrand)
         Gaussian (AbstractTrueMeasure)
             mean            0
+            variance        2^(-1)
+            standard_deviation 0.707
             covariance      2^(-1)
             decomp_type     PCA
         IIDStdUniform (AbstractIIDDiscreteDistribution)
@@ -59,7 +62,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.18448043, 0.95435347])
-        >>> data
+        >>> data  # doctest: +NORMALIZE_WHITESPACE
         Data (Data)
             solution        [1.184 0.954]
             comb_bound_low  [1.165 0.932]
@@ -81,6 +84,15 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            variance        [0.083 0.083 0.083]
+            standard_deviation [0.289 0.289 0.289]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                with 3 stored elements (1 diagonals) and shape (3, 3)>
+                 Coords Values
+                 (0, 0) 0.08333333333333333
+                 (1, 1) 0.08333333333333333
+                 (2, 2) 0.08333333333333333
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               3
             replications    1
@@ -96,7 +108,7 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         >>> integrand = SensitivityIndices(function)
         >>> sc = CubMCCLTVec(integrand,abs_tol=2.5e-2,rel_tol=0)
         >>> solution,data = sc.integrate()
-        >>> data
+        >>> data  # doctest: +NORMALIZE_WHITESPACE
         Data (Data)
             solution        [[0.024 0.203 0.662]
                              [0.044 0.308 0.78 ]]
@@ -131,44 +143,58 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            variance        [0.083 0.083 0.083]
+            standard_deviation [0.289 0.289 0.289]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                with 3 stored elements (1 diagonals) and shape (3, 3)>
+                 Coords Values
+                 (0, 0) 0.08333333333333333
+                 (1, 1) 0.08333333333333333
+                 (2, 2) 0.08333333333333333
         IIDStdUniform (AbstractIIDDiscreteDistribution)
             d               3
             replications    1
             entropy         7
     """
+    _RESUME_REQUIRED_FIELDS = ("xfull", "yfull", "n", "n_max")
 
     def __init__(
         self,
-        integrand,
-        abs_tol=1e-2,
-        rel_tol=0.0,
-        n_init=256.0,
-        n_limit=2**30,
-        error_fun="EITHER",
-        inflate=1,
-        alpha=0.01,
-    ):
-        r"""
+        integrand: AbstractIntegrand,
+        abs_tol: Union[float, np.ndarray] = 1e-2,
+        rel_tol: Union[float, np.ndarray] = 0.0,
+        n_init: int = 256,
+        n_limit: int = 2**30,
+        error_fun: Union[str, Callable] = "EITHER",
+        inflate: float = 1,
+        alpha: Union[float, np.ndarray] = 0.01,
+    ) -> None:
+        r"""Initialize a CubMCCLTVec stopping criterion.
+
         Args:
             integrand (AbstractIntegrand): The integrand.
-            abs_tol (np.ndarray): Absolute error tolerance.
-            rel_tol (np.ndarray): Relative error tolerance.
+            abs_tol (Union[float, np.ndarray]): Absolute error tolerance.
+            rel_tol (Union[float, np.ndarray]): Relative error tolerance.
             n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
-            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str, Callable]): Function mapping the approximate
+                solution, absolute error tolerance, and relative error
+                tolerance to the current error bound.
 
-                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                - `'EITHER'`, the default, requires the approximation error to be below either the absolute *or* relative tolerance.
                     Equivalent to setting
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
                     ```
-                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance.
+                - `'BOTH'` requires the approximation error to be below both the absolute *and* relative tolerance.
                     Equivalent to setting
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
                     ```
-            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$.
+            inflate (float): Inflation factor $\geq 1$ to multiply by the
+                variance estimate to make it more conservative.
+            alpha (Union[float, np.ndarray]): Uncertainty level in $(0,1)$.
         """
         self.parameters = [
             "inflate",
@@ -192,22 +218,13 @@ class CubMCCLTVec(AbstractStoppingCriterion):
         # Set Attributes
         self.n_init = int(n_init)
         self.n_limit = int(n_limit)
-        assert isinstance(error_fun, str) or callable(error_fun)
-        if isinstance(error_fun, str):
-            if error_fun.upper() == "EITHER":
-                error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            elif error_fun.upper() == "BOTH":
-                error_fun = lambda sv, abs_tol, rel_tol: np.minimum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            else:
-                raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
-        self.error_fun = error_fun
+        if not (isinstance(error_fun, str) or callable(error_fun)):
+            raise AssertionError
+        self.error_fun, _ = self._resolve_error_fun(error_fun)
         self.alpha = alpha
         self.inflate = float(inflate)
-        assert self.inflate >= 1
+        if not (self.inflate >= 1):
+            raise AssertionError
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -216,44 +233,86 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             allowed_distribs=[AbstractIIDDiscreteDistribution],
             allow_vectorized_integrals=True,
         )
-        assert (
+        if not (
             self.integrand.discrete_distrib.no_replications == True
-        ), "Require the discrete distribution has replications=None"
-        self.alphas_indv, identity_dependency = self._compute_indv_alphas(
+        ):
+            raise AssertionError("Require the discrete distribution has replications=None")
+        self.alphas_indv, _ = self._compute_indv_alphas(
             np.full(self.integrand.d_comb, self.alpha)
         )
         self.set_tolerance(abs_tol, rel_tol)
         self.z_star = -norm.ppf(self.alphas_indv / 2)
 
-    def integrate(self):
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if int(data.stopping_crit.n_init) != int(self.n_init):
+            raise ParameterError("resume data has incompatible n_init.")
+        if data.xfull.shape[0] != int(data.n_total):
+            raise ParameterError("resume data xfull length must match n_total.")
+        if data.yfull.shape[-1] != int(data.n_total):
+            raise ParameterError("resume data yfull length must match n_total.")
+        if np.shape(data.n) != self.integrand.d_indv:
+            raise ParameterError(
+                "resume data n shape must match integrand.d_indv."
+            )
+        if int(np.max(np.asarray(data.n))) != int(data.n_total):
+            raise ParameterError("resume data n must be consistent with n_total.")
+        if int(data.n_total) < int(self.n_init):
+            raise ParameterError("resume data must include at least n_init samples.")
+
+    def _restore_resume_state(self, data):
+        self._restore_resume_rng_state(data)
+        self.true_measure.discrete_distrib = self.discrete_distrib
+        self.integrand.discrete_distrib = self.discrete_distrib
+        self.integrand.true_measure.discrete_distrib = self.discrete_distrib
+
+    def integrate(self, resume: Union[None, Data] = None) -> tuple:
+        """Determine the samples needed to satisfy the target tolerance.
+
+        Doubles the sample count each iteration and forms a CLT-based
+        confidence interval (`self.z_star`, inflated by `self.inflate`) on
+        each not-yet-converged output. Stops once every combined output is
+        within tolerance or `self.n_limit` would be exceeded.
+
+        Args:
+            resume (Union[None, Data]): Existing integration state to resume from, if
+                supported. Defaults to None.
+
+        Returns:
+            tuple: Approximation to the integral with shape ``integrand.d_comb``
+                and the corresponding data object.
+        """
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "time_integrate",
-            ]
+        resume_provenance = self._capture_resume_provenance(resume)
+        trace = self._make_trace_logger()
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
         )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (0,))
+        if data is not None:
+            # Reset flags so the tighter tolerance is re-evaluated from existing samples.
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
+            trace.resume(data)
+        else:
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (0,))
+        first_resume_iter = resume is not None
         while True:
-            xnext = self.discrete_distrib(n=data.n_max - data.n_min)
-            data.xfull = np.concatenate([data.xfull, xnext], 0)
-            ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            data.n[data.compute_flags] = data.n_max
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n=data.n_max - data.n_min)
+                data.xfull = np.concatenate([data.xfull, xnext], 0)
+                ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+                data.n[data.compute_flags] = data.n_max
             yfullfinite = np.isfinite(data.yfull)
             data.solution_indv = data.yfull.mean(-1, where=yfullfinite)
             data.sigmahat = data.yfull.std(-1, ddof=1, where=yfullfinite)
@@ -292,6 +351,8 @@ class CubMCCLTVec(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            self._set_elapsed_time(data, time() - t_start, resume_provenance=resume_provenance)
+            trace.iteration(data)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
@@ -306,17 +367,30 @@ class CubMCCLTVec(AbstractStoppingCriterion):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
+        trace.finalize()
         return data.solution, data
 
-    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
+    def set_tolerance(self, abs_tol: Union[None, float] = None, rel_tol: Union[None, float] = None, rmse_tol: Union[None, float] = None) -> None:
+        """Update the stopping criterion's target tolerance.
+
+        Args:
+            abs_tol (Union[None, float]): Absolute error tolerance, broadcast to
+                `self.abs_tols` with shape `integrand.d_comb`.
+            rel_tol (Union[None, float]): Relative error tolerance, broadcast to
+                `self.rel_tols` with shape `integrand.d_comb`.
+            rmse_tol (Union[None, float]): Unsupported; must be `None`.
+
+        Raises:
+            AssertionError: If `rmse_tol` is supplied.
+        """
+        if not (rmse_tol is None):
+            raise AssertionError("rmse_tol not supported by this stopping criterion.")
         if abs_tol is not None:
             self.abs_tol = abs_tol
             self.abs_tols = np.full(self.integrand.d_comb, self.abs_tol)

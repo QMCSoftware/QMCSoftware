@@ -1,15 +1,12 @@
+from typing import Union
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
-from ..discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
+from ..discrete_distribution import IIDStdUniform
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractIIDDiscreteDistribution,
 )
 from ..integrand import FinancialOption, Linear0, AbstractIntegrand
-from ..true_measure import Gaussian, Uniform
-from ..discrete_distribution import IIDStdUniform
 from ..util import MaxSamplesWarning, ParameterError
 import numpy as np
 from scipy.optimize import root_scalar
@@ -19,8 +16,8 @@ import warnings
 
 
 class CubMCG(AbstractStoppingCriterion):
-    r"""
-    IID Monte Carlo stopping criterion using Berry-Esseen inequalities in a two step method with guarantees for functions with bounded kurtosis.
+    r"""IID Monte Carlo stopping criterion using Berry-Esseen inequalities in
+    a two step method with guarantees for functions with bounded kurtosis.
 
     Examples:
         >>> ao = FinancialOption(IIDStdUniform(52,seed=7))
@@ -243,51 +240,43 @@ class CubMCG(AbstractStoppingCriterion):
 
     **References:**
 
-    1.  Fred J. Hickernell, Lan Jiang, Yuewei Liu, and Art B. Owen,
-        "Guaranteed conservative fixed width confidence intervals via Monte Carlo sampling,"
-        Monte Carlo and Quasi-Monte Carlo Methods 2012 (J. Dick, F. Y. Kuo, G. W. Peters, and I. H. Sloan, eds.), pp. 105-128,
-        Springer-Verlag, Berlin, 2014. DOI: 10.1007/978-3-642-41095-6_5
+    [1] F. J. Hickernell, L. Jiang, Y. Liu, and A. B. Owen, "Guaranteed conservative fixed width confidence intervals via Monte Carlo sampling," in *Monte Carlo and Quasi-Monte Carlo Methods 2012*, J. Dick, F. Y. Kuo, G. W. Peters, and I. H. Sloan, Eds. Berlin: Springer-Verlag, 2014, pp. 105-128. DOI: 10.1007/978-3-642-41095-6_5
 
-    2.  Sou-Cheng T. Choi, Yuhan Ding, Fred J. Hickernell, Lan Jiang, Lluis Antoni Jimenez Rugama,
-        Da Li, Jagadeeswaran Rathinavel, Xin Tong, Kan Zhang, Yizhi Zhang, and Xuan Zhou,
-        GAIL: Guaranteed Automatic Integration Library (Version 2.3) [MATLAB Software], 2019.
-        [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/).
-        [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m).
+    [2] S.-C. T. Choi, Y. Ding, F. J. Hickernell, L. Jiang, Ll. A. Jimenez Rugama, D. Li, J. Rathinavel, X. Tong, K. Zhang, Y. Zhang, and X. Zhou, "GAIL: Guaranteed Automatic Integration Library," MATLAB software, Version 2.3, 2019. [Online]. Available: [http://gailgithub.github.io/GAIL_Dev/](http://gailgithub.github.io/GAIL_Dev/) and [https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m](https://github.com/GailGithub/GAIL_Dev/blob/master/Algorithms/IntegrationExpectation/meanMC_g.m)
     """
 
     def __init__(
         self,
-        integrand,
-        abs_tol=1e-2,
-        rel_tol=0.0,
-        n_init=1024,
-        n_limit=2**30,
-        inflate=1.2,
-        alpha=0.01,
-        control_variates=[],
-        control_variate_means=[],
-    ):
-        r"""
+        integrand: AbstractIntegrand,
+        abs_tol: Union[float, np.ndarray] = 1e-2,
+        rel_tol: Union[float, np.ndarray] = 0.0,
+        n_init: int = 1024,
+        n_limit: int = 2**30,
+        inflate: float = 1.2,
+        alpha: Union[float, np.ndarray] = 0.01,
+        control_variates: Union[None, list] = None,
+        control_variate_means: Union[None, np.ndarray] = None,
+    ) -> None:
+        r"""Initialize a CubMCG stopping criterion.
+
         Args:
             integrand (AbstractIntegrand): The integrand.
-            abs_tol (np.ndarray): Absolute error tolerance.
-            rel_tol (np.ndarray): Relative error tolerance.
+            abs_tol (Union[float, np.ndarray]): Absolute error tolerance.
+            rel_tol (Union[float, np.ndarray]): Relative error tolerance.
             n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
-            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$.
-            control_variates (list): Integrands to use as control variates, each with the same underlying discrete distribution instance.
-            control_variate_means (np.ndarray): Means of each control variate.
+            inflate (float): Inflation factor $\geq 1$ to multiply by the
+                variance estimate to make it more conservative.
+            alpha (Union[float, np.ndarray]): Uncertainty level in $(0,1)$.
+            control_variates (Union[None, list]): Integrands to use as control variates,
+                each with the same underlying discrete distribution instance.
+            control_variate_means (Union[None, np.ndarray]): Means of each control variate.
         """
-        self.parameters = [
-            "abs_tol",
-            "rel_tol",
-            "n_init",
-            "n_limit",
-            "inflate",
-            "alpha",
-            "kurtmax",
-        ]
+        if control_variates is None:
+            control_variates = []
+        if control_variate_means is None:
+            control_variate_means = []
+        self.parameters = ["abs_tol", "rel_tol", "n_init", "n_limit", "inflate", "alpha", "kurtmax"]
         # Set Attributes
         self.abs_tol = float(abs_tol)
         self.rel_tol = float(rel_tol)
@@ -309,47 +298,55 @@ class CubMCG(AbstractStoppingCriterion):
             allowed_distribs=[AbstractIIDDiscreteDistribution],
             allow_vectorized_integrals=False,
         )
-        assert self.integrand.d_indv == ()
+        if not (self.integrand.d_indv == ()):
+            raise AssertionError
         # control variates
-        self.cv_mu = np.atleast_1d(control_variate_means)
-        self.cv = control_variates
-        if isinstance(self.cv, AbstractIntegrand):
-            self.cv = [self.cv]
-            self.cv_mu = self.cv_mu[None, ...]
-        assert isinstance(
-            self.cv, list
-        ), "cv must be a list of AbstractIntegrand objects"
-        for cv in self.cv:
-            if (
-                (not isinstance(cv, AbstractIntegrand))
-                or (cv.discrete_distrib != self.discrete_distrib)
-                or (cv.d_indv != self.integrand.d_indv)
-            ):
-                raise ParameterError(
-                    """
-                        Each control variates discrete distribution must be an AbstractIntegrand instance 
-                        with the same discrete distribution as the main integrand. d_indv must also match 
-                        that of the main integrand instance for each control variate."""
-                )
-        self.ncv = len(self.cv)
+        self._init_control_variates(control_variates, control_variate_means)
         if self.ncv > 0:
-            assert self.cv_mu.shape == (
+            if not (self.cv_mu.shape == (
                 (self.ncv,) + self.integrand.d_indv
-            ), "Control variate means should have shape (len(control variates),d_indv)."
+            )):
+                raise AssertionError("Control variate means should have shape (len(control variates),d_indv).")
             self.parameters += ["cv", "cv_mu"]
 
-    def integrate(self):
+    def _get_main_stage_samples(self, data):
+        n_init = int(self.n_init)
+        y = np.array(data.yfull[n_init:], copy=False)
+        if self.ncv == 0:
+            return y
+        ycv = np.array(data.ycvfull[:, n_init:], copy=False)
+        return y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
+
+    def _update_main_stage_solution(self, data):
+        y_main = self._get_main_stage_samples(data)
+        data.solution = y_main.mean()
+        data.n_total = data.yfull.shape[-1]
+
+    def integrate(self, resume: Union[None, Data] = None) -> tuple:
+        """Determine the samples needed to satisfy the target tolerance.
+
+        Draws an initial `self.n_init` samples to estimate the standard
+        deviation and kurtosis. If `self.rel_tol` is 0, sizes and draws one
+        additional batch via a Chebyshev/Berry-Esseen bound (`_nchebe`).
+        Otherwise, iteratively grows the sample size (`_ncbinv`) until the
+        Berry-Esseen confidence bound meets both the absolute and relative
+        tolerance or `self.n_limit` would be exceeded.
+
+        Args:
+            resume (Union[None, Data]): Unsupported; must be `None`, as `CubMCG` cannot
+                resume a prior checkpoint.
+
+        Returns:
+            tuple: Approximation to the integral and the corresponding data object.
+
+        Raises:
+            ParameterError: If `resume` is not `None`.
+        """
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "bound_low",
-                "bound_high",
-                "bound_diff",
-                "n_total",
-                "time_integrate",
-            ]
-        )
+        trace = self._make_trace_logger()
+        if resume is not None:
+            raise ParameterError("CubMCG does not support resume.")
+        data = Data(parameters=["solution", "bound_low", "bound_high", "bound_diff", "n_total", "time_integrate"])
         data.xfull = np.empty((0, self.integrand.d))
         data.yfull = np.empty(0)
         if self.ncv > 0:
@@ -375,21 +372,14 @@ class CubMCG(AbstractStoppingCriterion):
         if self.rel_tol == 0:
             self.alpha_mu = 1 - (1 - self.alpha) / (1 - self.alpha_sigma)
             toloversig = self.abs_tol / sigma_up
-            n_mu, data.bound_half_width = self._nchebe(
-                toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up
-            )
+            n_mu, data.bound_half_width = self._nchebe(toloversig, self.alpha_mu, self.kurtmax, self.n_limit, sigma_up)
             data.n_mu = int(n_mu)
             if (self.n_init + data.n_mu) > self.n_limit:
                 # cannot generate this many new samples
                 warning_s = """
                 Already generated %d samples.
                 Trying to generate %d new samples would exceed n_limit = %d.
-                Will instead generate %d new samples to reach n_limit.""" % (
-                    int(self.n_init),
-                    int(data.n_mu),
-                    int(self.n_limit),
-                    int(self.n_limit - self.n_init),
-                )
+                Will instead generate %d new samples to reach n_limit.""" % (int(self.n_init), int(data.n_mu), int(self.n_limit), int(self.n_limit - self.n_init))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 data.n_mu = self.n_limit - self.n_init
             x = self.discrete_distrib(n=data.n_mu)
@@ -405,10 +395,10 @@ class CubMCG(AbstractStoppingCriterion):
                 y = y - ((ycv - self.cv_mu[:, None]) * self.beta[:, None]).sum(0)
             data.solution = y.mean()
             data.n_total = self.n_init + data.n_mu
+            self._set_elapsed_time(data, time() - t_start)
+            trace.iteration(data)
         else:  # self.rel_tol > 0
-            alphai = (self.alpha - self.alpha_sigma) / (
-                2 * (1 - self.alpha_sigma)
-            )  # uncertainty to do iteration
+            alphai = (self.alpha - self.alpha_sigma) / (2 * (1 - self.alpha_sigma))  # uncertainty to do iteration
             eps1 = self._ncbinv(self.n_init, alphai, self.kurtmax)
             data.bound_half_width = sigma_up * eps1
             data.tau = 1.0  # step of the iteration
@@ -421,13 +411,7 @@ class CubMCG(AbstractStoppingCriterion):
                     Already generated %d samples.
                     Trying to generate %d new samples would exceeds n_limit = %d.
                     Will instead generate %d samples to meet n_limit total samples. 
-                    Note that error tolerances may no longer be satisfied""" % (
-                        int(data.n_total),
-                        int(n),
-                        int(self.n_limit),
-                        int(self.n_limit),
-                        int(self.n_limit - data.n_total),
-                    )
+                    Note that error tolerances may no longer be satisfied""" % (int(data.n_total), int(n), int(self.n_limit), int(self.n_limit - data.n_total))
                     warnings.warn(warning_s, MaxSamplesWarning)
                     n = self.n_limit - data.n_total
                 x = self.discrete_distrib(n=n)
@@ -444,6 +428,8 @@ class CubMCG(AbstractStoppingCriterion):
                 data.solution = y.mean()
                 data.n_total += n
                 if data.n_total >= self.n_limit:
+                    self._set_elapsed_time(data, time() - t_start)
+                    trace.iteration(data)
                     break
                 lb_tol = _tol_fun(
                     self.abs_tol,
@@ -464,8 +450,12 @@ class CubMCG(AbstractStoppingCriterion):
                     # stopping criterion met
                     delta_minus = (lb_tol - ub_tol) / 2.0
                     data.solution += delta_minus  # adjust solution a bit
+                    self._set_elapsed_time(data, time() - t_start)
+                    trace.iteration(data)
                     break
                 else:
+                    self._set_elapsed_time(data, time() - t_start)
+                    trace.iteration(data)
                     candidate_tol = np.maximum(
                         self.abs_tol, 0.95 * self.rel_tol * abs(data.solution)
                     )
@@ -480,19 +470,12 @@ class CubMCG(AbstractStoppingCriterion):
                     * (self.alpha - self.alpha_sigma)
                     / (1 - self.alpha_sigma)
                 )
-                n = int(
-                    self._nchebe(
-                        toloversig, alphai, self.kurtmax, self.n_limit, sigma_up
-                    )[0]
-                )
+                n = int(self._nchebe(toloversig, alphai, self.kurtmax, self.n_limit, sigma_up)[0])
         data.bound_low = data.solution - data.bound_half_width
         data.bound_high = data.solution + data.bound_half_width
         data.bound_diff = data.bound_high - data.bound_low
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(data, time() - t_start)
+        trace.finalize()
         return data.solution, data
 
     def _nchebe(self, toloversig, alpha, kurtmax, n_budget, sigma_0_up):
@@ -517,9 +500,7 @@ class CubMCG(AbstractStoppingCriterion):
         # Berry-Esseen function, whose solution is the sample size needed
         logsqrtnCLT = np.log(norm.ppf(1 - alpha / 2) / toloversig)
         # sample size by CLT
-        rsdata = root_scalar(
-            BEfun2, x0=logsqrtnCLT, method="toms748", bracket=(-_b, _b)
-        )
+        rsdata = root_scalar(BEfun2, x0=logsqrtnCLT, method="toms748", bracket=(-_b, _b))
         nbe = np.ceil(np.exp(2 * rsdata.root))
         # calculate Berry-Esseen n by fsolve function (scipy)
         ncb = np.minimum(
@@ -559,41 +540,54 @@ class CubMCG(AbstractStoppingCriterion):
         # Berry-Esseen inequality
         logsqrtb_clt = np.log(np.sqrt(norm.ppf(1 - alpha1 / 2) / np.sqrt(n1)))
         # use CLT to get tolerance
-        rsdata = root_scalar(
-            BEfun, x0=logsqrtb_clt, method="toms748", bracket=(-_b, _b)
-        )
+        rsdata = root_scalar(BEfun, x0=logsqrtb_clt, method="toms748", bracket=(-_b, _b))
         NBE_inv = np.exp(2 * rsdata.root)
         # use fsolve to get Berry-Esseen tolerance
         eps = np.minimum(NCheb_inv, NBE_inv)
         # take the min of Chebyshev and Berry Esseen tolerance
         return eps
 
-    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
+    def set_tolerance(self, abs_tol: Union[None, float] = None, rel_tol: Union[None, float] = None, rmse_tol: Union[None, float] = None) -> None:
+        """Update the stopping criterion's target tolerance.
+
+        Args:
+            abs_tol (Union[None, float]): Absolute error tolerance.
+            rel_tol (Union[None, float]): Relative error tolerance.
+            rmse_tol (Union[None, float]): Unsupported; must be `None`.
+
+        Raises:
+            AssertionError: If `rmse_tol` is supplied.
+        """
+        if not (rmse_tol is None):
+            raise AssertionError("rmse_tol not supported by this stopping criterion.")
         if abs_tol != None:
             self.abs_tol = abs_tol
         if rel_tol != None:
             self.rel_tol = rel_tol
 
 
-def _tol_fun(abs_tol, rel_tol, theta, mu, toltype):
-    # """
-    # Generalized error tolerance function.
+def _tol_fun(abs_tol: float, rel_tol: float, theta: float, mu: float, toltype: str):
+    """Generalized error tolerance function.
 
-    # Args:
-    #     abs_tol (float): absolute error tolerance
-    #     rel_tol (float): relative error tolerance
-    #     theta (float): parameter in 'theta' case
-    #     mu (float): true mean
-    #     toltype (str): different options of tolerance function
+    Args:
+        abs_tol (float): Absolute error tolerance.
+        rel_tol (float): Relative error tolerance.
+        theta (float): Weight in `"combine"` case; 0 gives pure relative
+            tolerance, 1 gives pure absolute tolerance.
+        mu (float): True mean.
+        toltype (str): `"combine"` for a weighted sum of the two tolerances,
+            or `"max"` for their max.
 
-    # Returns:
-    #     float: tolerance as weighted sum of absolute and relative tolerance
-    # """
+    Returns:
+        float: Tolerance as a combination of absolute and relative tolerance.
+    """
     if toltype == "combine":  # the linear combination of two tolerances
         # theta == 0 --> relative error tolerance
-        # theta === 1 --> absolute error tolerance
-        tol = theta * abs_tol + (1 - theta) * rel_tol * abs(mu)
+        # theta == 1 --> absolute error tolerance
+        return theta * abs_tol + (1 - theta) * rel_tol * abs(mu)
     elif toltype == "max":  # the max case
-        tol = max(abs_tol, rel_tol * abs(mu))
-    return tol
+        return max(abs_tol, rel_tol * abs(mu))
+    else:
+        raise ParameterError(
+            f"unknown toltype {toltype!r}; expected 'combine' or 'max'."
+        )

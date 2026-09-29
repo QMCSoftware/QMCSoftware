@@ -1,12 +1,45 @@
 # Contributing
 
-Thank you for your interest in contributing to the QMCPy package!
+Thank you for your interest in contributing to the QMCPy library! This library is the product of many hours of labor from many contributors. Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com).
 
-Please submit **pull requests** to the `develop` branch and **issues** using a template from `.github/ISSUE_TEMPLATE/`
+## Good Practices
 
-If you develop a new component please consider writing a blog for [qmcpy.org](https://qmcpy.org)
+To preserve the integrity of this library, we have instituted some good practices for developing features, improving performance, and fixing bugs. Please read [this document](docs/good_practices.md) to acquaint yourself with them.
 
-Join team communications by reaching out to us at [qmc-software@googlegroups.com](mailto:qmc-software@googlegroups.com)
+### AI-Assisted Contributions
+
+QMCPy welcomes AI assistance, but contributors and reviewers remain responsible for correctness, reproducibility, licensing, and citations. If AI affects your code, tests, demos, documentation, or pull request text, follow the [AI-assisted contributions policy](docs/ai-assisted-contributions.md) and disclose that use in your pull request.
+
+### Issues
+
+All improvements to QMCPy should be connected to an **issue** using a template from `.github/ISSUE_TEMPLATE/`.
+
+- If you are looking for a way to contribute, search the issues and contact the person who started the issue, if you would like to help.
+
+- If you identify an improvement that is not in an issue, you may submit an issue yourself.
+
+### Feature Branches
+
+If you have not yet installed the QMCPy library, see [Installation](#installation) below.
+
+You should do all your work on a feature branch that is created from the `develop` branch; see [Branches](#branches) below. Once you have something ready, submit a **pull request (PR)** to the `develop` branch and request reviews from at least two team members. Tools such as GitHub Copilot may provide supplemental feedback, but they do not replace human review or approval. It may help to have a brief PR review Zoom meeting with the code reviewers to walk them through the changes.
+
+After a feature branch has been approved by two code reviewers, you may merge it into `develop`. After a successful merge, it is best practice to delete your feature branch on GitHub. This action keeps the repository tidy and prevents the accumulation of stale branches.
+
+We periodically release the contents of `develop` to `master`. Contact the team for the next release date. Plan to submit your pull request to `develop` at least one week before the release date. If your contribution does not make it into the next release, we hope that it will make it into the one after that.
+
+### Blogs
+
+Blog prose is maintained in [`QMCSoftware/QMCSoftware.github.io`](https://github.com/QMCSoftware/QMCSoftware.github.io), not in this repository's MkDocs documentation site. Propose and publish blog posts there; published articles appear on the [QMCSoftware Blog](https://qmcsoftware.org/blogs/).
+
+Runnable examples remain in this repository. For every article backed by a notebook:
+
+1. Keep the executable notebook under `demos/` as the reproducible source and link the article to that exact repository path. Moving the article prose to the website is not a reason to delete its notebook.
+2. Edit and execute the notebook in the QMCPy development environment, from its containing directory when it uses relative imports or helper files.
+3. Add or update the matching `test/booktests/tb_*.py` test and run that focused test before updating the website article. See [`test/booktests/README.md`](https://github.com/QMCSoftware/QMCSoftware/blob/develop/test/booktests/README.md) for commands.
+4. Update the website article separately, then verify that its source-notebook link still resolves.
+5. If the article had a page on this repository's MkDocs site, do not just delete it: add a `redirect_maps` entry for its old path under the `redirects` plugin in `mkdocs.yml`, then confirm with `make check_removed_urls`.
+
 
 ## Installation
 
@@ -16,7 +49,7 @@ In a git enabled terminal (e.g. [bash](https://gitforwindows.org/) for Windows) 
 git clone https://github.com/QMCSoftware/QMCSoftware.git
 cd QMCSoftware
 git checkout develop
-conda create --name qmcpy python=3.12
+conda create --name qmcpy python=3.13
 conda activate qmcpy
 pip install -e .[dev]
 ~~~
@@ -27,11 +60,43 @@ While `dev` contains the most complete set of install dependencies, a number of 
 pip install -e ".[dev]"
 ~~~
 
-### 📚 Using `qmcpy` in courses (`class` extra)
+The `dev` extra includes QMCPy's PyPI-hosted MPMC dependencies. MPMC additionally requires a platform-specific `pyg_lib` wheel that is not available from PyPI. After installing `dev`, let the QMCPy installer select the wheel page matching the installed PyTorch build:
 
-`qmcpy` provides a `class` optional dependency group that installs a
-complete teaching environment (JupyterLab, plotting, statistics, and utilities)
-in addition to `qmcpy` itself.
+~~~bash
+qmcpy-install-mpmc
+~~~
+
+For an MPMC installation without the complete development environment, use:
+
+~~~bash
+pip install -e ".[mpmc]"
+qmcpy-install-mpmc
+~~~
+
+### Minimum Python Version by Role
+
+`requires-python` covers a bare install; the optional dependency groups in `pyproject.toml` raise it. Each row shows the strictest floor among that role's pinned dependencies. Rows marked `+` add a capability to the Application-user install; unmarked rows are self-contained role profiles.
+
+| Role | Install command | Binding constraint | Minimum Python |
+|---|---|---|---|
+| Application user | `pip install qmcpy` | QMCPy support policy | 3.9 |
+| + torch / GP features | `pip install "qmcpy[torch,gpytorch]"` | inherits the QMCPy floor | 3.9 |
+| + MPMC | `pip install "qmcpy[mpmc]"`, then `qmcpy-install-mpmc` | `torch >= 2.10.0` | 3.10 |
+| + Bayesian optimization | `pip install "qmcpy[botorch]"` | `botorch >= 0.10.0` | 3.9 |
+| Course instructor (`class`) | `pip install -e ".[class]"` | `arviz >= 0.17`, `matplotlib >= 3.9.0`, `statsmodels >= 0.14.3` | 3.9 |
+| Test developer | `pip install -e ".[test]"` | `pytest >= 9.0.3`, `parsl >= 2026.01.05` | 3.10 |
+| Documentation developer | `pip install -e ".[docs]"` | inherits `test`; `pylint >= 4.0.5` | 3.10 |
+| Release / core developer | `pip install -e ".[dev]"` | inherits `docs` / `test` | 3.10 |
+
+Using `qmcpy` needs Python **3.9+**; contributing code, running tests, or building docs needs **3.10+**. We recommend 3.13 for development.
+
+Python 3.9 is a deliberate QMCPy **support-policy floor**, not a claim about source syntax or `qmctoolscl`'s declared floor. It is the oldest interpreter whose current runtime stack QMCPy commits to support and test; earlier versions are outside that policy even if a particular toolchain can install them.
+
+CI measures the lower tier rather than assuming it: `unittests.yml`'s `core-tests` job builds the QMCPy wheel on Python 3.9 on Linux, macOS, and Windows, installs it with no extras, checks its dependencies, and imports it from outside the source tree. The 3.9 claim is OS-independent, and `qmctoolscl` ships only one wheel (cp312, `win_amd64`), so every leg builds it from its source distribution. It then runs `make unittests_core` with the slim `test_core` extra and no notebook stack. Its main `tests` job runs the full suite on 3.10-3.14, each version on one operating system. Every conda matrix asserts the running interpreter before any test runs. Test modules self-skip via `pytest.importorskip` when an optional stack (torch, gpytorch, PyG) is absent, so each interpreter runs what applies to it.
+
+## 📚 Using `qmcpy` In Courses (`class` Extra)
+
+`qmcpy` provides a `class` optional dependency group that installs a complete teaching environment (JupyterLab, plotting, statistics, and utilities) in addition to `qmcpy` itself.
 
 For a typical course setup, you can do:
 ```bash
@@ -45,11 +110,48 @@ or for a heavy-duty version
 pip install -e ".[class,dev]"
 ```
 
+## Branches
+
+### For Main Repository Collaborators
+
+Branch directly from `develop` inside the `QMCSoftware/` repository. This allows other team members to easily review your work by checking out your branch with
+
+```bash
+git fetch origin
+git checkout <branch-name>
+```
+
+### For External Contributors (Forks)
+
+Fork the repository to your personal account and create your branch there. Main repository collaborators can review or test your forked branch without having to clone your repo. For example, say a main repository collaborator wants to check out the `develop` branch on the `git@github.com:MyGitHubUsername/QMCSoftware.git` fork. The main repository contributor may call this remote fork the `MyGitHubUsername-fork` and call the branch name `MyGitHubUsername-develop` within our repo to avoid conflict with the origin `develop` branch. The following commands accomplish this.
+
+```bash
+# Add the fork as a remote source
+git remote add MyGitHubUsername-fork git@github.com:MyGitHubUsername/QMCSoftware.git
+
+# Download the fork's branch data
+git fetch MyGitHubUsername-fork
+
+# Create your local branch tracking the fork's branch
+git checkout -b MyGitHubUsername-develop MyGitHubUsername-fork/develop
+```
+
+When new changes are pushed to the `develop` branch on the fork `git@github.com:MyGitHubUsername/QMCSoftware.git`, the main repo collaborator may then run
+
+```bash
+# 1. Switch to the local branch tracking your fork
+git checkout MyGitHubUsername-develop
+
+# 2. Pull the new changes directly from your fork's branch
+git pull MyGitHubUsername-fork develop
+```
+
 ## Tests
 
-Doctests and unittests take a few minute to run with
+Doctests and unittests take a few minutes to run with
 
 ~~~bash
+pip install -e ".[dev,docs,test]"
 make tests_no_docker
 ~~~
 
@@ -61,15 +163,13 @@ make tests
 
 Please see the targets in the makefile for more granular control over tests.
 
+### Test file layout
+
+Unit tests live flat in `test/`, named `test_<area>_<topic>.py` where `<area>` is a short code for the `qmcpy` subpackage under test (`tm` true_measure, `dd` discrete_distribution, `sc` stopping_criterion, `ig` integrand, ...) or a cross-cutting bucket (`ee`, `sr`). So `pytest test/ -k test_tm_` runs every true-measure test. A test that spans two areas goes under the component actually under test, with the other named in `<topic>` (e.g. `test_sc_cubbayes_kernels.py`); use `ee` only when neither side is the clear subject, and never coin a new code — `STRICT=--strict` rejects anything outside the table. New files should also be written as a `unittest.TestCase` subclass rather than bare `def test_*` functions. `make check_test_style` lists any file that breaks either convention (informational; also runs inside `make format`; `STRICT=--strict` makes it fail). The full area table is in [`test/README.md`](test/README.md#test-file-organization).
+
 ## Documentation
 
-~~~bash
-pip install -e ".[doc]"
-~~~
-
-This installs the documentation extras, including `pylint`.
-
-### Ensure `pyreverse` is on your PATH
+### Ensure `pyreverse` Is On Your PATH
 
 `pyreverse` must be available as a command-line tool. If it is not, verify your PATH as below.
 
@@ -109,7 +209,7 @@ python -m site --user-base
 
 You can update PATH via System settings or in your PowerShell profile (`$PROFILE`).
 
-### Build the documentation
+### Build the Documentation
 
 On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `make`):
 
@@ -117,7 +217,7 @@ On MacOS / Linux (and on Windows via Git Bash, WSL, or any environment with `mak
 make doc
 ~~~
 
-### Download PDF documentation
+### Download PDF Documentation
 
 In the built HTML documentation:
 
@@ -130,11 +230,17 @@ In the built HTML documentation:
 
 ## Demos
 
-Demos are Jupyter notebooks which may be launched using the command
+Demos are Jupyter notebooks under `demos/`. To open one:
 
 ~~~bash
-jupyter-lab
+jupyter-lab                                              # or: make open_notebook NOTEBOOK=demos/quickstart.ipynb
+make open_colab_notebook NOTEBOOK=demos/quickstart.ipynb # in Colab, from your current (pushed) branch
+make open_colab_notebook_gist NOTEBOOK=demos/quickstart.ipynb  # in Colab, from your uncommitted working copy (needs the gh CLI)
 ~~~
+
+`open_colab_notebook` uses the branch version only when the notebook is new or differs from `develop`, otherwise the `develop` version. See [docs/tests.md](docs/tests.md) for details.
+
+Note: `make format` runs `make harden_colab_notebook`, so it will insert a Colab badge and bootstrap cell into any unclassified `demos/*.ipynb` and add it to `scripts/colab_notebooks_manifest.json` (and fail if a notebook cannot be hardened automatically).
 
 ## Other Developer Tools
 

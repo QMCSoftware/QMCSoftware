@@ -15,14 +15,18 @@ class NotebookTests(BaseNotebookTest):
         test_instance.run_notebook(notebook_path)
 
     def test_portfolio_allocation_demo_notebook(self):
-        notebook_path, _ = self.locate_notebook('../../demos/portfolio/portfolio_allocation_demo.ipynb')
-        
-        # Define variables for readability 
+        notebook_path, _ = self.locate_notebook(
+            "../../demos/portfolio/portfolio_allocation_demo.ipynb"
+        )
+
+        # Define ticker patterns for readability (wildcard: [...] represents variable list items)
         old_tick1 = '"CSCO", "IBM", "TSLA", "META", "ABNB", "UPS", "NFLX", "MRNA"'
-        old_desc1 = '"CISCO", "IBM", "Tesla", "Meta", "Airbnb", "UPS", "Netflix", "Moderna"'
+        old_desc1 = (
+            '"CISCO", "IBM", "Tesla", "Meta", "Airbnb", "UPS", "Netflix", "Moderna"'
+        )
         old_tick2 = '"IBM","TSLA","META","ABNB","UPS","NFLX","MRNA","^IXIC", "T","GE","FMC","AMC","JPM","DIS","CVX","GOOGL","BA"'
         old_desc2 = '"IBM","Tesla","Meta","Airbnb","UPS","Netflix","Moderna","NASDAQ","AT&T","General Electric","FMC","AMC","JPMorgan","Disney","Chevron","Google","Boeing"'
-        
+
         replacements = {
             "(10, 2**15),":"",
             "(20, 2**16),":"",
@@ -42,5 +46,5 @@ class NotebookTests(BaseNotebookTest):
         
         self.run_notebook(notebook_path, replacements)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,20 +1,17 @@
+from ..integrand.abstract_integrand import AbstractIntegrand
+from typing import Union, Callable
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
-from ..discrete_distribution.abstract_discrete_distribution import (
-    AbstractDiscreteDistribution,
-)
-from ..discrete_distribution import Lattice, DigitalNetB2, Halton
+from ..discrete_distribution import DigitalNetB2
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractLDDiscreteDistribution,
 )
-from ..true_measure import Gaussian, Uniform
 from ..integrand.keister import Keister
 from ..integrand.box_integral import BoxIntegral
 from ..integrand.sensitivity_indices import SensitivityIndices
 from ..integrand.genz import Genz
 from ..util import (
     MaxSamplesWarning,
-    NotYetImplemented,
     ParameterWarning,
     ParameterError,
 )
@@ -55,6 +52,8 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         Keister (AbstractIntegrand)
         Gaussian (AbstractTrueMeasure)
             mean            0
+            variance        2^(-1)
+            standard_deviation 0.707
             covariance      2^(-1)
             decomp_type     PCA
         DigitalNetB2 (AbstractLDDiscreteDistribution)
@@ -76,7 +75,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         >>> solution,data = sc.integrate()
         >>> solution
         array([1.19025707, 0.96062762])
-        >>> data
+        >>> data  # doctest: +NORMALIZE_WHITESPACE
         Data (Data)
             solution        [1.19  0.961]
             comb_bound_low  [1.19  0.961]
@@ -99,6 +98,15 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            variance        [0.083 0.083 0.083]
+            standard_deviation [0.289 0.289 0.289]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                             with 3 stored elements (1 diagonals) and shape (3, 3)>
+                              Coords Values
+                              (0, 0) 0.08333333333333333
+                              (1, 1) 0.08333333333333333
+                              (2, 2) 0.08333333333333333
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    25
@@ -120,7 +128,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         >>> integrand = SensitivityIndices(function)
         >>> sc = CubQMCRepStudentT(integrand,abs_tol=5e-4,rel_tol=0)
         >>> solution,data = sc.integrate()
-        >>> data
+        >>> data  # doctest: +NORMALIZE_WHITESPACE
         Data (Data)
             solution        [[0.02  0.196 0.667]
                              [0.036 0.303 0.782]]
@@ -162,6 +170,15 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         Uniform (AbstractTrueMeasure)
             lower_bound     0
             upper_bound     1
+            mean            [0.5 0.5 0.5]
+            variance        [0.083 0.083 0.083]
+            standard_deviation [0.289 0.289 0.289]
+            covariance      <DIAgonal sparse matrix of dtype 'float64'
+                             with 3 stored elements (1 diagonals) and shape (3, 3)>
+                              Coords Values
+                              (0, 0) 0.08333333333333333
+                              (1, 1) 0.08333333333333333
+                              (2, 2) 0.08333333333333333
         DigitalNetB2 (AbstractLDDiscreteDistribution)
             d               3
             replications    25
@@ -176,56 +193,51 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
 
     **References:**
 
-    1.  Art B. Owen. "Practical Quasi-Monte Carlo Integration." 2023.
-        [https://artowen.su.domains/mc/](https://artowen.su.domains/mc/).
+    [1] A. B. Owen, "Practical Quasi-Monte Carlo Integration," 2023. [Online]. Available: [https://artowen.su.domains/mc/](https://artowen.su.domains/mc/)
 
-    2.  Pierre l’Ecuyer et al.
-        "Confidence intervals for randomized quasi-Monte Carlo estimators."
-        2023 Winter Simulation Conference (WSC). IEEE, 2023.
-        [https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10408613](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10408613).
+    [2] P. L'Ecuyer et al., "Confidence intervals for randomized quasi-Monte Carlo estimators," in *2023 Winter Simulation Conference (WSC)*. IEEE, 2023. [Online]. Available: [https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10408613](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10408613)
     """
+
+    _RESUME_REQUIRED_FIELDS = ("xfull", "yfull", "n", "n_rep", "_ysums", "n_max")
 
     def __init__(
         self,
-        integrand,
-        abs_tol=1e-2,
-        rel_tol=0.0,
-        n_init=256.0,
-        n_limit=2**30,
-        error_fun="EITHER",
-        inflate=1,
-        alpha=0.01,
-    ):
-        r"""
+        integrand: AbstractIntegrand,
+        abs_tol: Union[float, np.ndarray] = 1e-2,
+        rel_tol: Union[float, np.ndarray] = 0.0,
+        n_init: int = 256,
+        n_limit: int = 2**30,
+        error_fun: Union[str, Callable] = "EITHER",
+        inflate: float = 1,
+        alpha: Union[float, np.ndarray] = 0.01,
+    ) -> None:
+        r"""Initialize a CubQMCRepStudentT stopping criterion.
+
         Args:
             integrand (AbstractIntegrand): The integrand.
-            abs_tol (np.ndarray): Absolute error tolerance.
-            rel_tol (np.ndarray): Relative error tolerance.
+            abs_tol (Union[float, np.ndarray]): Absolute error tolerance.
+            rel_tol (Union[float, np.ndarray]): Relative error tolerance.
             n_init (int): Initial number of samples.
             n_limit (int): Maximum number of samples.
-            error_fun (Union[str,callable]): Function mapping the approximate solution, absolute error tolerance, and relative error tolerance to the current error bound.
+            error_fun (Union[str, Callable]): Function mapping the approximate
+                solution, absolute error tolerance, and relative error
+                tolerance to the current error bound.
 
-                - `'EITHER'`, the default, requires the approximation error must be below either the absolue *or* relative tolerance.
+                - `'EITHER'`, the default, requires the approximation error to be below either the absolute *or* relative tolerance.
                     Equivalent to setting
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.maximum(abs_tol,abs(sv)*rel_tol)
                     ```
-                - `'BOTH'` requires the approximation error to be below both the absolue *and* relative tolerance.
+                - `'BOTH'` requires the approximation error to be below both the absolute *and* relative tolerance.
                     Equivalent to setting
                     ```python
                     error_fun = lambda sv,abs_tol,rel_tol: np.minimum(abs_tol,abs(sv)*rel_tol)
                     ```
-            inflate (float): Inflation factor $\geq 1$ to multiply by the variance estimate to make it more conservative.
-            alpha (np.ndarray): Uncertainty level in $(0,1)$.
+            inflate (float): Inflation factor $\geq 1$ to multiply by the
+                variance estimate to make it more conservative.
+            alpha (Union[float, np.ndarray]): Uncertainty level in $(0,1)$.
         """
-        self.parameters = [
-            "inflate",
-            "alpha",
-            "abs_tol",
-            "rel_tol",
-            "n_init",
-            "n_limit",
-        ]
+        self.parameters = ["inflate", "alpha", "abs_tol", "rel_tol", "n_init", "n_limit"]
         # Input Checks
         if np.log2(n_init) % 1 != 0:
             warnings.warn(
@@ -240,7 +252,8 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         # Set Attributes
         self.n_init = int(n_init)
         self.n_limit = int(n_limit)
-        assert isinstance(error_fun, str) or callable(error_fun)
+        if not (isinstance(error_fun, str) or callable(error_fun)):
+            raise AssertionError
         if isinstance(error_fun, str):
             if error_fun.upper() == "EITHER":
                 error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
@@ -255,8 +268,10 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
         self.error_fun = error_fun
         self.alpha = alpha
         self.inflate = float(inflate)
-        assert self.inflate >= 1
-        assert 0 < self.alpha < 1
+        if not (self.inflate >= 1):
+            raise AssertionError
+        if not (0 < self.alpha < 1):
+            raise AssertionError
         # QMCPy Objs
         self.integrand = integrand
         self.true_measure = self.integrand.true_measure
@@ -265,13 +280,15 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             allowed_distribs=[AbstractLDDiscreteDistribution],
             allow_vectorized_integrals=True,
         )
-        assert (
+        if not (
             self.integrand.discrete_distrib.replications > 1
-        ), "Require the discrete distribution has replications>1"
-        assert (
+        ):
+            raise AssertionError("Require the discrete distribution has replications>1")
+        if not (
             self.integrand.discrete_distrib.randomize != "FALSE"
-        ), "Require discrete distribution is randomized"
-        self.alphas_indv, identity_dependency = self._compute_indv_alphas(
+        ):
+            raise AssertionError("Require discrete distribution is randomized")
+        self.alphas_indv, _ = self._compute_indv_alphas(
             np.full(self.integrand.d_comb, self.alpha)
         )
         self.set_tolerance(abs_tol, rel_tol)
@@ -279,51 +296,61 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             self.alphas_indv / 2, df=self.integrand.discrete_distrib.replications - 1
         )
 
-    def integrate(self):
+    def integrate(self, resume: Union[None, Data] = None) -> tuple:
+        """Determine the samples needed to satisfy the target tolerance.
+
+        Doubles the per-replication sample count each iteration and forms a
+        Student's $t$ confidence interval (`self.t_star`, inflated by
+        `self.inflate`, with degrees of freedom set by
+        `self.discrete_distrib.replications`) on each not-yet-converged
+        output. Stops once every combined output is within tolerance or
+        `self.n_limit` would be exceeded.
+
+        Args:
+            resume (Union[None, Data]): Existing integration state to resume from, if
+                supported. Defaults to None.
+
+        Returns:
+            tuple: Approximation to the integral with shape ``integrand.d_comb``
+                and the corresponding data object.
+        """
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "n_rep",
-                "time_integrate",
-            ]
+        resume_provenance = self._capture_resume_provenance(resume)
+        trace = self._make_trace_logger()
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
         )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n_rep = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((self.discrete_distrib.replications, 0, self.integrand.d))
-        data.yfull = np.empty(
-            self.integrand.d_indv + (self.discrete_distrib.replications, 0)
-        )
-        data._ysums = np.zeros(
-            self.integrand.d_indv + (self.discrete_distrib.replications,), dtype=float
-        )
+        if data is not None:
+            # Reset flags so the tighter tolerance is re-evaluated from existing samples.
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
+            trace.resume(data)
+        else:
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "n_rep", "time_integrate"])
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n_rep = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((self.discrete_distrib.replications, 0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (self.discrete_distrib.replications, 0))
+            data._ysums = np.zeros(self.integrand.d_indv + (self.discrete_distrib.replications,), dtype=float)
+        first_resume_iter = resume is not None
         while True:
-            xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull, xnext], 1)
-            ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            data.n_rep[data.compute_flags] = data.n_max
-            data._ysums[data.compute_flags] += ynext[data.compute_flags].sum(-1)
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
+                data.xfull = np.concatenate([data.xfull, xnext], 1)
+                ynext = self.integrand.f(xnext, compute_flags=data.compute_flags)
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+                data.n_rep[data.compute_flags] = data.n_max
+                data._ysums[data.compute_flags] += ynext[data.compute_flags].sum(-1)
             data.muhats = data._ysums / data.n_rep[..., None]
             data.solution_indv = data.muhats.mean(-1)
             data.sigmahat = data.muhats.std(-1, ddof=1)
-            data.ci_half_width = (
-                self.t_star
-                * self.inflate
-                * data.sigmahat
-                / np.sqrt(self.discrete_distrib.replications)
-            )
+            data.ci_half_width = self.t_star * self.inflate * data.sigmahat / np.sqrt(self.discrete_distrib.replications)
             data.indv_bound_low = data.solution_indv - data.ci_half_width
             data.indv_bound_high = data.solution_indv + data.ci_half_width
             data.n = self.discrete_distrib.replications * data.n_rep
@@ -340,16 +367,7 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                 self.rel_tols[fidxs],
             )
             data.solution = np.tile(np.nan, data.comb_bound_low.shape)
-            data.solution[fidxs] = (
-                1
-                / 2
-                * (
-                    slow
-                    + shigh
-                    + self.error_fun(slow, abs_tols, rel_tols)
-                    - self.error_fun(shigh, abs_tols, rel_tols)
-                )
-            )
+            data.solution[fidxs] = 0.5 * (slow + shigh + self.error_fun(slow, abs_tols, rel_tols) - self.error_fun(shigh, abs_tols, rel_tols))
             data.comb_flags = np.tile(False, data.comb_bound_low.shape)
             data.comb_flags[fidxs] = (shigh - slow) <= (
                 self.error_fun(slow, abs_tols, rel_tols)
@@ -357,6 +375,8 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            self._set_elapsed_time(data, time() - t_start, resume_provenance=resume_provenance)
+            trace.iteration(data)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
@@ -364,24 +384,86 @@ class CubQMCRepStudentT(AbstractStoppingCriterion):
                 Already generated %d samples.
                 Trying to generate %d new samples would exceeds n_limit = %d.
                 No more samples will be generated.
-                Note that error tolerances may not be satisfied. """ % (
-                    int(data.n_total),
-                    int(data.n_total),
-                    int(self.n_limit),
-                )
+                Note that error tolerances may not be satisfied. """ % (int(data.n_total), int(data.n_total), int(self.n_limit))
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
+        trace.finalize()
         return data.solution, data
 
-    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
+    def _validate_resume(self, data):
+        self._validate_resume_data(data, required_fields=self._RESUME_REQUIRED_FIELDS)
+        if int(data.stopping_crit.n_init) != int(self.n_init):
+            raise ParameterError("resume data has incompatible n_init.")
+        replications = int(self.discrete_distrib.replications)
+        n_rep_max = int(np.max(np.asarray(data.n_rep)))
+        if not self._is_power_of_two(n_rep_max):
+            raise ParameterError("resume data n_rep must be a power of 2.")
+        if int(data.n_max) != n_rep_max:
+            raise ParameterError("resume data n_max must match max(n_rep).")
+        if n_rep_max < int(self.n_init):
+            raise ParameterError(
+                "resume data must include at least n_init samples per replication."
+            )
+        if data.xfull.shape != (replications, n_rep_max, self.integrand.d):
+            raise ParameterError(
+                "resume data xfull shape must be (%d, %d, %d); got %s."
+                % (replications, n_rep_max, self.integrand.d, data.xfull.shape)
+            )
+        expected_y_shape = self.integrand.d_indv + (replications, n_rep_max)
+        if np.shape(data.yfull) != expected_y_shape:
+            raise ParameterError(
+                "resume data yfull shape must be %s; got %s."
+                % (expected_y_shape, np.shape(data.yfull))
+            )
+        if np.shape(data._ysums) != self.integrand.d_indv + (replications,):
+            raise ParameterError(
+                "resume data _ysums shape must be %s; got %s."
+                % (self.integrand.d_indv + (replications,), np.shape(data._ysums))
+            )
+        if np.shape(data.n) != self.integrand.d_indv:
+            raise ParameterError("resume data n shape must match integrand.d_indv.")
+        if np.shape(data.n_rep) != self.integrand.d_indv:
+            raise ParameterError(
+                "resume data n_rep shape must match integrand.d_indv."
+            )
+        if not np.array_equal(
+            np.asarray(data.n), replications * np.asarray(data.n_rep)
+        ):
+            raise ParameterError(
+                "resume data n must equal replications * n_rep componentwise."
+            )
+        if int(data.n_total) != replications * n_rep_max:
+            raise ParameterError(
+                "resume data n_total must equal replications * max(n_rep)."
+            )
+
+    def _restore_resume_state(self, data):
+        self._restore_resume_rng_state(data)
+        self.true_measure.discrete_distrib = self.discrete_distrib
+        self.integrand.discrete_distrib = self.discrete_distrib
+        self.integrand.true_measure.discrete_distrib = self.discrete_distrib
+
+    def set_tolerance(self, abs_tol: Union[None, float] = None, rel_tol: Union[None, float] = None, rmse_tol: Union[None, float] = None) -> None:
+        """Update the stopping criterion's target tolerance.
+
+        Args:
+            abs_tol (Union[None, float]): Absolute error tolerance, broadcast to
+                `self.abs_tols` with shape `integrand.d_comb`.
+            rel_tol (Union[None, float]): Relative error tolerance, broadcast to
+                `self.rel_tols` with shape `integrand.d_comb`.
+            rmse_tol (Union[None, float]): Unsupported; must be `None`.
+
+        Raises:
+            AssertionError: If `rmse_tol` is supplied.
+        """
+        if not (rmse_tol is None):
+            raise AssertionError("rmse_tol not supported by this stopping criterion.")
         if abs_tol is not None:
             self.abs_tol = abs_tol
             self.abs_tols = np.full(self.integrand.d_comb, self.abs_tol)

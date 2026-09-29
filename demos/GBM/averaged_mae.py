@@ -13,8 +13,8 @@ def _compute_mae(
     sampler: str,
     sweep_type: str,
     replications: int = 5,
-    qp_seed: int = 42,
-    ql_seed: int = 7,
+    qp_seed: int = cf.QMCPY_SEED,
+    ql_seed: int = cf.QUANTLIB_SEED,
 ) -> tuple:
     """
     Compute averaged MAE for a given sweep type (paths or steps).
@@ -115,8 +115,8 @@ def compute_mae_vs_paths(
     method: str,
     sampler: str,
     replications: int = 5,
-    qp_seed: int = 42,
-    ql_seed: int = 7,
+    qp_seed: int = cf.QMCPY_SEED,
+    ql_seed: int = cf.QUANTLIB_SEED,
 ) -> tuple:
     """
     Compute averaged MAE vs number of paths for all samplers.
@@ -143,17 +143,17 @@ def compute_mae_vs_steps(
     method: str,
     sampler: str,
     replications: int = 5,
-    qp_seed: int = 42,
-    ql_seed: int = 7,
+    qp_seed: int = cf.QMCPY_SEED,
+    ql_seed: int = cf.QUANTLIB_SEED,
 ) -> tuple:
     """
     Compute averaged MAE vs number of time steps for all samplers.
 
     This computes the Mean Absolute Error (MAE) of the MEAN ESTIMATOR, defined as:
         MAE = E[|mean(paths) - theoretical_mean|]
-    where the expectation is taken over replications. This measures how the
-    discretization error (number of time steps) affects the accuracy of the
-    Monte Carlo mean estimator.
+    where the expectation is taken over replications. With exact GBM evolution,
+    changing the number of time steps changes the sampling dimension and path
+    construction, not a time-discretization error.
 
     Args:
         method: Either "QMCPy" or "QuantLib"
@@ -197,15 +197,16 @@ def _plot_mae(sweep_type: str, replications: int = 5) -> None:
 
         colors = styling["colors"][method]
         markers = styling["markers"][method]
+        line_style = styling["lines"][method]
 
         ax.loglog(
             x_vals,
             mean_errors,
             marker=markers.get(sampler),
             color=colors.get(sampler),
-            linewidth=2,
             markersize=6,
             label=f"{method} - {sampler}",
+            **line_style,
         )
 
     ax.xaxis.set_major_locator(FixedLocator(x_vals))
@@ -227,7 +228,7 @@ def _plot_mae(sweep_type: str, replications: int = 5) -> None:
             fontweight="bold",
         )
 
-    ax.set_ylabel("Mean Absolute Error", fontsize=12, fontweight="bold")
+    ax.set_ylabel("MAE", fontsize=12, fontweight="bold")
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=10)
 
@@ -253,8 +254,8 @@ def plot_mae_vs_steps(replications: int = 5) -> None:
     Plot averaged MAE vs number of time steps for all samplers.
 
     Visualizes how the Mean Absolute Error of the mean estimator changes
-    with the number of discretization time steps, comparing different
-    sampling methods from both QMCPy and QuantLib.
+    with the sampling dimension and path construction, comparing different
+    time-grid sizes and sampling methods from both QMCPy and QuantLib.
 
     Args:
         replications: Number of independent replications to average over (default: 5)
@@ -278,10 +279,9 @@ def update_sweep_df(df: pd.DataFrame, replications: int = 5) -> pd.DataFrame:
     """
     df = df.copy()
 
-    # Get sampler configurations
-    exp_cfg = cf.get_experiment_configurations()
-    ql_samplers = cf.get_sampler_configurations()["quantlib_samplers"]
-    qp_samplers = cf.get_sampler_configurations()["all_samplers"]
+    sampler_cfg = cf.get_sampler_configurations()
+    ql_samplers = sampler_cfg["quantlib_samplers"]
+    qp_samplers = sampler_cfg["all_samplers"]
 
     # Compute MAE for all (method, sampler) pairs
     mae_vals = {}

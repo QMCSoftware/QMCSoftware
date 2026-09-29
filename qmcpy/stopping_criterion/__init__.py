@@ -15,24 +15,29 @@ from .cub_mc_clt_vec import CubMCCLTVec
 try:
     import torch
     import gpytorch
-    from .pf_gp_ci import PFGPCI, PFSampleErrorDensityAR, SuggesterSimple
+    from .pf_gp_ci import (
+        PFGPCI,
+        PFSampleErrorDensityAR,
+        SuggesterSimple,
+    )
 except ImportError:
 
     class PFGPCI(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ModuleNotFoundError(
                 "PFGPCI requires torch and gpytorch but no installations found"
             )
 
     class PFSampleErrorDensityAR(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
-                "PFSampleErrorDensityAR requires torch and gpytorch but no installations found"
+            raise ModuleNotFoundError(
+                "PFSampleErrorDensityAR requires torch and gpytorch but no "
+                "installations found"
             )
 
     class SuggesterSimple(object):
         def __init__(self, *args, **kwargs):
-            raise Exception(
+            raise ModuleNotFoundError(
                 "SuggesterSimple requires torch and gpytorch but no installations found"
             )
 

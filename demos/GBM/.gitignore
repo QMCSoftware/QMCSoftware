@@ -12,4 +12,4 @@ sc_*.
 * copy*
 .DS_Store
 __pycache__/
-*/*.png
+images/*.png

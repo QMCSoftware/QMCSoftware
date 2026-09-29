@@ -1,0 +1,150 @@
+# Good Practices for Contributors
+
+This page collects the shared contribution expectations that help QMCPy stay scientifically correct, reproducible, and reviewable. Use it together with the [contributing guide](https://qmcsoftware.github.io/QMCSoftware/CONTRIBUTING/), which covers repository workflow and local setup, plus the [AI-assisted contributions policy](ai-assisted-contributions.md), the [test targets guide](tests.md), and the [notebook test guide](booktests.md).
+
+## Start from an Issue and Keep the Scope Clear
+
+- Connect every bug fix, feature, refactor, or documentation update to an issue.
+- Keep each pull request focused on one topic so reviewers can reason about the mathematical and API impact.
+- For architectural or mathematically subtle changes, open a draft PR early and schedule a review meeting before merge.
+
+## Tests Are Required
+
+We expect tests for every change that affects behavior, documentation, or user workflows.
+
+### Cover the Changed Behavior
+
+- Add or update **unit tests** in `test/` for new logic, bug fixes, edge cases, invalid inputs, shapes, finite outputs, and meaningful invariants.
+- Add or update **doctests** when public docstrings, examples, or usage patterns change.
+- Add or update **notebook tests** when a demo or blog notebook changes.
+
+### Keep Tests Stable and Meaningful
+
+- Use deterministic seeds or deterministic generators in tests and examples.
+- Keep tests small enough to run locally and in CI.
+- When speeding up or stabilizing tests, keep tolerances, sample sizes, and expected outputs strong enough to catch real regressions. If you relax a check, explain why the weaker threshold is still meaningful.
+- Match the existing test style in the file and use the repository's assertion helpers or test framework methods consistently.
+
+Run the smallest relevant checks before requesting review; see the contributing guide and test guides for the exact commands.
+
+When notebook-backed content changes:
+
+- Use the notebook-focused checks for `demos/` and blog content.
+- Keep executable Python snippets under `docs/` runnable as well.
+- If one notebook cell is unusually slow, prefer skipping that cell or reducing the workload rather than skipping the entire notebook test.
+
+## Write Google-Style Docstrings
+
+QMCPy documentation is built from docstrings, so public APIs should document their behavior clearly and consistently.
+
+- Use **Google-style docstrings** for public classes, methods, and functions.
+- Start every docstring with a one-line summary before any section header.
+- Document every parameter and return value, plus shapes, assumptions, and any stochastic behavior. Constructor arguments go in the `__init__` method's own docstring, with the type in the docstring (`name (type): ...`).
+- Put a blank line before every section header (`Args:`, `Returns:`, `Raises:`, `Examples:`, ...) and write the header as `Name:` — not a NumPy-style `Name` followed by an `-----` underline.
+- Include short doctestable examples when they clarify expected use.
+- Update docstrings at the same time as the implementation so the rendered API docs do not drift from the code.
+
+`make check_docstring` runs two checks over public objects under `qmcpy/`:
+
+- `scripts/check_docstring.py` for **formatting** — a one-line summary before the first section (`missing-summary`), no NumPy-style sections, a blank line before every section header, canonical `Name:` headers, and public objects with no docstring. After the overall count it prints a second summary restricted to files changed relative to `DOCSTRING_BASE` (default `develop`), so you can see your branch's contribution to the backlog.
+- `pydoclint` (configured in `pyproject.toml` under `[tool.pydoclint]`) for **content** — every parameter and return value is documented and matches the signature, in Google form.
+
+It is informational by default; `STRICT=--strict make check_docstring` makes both parts fail the build. Pass `CHECK_DOCSTRING_ARGS=--skip-missing` to skip the "no docstring" formatting check, or `DOCSTRING_PATH=qmcpy/true_measure` to narrow the scan. `make check_docstring_changed` runs the same two checks on just the `qmcpy/*.py` files that changed relative to `DOCSTRING_BASE` — the quick check to run before opening a PR (it is also part of `make check`).
+
+For annotated public APIs, `make add_docstring_arg_types` inserts missing Google-style argument types into existing `Args:` entries from the function signature. For example, `distance: float` becomes `distance (float): ...` in the docstring. Use `DOCSTRING_TYPE_PATH=path/to/file.py` to narrow the scan, or run `make add_docstring_arg_types_changed` to apply it only to Python files reported by `git diff --name-only develop -- '*.py'`. Use `DOCSTRING_TYPE_DIFF_BASE=origin/develop` to compare against a different base, and use `make check_docstring_arg_types_changed` to fail when changed files still need annotation-derived updates. The helper does not infer types for unannotated functions and does not invent missing scientific argument descriptions.
+
+For changed public APIs, `make annotate_public_api_types_changed` performs the reverse operation conservatively: it copies explicit, valid Google `Args:` and `Returns:` types into missing function annotations and adds `-> None` to constructors. It never replaces an existing annotation. Types that are prose, use syntax unsafe for Python 3.9, or reference names not already available in the module are reported and skipped. Then `make sync_docstring_types_changed` copies the resulting signature annotations back into existing `Args:`, `Returns:`, and `Yields:` descriptions. Run the annotation target before the synchronization target, review the complete diff, and run `make check_public_api_types_changed` for a non-mutating consistency check. All three targets default to files under `qmcpy/` changed relative to `develop`; override this with `PUBLIC_API_TYPE_PATH` or `PUBLIC_API_TYPE_DIFF_BASE`.
+
+These helpers synchronize explicit type information; they do not infer a scientific API contract from default values, implementation expressions, or one observed runtime type. They also do not invent missing docstring descriptions or sections. Resolve every reported conflict manually, especially scalar-versus-array inputs, optional values, shape conventions, and abstract interfaces.
+
+There is intentionally no full third-party docstring reformatter in the Makefile. `format-docstring` was evaluated and rejected: on this codebase it strips `Returns:`/`Yields:` types and rewrites `**References:**` to `**References: **`. If wrapping/whitespace normalization is ever wanted, prefer a tool that leaves section structure and type hints untouched (for example `docformatter` or `pydocstringformatter`), and still review the diff.
+
+### Citing sources: IEEE style
+
+Any `References:` section (in a docstring, a `.md` file, or a demo notebook) should use **IEEE style**: numbered brackets in the order each source is first cited, not Chicago/APA-style `(Author, Year)` parenthetical citations.
+
+- **Inline**: `[1]`, `[2]`, ... in the order they are first cited — not alphabetical, not by year.
+- **Bibliography entry**: `[N] A. Author, B. Author, "Title," *Journal*, vol. X, no. Y, pp. Z–Z, Year.` (adapt the template for a book, report, or URL as needed, but keep the leading `[N]` marker and the year.)
+- Number entries sequentially starting at `[1]`; do not reuse `1.` for every entry or renumber a list that starts mid-sequence.
+
+`make check_ref_style` scans `qmcpy/**/*.py` docstrings, `*.md` files, and `demos/**/*.ipynb` notebooks for `References` sections and flags: a docstring header written as `References`/`**References**` instead of the canonical `References:`; an entry numbered some other way (`$[N]$`, `N.`, an unnumbered bullet, an HTML anchor); numbering that is not exactly `1, 2, 3, ...` in order; and an entry with no year at all. It is informational by default; `STRICT=--strict make check_ref_style` fails the build. `make fix_ref_style` applies only the two fixes that are unambiguous and purely mechanical — the docstring header's missing colon, and stripping a `$[N]$` LaTeX wrapper down to `[N]` — everything else it reports is left for a human, since rewriting free-text author/title/venue text automatically risks silently mangling content or breaking a cross-reference elsewhere in the same document. `paper/paper.md` and `*.bib` files are out of scope: that paper is built by Pandoc from BibTeX keys under its own citation-style template, a different (and already-correct) mechanism.
+
+## Extend the Existing Object Model
+
+New functionality should fit the existing QMCPy class hierarchy instead of introducing parallel designs without discussion.
+
+- Inherit from the closest existing QMCPy abstract or base class rather than directly from `object`.
+- Reuse established interfaces and field names where possible.
+- Typical extension points include `DiscreteDistribution`, `TrueMeasure`, `Integrand`, `StoppingCriterion`, and `AccumulateData`.
+- If a change does not fit the current hierarchy, raise that design question in an issue or draft PR before committing to a new abstraction.
+
+The [components overview](components.md) and the QMCSoftware blog post on [object classes in QMCPy](https://qmcsoftware.org/blogs/visualizing-the-internals-of-object-classes-in-qmcpy/) provide useful background on the current architecture.
+
+## Validate Links, Metadata, and CI Scope
+
+Several reviews focused on avoidable cleanup that is easy to catch before requesting review.
+
+### Links, Names, and Metadata
+
+- Verify external URLs, raw data links, and referenced file paths before opening a PR.
+- When a PR deletes or moves an already-published page, keep its URL alive with a `redirect_maps` entry under the `redirects` plugin in `mkdocs.yml`. Deleting a page deletes its links too, so only `make check_removed_urls` (deployed `sitemap.xml` vs current `docs/` sources) catches this, not `make check_links`.
+- Keep public names exact across code, docs, nav labels, notebooks, PR titles, and data files, especially for package names, publication years, and schema keys.
+- Use concrete metadata values when possible. For example, prefer specific supported languages over vague labels such as "Multiple".
+
+### Build Pipeline and Generated Artifacts
+
+- Avoid committing generated outputs, copied raw data, or other bulky artifacts when a source URL or regeneration step is sufficient.
+- Keep CI and dependency changes as narrow as possible, and explain in the PR description why each new extra, workflow step, or version pin is needed.
+- If you add generated documentation, data-driven tables, or helper scripts, keep the source files, generator, committed outputs, and docs build pipeline in sync. If regeneration is manual, document the exact command and commit the refreshed output together with the source change.
+
+### Docs and Assets
+
+- If you add custom HTML or CSS to the docs, verify that it renders correctly in both Material light and dark themes and on narrow screens without depending on missing third-party assets.
+- Prefer shell-friendly filenames without spaces for assets that may be referenced from scripts, CI, or command lines.
+- For large binary artifacts such as slides, prefer reproducible source materials plus a short README, and use Git LFS or external hosting when normal git history would become heavy.
+- In docs, prefer unambiguous wording and stable statuses over tentative or ambiguous phrases.
+
+### Code Hygiene
+
+- Remove unused imports, trailing whitespace, and other style-only churn before requesting review.
+- Use explicit runtime exceptions such as `ParameterError` for invalid user inputs instead of relying on `assert` statements in production code.
+
+For a mechanical first pass, `make check_asserts_changed` reports standalone assertions in production Python files changed relative to `ASSERT_DIFF_BASE` (default `develop`) and returns nonzero when conversions are available. `make convert_asserts_changed` uses the open-source [LibCST](https://libcst.readthedocs.io/) codemod library to convert those assertions to explicit `AssertionError` raises while preserving comments and formatting. Use `make convert_asserts ASSERT_PATH=path/to/file.py` for a specific file or directory; `make check_asserts` runs the same read-only check across the whole `ASSERT_PATH` tree, for a full pass instead of just changed files.
+
+`AssertionError` is the conservative default because it preserves the original exception class and message while making validation active under `python -O`. For a reviewed set of input checks, a developer may select an exception already imported by every target file, for example `make convert_asserts ASSERT_PATH=path/to/file.py ASSERT_EXCEPTION=ParameterError`. The tool does not infer whether a condition represents invalid input, a dimension mismatch, or an internal invariant; choose `ParameterError`, `DimensionError`, `ValueError`, or another public exception only after reviewing the API contract. Assertions sharing a semicolon-delimited line with another statement, or appearing in a one-line compound suite such as `if condition: assert invariant`, are reported but skipped. Always inspect the complete diff and run the focused tests after conversion.
+
+## Add Demos or Blogs as Notebooks
+
+User-facing methods, new workflows, and mathematically important additions should usually come with an executable notebook.
+- Put demos and tutorials in `.ipynb` files under `demos/`.
+- If a contribution is best explained as a blog post, keep the blog content backed by a notebook when practical.
+- Keep notebooks lightweight, deterministic, and suitable for docs rendering and CI.
+- Include the mathematical rationale, key assumptions, validation evidence, and a minimal example.
+
+## Requesting Review
+
+Request review when the contribution is ready for technical evaluation, not while core pieces are still missing.
+
+- Open a **draft PR** if you want early feedback on design, mathematics, or scope.
+- Request formal review only after the relevant tests pass locally and the required docstrings, docs, and notebooks are in place.
+- If AI tools substantively affected the change, disclose that use in the PR description and summarize what you independently verified.
+- Summarize the numerical goal, API impact, issue link, and commands you ran in the PR description.
+- If you changed CI, dependency pins, notebook runtime, or external data references, explain that scope explicitly in the PR description.
+- Call out any remaining risks, approximations, or open questions explicitly.
+- For complex mathematical changes, ask for a review meeting in addition to GitHub review comments.
+
+## Requesting Re-Review
+
+Re-request review when you have addressed prior comments and the branch is ready for another pass.
+
+- After substantial updates, post a short summary of what changed since the last review.
+- Re-run the relevant tests after addressing review feedback, especially if behavior or interfaces changed.
+- Re-request review from the same reviewers when their previous concerns have been addressed.
+- If new commits materially change the design or numerical behavior, mention that directly so reviewers know to re-check the affected areas.
+
+## Before Merge
+
+- Ensure required reviews are complete.
+- Ensure CI is green for the relevant jobs.
+- Make sure docs, tests, and notebooks changed together when the contribution changed public behavior.
+- Delete the feature branch after a successful merge.

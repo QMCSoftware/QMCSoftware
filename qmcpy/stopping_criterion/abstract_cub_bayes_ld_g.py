@@ -1,17 +1,34 @@
+from typing import Union
 from .abstract_stopping_criterion import AbstractStoppingCriterion
 from ..util.data import Data
 
-from ..util import MaxSamplesWarning, ParameterError, ParameterWarning, CubatureWarning
+from ..util import MaxSamplesWarning, ParameterError, ParameterWarning
 import numpy as np
 from time import time
 import warnings
 from scipy.optimize import fminbound as fminbnd
-from scipy.optimize import fmin, fmin_bfgs
+from scipy.optimize import fmin
 from scipy.stats import norm as gaussnorm
 from scipy.stats import t as tnorm
 
 
 class AbstractCubBayesLDG(AbstractStoppingCriterion):
+    """Abstract base class for guaranteed Bayesian low-discrepancy QMC stopping criteria.
+
+    Implements the fast-transform Bayesian cubature error bound shared by
+    concrete lattice/digital-net Bayesian stopping criteria: doubling sample
+    counts each iteration, maintaining the running transform coefficients
+    (`_ytildefull`), and fitting the kernel hyperparameter
+    (`objective_function`, `_stopping_criterion`) to derive a
+    credible-interval error bound.
+    """
+
+    order: int
+
+    _RESUME_REQUIRED_FIELDS = (
+        "solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n", "n_max", "xfull", "yfull"
+    )
+    _RESUME_STATE_FIELDS = ("_ytildefull",)
 
     def __init__(
         self,
@@ -28,7 +45,7 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         alpha,
         error_fun,
         errbd_type,
-    ):
+    ) -> None:
         self.parameters = ["abs_tol", "rel_tol", "n_init", "n_limit", "order"]
         # Input Checks
         if np.log2(n_init) % 1 != 0:
@@ -44,19 +61,11 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         # Set Attributes
         self.n_init = int(n_init)
         self.n_limit = int(n_limit)
-        assert isinstance(error_fun, str) or callable(error_fun)
-        if isinstance(error_fun, str):
-            if error_fun.upper() == "EITHER":
-                error_fun = lambda sv, abs_tol, rel_tol: np.maximum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            elif error_fun.upper() == "BOTH":
-                error_fun = lambda sv, abs_tol, rel_tol: np.minimum(
-                    abs_tol, abs(sv) * rel_tol
-                )
-            else:
-                raise ParameterError("str error_fun must be 'EITHER' or 'BOTH'")
-        self.error_fun = error_fun
+        if not (isinstance(error_fun, str) or callable(error_fun)):
+            raise AssertionError
+        # _error_fun_key stores a simple, serializable string and ensures correct state saving
+        # in __getstate__(), bypassing serialization of complex lambda functions, which often fails.
+        self.error_fun, self._error_fun_key = self._resolve_error_fun(error_fun)
         self.alpha = alpha
         # QMCPy Objs
         self.integrand = integrand
@@ -65,13 +74,15 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         super(AbstractCubBayesLDG, self).__init__(
             allowed_distribs=allowed_distribs, allow_vectorized_integrals=True
         )
-        assert (
+        if not (
             self.integrand.discrete_distrib.no_replications == True
-        ), "Require the discrete distribution has replications=None"
-        assert (
+        ):
+            raise AssertionError("Require the discrete distribution has replications=None")
+        if not (
             self.integrand.discrete_distrib.randomize != "FALSE"
-        ), "Require discrete distribution is randomized"
-        self.alphas_indv, identity_dependency = self._compute_indv_alphas(
+        ):
+            raise AssertionError("Require discrete distribution is randomized")
+        self.alphas_indv, _ = self._compute_indv_alphas(
             np.full(self.integrand.d_comb, self.alpha)
         )
         self.set_tolerance(abs_tol, rel_tol)
@@ -84,7 +95,8 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         self.use_gradient = False  # If true uses gradient descent in parameter search
         self.one_theta = True  # If true use common shape parameter for all dimensions, else allow shape parameter vary across dimensions
         self.errbd_type = errbd_type.upper()
-        assert self.errbd_type in ["MLE", "GCV", "FULL"]
+        if not (self.errbd_type in ["MLE", "GCV", "FULL"]):
+            raise AssertionError
         self.kernel = kernel
         self.debugEnable = True
         self.ft = ft
@@ -176,10 +188,38 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         muhat = np.abs(muhat)
         return muhat, err_bd
 
-    # objective function to estimate parameter theta
-    # MLE : Maximum likelihood estimation
-    # GCV : Generalized cross validation
-    def objective_function(self, theta, xun, ftilde):
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # error_fun is a local lambda when constructed from a string keyword.
+        # Replace with the canonical string form so it can be reconstructed.
+        if self._error_fun_key is not None:
+            state['error_fun'] = self._error_fun_key
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Rebuild error_fun from its string key if present.
+        if isinstance(self.error_fun, str):
+            self.error_fun, _ = self._resolve_error_fun(self.error_fun)
+
+    def objective_function(self, theta: float, xun: np.ndarray, ftilde: np.ndarray) -> float:
+        """Compute the Bayesian cubature loss used to fit the kernel parameter theta.
+
+        Evaluates either the negative log marginal likelihood (MLE) or the
+        generalized cross validation (GCV) loss, per `self.errbd_type`, along
+        with the kernel eigenvalues and RKHS norm needed by the error bound.
+
+        Args:
+            theta (float): Kernel hyperparameter to evaluate the loss at.
+            xun (np.ndarray): Unique ordered node locations.
+            ftilde (np.ndarray): Fast-transformed function values at `xun`.
+
+        Returns:
+            float: Loss value (MLE or GCV, per `self.errbd_type`).
+            np.ndarray: Kernel eigenvalues `vec_lambda`.
+            np.ndarray: Ring eigenvalues `vec_lambda_ring`, used by the error bound.
+            float: RKHS norm estimate of the fitted function.
+        """
         n = len(ftilde)
         fudge = 100 * np.finfo(float).eps
         # if type(theta) != np.ndarray:
@@ -241,10 +281,22 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         )
         return loss, vec_lambda, vec_lambda_ring, RKHS_norm
 
-    # Computes modified kernel Km1 = K - 1
-    # Useful to avoid cancellation error in the computation of (1 - n/\lambda_1)
     @staticmethod
-    def kernel_t(aconst, Bern):
+    def kernel_t(aconst: Union[float, np.ndarray], Bern: np.ndarray) -> np.ndarray:
+        r"""Compute the modified kernel ``Km1 = K - 1`` from Bernoulli polynomial values.
+
+        Working with ``Km1`` rather than ``K`` directly avoids cancellation
+        error when later computing $1 - n/\lambda_1$.
+
+        Args:
+            aconst (Union[float, np.ndarray]): Kernel parameter theta, scalar
+                or per-dimension array.
+            Bern (np.ndarray): Bernoulli polynomial values, shape ``(n, d)``.
+
+        Returns:
+            np.ndarray: ``Km1``, the kernel minus one.
+            np.ndarray: ``K``, the full kernel (``1 + Km1``).
+        """
         d = np.size(Bern, 1)
         if type(aconst) != np.ndarray:
             theta = np.ones((d, 1)) * aconst
@@ -265,11 +317,16 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
         K = Kj
         return [Km1, K]
 
-    # prints debug message if the given variable is Inf, Nan or complex, etc
-    # Example: alertMsg(x, 'Inf', 'Imag')
-    #          prints if variable 'x' is either Infinite or Imaginary
     @staticmethod
-    def alert_msg(*args):
+    def alert_msg(*args: tuple):
+        """Print a debug message if a variable contains NaN, Inf, or complex values.
+
+        Args:
+            *args (tuple): The variable to check, followed by one or more of
+                ``"Nan"``, ``"Inf"``, ``"Imag"`` naming which conditions to
+                report. Example: `alert_msg(x, "Inf", "Imag")` prints if `x`
+                contains infinite or imaginary values.
+        """
         varargin = args
         nargin = len(varargin)
         if nargin > 1:
@@ -294,44 +351,66 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
                 else:
                     print("unknown type check requested !")
 
-    def integrate(self):
+    def integrate(self, resume: Union[None, Data] = None) -> tuple:
+        """Determine the samples needed to satisfy the target tolerance.
+
+        Doubles the sample count each iteration, updates the running fast
+        transform (`_ytildefull`), and for each not-yet-converged output
+        calls `_stopping_criterion` to fit the Bayesian kernel hyperparameter
+        and derive a credible-interval bound on the integral. Stops once
+        every combined output is within tolerance or `self.n_limit` would be
+        exceeded.
+
+        Args:
+            resume (Union[None, Data]): Existing integration state to resume from, if
+                supported. Defaults to None.
+
+        Returns:
+            tuple: Approximation to the integral with shape ``integrand.d_comb``
+                and the corresponding data object.
+        """
         t_start = time()
-        data = Data(
-            parameters=[
-                "solution",
-                "comb_bound_low",
-                "comb_bound_high",
-                "comb_bound_diff",
-                "comb_flags",
-                "n_total",
-                "n",
-                "time_integrate",
-            ]
+        resume_provenance = self._capture_resume_provenance(resume)
+        first_resume_iter = False
+        trace = self._make_trace_logger()
+        data = self._prepare_resume_data(
+            resume, self._validate_resume, self._restore_resume_state
         )
-        data.flags_indv = np.tile(False, self.integrand.d_indv)
-        data.compute_flags = np.tile(True, self.integrand.d_indv)
-        data.n = np.tile(self.n_init, self.integrand.d_indv)
-        data.n_min = 0
-        data.n_max = self.n_init
-        data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
-        data.xfull = np.empty((0, self.integrand.d))
-        data.yfull = np.empty(self.integrand.d_indv + (0,))
-        data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
-        data.muhat = np.tile(np.nan, self.integrand.d_indv)
+        if data is not None:
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n_min = int(data.n_total)
+            ytildefull = data._ytildefull
+            first_resume_iter = True
+            self._set_elapsed_time(data, 0.0, resume_provenance=resume_provenance)
+            trace.resume(data, step_value=int(np.log2(max(1, int(data.n_total)))))
+        else:
+            data = Data(parameters=["solution", "comb_bound_low", "comb_bound_high", "comb_bound_diff", "comb_flags", "n_total", "n", "time_integrate"])
+            data.flags_indv = np.tile(False, self.integrand.d_indv)
+            data.compute_flags = np.tile(True, self.integrand.d_indv)
+            data.n = np.tile(self.n_init, self.integrand.d_indv)
+            data.n_min = 0
+            data.n_max = self.n_init
+            data.solution_indv = np.tile(np.nan, self.integrand.d_indv)
+            data.xfull = np.empty((0, self.integrand.d))
+            data.yfull = np.empty(self.integrand.d_indv + (0,))
+            data.bounds_half_width = np.tile(np.inf, self.integrand.d_indv)
+            data.muhat = np.tile(np.nan, self.integrand.d_indv)
         while True:
             m = int(np.log2(data.n_max))
-            xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
-            data.xfull = np.concatenate([data.xfull, xnext], 0)
-            ynext = self.integrand.f(
-                xnext,
-                periodization_transform=self.ptransform,
-                compute_flags=data.compute_flags,
-            )
-            ynext[~data.compute_flags] = np.nan
-            data.yfull = np.concatenate([data.yfull, ynext], -1)
-            if data.n_min == 0:  # first iteration
+            if not first_resume_iter:
+                xnext = self.discrete_distrib(n_min=data.n_min, n_max=data.n_max)
+                data.xfull = np.concatenate([data.xfull, xnext], 0)
+                ynext = self.integrand.f(
+                    xnext,
+                    periodization_transform=self.ptransform,
+                    compute_flags=data.compute_flags,
+                )
+                ynext[~data.compute_flags] = np.nan
+                data.yfull = np.concatenate([data.yfull, ynext], -1)
+            if not first_resume_iter and data.n_min == 0:  # first fresh iteration
                 ytildefull = self.ft(ynext) / np.sqrt(2**m)
-            else:  # any iteration after the first
+            elif not first_resume_iter:  # any iteration after the first
                 mnext = int(m - 1)
                 ytildeomega = (
                     self.omega(mnext)
@@ -385,6 +464,10 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
             )
             data.flags_indv = self.integrand.dependency(data.comb_flags)
             data.compute_flags = ~data.flags_indv
+            # Save transform state so this computation can be resumed later.
+            data._ytildefull = ytildefull
+            self._set_elapsed_time(data, time() - t_start, resume_provenance=resume_provenance)
+            trace.iteration(data, step_value=m)
             if np.sum(data.compute_flags) == 0:
                 break  # sufficiently estimated
             elif 2 * data.n_total > self.n_limit:
@@ -399,17 +482,49 @@ class AbstractCubBayesLDG(AbstractStoppingCriterion):
                 )
                 warnings.warn(warning_s, MaxSamplesWarning)
                 break
+            first_resume_iter = False
             data.n_min = data.n_max
             data.n_max = 2 * data.n_min
-        data.stopping_crit = self
-        data.integrand = self.integrand
-        data.true_measure = self.integrand.true_measure
-        data.discrete_distrib = self.true_measure.discrete_distrib
-        data.time_integrate = time() - t_start
+        self._finalize_integration_data(
+            data, time() - t_start, resume_provenance=resume_provenance
+        )
+        trace.finalize()
         return data.solution, data
 
-    def set_tolerance(self, abs_tol=None, rel_tol=None, rmse_tol=None):
-        assert rmse_tol is None, "rmse_tol not supported by this stopping criterion."
+    def _validate_resume(self, data):
+        self._validate_resume_with_state(
+            data,
+            required_fields=self._RESUME_REQUIRED_FIELDS,
+            state_fields=self._RESUME_STATE_FIELDS,
+        )
+        n_total = int(data.n_total)
+        output_shape = self.integrand.d_indv + (n_total,)
+        self._validate_resume_shape("xfull", data.xfull, (n_total, self.integrand.d))
+        self._validate_resume_shape("yfull", data.yfull, output_shape)
+        self._validate_resume_shape("_ytildefull", data._ytildefull, output_shape)
+        self._validate_resume_shape("n", data.n, self.integrand.d_indv)
+        if int(np.max(np.asarray(data.n))) != n_total:
+            raise ParameterError("resume data n must be consistent with n_total.")
+        if int(data.n_max) != n_total:
+            raise ParameterError("resume data n_total must match n_max.")
+        if not self._is_power_of_two(n_total):
+            raise ParameterError("resume data n_total must be a power of 2.")
+
+    def set_tolerance(self, abs_tol: Union[None, float] = None, rel_tol: Union[None, float] = None, rmse_tol: Union[None, float] = None) -> None:
+        """Update the stopping criterion's target tolerance.
+
+        Args:
+            abs_tol (Union[None, float]): Absolute error tolerance, broadcast to
+                `self.abs_tols` with shape `integrand.d_comb`.
+            rel_tol (Union[None, float]): Relative error tolerance, broadcast to
+                `self.rel_tols` with shape `integrand.d_comb`.
+            rmse_tol (Union[None, float]): Unsupported; must be `None`.
+
+        Raises:
+            AssertionError: If `rmse_tol` is supplied.
+        """
+        if not (rmse_tol is None):
+            raise AssertionError("rmse_tol not supported by this stopping criterion.")
         if abs_tol is not None:
             self.abs_tol = abs_tol
             self.abs_tols = np.full(self.integrand.d_comb, self.abs_tol)
