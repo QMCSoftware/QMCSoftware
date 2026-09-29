@@ -1,9 +1,8 @@
 """
 Transformations of points from a unit hypercube onto a simplex.
 
-Implements Drop, Sort, Root, and Mirror as given in [1], and Origami and Shift
-as given in the fuller derivation in Chapter 4 ("Transformations for a
-Simplex") of [2].
+Implements Drop, Sort, Mirror, Origami, Root, and Shift as described in [1],
+with fuller derivations in Chapter 4 ("Transformations for a Simplex") of [2].
 
 Authors: Larysa Matiukha and Sou-Cheng T. Choi
 Date: February 6, 2026
@@ -23,13 +22,16 @@ References:
 
 import numpy as np
 
+from ...util import ParameterError
+
 
 class SimplexTransform:
     """
     A class implementing various transformations from the unit cube to a simplex.
     
-    The simplex Ts is defined as:
-    Ts = {(x1, ..., xs) ∈ Rs : 0 ≤ x1 ≤ x2 ≤ ... ≤ xs ≤ 1}
+    This stateless helper transforms supplied points; it does not generate points.
+    The simplex Td is defined as:
+    Td = {(x1, ..., xd) ∈ Rd : 0 ≤ x1 ≤ x2 ≤ ... ≤ xd ≤ 1}
     
     Attributes:
         dimension (int): The dimension of the space
@@ -42,7 +44,31 @@ class SimplexTransform:
         Args:
             dimension (int): The dimension of the space (default: 2)
         """
-        self.dimension = dimension
+        if (
+            isinstance(dimension, bool)
+            or not isinstance(dimension, (int, np.integer))
+            or dimension < 1
+        ):
+            raise ParameterError("dimension must be a positive integer")
+        self.dimension = int(dimension)
+
+    def _validate_points(self, points: np.ndarray) -> np.ndarray:
+        """Return finite cube points with a checked final coordinate axis."""
+        points = np.asarray(points)
+        if points.ndim == 0 or not np.issubdtype(points.dtype, np.number):
+            raise ParameterError(
+                "points must be a numeric array with shape (..., dimension)"
+            )
+        if points.ndim == 1:
+            points = points.reshape(1, -1)
+        if points.shape[-1] != self.dimension:
+            raise ParameterError(
+                f"points must have final dimension {self.dimension}, got {points.shape[-1]}"
+            )
+        points = np.asarray(points, dtype=float)
+        if not np.all(np.isfinite(points)) or np.any((points < 0) | (points > 1)):
+            raise ParameterError("points must contain finite values in [0, 1]")
+        return points
 
     def drop(self, points: np.ndarray) -> np.ndarray:
         """
@@ -52,10 +78,12 @@ class SimplexTransform:
         points is kept in higher dimensions.
         
         Args:
-            points (np.ndarray): Points in the unit cube, shape (N, s)
+            points (np.ndarray): Points in the unit cube, shape (..., d)
             
         Returns:
-            np.ndarray: Points that fall inside the simplex
+            np.ndarray: Points that fall inside the simplex, shape (M, d).
+                Leading batch axes are flattened because each batch may retain a
+                different number of points.
             
         Examples:
             >>> import numpy as np
@@ -66,11 +94,9 @@ class SimplexTransform:
             array([[0.3, 0.7]])
         """
         # Check if points satisfy x1 ≤ x2 ≤ ... ≤ xs
-        if points.ndim == 1:
-            points = points.reshape(1, -1)
-
-        mask = np.all(points[:, :-1] <= points[:, 1:], axis=1)
-        return points[mask]
+        points = self._validate_points(points)
+        mask = np.all(points[..., :-1] <= points[..., 1:], axis=-1)
+        return points.reshape(-1, self.dimension)[mask.reshape(-1)]
 
     def sort(self, points: np.ndarray) -> np.ndarray:
         """
@@ -81,7 +107,7 @@ class SimplexTransform:
         we obtain a point in the simplex Ts.
         
         Args:
-            points (np.ndarray): Points in the unit cube, shape (N, s)
+            points (np.ndarray): Points in the unit cube, shape (..., d)
             
         Returns:
             np.ndarray: Transformed points in the simplex
@@ -95,27 +121,25 @@ class SimplexTransform:
             array([[0.3, 0.7],
                    [0.4, 0.8]])
         """
-        if points.ndim == 1:
-            points = points.reshape(1, -1)
-
-        return np.sort(points, axis=1)
+        points = self._validate_points(points)
+        return np.sort(points, axis=-1)
 
     def root(self, points: np.ndarray) -> np.ndarray:
         r"""
         Transformation Root: map points via the cumulative distribution function.
 
-        Based on [2], Sec. 4.3.5: a bijective, continuous transformation for
-        any dimension d, with no free parameters.
+        Based on [1], Sec. 2.5, and [2], Sec. 4.3.5: a bijective, continuous
+        transformation for any dimension d, with no free parameters.
         Writing the input as (x1, ..., xd), the output (y1, ..., yd) is
 
             yd := xd ** (1/d)
             y_i := y_{i+1} * x_i ** (1/i)   for i = d-1, ..., 1
 
-        Root is highly non-uniform: points near x_d = 0 get shifted far more
-        than points near x_d = 1.
+        Root has highly nonuniform displacement: points near x_d = 0 move far
+        more than points near x_d = 1.
 
         Args:
-            points (np.ndarray): Points in the unit cube, shape (N, s)
+            points (np.ndarray): Points in the unit cube, shape (..., d)
 
         Returns:
             np.ndarray: Transformed points in the simplex
@@ -128,15 +152,12 @@ class SimplexTransform:
             >>> np.round(transformer.root(np.array([0.5, 0.99])), 3)
             array([[0.497, 0.995]])
         """
-        if points.ndim == 1:
-            points = points.reshape(1, -1)
-
-        points = np.asarray(points, dtype=float)
-        d = points.shape[1]
+        points = self._validate_points(points)
+        d = points.shape[-1]
         y = np.empty_like(points)
-        y[:, d - 1] = points[:, d - 1] ** (1.0 / d)
+        y[..., d - 1] = points[..., d - 1] ** (1.0 / d)
         for i in range(d - 2, -1, -1):
-            y[:, i] = y[:, i + 1] * points[:, i] ** (1.0 / (i + 1))
+            y[..., i] = y[..., i + 1] * points[..., i] ** (1.0 / (i + 1))
         return y
 
     def mirror(self, points: np.ndarray) -> np.ndarray:
@@ -144,13 +165,15 @@ class SimplexTransform:
         Transformation Mirror: keep points already in the simplex fixed and
         reflect every other point into it.
 
-        Based on [2], Sec. 4.3.3. Only dimensions 1-3 are given a closed form
-        there; Mirror is fast but discontinuous, and (unlike Root or Shift)
+        Based on [1], Sec. 2.3, and [2], Sec. 4.3.3. This implementation covers
+        the explicit formulas for dimensions 1-3. Mirror is fast but
+        discontinuous, and (unlike Root or Shift)
         folds half of any point set that is symmetric about its center (e.g. a
         lattice) on top of the other half.
 
         Args:
-            points (np.ndarray): Points in the unit cube, shape (N, s), s in {1, 2, 3}
+            points (np.ndarray): Points in the unit cube, shape (..., d),
+                d in {1, 2, 3}
 
         Returns:
             np.ndarray: Transformed points in the simplex
@@ -166,19 +189,17 @@ class SimplexTransform:
             array([[0.3, 0.7],
                    [0.2, 0.6]])
         """
-        if points.ndim == 1:
-            points = points.reshape(1, -1)
-
-        y = np.array(points, dtype=float, copy=True)
-        d = y.shape[1]
+        y = self._validate_points(points).copy()
+        d = y.shape[-1]
+        flat = y.reshape(-1, d)
         if d == 1:
             return y
         if d == 2:
-            swap = y[:, 0] > y[:, 1]
-            y[swap] = 1.0 - y[swap]
+            swap = flat[:, 0] > flat[:, 1]
+            flat[swap] = 1.0 - flat[swap]
             return y
         if d == 3:
-            x1, x2, x3 = y[:, 0].copy(), y[:, 1].copy(), y[:, 2].copy()
+            x1, x2, x3 = flat[:, 0].copy(), flat[:, 1].copy(), flat[:, 2].copy()
             m = x3 <= x1
             x1[m], x2[m], x3[m] = 1.0 - x1[m], 1.0 - x2[m], 1.0 - x3[m]
             m = x3 <= x2
@@ -186,10 +207,11 @@ class SimplexTransform:
             m = x2 <= x1
             x1_new, x2_new = x3[m] - x1[m], x3[m] - x2[m]
             x1[m], x2[m] = x1_new, x2_new
-            return np.stack([x1, x2, x3], axis=1)
+            flat[...] = np.stack([x1, x2, x3], axis=-1)
+            return y
         raise NotImplementedError(
-            "Transformation Mirror is only given a closed form for dimension 1-3 in "
-            "Pillards & Cools (2005); no general-d formula is given there for d > 3."
+            "Transformation Mirror is implemented only for dimensions 1-3; "
+            "see [1], Sec. 2.3, and [2], Sec. 4.3.3."
         )
 
     def origami(self, points: np.ndarray, base: int = 2, depth: int = 1) -> np.ndarray:
@@ -207,7 +229,7 @@ class SimplexTransform:
         transformation. depth=0 reduces to plain Sort.
 
         Args:
-            points (np.ndarray): Points in the unit cube, shape (N, s)
+            points (np.ndarray): Points in the unit cube, shape (..., d)
             base (int): grid subdivisions per level, b >= 2
             depth (int): number of levels above the base grid, m >= 0
 
@@ -220,15 +242,24 @@ class SimplexTransform:
             >>> transformer.origami(np.array([0.9, 0.3]), base=2, depth=1)
             array([[0.4, 0.8]])
         """
-        if points.ndim == 1:
-            points = points.reshape(1, -1)
-
-        x = np.array(points, dtype=float, copy=True)
+        x = self._validate_points(points).copy()
+        if (
+            isinstance(base, bool)
+            or not isinstance(base, (int, np.integer))
+            or base < 2
+        ):
+            raise ParameterError("base must be an integer greater than or equal to 2")
+        if (
+            isinstance(depth, bool)
+            or not isinstance(depth, (int, np.integer))
+            or depth < 0
+        ):
+            raise ParameterError("depth must be a nonnegative integer")
         b = int(base)
         for n in (b ** k for k in range(depth, -1, -1)):
             cell = np.floor(n * x)
             frac = n * x - cell
-            frac.sort(axis=1)
+            frac.sort(axis=-1)
             x = (cell + frac) / n
         return x
 
@@ -247,7 +278,7 @@ class SimplexTransform:
         elementary intervals more compact than Root does.
 
         Args:
-            points (np.ndarray): Points in the unit cube, shape (N, s)
+            points (np.ndarray): Points in the unit cube, shape (..., d)
 
         Returns:
             np.ndarray: Transformed points in the simplex
@@ -260,22 +291,18 @@ class SimplexTransform:
             array([[0.15, 0.7 ],
                    [0.6 , 0.8 ]])
         """
-        if points.ndim == 1:
-            points = points.reshape(1, -1)
-
-        points = np.asarray(points, dtype=float)
-        d = points.shape[1]
+        points = self._validate_points(points)
+        d = points.shape[-1]
         if d == 1:
             return points.copy()
 
-        order = np.argsort(points, axis=1)
-        x = np.take_along_axis(points, order, axis=1)
+        order = np.argsort(points, axis=-1)
+        x = np.take_along_axis(points, order, axis=-1)
         for j in range(d - 1):
-            prev = x[:, j - 1] if j >= 1 else 0.0
-            gap = x[:, j] - prev
+            prev = x[..., j - 1] if j >= 1 else 0.0
+            gap = x[..., j] - prev
             coeff = (d - j - 1) / (d - j)
-            x[:, j:] -= (coeff * gap)[:, None]
-        inverse_order = np.argsort(order, axis=1)
-        a = np.take_along_axis(x, inverse_order, axis=1)
-        return np.cumsum(a, axis=1)
-
+            x[..., j:] -= (coeff * gap)[..., None]
+        inverse_order = np.argsort(order, axis=-1)
+        a = np.take_along_axis(x, inverse_order, axis=-1)
+        return np.cumsum(a, axis=-1)
