@@ -465,7 +465,9 @@ class Kronecker(AbstractLDDiscreteDistribution):
             gamma (Union[None, np.ndarray]): Coordinate weights, shape `(d,)`.
 
         Returns:
-            np.ndarray: The discrepancy.
+            np.ndarray: Discrepancies for prefixes 1 through `n`, shape `(n,)`
+                when replications are omitted, or `(g, n)` otherwise, where
+                `g` is the number of generating vectors.
 
         Note:
             - If `k_tilde` is not specified, the second Bernoulli polynomial is used.
@@ -490,7 +492,8 @@ class Kronecker(AbstractLDDiscreteDistribution):
             gamma (Union[None, np.ndarray]): Coordinate weights, shape `(d,)`.
 
         Returns:
-            np.ndarray: The weighted sum of squared discrepancies.
+            np.ndarray: A scalar when replications are omitted, or one value
+                per generating vector otherwise.
         """
         if gamma is None:
             gamma = np.ones(self.d)
@@ -515,7 +518,8 @@ class Kronecker(AbstractLDDiscreteDistribution):
         k_tilde_zero_terms = k_tilde_terms[...,0] * n_array
         summation = np.zeros_like(k_tilde_terms)
         summation[...,1:] = left_sum - right_sum
-        return (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - k_tilde[1]
+        squared = (k_tilde_zero_terms + 2 * summation) / (n_array ** 2) - k_tilde[1]
+        return squared[0] if self.no_replications else squared
 
 
     def _spawn(self, child_seed, dimension):

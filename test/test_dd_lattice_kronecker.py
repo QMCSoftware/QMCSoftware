@@ -138,12 +138,13 @@ class TestLatKron(unittest.TestCase):
         points = (np.arange(n)[:, None] * kronecker.gen_vec[0]) % 1
         sample_weights = np.arange(1, n + 1)
         expected = _direct_disc(points, np.ones(2))
+        default_expected = expected
         actual = kronecker.periodic_discrepancy(n) ** 2
-        self.assertEqual(actual.shape, (1, n))
-        npt.assert_allclose(actual, expected[None], rtol=0, atol=5e-15)
+        self.assertEqual(actual.shape, (n,))
+        npt.assert_allclose(actual, expected, rtol=0, atol=5e-15)
         npt.assert_allclose(
             kronecker.wssd_discrepancy(n, sample_weights),
-            [sample_weights @ expected],
+            sample_weights @ expected,
             rtol=0,
             atol=5e-14,
         )
@@ -157,15 +158,24 @@ class TestLatKron(unittest.TestCase):
             )
             ** 2,
         ):
-            npt.assert_allclose(actual, expected[None], rtol=0, atol=5e-15)
+            self.assertEqual(actual.shape, (n,))
+            npt.assert_allclose(actual, expected, rtol=0, atol=5e-15)
         npt.assert_allclose(
             kronecker.wssd_discrepancy(
                 n, sample_weights=sample_weights, k_tilde=kernel, gamma=coord_weights
             ),
-            [sample_weights @ expected],
+            sample_weights @ expected,
             rtol=0,
             atol=5e-14,
         )
+
+        explicit = Kronecker(
+            2, replications=1, generating_vector="SUZUKI",
+            randomize="SHIFT", shift=[0.1, 0.2]
+        )
+        self.assertEqual(explicit.periodic_discrepancy(n).shape, (1, n))
+        self.assertEqual(explicit.wssd_discrepancy(n, sample_weights).shape, (1,))
+        npt.assert_allclose(explicit.periodic_discrepancy(n) ** 2, default_expected[None], rtol=0, atol=5e-15)
 
     def test_cbc_mt_fallback(self):
         kronecker = Kronecker(3, generating_vector="CBC_MT", randomize=False)
