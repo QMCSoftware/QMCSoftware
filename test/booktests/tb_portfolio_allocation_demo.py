@@ -30,9 +30,9 @@ class NotebookTests(BaseNotebookTest):
         replacements = {
             "(10, 2**15),":"",
             "(20, 2**16),":"",
-            "(20, 2**16),":"",   
+            "(20, 2**16),":"",
             "(100, 2**17),":"",
-            "(500, 2**18),":"",   
+            "(500, 2**18),":"",
             "(1000, 2**19)":"",
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
             "start_date = '2014-01-01'": "start_date = '2019-01-01'",
@@ -43,7 +43,7 @@ class NotebookTests(BaseNotebookTest):
             f'tickers2 = ["AAPL", "AMZN", "CSCO",{old_tick2}]': 'tickers2 = ["AAPL", "AMZN", "CSCO"]',
             f'description2 = ["Apple", "Amazon", "CISCO", {old_desc2}]': 'description2 = ["Apple", "Amazon", "CISCO"]',
         }
-        
+
         self.run_notebook(notebook_path, replacements)
 
 if __name__ == "__main__":
