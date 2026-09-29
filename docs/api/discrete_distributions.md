@@ -61,6 +61,10 @@ jupyter:
 
 ::: qmcpy.discrete_distribution.iid_std_uniform.IIDStdUniform
 
+## `SimplexTransform`
+
+::: qmcpy.discrete_distribution.simplex.simplex.SimplexTransform
+
 ## `MPMC: Message Passing Monte Carlo`
 
 MPMC requires PyTorch and PyTorch Geometric. Install with:
