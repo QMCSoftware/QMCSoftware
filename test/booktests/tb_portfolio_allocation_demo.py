@@ -19,32 +19,16 @@ class NotebookTests(BaseNotebookTest):
             "../../demos/portfolio/portfolio_allocation_demo.ipynb"
         )
 
-        # Define ticker patterns for readability (wildcard: [...] represents variable list items)
-        old_tick1 = '"CSCO", "IBM", "TSLA", "META", "ABNB", "UPS", "NFLX", "MRNA"'
-        old_desc1 = (
-            '"CISCO", "IBM", "Tesla", "Meta", "Airbnb", "UPS", "Netflix", "Moderna"'
-        )
-        old_tick2 = '"IBM","TSLA","META","ABNB","UPS","NFLX","MRNA","^IXIC", "T","GE","FMC","AMC","JPM","DIS","CVX","GOOGL","BA"'
-        old_desc2 = '"IBM","Tesla","Meta","Airbnb","UPS","Netflix","Moderna","NASDAQ","AT&T","General Electric","FMC","AMC","JPMorgan","Disney","Chevron","Google","Boeing"'
-
         replacements = {
-            "(10, 2**15),":"",
-            "(20, 2**16),":"",
-            "(20, 2**16),":"",
-            "(100, 2**17),":"",
-            "(500, 2**18),":"",
-            "(1000, 2**19)":"",
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
-            "start_date = '2014-01-01'": "start_date = '2019-01-01'",
             "dimensions = [5, 10, 20, 50, 100, 200, 500, 1000]": "dimensions = [5, 10]",
+            "range(8, 18)": "range(8, 11)",
+            "fixed_dimension = 50": "fixed_dimension = 10",
             "num_ports = 2**14": "num_ports = 2**5",
-            f'tickers1 = ["AAPL", "AMZN", {old_tick1}]': 'tickers1 = ["AAPL", "AMZN"]',
-            f'description1 = ["Apple", "Amazon", {old_desc1}]': 'description1 = ["Apple", "Amazon"]',
+            'tickers1, description1 = load_assets(f"data/df10_{start_date}_to_{end_date}.csv")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
             # The backtest cell hardcodes n_tickers instead of deriving it from
             # len(tickers1); keep it in sync with the tickers1 shrink above.
             "n_tickers = 10": "n_tickers = 2",
-            f'tickers2 = ["AAPL", "AMZN", "CSCO",{old_tick2}]': 'tickers2 = ["AAPL", "AMZN", "CSCO"]',
-            f'description2 = ["Apple", "Amazon", "CISCO", {old_desc2}]': 'description2 = ["Apple", "Amazon", "CISCO"]',
         }
 
         self.run_notebook(notebook_path, replacements)
