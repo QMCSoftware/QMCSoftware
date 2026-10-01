@@ -25,7 +25,7 @@ import numpy as np
 from ...util import ParameterError
 
 
-class SimplexTransform:
+class _SimplexTransform:
     """
     A class implementing various transformations from the unit cube to a simplex.
     
@@ -39,13 +39,13 @@ class SimplexTransform:
 
     def __init__(self, dimension: int = 2):
         """
-        Initialize the SimplexTransform class.
+        Initialize the _SimplexTransform class.
         
         Args:
             dimension (int): The dimension of the space (default: 2)
 
         Examples:
-            >>> SimplexTransform(dimension=3).dimension
+            >>> _SimplexTransform(dimension=3).dimension
             3
         """
         if (
@@ -91,7 +91,7 @@ class SimplexTransform:
             
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransform(dimension=2)
+            >>> transformer = _SimplexTransform(dimension=2)
             >>> points = np.array([[0.3, 0.7], [0.8, 0.4]])
             >>> result = transformer.drop(points)
             >>> result
@@ -118,7 +118,7 @@ class SimplexTransform:
             
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransform(dimension=2)
+            >>> transformer = _SimplexTransform(dimension=2)
             >>> points = np.array([[0.3, 0.7], [0.8, 0.4]])
             >>> result = transformer.sort(points)
             >>> result
@@ -150,7 +150,7 @@ class SimplexTransform:
 
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransform(dimension=2)
+            >>> transformer = _SimplexTransform(dimension=2)
             >>> transformer.root(np.array([0.5, 0.01]))
             array([[0.05, 0.1 ]])
             >>> np.round(transformer.root(np.array([0.5, 0.99])), 3)
@@ -199,7 +199,7 @@ class SimplexTransform:
 
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransform(dimension=2)
+            >>> transformer = _SimplexTransform(dimension=2)
             >>> points = np.array([[0.3, 0.7], [0.8, 0.4]])
             >>> transformer.mirror(points)
             array([[0.3, 0.7],
@@ -254,7 +254,7 @@ class SimplexTransform:
 
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransform(dimension=2)
+            >>> transformer = _SimplexTransform(dimension=2)
             >>> transformer.origami(np.array([0.9, 0.3]), base=2, depth=1)
             array([[0.4, 0.8]])
         """
@@ -306,7 +306,7 @@ class SimplexTransform:
 
         Examples:
             >>> import numpy as np
-            >>> transformer = SimplexTransform(dimension=2)
+            >>> transformer = _SimplexTransform(dimension=2)
             >>> points = np.array([[0.3, 0.7], [0.8, 0.4]])
             >>> transformer.shift(points)
             array([[0.15, 0.7 ],

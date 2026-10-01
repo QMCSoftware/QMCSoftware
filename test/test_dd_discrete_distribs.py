@@ -6,8 +6,8 @@ from qmcpy import (
     KorobovLattice,
     LatinHypercube,
     Lattice,
-    SimplexTransform,
 )
+from qmcpy.discrete_distribution.simplex.simplex import _SimplexTransform
 
 from qmcpy.util import ParameterError, ParameterWarning
 import qmctoolscl
@@ -784,7 +784,7 @@ class TestLatinHypercube(unittest.TestCase):
 
 
 class TestSimplexTransform(unittest.TestCase):
-    """ Unit tests for SimplexTransform. """
+    """ Unit tests for _SimplexTransform. """
 
     def test_drop_examples_1d_to_4d(self):
         examples = {
@@ -795,7 +795,7 @@ class TestSimplexTransform(unittest.TestCase):
         }
         for dim, (points, expected) in examples.items():
             with self.subTest(dimension=dim):
-                transformer = SimplexTransform(dimension=dim)
+                transformer = _SimplexTransform(dimension=dim)
                 result = transformer.drop(points)
                 np.testing.assert_allclose(result, expected)
 
@@ -808,7 +808,7 @@ class TestSimplexTransform(unittest.TestCase):
         }
         for dim, (points, expected) in examples.items():
             with self.subTest(dimension=dim):
-                transformer = SimplexTransform(dimension=dim)
+                transformer = _SimplexTransform(dimension=dim)
                 result = transformer.sort(points)
                 np.testing.assert_allclose(result, expected)
 
@@ -824,11 +824,11 @@ class TestSimplexTransform(unittest.TestCase):
         }
         for dim, (points, expected) in examples.items():
             with self.subTest(dimension=dim):
-                transformer = SimplexTransform(dimension=dim)
+                transformer = _SimplexTransform(dimension=dim)
                 result = transformer.root(points)
                 np.testing.assert_allclose(result, expected, atol=1e-8)
         # Pillards & Cools (2005), Sec. 2.5, and Pillards (2006), Sec. 4.3.5.
-        transformer = SimplexTransform(dimension=2)
+        transformer = _SimplexTransform(dimension=2)
         np.testing.assert_allclose(transformer.root(np.array([0.5, 0.01])), [[0.05, 0.1]])
         np.testing.assert_allclose(transformer.root(np.array([0.5, 0.99])), [[0.497494, 0.994987]], atol=1e-6)
 
@@ -840,11 +840,11 @@ class TestSimplexTransform(unittest.TestCase):
         }
         for dim, (points, expected) in examples.items():
             with self.subTest(dimension=dim):
-                transformer = SimplexTransform(dimension=dim)
+                transformer = _SimplexTransform(dimension=dim)
                 result = transformer.mirror(points)
                 np.testing.assert_allclose(result, expected)
         with self.subTest(dimension=4), self.assertRaises(NotImplementedError):
-            SimplexTransform(dimension=4).mirror(np.array([[0.9, 0.1, 0.4, 0.2]]))
+            _SimplexTransform(dimension=4).mirror(np.array([[0.9, 0.1, 0.4, 0.2]]))
 
     def test_origami_examples_1d_to_4d(self):
         examples = {
@@ -855,7 +855,7 @@ class TestSimplexTransform(unittest.TestCase):
         }
         for dim, (points, expected) in examples.items():
             with self.subTest(dimension=dim):
-                transformer = SimplexTransform(dimension=dim)
+                transformer = _SimplexTransform(dimension=dim)
                 result = transformer.origami(points, base=2, depth=1)
                 np.testing.assert_allclose(result, expected)
         # depth=0 has no coarser scale above the base grid, i.e. plain Sort.
@@ -874,7 +874,7 @@ class TestSimplexTransform(unittest.TestCase):
         }
         for dim, (points, expected) in examples.items():
             with self.subTest(dimension=dim):
-                transformer = SimplexTransform(dimension=dim)
+                transformer = _SimplexTransform(dimension=dim)
                 result = transformer.shift(points)
                 np.testing.assert_allclose(result, expected, atol=1e-8)
 
@@ -883,7 +883,7 @@ class TestSimplexTransform(unittest.TestCase):
         # dimensions should always come out ascending and within [0, 1).
         rng = np.random.default_rng(0)
         for dim in range(1, 6):
-            transformer = SimplexTransform(dimension=dim)
+            transformer = _SimplexTransform(dimension=dim)
             points = rng.random((50, dim))
             for name, kwargs in [("root", {}), ("shift", {}), ("origami", {"base": 3, "depth": 2})]:
                 with self.subTest(dimension=dim, transform=name):
@@ -898,7 +898,7 @@ class TestSimplexTransform(unittest.TestCase):
 
     def test_replicated_points_use_last_axis(self):
         points = DigitalNetB2(3, seed=7, replications=2).gen_samples(4)
-        transformer = SimplexTransform(dimension=3)
+        transformer = _SimplexTransform(dimension=3)
         for name, kwargs in [
             ("sort", {}),
             ("root", {}),
@@ -919,8 +919,8 @@ class TestSimplexTransform(unittest.TestCase):
 
     def test_dimension_and_domain_validation(self):
         with self.assertRaises(ParameterError):
-            SimplexTransform(dimension=0)
-        transformer = SimplexTransform(dimension=2)
+            _SimplexTransform(dimension=0)
+        transformer = _SimplexTransform(dimension=2)
         for case, points in (
             ("wrong dimension", np.array([[0.1, 0.2, 0.3]])),
             ("outside unit cube", np.array([[1.1, 0.2]])),
@@ -937,7 +937,7 @@ class TestSimplexTransform(unittest.TestCase):
         rng = np.random.default_rng(0)
         n, dim = 2**16, 4
         points = rng.random((n, dim))
-        transformer = SimplexTransform(dimension=dim)
+        transformer = _SimplexTransform(dimension=dim)
         expected = np.arange(1, dim + 1) / (dim + 1)
         variances = (
             np.arange(1, dim + 1)

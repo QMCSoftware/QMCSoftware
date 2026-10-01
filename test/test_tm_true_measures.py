@@ -1,6 +1,7 @@
 from qmcpy import (
     BernoulliCont,
     BrownianMotion,
+    CubQMCCLT,
     CustomFun,
     DigitalNetB2,
     Gaussian,
@@ -12,6 +13,7 @@ from qmcpy import (
     Lattice,
     Lebesgue,
     MaternGP,
+    SimplexUniform,
     Uniform,
     ZeroInflatedExpUniform,
 )
@@ -688,6 +690,72 @@ class TestUniformTriangle(unittest.TestCase):
         x = adapter.transform(u)
         lp = adapter.logpdf(x)
         self.assertEqual(lp.shape, (5,))
+
+
+class TestSimplexUniform(unittest.TestCase):
+    """Tests for SimplexUniform."""
+
+    def test_basic_usage_and_ordering(self):
+        tm = SimplexUniform(DigitalNetB2(4, seed=7))
+        x = tm(8)
+        self.assertEqual(x.shape, (8, 4))
+        self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
+        self.assertTrue(np.all((x >= -1e-12) & (x <= 1 + 1e-12)))
+
+    def test_default_transform_method(self):
+        self.assertEqual(SimplexUniform(DigitalNetB2(3, seed=7)).transform_method, "root")
+
+    def test_all_measure_preserving_methods_construct_and_run(self):
+        for method in ("root", "sort", "shift", "origami"):
+            tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method=method)
+            x = tm(8)
+            self.assertEqual(x.shape, (8, 3))
+            self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
+
+    def test_invalid_transform_method(self):
+        # 'mirror' folds a symmetric point set onto itself; 'drop' rejects
+        # rather than mapping 1:1 -- neither fits the _transform/_weight contract.
+        with self.assertRaises(ParameterError):
+            SimplexUniform(DigitalNetB2(3, seed=7), transform_method="mirror")
+        with self.assertRaises(ParameterError):
+            SimplexUniform(DigitalNetB2(3, seed=7), transform_method="drop")
+
+    def test_uniform_on_simplex(self):
+        # Order statistics of d iid Uniform(0,1) have E[x_i] = i/(d+1); a correct
+        # cube-to-simplex transform reproduces this to within Monte Carlo noise.
+        d = 4
+        tm = SimplexUniform(DigitalNetB2(d, seed=7, replications=16))
+        x = tm(2**10)
+        theory = np.arange(1, d + 1) / (d + 1)
+        np.testing.assert_allclose(x.mean(axis=(0, 1)), theory, atol=0.02)
+
+    def test_weight_is_constant_density(self):
+        d = 4
+        tm = SimplexUniform(DigitalNetB2(d, seed=7))
+        x = tm(8)
+        density = tm._weight(x)
+        np.testing.assert_allclose(density, 24.0)  # d! = 1 / Vol(T_d)
+        _, jacobian = tm(8, return_weights=True)
+        np.testing.assert_allclose(jacobian, 1 / 24.0)
+
+    def test_spawn(self):
+        tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method="shift")
+        spawns = tm.spawn(s=2)
+        self.assertEqual(len(spawns), 2)
+        self.assertTrue(all(isinstance(s, SimplexUniform) for s in spawns))
+        self.assertTrue(all(s.transform_method == "shift" for s in spawns))
+        self.assertEqual(spawns[0](4).shape, (4, 3))
+
+    def test_integration_matches_exact_value(self):
+        # E[sum(x)] under uniform-on-T_d = sum_i i/(d+1); verify a real QMC
+        # integration (not just sampling) reproduces it -- the actual point
+        # of making this a TrueMeasure instead of a standalone transform.
+        d = 3
+        tm = SimplexUniform(DigitalNetB2(d, seed=11, replications=16), transform_method="root")
+        integrand = CustomFun(tm, lambda x: x.sum(axis=-1))
+        solution, _ = CubQMCCLT(integrand, abs_tol=1e-3).integrate()
+        exact = sum(i / (d + 1) for i in range(1, d + 1))
+        self.assertAlmostEqual(solution, exact, delta=5e-3)
 
 
 class TestGaussian(unittest.TestCase):

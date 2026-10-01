@@ -8,7 +8,6 @@ from .kronecker import Kronecker
 from .korobov import KorobovLattice
 from .dummy_sampler import DummySampler
 from .latin_hypercube import LatinHypercube
-from .simplex import SimplexTransform
 
 DiscreteDistribution = AbstractDiscreteDistribution
 _DiscreteDistribution = AbstractDiscreteDistribution

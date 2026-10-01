@@ -392,7 +392,7 @@ def display_sampler_table(df, value_cols, sampler_types, transform_method, filte
         value_cols (list[str]): Numeric columns to color-grade, min to max.
         sampler_types (list[str]): The caller's own canonical sampler order,
             e.g. ['iid', 'iid_simplex', 'sobol', 'sobol_simplex', ...].
-        transform_method (str): The caller's active SimplexTransform method
+        transform_method (str): The caller's active simplex-transform method
             name, used only to build the '_simplex' -> '_<method>' relabel.
         filter_col (str): Categorical column to filter by, case-insensitively
             matched against 'sampler' to decide whether the relabeling above
