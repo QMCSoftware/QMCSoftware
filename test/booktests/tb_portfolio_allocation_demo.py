@@ -29,7 +29,7 @@ class NotebookTests(BaseNotebookTest):
             'tickers1, description1 = load_assets(f"data/df10_{start_date}_to_{end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
             # Shrinks Section 4's loops to just 4 tickers (independent of the tickers1 shrink above).
             "for n_tickers in (4, 10, 20, 40):": "for n_tickers in (4,):",
-            "num_ports_section4 = 2**14  # or 2**15": "num_ports_section4 = 2**7",
+            re.compile(r"num_ports_section4 = 2\*\*\d+(  # or 2\*\*\d+)?"): "num_ports_section4 = 2**7",
             "replications = 50": "replications = 5",
         }
 

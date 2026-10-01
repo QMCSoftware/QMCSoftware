@@ -883,11 +883,23 @@ class TestSimplexUniform(unittest.TestCase):
             self.assertEqual(x.shape, (8, 3))
             self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
 
+    def test_mirror_warns_and_dimension_limit(self):
+        # 'mirror' folds a symmetric point set (e.g. a lattice) onto itself,
+        # so it's accepted but warns; _SimplexTransform itself still rejects
+        # dimension > 3 (at transform time, not construction).
+        with self.assertWarns(UserWarning):
+            tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method="mirror")
+        x = tm(8)
+        self.assertEqual(x.shape, (8, 3))
+        self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
+        with self.assertWarns(UserWarning):
+            tm4 = SimplexUniform(DigitalNetB2(4, seed=7), transform_method="mirror")
+        with self.assertRaises(NotImplementedError):
+            tm4(8)
+
     def test_invalid_transform_method(self):
-        # 'mirror' folds a symmetric point set onto itself; 'drop' rejects
-        # rather than mapping 1:1 -- neither fits the _transform/_weight contract.
-        with self.assertRaises(ParameterError):
-            SimplexUniform(DigitalNetB2(3, seed=7), transform_method="mirror")
+        # 'drop' rejects rather than mapping 1:1, so it does not fit the
+        # _transform/_weight contract at all.
         with self.assertRaises(ParameterError):
             SimplexUniform(DigitalNetB2(3, seed=7), transform_method="drop")
 
@@ -899,6 +911,16 @@ class TestSimplexUniform(unittest.TestCase):
         x = tm(2**10)
         theory = np.arange(1, d + 1) / (d + 1)
         np.testing.assert_allclose(x.mean(axis=(0, 1)), theory, atol=0.02)
+
+    def test_second_moment_x1_xd(self):
+        # Catches a wrong x1/xd correlation that a first-moment-only check would
+        # miss. E[X_(i) X_(j)] = i(j+1) / ((d+1)(d+2)) for order statistics of d
+        # iid Uniform(0,1); at i=1, j=d this is 1/(d+2).
+        d = 4
+        tm = SimplexUniform(DigitalNetB2(d, seed=7, replications=16))
+        x = tm(2**10)
+        theory = 1 / (d + 2)
+        np.testing.assert_allclose((x[..., 0] * x[..., -1]).mean(), theory, atol=0.01)
 
     def test_weight_is_constant_density(self):
         d = 4

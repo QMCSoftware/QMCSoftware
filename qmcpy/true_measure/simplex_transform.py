@@ -26,12 +26,11 @@ from ..util import ParameterError
 
 
 class _SimplexTransform:
-    """
+    r"""
     A class implementing various transformations from the unit cube to a simplex.
 
     This stateless helper transforms supplied points; it does not generate points.
-    The simplex Td is defined as:
-    Td = {(x1, ..., xd) in Rd : 0 <= x1 <= x2 <= ... <= xd <= 1}
+    The simplex is $T_d = \{(x_1,\dots,x_d) \in \mathbb{R}^d : 0 \le x_1 \le \dots \le x_d \le 1\}$.
 
     Attributes:
         dimension (int): The dimension of the space
@@ -75,11 +74,11 @@ class _SimplexTransform:
         return points
 
     def drop(self, points: np.ndarray) -> np.ndarray:
-        """
+        r"""
         Transformation Drop: Keep only points that fall inside the simplex.
 
-        This is a straightforward but inefficient transformation. Only 1 out of s!
-        points is kept in higher dimensions.
+        This is a straightforward but inefficient transformation. Only $1$ out
+        of $d!$ points is kept in higher dimensions.
 
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
@@ -103,12 +102,12 @@ class _SimplexTransform:
         return points.reshape(-1, self.dimension)[mask.reshape(-1)]
 
     def sort(self, points: np.ndarray) -> np.ndarray:
-        """
+        r"""
         Transformation Sort: Sort the coordinates of each point.
 
         This is a fast, continuous transformation that recovers points lost by Drop.
-        When we sort the coordinates of a point in Is (such that xi <= xi+1),
-        we obtain a point in the simplex Ts.
+        When we sort the coordinates of a point in $I^d$ (such that $x_i \le x_{i+1}$),
+        we obtain a point in the simplex $T_d$.
 
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
@@ -133,14 +132,13 @@ class _SimplexTransform:
         Transformation Root: map points via the cumulative distribution function.
 
         Based on [1], Sec. 2.5, and [2], Sec. 4.3.5: a bijective, continuous
-        transformation for any dimension d, with no free parameters.
-        Writing the input as (x1, ..., xd), the output (y1, ..., yd) is
+        transformation for any dimension $d$, with no free parameters.
+        Writing the input as $(x_1,\dots,x_d)$, the output $(y_1,\dots,y_d)$ is
 
-            yd := xd ** (1/d)
-            y_i := y_{i+1} * x_i ** (1/i)   for i = d-1, ..., 1
+        $$y_d := x_d^{1/d}, \qquad y_i := y_{i+1} \cdot x_i^{1/i} \quad \text{for } i = d-1, \dots, 1.$$
 
-        Root has highly nonuniform displacement: points near x_d = 0 move far
-        more than points near x_d = 1.
+        Root has highly nonuniform displacement: points near $x_d=0$ move far
+        more than points near $x_d=1$.
 
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
@@ -182,14 +180,14 @@ class _SimplexTransform:
         reflect every other point into it.
 
         Based on [1], Sec. 2.3, and [2], Sec. 4.3.3. This implementation covers
-        the explicit formulas for dimensions 1-3. Mirror is fast but
+        the explicit formulas for $d \in \{1, 2, 3\}$. Mirror is fast but
         discontinuous, and (unlike Root or Shift)
         folds half of any point set that is symmetric about its center (e.g. a
         lattice) on top of the other half.
 
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d),
-                d in {1, 2, 3}
+                $d \in \{1, 2, 3\}$
 
         Returns:
             np.ndarray: Transformed points in the simplex
@@ -235,19 +233,19 @@ class _SimplexTransform:
         Transformation Origami: recursively apply Sort within a grid of cubes,
         from the finest scale down to the whole cube.
 
-        Based on [2], Sec. 4.3.4. Choosing a base b and depth m (so the finest
-        grid has M = b**m cells per axis), Origami divides the unit cube into
-        M**d cells and applies Sort within each; then repeats at grid
-        resolutions M/b, M/b**2, ..., b, 1, always operating on the current
-        (already partly transformed) point, with the final N=1 pass equal to a
-        plain global Sort. Origami is discontinuous but, unlike Sort, keeps
-        every elementary interval (see [2], Sec. 2.3.5) the same size after the
-        transformation. depth=0 reduces to plain Sort.
+        Based on [2], Sec. 4.3.4. Choosing a base $b$ and depth $m$ (so the
+        finest grid has $M = b^m$ cells per axis), Origami divides the unit
+        cube into $M^d$ cells and applies Sort within each; then repeats at
+        grid resolutions $M/b, M/b^2, \dots, b, 1$, always operating on the
+        current (already partly transformed) point, with the final $N=1$ pass
+        equal to a plain global Sort. Origami is discontinuous but, unlike
+        Sort, keeps every elementary interval (see [2], Sec. 2.3.5) the same
+        size after the transformation. `depth=0` reduces to plain Sort.
 
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
-            base (int): grid subdivisions per level, b >= 2
-            depth (int): number of levels above the base grid, m >= 0
+            base (int): grid subdivisions per level, $b \ge 2$
+            depth (int): number of levels above the base grid, $m \ge 0$
 
         Returns:
             np.ndarray: Transformed points in the simplex
@@ -286,17 +284,19 @@ class _SimplexTransform:
 
     def shift(self, points: np.ndarray) -> np.ndarray:
         r"""
-        Transformation Shift: push the unit cube into the simplex Ad (Eq. 4.5),
-        then map Ad onto the simplex Td used elsewhere in this class (Eq. 4.6).
+        Transformation Shift: push the unit cube into the simplex $A_d$
+        (Eq. 4.5), then map $A_d$ onto the simplex $T_d$ used elsewhere in
+        this class (Eq. 4.6).
 
         Based on [2], Sec. 4.3.6. Sorting the input ascending, then for
-        k = 1, ..., d-1 subtracting (d-k)/(d-k+1) times the gap between sorted
-        coordinates k-1 and k from every sorted coordinate at or after
-        position k, maps the unit cube onto Ad = {x in Id : sum(x) < 1};
-        unsorting and taking the cumulative sum (Eq. 4.6) then maps Ad onto
-        Td. Shift is continuous for any dimension d, with no free parameters,
-        and (per the elementary-interval comparison in [2], Sec. 4.4) keeps
-        elementary intervals more compact than Root does.
+        $k = 1, \dots, d-1$ subtracting $(d-k)/(d-k+1)$ times the gap between
+        sorted coordinates $k-1$ and $k$ from every sorted coordinate at or
+        after position $k$, maps the unit cube onto
+        $A_d = \{x \in I^d : \sum x < 1\}$; unsorting and taking the
+        cumulative sum (Eq. 4.6) then maps $A_d$ onto $T_d$. Shift is
+        continuous for any dimension $d$, with no free parameters, and (per
+        the elementary-interval comparison in [2], Sec. 4.4) keeps elementary
+        intervals more compact than Root does.
 
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
