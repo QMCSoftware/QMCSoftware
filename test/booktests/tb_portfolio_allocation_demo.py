@@ -22,18 +22,15 @@ class NotebookTests(BaseNotebookTest):
 
         replacements = {
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
-            # Regex, not literal strings: measure_runtime's own sweep bounds keep getting
-            # retuned (dimensions list shrunk, range(8, 18) -> range(8, 15)), which silently
-            # dead-ended the old exact-literal keys twice. Anchor only on the stable prefix
-            # so future retuning of the tail/bound keeps matching instead of going dead again.
+            # Regex (not literal): these sweep bounds keep getting retuned, which dead-ended literal keys twice; anchoring on the stable prefix survives future retuning.
             re.compile(r"dimensions = \[5, 10, 20[^\]]*\]"): "dimensions = [5, 10]",
             re.compile(r"range\(8,\s*\d+\)"): "range(8, 11)",
             "fixed_dimension = 50": "fixed_dimension = 10",
-            "num_ports = 2**14": "num_ports = 2**5",
-            'tickers1, description1 = load_assets(f"data/df10_{start_date}_to_{end_date}.csv")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
-            # The backtest cell hardcodes n_tickers instead of deriving it from
-            # len(tickers1); keep it in sync with the tickers1 shrink above.
-            "n_tickers = 10": "n_tickers = 2",
+            'tickers1, description1 = load_assets(f"data/df10_{start_date}_to_{end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
+            # Shrinks Section 4's loops to just 4 tickers (independent of the tickers1 shrink above).
+            "for n_tickers in (4, 10, 20, 40):": "for n_tickers in (4,):",
+            "num_ports_section4 = 2**14  # or 2**15": "num_ports_section4 = 2**7",
+            "replications = 50": "replications = 5",
         }
 
         self.run_notebook(notebook_path, replacements)

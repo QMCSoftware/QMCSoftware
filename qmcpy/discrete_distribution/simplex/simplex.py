@@ -20,9 +20,6 @@ References:
     https://www.cs.kuleuven.be/publicaties/doctoraten/tw/TW2006_05.pdf
 """
 
-import os
-from concurrent.futures import ThreadPoolExecutor
-
 import numpy as np
 
 from ...util import ParameterError
@@ -34,7 +31,7 @@ class SimplexTransform:
     
     This stateless helper transforms supplied points; it does not generate points.
     The simplex Td is defined as:
-    Td = {(x1, ..., xd) ∈ Rd : 0 ≤ x1 ≤ x2 ≤ ... ≤ xd ≤ 1}
+    Td = {(x1, ..., xd) in Rd : 0 <= x1 <= x2 <= ... <= xd <= 1}
     
     Attributes:
         dimension (int): The dimension of the space
@@ -46,6 +43,10 @@ class SimplexTransform:
         
         Args:
             dimension (int): The dimension of the space (default: 2)
+
+        Examples:
+            >>> SimplexTransform(dimension=3).dimension
+            3
         """
         if (
             isinstance(dimension, bool)
@@ -73,31 +74,6 @@ class SimplexTransform:
             raise ParameterError("points must contain finite values in [0, 1]")
         return points
 
-    def _parallel_map(self, fn, points, min_chunk=50_000, max_workers=None):
-        """Apply fn to `points`, splitting the flattened leading axis across
-        threads once there are enough points to be worth it. fn must be a
-        same-shape, per-point-independent transform (root/sort/shift/origami
-        all qualify: every point's output depends only on that point, never
-        on any other point). numpy's own elementwise ops used by those
-        methods (**, sort, take_along_axis, cumsum) release the GIL during
-        their C-level work but don't use multiple cores on their own, so
-        chunking across threads gives a real 4-6x speedup for large inputs
-        (verified against the single-threaded result at the sizes this
-        applies to); below 2*min_chunk points the overhead isn't worth it and
-        this just calls fn(points) directly, unchanged from before threading
-        was added.
-        """
-        d = points.shape[-1]
-        flat = points.reshape(-1, d)
-        n = flat.shape[0]
-        if n < 2 * min_chunk:
-            return fn(flat).reshape(points.shape)
-        workers = min(max_workers or (os.cpu_count() or 1), n // min_chunk)
-        chunks = np.array_split(flat, workers, axis=0)
-        with ThreadPoolExecutor(workers) as ex:
-            results = list(ex.map(fn, chunks))
-        return np.concatenate(results, axis=0).reshape(points.shape)
-
     def drop(self, points: np.ndarray) -> np.ndarray:
         """
         Transformation Drop: Keep only points that fall inside the simplex.
@@ -121,7 +97,7 @@ class SimplexTransform:
             >>> result
             array([[0.3, 0.7]])
         """
-        # Check if points satisfy x1 ≤ x2 ≤ ... ≤ xs
+        # Check if points satisfy x1 <= x2 <= ... <= xd
         points = self._validate_points(points)
         mask = np.all(points[..., :-1] <= points[..., 1:], axis=-1)
         return points.reshape(-1, self.dimension)[mask.reshape(-1)]
@@ -131,7 +107,7 @@ class SimplexTransform:
         Transformation Sort: Sort the coordinates of each point.
         
         This is a fast, continuous transformation that recovers points lost by Drop.
-        When we sort the coordinates of a point in Is (such that xi ≤ xi+1), 
+        When we sort the coordinates of a point in Is (such that xi <= xi+1),
         we obtain a point in the simplex Ts.
         
         Args:
@@ -150,7 +126,7 @@ class SimplexTransform:
                    [0.4, 0.8]])
         """
         points = self._validate_points(points)
-        return self._parallel_map(lambda flat: np.sort(flat, axis=-1), points)
+        return np.sort(points, axis=-1)
 
     def root(self, points: np.ndarray) -> np.ndarray:
         r"""
@@ -179,6 +155,14 @@ class SimplexTransform:
             array([[0.05, 0.1 ]])
             >>> np.round(transformer.root(np.array([0.5, 0.99])), 3)
             array([[0.497, 0.995]])
+
+            Leading batch axes (the "..." in ``shape (..., d)``) pass through
+            unchanged, e.g. a (replications, portfolios, dimension) array as
+            used elsewhere in this package:
+
+            >>> batch = np.array([[[0.5, 0.01], [0.5, 0.99]], [[0.3, 0.7], [0.8, 0.4]]])
+            >>> transformer.root(batch).shape
+            (2, 2, 2)
         """
         points = self._validate_points(points)
         d = points.shape[-1]
@@ -190,7 +174,7 @@ class SimplexTransform:
                 y[..., i] = y[..., i + 1] * flat[..., i] ** (1.0 / (i + 1))
             return y
 
-        return self._parallel_map(_root, points)
+        return _root(points)
 
     def mirror(self, points: np.ndarray) -> np.ndarray:
         r"""
@@ -298,7 +282,7 @@ class SimplexTransform:
                 y = (cell + frac) / n
             return y
 
-        return self._parallel_map(_origami, x)
+        return _origami(x)
 
     def shift(self, points: np.ndarray) -> np.ndarray:
         r"""
@@ -345,4 +329,4 @@ class SimplexTransform:
             a = np.take_along_axis(x, inverse_order, axis=-1)
             return np.cumsum(a, axis=-1)
 
-        return self._parallel_map(_shift, points)
+        return _shift(points)
