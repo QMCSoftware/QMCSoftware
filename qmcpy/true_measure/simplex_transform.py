@@ -1,5 +1,6 @@
-"""
-Transformations of points from a unit hypercube onto a simplex.
+r"""
+Transformations of points from a unit hypercube onto the ordered simplex
+$T_d = \{0 \le x_1 \le x_2 \le \dots \le x_d \le 1\}$.
 
 Implements Drop, Sort, Mirror, Origami, Root, and Shift as described in [1],
 with fuller derivations in Chapter 4 ("Transformations for a Simplex") of [2].
@@ -27,7 +28,7 @@ from ..util import ParameterError
 
 class _SimplexTransform:
     r"""
-    A class implementing various transformations from the unit cube to a simplex.
+    A class implementing various transformations from the unit cube to the ordered simplex $T_d$.
 
     This stateless helper transforms supplied points; it does not generate points.
     The simplex is $T_d = \{(x_1,\dots,x_d) \in \mathbb{R}^d : 0 \le x_1 \le \dots \le x_d \le 1\}$.
@@ -75,7 +76,7 @@ class _SimplexTransform:
 
     def drop(self, points: np.ndarray) -> np.ndarray:
         r"""
-        Transformation Drop: Keep only points that fall inside the simplex.
+        Transformation Drop: Keep only points that fall inside the ordered simplex $T_d$.
 
         This is a straightforward but inefficient transformation. Only $1$ out
         of $d!$ points is kept in higher dimensions.
@@ -84,7 +85,7 @@ class _SimplexTransform:
             points (np.ndarray): Points in the unit cube, shape (..., d)
 
         Returns:
-            np.ndarray: Points that fall inside the simplex, shape (M, d).
+            np.ndarray: Points in the ordered simplex $T_d$, shape (M, d).
                 Leading batch axes are flattened because each batch may retain a
                 different number of points.
 
@@ -113,7 +114,7 @@ class _SimplexTransform:
             points (np.ndarray): Points in the unit cube, shape (..., d)
 
         Returns:
-            np.ndarray: Transformed points in the simplex
+            np.ndarray: Transformed points in the ordered simplex $T_d$
 
         Examples:
             >>> import numpy as np
@@ -144,7 +145,7 @@ class _SimplexTransform:
             points (np.ndarray): Points in the unit cube, shape (..., d)
 
         Returns:
-            np.ndarray: Transformed points in the simplex
+            np.ndarray: Transformed points in the ordered simplex $T_d$
 
         Examples:
             >>> import numpy as np
@@ -176,7 +177,7 @@ class _SimplexTransform:
 
     def mirror(self, points: np.ndarray) -> np.ndarray:
         r"""
-        Transformation Mirror: keep points already in the simplex fixed and
+        Transformation Mirror: keep points already in the ordered simplex $T_d$ fixed and
         reflect every other point into it.
 
         Based on [1], Sec. 2.3, and [2], Sec. 4.3.3. This implementation covers
@@ -190,7 +191,7 @@ class _SimplexTransform:
                 $d \in \{1, 2, 3\}$
 
         Returns:
-            np.ndarray: Transformed points in the simplex
+            np.ndarray: Transformed points in the ordered simplex $T_d$
 
         Raises:
             NotImplementedError: if the points have dimension greater than 3
@@ -248,7 +249,7 @@ class _SimplexTransform:
             depth (int): number of levels above the base grid, $m \ge 0$
 
         Returns:
-            np.ndarray: Transformed points in the simplex
+            np.ndarray: Transformed points in the ordered simplex $T_d$
 
         Examples:
             >>> import numpy as np
@@ -302,7 +303,7 @@ class _SimplexTransform:
             points (np.ndarray): Points in the unit cube, shape (..., d)
 
         Returns:
-            np.ndarray: Transformed points in the simplex
+            np.ndarray: Transformed points in the ordered simplex $T_d$
 
         Examples:
             >>> import numpy as np

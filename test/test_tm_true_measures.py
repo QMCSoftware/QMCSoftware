@@ -866,22 +866,23 @@ class TestSimplexTransform(unittest.TestCase):
 class TestSimplexUniform(unittest.TestCase):
     """Tests for SimplexUniform."""
 
-    def test_basic_usage_and_ordering(self):
+    def test_basic_usage(self):
         tm = SimplexUniform(DigitalNetB2(4, seed=7))
         x = tm(8)
         self.assertEqual(x.shape, (8, 4))
-        self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
-        self.assertTrue(np.all((x >= -1e-12) & (x <= 1 + 1e-12)))
+        self.assertTrue(np.all(x >= -1e-12))
+        self.assertTrue(np.all(x.sum(axis=-1) <= 1 + 1e-12))
 
     def test_default_transform_method(self):
         self.assertEqual(SimplexUniform(DigitalNetB2(3, seed=7)).transform_method, "root")
 
-    def test_all_measure_preserving_methods_construct_and_run(self):
+    def test_all_methods_run(self):
         for method in ("root", "sort", "shift", "origami"):
             tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method=method)
             x = tm(8)
             self.assertEqual(x.shape, (8, 3))
-            self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
+            self.assertTrue(np.all(x >= -1e-12))
+            self.assertTrue(np.all(x.sum(axis=-1) <= 1 + 1e-12))
 
     def test_mirror_warns_and_dimension_limit(self):
         # 'mirror' folds a symmetric point set (e.g. a lattice) onto itself,
@@ -891,7 +892,8 @@ class TestSimplexUniform(unittest.TestCase):
             tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method="mirror")
         x = tm(8)
         self.assertEqual(x.shape, (8, 3))
-        self.assertTrue(np.all(x[:, :-1] <= x[:, 1:] + 1e-12))
+        self.assertTrue(np.all(x >= -1e-12))
+        self.assertTrue(np.all(x.sum(axis=-1) <= 1 + 1e-12))
         with self.assertWarns(UserWarning):
             tm4 = SimplexUniform(DigitalNetB2(4, seed=7), transform_method="mirror")
         with self.assertRaises(NotImplementedError):
@@ -904,23 +906,24 @@ class TestSimplexUniform(unittest.TestCase):
             SimplexUniform(DigitalNetB2(3, seed=7), transform_method="drop")
 
     def test_uniform_on_simplex(self):
-        # Order statistics of d iid Uniform(0,1) have E[x_i] = i/(d+1); a correct
-        # cube-to-simplex transform reproduces this to within Monte Carlo noise.
+        # Appending 1-sum(w) makes w the first d of d+1 Dirichlet(1,...,1)
+        # weights, each with mean 1/(d+1) (exchangeable, so every coordinate
+        # shares the same mean, unlike the old ordered-simplex output).
         d = 4
         tm = SimplexUniform(DigitalNetB2(d, seed=7, replications=16))
         x = tm(2**10)
-        theory = np.arange(1, d + 1) / (d + 1)
-        np.testing.assert_allclose(x.mean(axis=(0, 1)), theory, atol=0.02)
+        theory = 1 / (d + 1)
+        np.testing.assert_allclose(x.mean(axis=(0, 1)), np.full(d, theory), atol=0.02)
 
-    def test_second_moment_x1_xd(self):
-        # Catches a wrong x1/xd correlation that a first-moment-only check would
-        # miss. E[X_(i) X_(j)] = i(j+1) / ((d+1)(d+2)) for order statistics of d
-        # iid Uniform(0,1); at i=1, j=d this is 1/(d+2).
+    def test_second_moment_weights(self):
+        # Catches a wrong joint shape (e.g. right marginals, wrong covariance)
+        # that a first-moment-only check would miss. For w ~ Dirichlet(1,...,1)
+        # with d+1 categories, E[w_i^2] = 2 / ((d+1)(d+2)) for every i.
         d = 4
         tm = SimplexUniform(DigitalNetB2(d, seed=7, replications=16))
         x = tm(2**10)
-        theory = 1 / (d + 2)
-        np.testing.assert_allclose((x[..., 0] * x[..., -1]).mean(), theory, atol=0.01)
+        theory = 2 / ((d + 1) * (d + 2))
+        np.testing.assert_allclose((x**2).mean(), theory, atol=0.01)
 
     def test_weight_is_constant_density(self):
         d = 4
@@ -939,15 +942,16 @@ class TestSimplexUniform(unittest.TestCase):
         self.assertTrue(all(s.transform_method == "shift" for s in spawns))
         self.assertEqual(spawns[0](4).shape, (4, 3))
 
-    def test_integration_matches_exact_value(self):
-        # E[sum(x)] under uniform-on-T_d = sum_i i/(d+1); verify a real QMC
-        # integration (not just sampling) reproduces it -- the actual point
-        # of making this a TrueMeasure instead of a standalone transform.
+    def test_integration_exact_value(self):
+        # E[sum(w)] = d/(d+1) (d of the d+1 Dirichlet(1,...,1) weights, each
+        # with mean 1/(d+1)); verify a real QMC integration (not just
+        # sampling) reproduces it -- the actual point of making this a
+        # TrueMeasure instead of a standalone transform.
         d = 3
         tm = SimplexUniform(DigitalNetB2(d, seed=11, replications=16), transform_method="root")
         integrand = CustomFun(tm, lambda x: x.sum(axis=-1))
         solution, _ = CubQMCCLT(integrand, abs_tol=1e-3).integrate()
-        exact = sum(i / (d + 1) for i in range(1, d + 1))
+        exact = d / (d + 1)
         self.assertAlmostEqual(solution, exact, delta=5e-3)
 
 

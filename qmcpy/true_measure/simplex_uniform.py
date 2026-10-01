@@ -14,39 +14,48 @@ from .abstract_true_measure import AbstractTrueMeasure
 
 
 class SimplexUniform(AbstractTrueMeasure):
-    r"""Uniform distribution on the simplex $T_d = \{(x_1,\dots,x_d) : 0 \le x_1 \le \dots \le x_d \le 1\}$.
+    r"""Uniform distribution on the corner simplex $K_d = \{w \in \mathbb{R}^d :
+    w_i \ge 0, \sum_{i=1}^d w_i \le 1\}$ -- named for its shape: the corner of
+    the unit cube $[0,1]^d$ cut off by the hyperplane $\sum_i w_i = 1$.
 
-    Wraps `_SimplexTransform` (a stateless cube-to-simplex mapping) as a
-    proper `AbstractTrueMeasure`, so a cube sampler can be composed with
-    QMCPy's integration machinery directly instead of needing points
-    transformed by hand first.
+    Returns $d$ of $d+1$ nonnegative weights summing to 1; append $w_{d+1} =
+    1 - \sum_i w_i$ for the full probability-simplex vector, which is
+    $\mathrm{Dirichlet}(1,\dots,1)$-distributed ($d+1$ ones) [3].
+
+    Wraps `_SimplexTransform`'s mapping onto the *ordered* simplex $T_d = \{0
+    \le x_1 \le \dots \le x_d \le 1\}$, then takes consecutive differences
+    ($w_i = x_i - x_{i-1}$, $x_0 := 0$) -- a volume-preserving (Jacobian 1)
+    reparametrization, so the density is $d!$ either way.
+
+    References:
+        [3] L. Devroye, "Non-Uniform Random Variate Generation," Springer-Verlag,
+        1986, Sec. I.4.1 (sampling the simplex via uniform spacings). [Online].
+        Available: http://luc.devroye.org/rnbookindex.html
 
     Examples:
         >>> s = SimplexUniform(DigitalNetB2(3, seed=7))
-        >>> x = s(4)
-        >>> x.shape
+        >>> w = s(4)
+        >>> w.shape
         (4, 3)
-        >>> bool(np.all(x[:, :-1] <= x[:, 1:]))
+        >>> bool(np.all(w >= 0) and np.all(w.sum(axis=-1) <= 1))
         True
 
-        Every `transform_method` is measure-preserving (verified empirically:
-        the sorted-coordinate means of 500,000 samples all matched the exact
-        order-statistics means $i/(d+1)$ to within Monte Carlo noise), so the
+        Every `transform_method` is measure-preserving (weight means over
+        500,000 samples matched the exact Dirichlet mean $1/(d+1)$), so the
         choice is a QMC-efficiency question, not a correctness one:
 
         >>> s = SimplexUniform(DigitalNetB2(3, seed=7), transform_method='shift')
         >>> s(4).shape
         (4, 3)
 
-        A point in $T_d$ is `d` sorted coordinates, not a weight vector summing
-        to 1. Pad with 0 and 1 and take consecutive differences to get the
-        latter from the former ($d$ coordinates become $d+1$ weights):
+        Append the implicit $(d+1)$-th weight for the full probability-simplex
+        vector (sums to exactly 1):
 
-        >>> x = s(1)[0]
-        >>> weights = np.diff(np.concatenate([[0.0], x, [1.0]]))
-        >>> weights.shape
+        >>> w = s(1)[0]
+        >>> v = np.append(w, 1 - w.sum())
+        >>> v.shape
         (4,)
-        >>> bool(np.isclose(weights.sum(), 1) and np.all(weights >= 0))
+        >>> bool(np.isclose(v.sum(), 1) and np.all(v >= 0))
         True
     """
 
