@@ -15,6 +15,9 @@
 11. Implement a more optimal simplex transformation for low-discrepancy sequences --TODO
 12. Clean up demo --TODO
 14. Improve documentation --TODO
+15. Implement multiple randomized backtests --TODO
+16. Look into Sortino ratio --TODO
+17. Explain how we choose tickers, testing/training split --TODO
 
 ## Documentation
 
