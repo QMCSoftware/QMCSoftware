@@ -1,3 +1,4 @@
+import re
 import unittest, pytest
 from __init__ import BaseNotebookTest
 import tb_data_portfolio_allocation
@@ -21,8 +22,12 @@ class NotebookTests(BaseNotebookTest):
 
         replacements = {
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
-            "dimensions = [5, 10, 20, 50, 100, 200, 500, 1000]": "dimensions = [5, 10]",
-            "range(8, 18)": "range(8, 11)",
+            # Regex, not literal strings: measure_runtime's own sweep bounds keep getting
+            # retuned (dimensions list shrunk, range(8, 18) -> range(8, 15)), which silently
+            # dead-ended the old exact-literal keys twice. Anchor only on the stable prefix
+            # so future retuning of the tail/bound keeps matching instead of going dead again.
+            re.compile(r"dimensions = \[5, 10, 20[^\]]*\]"): "dimensions = [5, 10]",
+            re.compile(r"range\(8,\s*\d+\)"): "range(8, 11)",
             "fixed_dimension = 50": "fixed_dimension = 10",
             "num_ports = 2**14": "num_ports = 2**5",
             'tickers1, description1 = load_assets(f"data/df10_{start_date}_to_{end_date}.csv")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
