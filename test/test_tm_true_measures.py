@@ -24,6 +24,7 @@ from scipy.sparse import issparse
 import unittest
 import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
+from qmcpy.true_measure.simplex_transform import _SimplexTransform
 from qmcpy import SciPyWrapper
 
 
@@ -690,6 +691,176 @@ class TestUniformTriangle(unittest.TestCase):
         x = adapter.transform(u)
         lp = adapter.logpdf(x)
         self.assertEqual(lp.shape, (5,))
+
+
+class TestSimplexTransform(unittest.TestCase):
+    """ Unit tests for _SimplexTransform. """
+
+    def test_drop_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.3]), np.array([[0.3]])),
+            2: (np.array([[0.3, 0.7], [0.8, 0.4]]), np.array([[0.3, 0.7]])),
+            3: (np.array([[0.1, 0.4, 0.9], [0.6, 0.2, 0.8]]), np.array([[0.1, 0.4, 0.9]])),
+            4: (np.array([[0.1, 0.2, 0.3, 0.4], [0.2, 0.1, 0.3, 0.4]]), np.array([[0.1, 0.2, 0.3, 0.4]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = _SimplexTransform(dimension=dim)
+                result = transformer.drop(points)
+                np.testing.assert_allclose(result, expected)
+
+    def test_sort_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.8]), np.array([[0.8]])),
+            2: (np.array([[0.8, 0.4], [0.3, 0.7]]), np.array([[0.4, 0.8], [0.3, 0.7]])),
+            3: (np.array([[0.7, 0.2, 0.9], [0.6, 0.2, 0.8]]), np.array([[0.2, 0.7, 0.9], [0.2, 0.6, 0.8]])),
+            4: (np.array([[0.9, 0.1, 0.4, 0.2], [0.2, 0.1, 0.3, 0.4]]), np.array([[0.1, 0.2, 0.4, 0.9], [ 0.1, 0.2, 0.3, 0.4]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = _SimplexTransform(dimension=dim)
+                result = transformer.sort(points)
+                np.testing.assert_allclose(result, expected)
+
+    def test_root_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.8]), np.array([[0.8]])),
+            2: (np.array([[0.8, 0.4], [0.3, 0.7]]),
+                np.array([[0.50596443, 0.63245553], [0.25099801, 0.83666003]])),
+            3: (np.array([[0.7, 0.2, 0.9], [0.6, 0.2, 0.8]]),
+                np.array([[0.30224599, 0.43177998, 0.96548938], [0.2490938, 0.41515633, 0.92831777]])),
+            4: (np.array([[0.9, 0.1, 0.4, 0.2], [0.2, 0.1, 0.3, 0.4]]),
+                np.array([[0.14023401, 0.15581556, 0.49273207, 0.6687403], [0.03367069, 0.16835347, 0.53238043, 0.79527073]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = _SimplexTransform(dimension=dim)
+                result = transformer.root(points)
+                np.testing.assert_allclose(result, expected, atol=1e-8)
+        # Pillards & Cools (2005), Sec. 2.5, and Pillards (2006), Sec. 4.3.5.
+        transformer = _SimplexTransform(dimension=2)
+        np.testing.assert_allclose(transformer.root(np.array([0.5, 0.01])), [[0.05, 0.1]])
+        np.testing.assert_allclose(transformer.root(np.array([0.5, 0.99])), [[0.497494, 0.994987]], atol=1e-6)
+
+    def test_mirror_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.8]), np.array([[0.8]])),
+            2: (np.array([[0.8, 0.4], [0.3, 0.7]]), np.array([[0.2, 0.6], [0.3, 0.7]])),
+            3: (np.array([[0.7, 0.2, 0.9], [0.6, 0.2, 0.8]]), np.array([[0.2, 0.7, 0.9], [0.2, 0.6, 0.8]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = _SimplexTransform(dimension=dim)
+                result = transformer.mirror(points)
+                np.testing.assert_allclose(result, expected)
+        with self.subTest(dimension=4), self.assertRaises(NotImplementedError):
+            _SimplexTransform(dimension=4).mirror(np.array([[0.9, 0.1, 0.4, 0.2]]))
+
+    def test_origami_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.8]), np.array([[0.8]])),
+            2: (np.array([[0.8, 0.4], [0.3, 0.7]]), np.array([[0.4, 0.8], [0.2, 0.8]])),
+            3: (np.array([[0.7, 0.2, 0.9], [0.6, 0.2, 0.8]]), np.array([[0.2, 0.7, 0.9], [0.2, 0.6, 0.8]])),
+            4: (np.array([[0.9, 0.1, 0.4, 0.2], [0.2, 0.1, 0.3, 0.4]]), np.array([[0.2, 0.4, 0.4, 0.6], [0.1, 0.2, 0.3, 0.4]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = _SimplexTransform(dimension=dim)
+                result = transformer.origami(points, base=2, depth=1)
+                np.testing.assert_allclose(result, expected)
+        # depth=0 has no coarser scale above the base grid, i.e. plain Sort.
+        np.testing.assert_allclose(
+            transformer.origami(points, base=2, depth=0), transformer.sort(points)
+        )
+
+    def test_shift_examples_1d_to_4d(self):
+        examples = {
+            1: (np.array([0.8]), np.array([[0.8]])),
+            2: (np.array([[0.8, 0.4], [0.3, 0.7]]), np.array([[0.6, 0.8], [0.15, 0.7]])),
+            3: (np.array([[0.7, 0.2, 0.9], [0.6, 0.2, 0.8]]),
+                np.array([[0.31666667, 0.38333333, 0.9], [0.26666667, 0.33333333, 0.8]])),
+            4: (np.array([[0.9, 0.1, 0.4, 0.2], [0.2, 0.1, 0.3, 0.4]]),
+                np.array([[0.65833333, 0.68333333, 0.84166667, 0.9], [0.05833333, 0.08333333, 0.19166667, 0.4]])),
+        }
+        for dim, (points, expected) in examples.items():
+            with self.subTest(dimension=dim):
+                transformer = _SimplexTransform(dimension=dim)
+                result = transformer.shift(points)
+                np.testing.assert_allclose(result, expected, atol=1e-8)
+
+    def test_transforms_stay_in_simplex(self):
+        # Broader than the fixed 1D-4D examples above: random points across more
+        # dimensions should always come out ascending and within [0, 1).
+        rng = np.random.default_rng(0)
+        for dim in range(1, 6):
+            transformer = _SimplexTransform(dimension=dim)
+            points = rng.random((50, dim))
+            for name, kwargs in [("root", {}), ("shift", {}), ("origami", {"base": 3, "depth": 2})]:
+                with self.subTest(dimension=dim, transform=name):
+                    result = getattr(transformer, name)(points, **kwargs)
+                    self.assertTrue(np.all((result >= 0) & (result < 1)))
+                    self.assertTrue(np.all(result[:, :-1] <= result[:, 1:] + 1e-12))
+            if dim <= 3:
+                with self.subTest(dimension=dim, transform="mirror"):
+                    result = transformer.mirror(points)
+                    self.assertTrue(np.all((result >= 0) & (result < 1)))
+                    self.assertTrue(np.all(result[:, :-1] <= result[:, 1:] + 1e-12))
+
+    def test_replicated_points_use_last_axis(self):
+        points = DigitalNetB2(3, seed=7, replications=2).gen_samples(4)
+        transformer = _SimplexTransform(dimension=3)
+        for name, kwargs in [
+            ("sort", {}),
+            ("root", {}),
+            ("mirror", {}),
+            ("origami", {"base": 2, "depth": 1}),
+            ("shift", {}),
+        ]:
+            with self.subTest(transform=name):
+                result = getattr(transformer, name)(points, **kwargs)
+                self.assertEqual(result.shape, points.shape)
+                self.assertTrue(
+                    np.all(result[..., :-1] <= result[..., 1:] + 1e-12)
+                )
+
+        mask = np.all(points[..., :-1] <= points[..., 1:], axis=-1)
+        expected = points.reshape(-1, 3)[mask.reshape(-1)]
+        np.testing.assert_allclose(transformer.drop(points), expected)
+
+    def test_dimension_and_domain_validation(self):
+        with self.assertRaises(ParameterError):
+            _SimplexTransform(dimension=0)
+        transformer = _SimplexTransform(dimension=2)
+        for case, points in (
+            ("wrong dimension", np.array([[0.1, 0.2, 0.3]])),
+            ("outside unit cube", np.array([[1.1, 0.2]])),
+            ("nonfinite value", np.array([[np.nan, 0.2]])),
+        ):
+            with self.subTest(case=case), self.assertRaises(ParameterError):
+                transformer.root(points)
+        with self.assertRaises(ParameterError):
+            transformer.origami(np.array([[0.1, 0.2]]), base=1)
+        with self.assertRaises(ParameterError):
+            transformer.origami(np.array([[0.1, 0.2]]), depth=-1)
+
+    def test_uniform_simplex_moments(self):
+        rng = np.random.default_rng(0)
+        n, dim = 2**16, 4
+        points = rng.random((n, dim))
+        transformer = _SimplexTransform(dimension=dim)
+        expected = np.arange(1, dim + 1) / (dim + 1)
+        variances = (
+            np.arange(1, dim + 1)
+            * np.arange(dim, 0, -1)
+            / ((dim + 1) ** 2 * (dim + 2))
+        )
+        for name in ("sort", "root", "shift"):
+            with self.subTest(transform=name):
+                result = getattr(transformer, name)(points)
+                z_scores = np.abs(result.mean(axis=0) - expected) / np.sqrt(
+                    variances / n
+                )
+                self.assertLess(np.max(z_scores), 4)
 
 
 class TestSimplexUniform(unittest.TestCase):

@@ -8,7 +8,7 @@ Authors: Larysa Matiukha and Sou-Cheng T. Choi
 Date: February 6, 2026
 
 Unit tests:
-    python -W ignore -m unittest test.test_dd_discrete_distribs.TestSimplexTransform -v
+    python -W ignore -m unittest test.test_tm_true_measures.TestSimplexTransform -v
 
 References:
     [1] T. Pillards and R. Cools, "Transforming low-discrepancy sequences from a cube
@@ -22,17 +22,17 @@ References:
 
 import numpy as np
 
-from ...util import ParameterError
+from ..util import ParameterError
 
 
 class _SimplexTransform:
     """
     A class implementing various transformations from the unit cube to a simplex.
-    
+
     This stateless helper transforms supplied points; it does not generate points.
     The simplex Td is defined as:
     Td = {(x1, ..., xd) in Rd : 0 <= x1 <= x2 <= ... <= xd <= 1}
-    
+
     Attributes:
         dimension (int): The dimension of the space
     """
@@ -40,7 +40,7 @@ class _SimplexTransform:
     def __init__(self, dimension: int = 2):
         """
         Initialize the _SimplexTransform class.
-        
+
         Args:
             dimension (int): The dimension of the space (default: 2)
 
@@ -77,18 +77,18 @@ class _SimplexTransform:
     def drop(self, points: np.ndarray) -> np.ndarray:
         """
         Transformation Drop: Keep only points that fall inside the simplex.
-        
-        This is a straightforward but inefficient transformation. Only 1 out of s! 
+
+        This is a straightforward but inefficient transformation. Only 1 out of s!
         points is kept in higher dimensions.
-        
+
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
-            
+
         Returns:
             np.ndarray: Points that fall inside the simplex, shape (M, d).
                 Leading batch axes are flattened because each batch may retain a
                 different number of points.
-            
+
         Examples:
             >>> import numpy as np
             >>> transformer = _SimplexTransform(dimension=2)
@@ -105,17 +105,17 @@ class _SimplexTransform:
     def sort(self, points: np.ndarray) -> np.ndarray:
         """
         Transformation Sort: Sort the coordinates of each point.
-        
+
         This is a fast, continuous transformation that recovers points lost by Drop.
         When we sort the coordinates of a point in Is (such that xi <= xi+1),
         we obtain a point in the simplex Ts.
-        
+
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
-            
+
         Returns:
             np.ndarray: Transformed points in the simplex
-            
+
         Examples:
             >>> import numpy as np
             >>> transformer = _SimplexTransform(dimension=2)

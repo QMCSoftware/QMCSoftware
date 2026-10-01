@@ -7,7 +7,7 @@ from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
 from ..discrete_distribution import DigitalNetB2
-from ..discrete_distribution.simplex.simplex import _SimplexTransform
+from .simplex_transform import _SimplexTransform
 from ..util import ParameterError
 from .abstract_true_measure import AbstractTrueMeasure
 
