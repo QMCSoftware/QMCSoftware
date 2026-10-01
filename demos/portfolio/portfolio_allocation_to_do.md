@@ -15,6 +15,7 @@
 11. Implement a more optimal simplex transformation for low-discrepancy sequences --TODO
 12. Clean up demo --TODO
 14. Improve documentation --TODO
+15. Implement multiple randomized backtests --TODO
 
 ## Documentation
 
