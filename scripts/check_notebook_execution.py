@@ -58,6 +58,17 @@ def check_notebook_file(path):
         # Colab, so it is not part of the local execution-count sequence.
         if _is_generated_bootstrap(cell) and cell.get("execution_count") is None:
             continue
+        # Jupyter itself never assigns an execution_count to an empty (or
+        # whitespace-only) cell during Run All, so it is not part of the
+        # sequence either; counting it would misreport every later cell too.
+        # A missing "source" key (as opposed to a present-but-empty one) is
+        # not a real notebook shape, just a minimal test fixture, so it is
+        # not treated as empty here.
+        source = cell.get("source")
+        if source is not None:
+            source_text = source if isinstance(source, str) else "".join(source)
+            if not source_text.strip():
+                continue
         expected += 1
         actual = cell.get("execution_count")
         if actual != expected:

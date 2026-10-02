@@ -59,6 +59,20 @@ class TestCheckNotebookExecution(unittest.TestCase):
 
             self.assertEqual(check_notebook_file(path), [])
 
+    def test_empty_code_cell_is_excluded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "demo.ipynb"
+            self._write_notebook(
+                path,
+                [
+                    {"cell_type": "code", "execution_count": 1, "outputs": [], "source": ["x = 1\n"]},
+                    {"cell_type": "code", "execution_count": None, "outputs": [], "source": ["   \n", "\n"]},
+                    {"cell_type": "code", "execution_count": 2, "outputs": [], "source": ["y = 2\n"]},
+                ],
+            )
+
+            self.assertEqual(check_notebook_file(path), [])
+
     def test_error_output_is_reported(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "demo.ipynb"
