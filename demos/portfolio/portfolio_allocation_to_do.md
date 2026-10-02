@@ -17,7 +17,8 @@
 14. Improve documentation --TODO
 15. Implement multiple randomized backtests --TODO
 16. Look into Sortino ratio --TODO
-17. Explain how we choose tickers, testing/training split --TODO
+17. Explain how we choose tickers, testing/training split: were train_end_date/test_start_date/tickers1 etc. chosen by objective criteria, or subjectively? --TODO
+18. Handle tickers with a later listing date (e.g. MRNA, ABNB): their missing early price history gets silently dropped (not held as cash) when concatenated, understating portfolio value until a sudden jump at listing; fix via point-in-time universe construction. --TODO
 
 ## Documentation
 
@@ -30,7 +31,7 @@
 
 1. Utilize QMCPy's `replications` parameter for averaged results --DONE
 2. Implement out-of-sample backtesting --DONE
-3. Make tb_portfolio_allocation_demo.py work in CI tests on Windows ---TODO, Brandon  
+3. Make tb_portfolio_allocation_demo.py work in CI tests on Windows --DONE
 4. Implement rebalancing
 
 
