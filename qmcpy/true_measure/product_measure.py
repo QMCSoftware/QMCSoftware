@@ -110,7 +110,7 @@ class ProductMeasure(AbstractTrueMeasure):
                 marginal dimensions.
             marginals (Union[list, tuple]): Independent true
                 measures to place side by side. A marginal may itself be
-                multidimensional, but must preserve its sampler dimension.
+                multidimensional.
 
         Notes:
             Why one sampler? The product measure should be driven by one
@@ -118,7 +118,7 @@ class ProductMeasure(AbstractTrueMeasure):
             samples from each marginal. Instead, one sample $u \in [0,1]^d$
             is split into blocks:
 
-            $$u = (u_{\text{marginal},1}, u_{\text{marginal},2}, \ldots, u_{\text{marginal},k}).$$
+                u = (u_marginal_1, u_marginal_2, ..., u_marginal_k).
 
             This preserves the intended total-dimensional QMC construction.
         """
