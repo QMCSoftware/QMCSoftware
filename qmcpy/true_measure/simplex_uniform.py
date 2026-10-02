@@ -15,20 +15,20 @@ from .abstract_true_measure import AbstractTrueMeasure
 
 class SimplexUniform(AbstractTrueMeasure):
     r"""Uniform distribution on the corner simplex $K_d = \{w \in \mathbb{R}^d :
-    w_i \ge 0, \sum_{i=1}^d w_i \le 1\}$ -- named for its shape: the corner of
+    w_i \ge 0, \sum_{i=1}^d w_i \le 1\}$, named for its shape: the corner of
     the unit cube $[0,1]^d$ cut off by the hyperplane $\sum_i w_i = 1$.
 
     Returns $d$ of $d+1$ nonnegative weights summing to 1; append $w_{d+1} =
     1 - \sum_i w_i$ for the full probability-simplex vector, which is
-    $\mathrm{Dirichlet}(1,\dots,1)$-distributed ($d+1$ ones) [3].
+    $\mathrm{Dirichlet}(1,\dots,1)$-distributed ($d+1$ ones) [1].
 
     Wraps `_SimplexTransform`'s mapping onto the *ordered* simplex $T_d = \{0
     \le x_1 \le \dots \le x_d \le 1\}$, then takes consecutive differences
-    ($w_i = x_i - x_{i-1}$, $x_0 := 0$) -- a volume-preserving (Jacobian 1)
+    ($w_i = x_i - x_{i-1}$, $x_0 := 0$), a volume-preserving (Jacobian 1)
     reparametrization, so the density is $d!$ either way.
 
     References:
-        [3] L. Devroye, "Non-Uniform Random Variate Generation," Springer-Verlag,
+        [1] L. Devroye, "Non-Uniform Random Variate Generation," Springer-Verlag,
         1986, Sec. I.4.1 (sampling the simplex via uniform spacings). [Online].
         Available: http://luc.devroye.org/rnbookindex.html
 
@@ -102,10 +102,8 @@ class SimplexUniform(AbstractTrueMeasure):
 
     def _transform(self, x):
         t = getattr(self._simplex, self.transform_method)(x)
-        # t is a point in the ordered simplex T_d (d sorted coordinates). Consecutive
-        # differences (x_0 := 0) give the first d of d+1 nonnegative weights summing to
-        # 1 -- a linear, volume-preserving (Jacobian 1) reparametrization onto the
-        # "corner simplex" K_d, so _weight's density is unaffected.
+        # t is an ordered-simplex T_d point (d sorted coords); consecutive differences
+        # (x_0 := 0) give the first d of d+1 weights, a Jacobian-1 map that leaves density unchanged.
         return np.diff(t, axis=-1, prepend=0)
 
     def _weight(self, x):
