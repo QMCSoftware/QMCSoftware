@@ -217,6 +217,9 @@ def plot_avg_portfolio_values(all_portfolios_dict, sr_dict, colors, label_fn, n_
     Each subplot's title also names whichever sampler ends the period with
     the highest ('Best') and lowest ('Worst') average portfolio value; this
     is about the single final value only, not the whole trajectory.
+
+    Returns:
+        matplotlib.figure.Figure: The rendered figure.
     """
     risk_levels = ['low', 'medium', 'high']
     samplers = list(sr_dict.keys())
@@ -252,7 +255,7 @@ def plot_avg_portfolio_values(all_portfolios_dict, sr_dict, colors, label_fn, n_
     axes[0].legend(fontsize=14, ncol=2)
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.22, top=0.82)  # bottom: rotated date labels; top: room for the extremes line
-    plt.show()
+    return fig
 
 
 def plot_diff_vs_iid(all_portfolios_dict, principal, colors, label_fn, n_tickers=None, sample_type=None):
@@ -275,6 +278,9 @@ def plot_diff_vs_iid(all_portfolios_dict, principal, colors, label_fn, n_tickers
     Each subplot's title also names whichever sampler ends the period
     highest ('Best') and lowest ('Worst') relative to the baseline; this is
     about the single final value only, not the whole trajectory.
+
+    Returns:
+        matplotlib.figure.Figure: The rendered figure.
     """
     baseline = 'iid' if 'iid' in all_portfolios_dict else 'iid_simplex'
     risk_levels = ['low', 'medium', 'high']
@@ -307,7 +313,7 @@ def plot_diff_vs_iid(all_portfolios_dict, principal, colors, label_fn, n_tickers
     axes[0].legend(fontsize=14, ncol=2)
     plt.tight_layout()
     fig.subplots_adjust(bottom=0.22, top=0.82)
-    plt.show()
+    return fig
 
 
 def plot_runtime(df, sampler_types, colors, markers, label_fn, runtime_type='Runtime_real'):
@@ -323,6 +329,9 @@ def plot_runtime(df, sampler_types, colors, markers, label_fn, runtime_type='Run
         label_fn (callable): sampler key -> display label, e.g. 'sobol' ->
             'Sobol'.
         runtime_type (str): Column to plot, e.g. 'Runtime_real' or 'Runtime_CPU'.
+
+    Returns:
+        matplotlib.figure.Figure: The rendered figure.
     """
     fig, axes = plt.subplots(1, 2, figsize=(14, 5), sharey=True)
     fig.suptitle('CPU time' if runtime_type == 'Runtime_CPU' else 'Real (wall-clock) time', fontsize=16, fontweight='bold')
@@ -376,7 +385,7 @@ def plot_runtime(df, sampler_types, colors, markers, label_fn, runtime_type='Run
     axes[0].legend(fontsize=14, ncol=2)
     plt.tight_layout()
     fig.subplots_adjust(top=0.82)
-    plt.show()
+    return fig
 
 
 def display_sampler_table(df, value_cols, sampler_types, transform_method, filter_col='sampler', **kwargs):
