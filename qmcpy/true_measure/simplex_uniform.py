@@ -115,6 +115,60 @@ class SimplexUniform(AbstractTrueMeasure):
         # (x_0 := 0) give the first d of d+1 weights, a Jacobian-1 map that leaves density unchanged.
         return np.diff(t, axis=-1, prepend=0)
 
+    @staticmethod
+    def transform_points(x: np.ndarray, transform_method: str = "root") -> np.ndarray:
+        r"""Map pre-generated points through a simplex transform directly,
+        without constructing a `SimplexUniform` or generating samples via
+        `gen_samples`/`__call__`.
+
+        Has no dimension limit, unlike the class itself: it never computes
+        this measure's density ($d!$, which overflows float64 above $d=170$
+        and is only needed by `_weight`/a weighted `gen_samples`), so it stays
+        usable for an externally-shared point set of any width.
+
+        For sharing one point set between several constructions on identical
+        draws (e.g. comparing `transform_method`s, or feeding a point set
+        wider than what a single `SimplexUniform` would consume), generate
+        points once from any sampler, then pass slices of them here instead
+        of letting each construction draw its own.
+
+        Args:
+            x (np.ndarray): Points with shape `(..., d)`, each row in
+                $[0,1]^d$. Not validated against any sampler -- the caller is
+                responsible for `x` being an appropriate input (e.g. a
+                uniform point set) for `transform_method`.
+            transform_method (str): One of `_SimplexTransform`'s measure-
+                preserving methods: 'root', 'sort', 'shift', 'origami', or
+                'mirror' (same constraints as `__init__`'s own Args).
+
+        Returns:
+            np.ndarray: `d` of the `d+1` corner-simplex weights, shape
+                `(..., d)` -- append the implicit `(d+1)`-th weight for the
+                full vector, as in the class docstring's last example.
+
+            >>> x = DigitalNetB2(3, seed=7).gen_samples(4)
+            >>> w = SimplexUniform.transform_points(x)
+            >>> w.shape
+            (4, 3)
+            >>> full = np.concatenate([w, 1 - w.sum(axis=-1, keepdims=True)], axis=-1)
+            >>> bool(np.allclose(full.sum(axis=-1), 1) and np.all(full >= 0))
+            True
+        """
+        if transform_method not in ("root", "sort", "shift", "origami", "mirror"):
+            raise ParameterError(
+                "transform_method must be one of 'root', 'sort', 'shift', 'origami', "
+                f"'mirror', not {transform_method!r}"
+            )
+        if transform_method == "mirror":
+            warnings.warn(
+                "transform_method='mirror' folds a symmetric point set (e.g., a "
+                "lattice) onto itself, which can degrade its low-discrepancy "
+                "structure, and only supports dimension <= 3.",
+                UserWarning,
+            )
+        t = getattr(_SimplexTransform(dimension=x.shape[-1]), transform_method)(x)
+        return np.diff(t, axis=-1, prepend=0)
+
     def _weight(self, x):
         eps = np.finfo(float).eps
         inside = np.all(x >= -eps, axis=-1) & (x.sum(axis=-1) <= 1+eps)
