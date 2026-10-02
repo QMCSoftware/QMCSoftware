@@ -109,7 +109,9 @@ class SimplexUniform(AbstractTrueMeasure):
         return np.diff(t, axis=-1, prepend=0)
 
     def _weight(self, x):
-        return np.full(x.shape[:-1], self._density)
+        eps = np.finfo(float).eps
+        inside = np.all(x >= -eps, axis=-1) & (x.sum(axis=-1) <= 1+eps)
+        return np.where(inside, self._density, 0.0)
 
     def _spawn(self, sampler, dimension):
         return SimplexUniform(sampler, transform_method=self.transform_method)

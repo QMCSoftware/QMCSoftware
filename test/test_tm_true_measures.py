@@ -934,6 +934,19 @@ class TestSimplexUniform(unittest.TestCase):
         _, jacobian = tm(8, return_weights=True)
         np.testing.assert_allclose(jacobian, 1 / 24.0)
 
+    def test_weight_off_support(self):
+        # _weight must vanish off K_d, not stay a constant d! Direct construction
+        # never exercises this (self-generated points are always on-support); composition does.
+        d = 2
+        tm = SimplexUniform(DigitalNetB2(d, seed=7))
+        off_support = np.array([[0.8, 0.5], [-0.1, 0.8], [0.2, 1.2]])  # sum>1, <0, sum>1
+        np.testing.assert_allclose(tm._weight(off_support), 0.0)
+        on_support = np.array([[0.2, 0.3], [0.0, 0.0], [0.5, 0.5]])  # sum<1, sum<1, sum==1
+        np.testing.assert_allclose(tm._weight(on_support), 2.0)  # unchanged: d! = 2! = 2
+        composed = SimplexUniform(Uniform(DigitalNetB2(d, seed=7)))
+        mean = CustomFun(composed, lambda x: np.ones(x.shape[:-1]))(2**12).mean()
+        self.assertAlmostEqual(mean, 1.0, delta=0.05)  # any true measure integrates to 1
+
     def test_spawn(self):
         tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method="shift")
         spawns = tm.spawn(s=2)
