@@ -2,7 +2,12 @@ from pathlib import Path
 import tempfile
 import unittest
 
-import nbformat
+import pytest
+
+# nbformat belongs to the notebook stack omitted from the slim `test_core`
+# extra (see pyproject.toml / CONTRIBUTING.md), so skip rather than fail
+# collection where it's absent, as the other optional-stack tests do.
+nbformat = pytest.importorskip("nbformat")
 
 from scripts.strip_notebook_execution_metadata import strip_execution_metadata
 
