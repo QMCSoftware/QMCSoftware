@@ -913,9 +913,13 @@ strip_notebook_execution_metadata:
 # branch actually introduced. Static checks run first (seconds) so a doc
 # mistake fails fast before paying for the slower test suite below.
 prepush:
-	@time $(MAKE) tests_fast
 	@time $(MAKE) format
+	@git diff --quiet -- . || { \
+		echo "make prepush: formatting changed tracked files; review and commit them, then rerun"; \
+		exit 1; \
+	}
 	@time $(MAKE) check
+	@time $(MAKE) tests_fast
 	@echo
 	@echo "$(RULE)"
 	@echo "make prepush: enforcing on files changed relative to develop"
