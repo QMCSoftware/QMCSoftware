@@ -947,6 +947,12 @@ class TestSimplexUniform(unittest.TestCase):
         mean = CustomFun(composed, lambda x: np.ones(x.shape[:-1]))(2**12).mean()
         self.assertAlmostEqual(mean, 1.0, delta=0.05)  # any true measure integrates to 1
 
+    def test_density_overflow(self):
+        # d! overflows float64 above d=170; must surface as ParameterError, not OverflowError.
+        self.assertEqual(SimplexUniform(DigitalNetB2(170, seed=7))(2).shape, (2, 170))
+        with self.assertRaises(ParameterError):
+            SimplexUniform(DigitalNetB2(171, seed=7))
+
     def test_spawn(self):
         tm = SimplexUniform(DigitalNetB2(3, seed=7), transform_method="shift")
         spawns = tm.spawn(s=2)

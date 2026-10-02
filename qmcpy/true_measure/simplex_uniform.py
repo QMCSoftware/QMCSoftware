@@ -69,6 +69,9 @@ class SimplexUniform(AbstractTrueMeasure):
 
                 - a discrete distribution from which to transform samples, or
                 - a true measure by which to compose a transform.
+
+                Its dimension must be <= 170: the density d! exceeds float64's
+                range above that, raising ParameterError at construction.
             transform_method (str): One of _SimplexTransform's measure-preserving
                 methods: 'root', 'sort', 'shift', 'origami', or 'mirror'.
                 'mirror' folds a symmetric point set (e.g. a lattice) onto
@@ -96,7 +99,13 @@ class SimplexUniform(AbstractTrueMeasure):
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
         self._simplex = _SimplexTransform(dimension=self.d)
-        self._density = float(math.factorial(self.d))  # 1 / Vol(T_d), Vol(T_d) = 1/d!
+        try:
+            self._density = float(math.factorial(self.d))  # 1 / Vol(T_d), Vol(T_d) = 1/d!
+        except OverflowError:
+            raise ParameterError(
+                f"SimplexUniform's density d! is not representable as a float64 "
+                f"for dimension {self.d} (float64 overflows above d=170)."
+            )
         self.range = np.tile(np.array([0, 1]), (self.d, 1))
         super(SimplexUniform, self).__init__()
 
