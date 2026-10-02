@@ -2,7 +2,7 @@ from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
 from typing import Union
-from .abstract_true_measure import AbstractTrueMeasure
+from .abstract_true_measure import AbstractTrueMeasure, _clip_unit_interval
 from ..util import DimensionError, ParameterError
 from ..discrete_distribution import DigitalNetB2
 import numpy as np
@@ -100,7 +100,18 @@ class JohnsonsSU(AbstractTrueMeasure):
             raise AssertionError
 
     def _transform(self, x):
+        x = _clip_unit_interval(x)
         return self._lam * np.sinh((norm.ppf(x) - self._gamma) / self._delta) + self._xi
+
+    def _map_effective_range(self, input_range):
+        bounds = self._broadcast_box(input_range, self.d)
+        if bounds is None:
+            return None
+        with np.errstate(over="ignore"):
+            mapped = self._lam * np.sinh(
+                (norm.ppf(bounds.T) - self._gamma) / self._delta
+            ) + self._xi
+        return mapped.T
 
     def _weight(self, x):
         term1 = (x - self._xi) / self._lam
