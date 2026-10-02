@@ -21,9 +21,9 @@ from qmcpy import (
     DummySampler,
     Gaussian,
     IIDStdUniform,
+    ImportanceSampling,
     Kumaraswamy,
     Lattice,
-    Lebesgue,
     Mixture,
     ProductMeasure,
     SciPyWrapper,
@@ -503,20 +503,18 @@ class TestMixtureIntegration(TestCase):
                     self.assertTrue(np.isfinite(y).all())
                     self.assertEqual((g.d, g.discrete_distrib.d), (1, 2))
 
-    def test_importance(self):
+    def test_importance_sampling_rejects_mixture_proposal(self):
         for reps in (None, 1, 3):
             with self.subTest(replications=reps):
                 m = self._mixture(DigitalNetB2(2, seed=7, replications=reps))
-                # The two intervals cover the complete target support [0, 2].
-                g = CustomFun(Lebesgue(m), lambda t: t[..., 0])
-                u = m.discrete_distrib(1024)
-                t = u[..., 1] + (u[..., 0] >= .25)
-                density = np.where(t < 1, .25, .75)
-                y = g.f(u)
-                np.testing.assert_allclose(y, t / density)
-                np.testing.assert_allclose(y.mean(-1), 2, rtol=0, atol=.01)
-                self.assertEqual(y.shape, u.shape[:-1])
-                self.assertTrue(np.isfinite(y).all())
+                target = Uniform(DummySampler(m.d), 0, 2)
+                # Mixture does not certify an effective range for use as an
+                # explicit ImportanceSampling proposal.
+                with self.assertRaisesRegex(
+                    ParameterError,
+                    "proposal effective range must be exactly certified",
+                ):
+                    ImportanceSampling(target=target, proposal=m)
 
     def test_driver_points(self):
         cases = (
@@ -592,17 +590,15 @@ class TestMixtureIntegration(TestCase):
                 self.assertTrue(np.isfinite(resumed_solution).all())
 
     def test_spawn_dims(self):
-        for importance in (False, True):
-            with self.subTest(importance=importance):
-                m = self._mixture(DigitalNetB2(2, seed=7))
-                g = CustomFun(Lebesgue(m) if importance else m, self._square)
-                children = g.spawn([0, 0])
-                for child in children:
-                    self.assertEqual((child.d, child.discrete_distrib.d), (1, 2))
-                    self.assertIsNot(child.discrete_distrib, g.discrete_distrib)
-                    self.assertEqual(child(16).shape, (16,))
-                    self.assertTrue(np.isfinite(child(16)).all())
-                self.assertIsNot(children[0].discrete_distrib, children[1].discrete_distrib)
+        m = self._mixture(DigitalNetB2(2, seed=7))
+        g = CustomFun(m, self._square)
+        children = g.spawn([0, 0])
+        for child in children:
+            self.assertEqual((child.d, child.discrete_distrib.d), (1, 2))
+            self.assertIsNot(child.discrete_distrib, g.discrete_distrib)
+            self.assertEqual(child(16).shape, (16,))
+            self.assertTrue(np.isfinite(child(16)).all())
+        self.assertIsNot(children[0].discrete_distrib, children[1].discrete_distrib)
 
     def test_rejects_nesting(self):
         m = self._mixture(DigitalNetB2(2, seed=7))

@@ -27,8 +27,11 @@ class Mixture(AbstractTrueMeasure):
     nested mixtures are not supported.
 
     Integrands use the component output dimension, while stopping criteria
-    retain all ``d+1`` driver coordinates. Selector boundaries can reduce QMC
-    convergence; the usual assumptions of each stopping criterion still apply.
+    retain all ``d+1`` driver coordinates. The component-selection thresholds
+    can introduce discontinuities in the transformed integrand when crossing
+    from one mixture component to another, which may affect the observed QMC
+    convergence behavior depending on the component transforms and integrand.
+    The usual assumptions of each stopping criterion still apply.
 
     When the necessary component statistics are available, mixture moments are
     exposed through ``mean``, ``variance``, ``standard_deviation``, and
