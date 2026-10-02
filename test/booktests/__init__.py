@@ -118,7 +118,7 @@ class BaseNotebookTest(unittest.TestCase):
             timeout: Execution timeout in seconds
             replacements: Optional dict of {old_str: new_str} to apply to code cells in memory.
                 A key may instead be a compiled regex (re.Pattern), matched with .sub()
-                instead of a literal substring replace -- use this for values (sweep
+                instead of a literal substring replace: use this for values (sweep
                 bounds, list literals) that drift as the notebook is tuned, so the key
                 keeps matching instead of silently going dead.
             is_overwrite: If True, overwrite the notebook file with modified cells

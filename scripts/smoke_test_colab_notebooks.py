@@ -42,8 +42,8 @@ import types
 
 # Prefer the real "google" namespace package (e.g. the one `protobuf` installs)
 # so later cells that need google.protobuf still resolve it; only synthesize a
-# bare stand-in -- with an explicit (empty) __path__ so it still reads as a
-# package -- if no real "google" package exists at all.
+# bare stand-in, with an explicit (empty) __path__ so it still reads as a
+# package, if no real "google" package exists at all.
 try:
     google = importlib.import_module("google")
 except ImportError:

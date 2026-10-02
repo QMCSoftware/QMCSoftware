@@ -204,7 +204,7 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
         )
 
     if source_install:
-        # Branch-only code (not yet released to PyPI) -- install from the clone
+        # Branch-only code (not yet released to PyPI): install from the clone
         # made above instead of the public package.
         lines.append("  !pip install -q -e {repo_root}\n")
     else:
@@ -326,7 +326,7 @@ def harden_notebook(notebook_path: Path, manifest_path: Path) -> None:
         "source": bootstrap_cell_source(notebook_path, manifest, kept_cells),
     }
 
-    # Build the final cell list purely by concatenation — kept_cells are untouched.
+    # Build the final cell list purely by concatenation: kept_cells are untouched.
     cells = kept_cells[:insert_at] + [badge_cell, bootstrap_cell] + kept_cells[insert_at:]
 
     notebook_payload["cells"] = cells

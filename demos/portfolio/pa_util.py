@@ -64,7 +64,7 @@ def plot_3d_stages(stages, title_prefix='', figsize=(15, 5), elev=24, azim=38):
 
     The first panel draws a unit-cube wireframe behind its points (axes
     u_1, u_2, u_3); every later panel draws a fixed simplex-boundary triangle
-    behind its points instead (axes w_1, w_2, w_3) -- meant for a pipeline
+    behind its points instead (axes w_1, w_2, w_3), meant for a pipeline
     that moves points from the unit cube onto the simplex stage by stage.
 
     Args:
@@ -149,7 +149,7 @@ def display_filterable_table(df, value_cols, filter_col, cmap='RdYlGn', fmt='{:.
             caller-specific suffix for display.
         reverse_substring (str, optional): value_cols whose name contains this
             (case-insensitive) are graded with cmap reversed, since for a
-            dispersion column (e.g. a standard deviation) smaller is better --
+            dispersion column (e.g. a standard deviation) smaller is better;
             the opposite of every other column here, where larger is better.
             Pass None to disable and grade every column the same way.
     """
@@ -280,7 +280,7 @@ def plot_diff_vs_iid(all_portfolios_dict, principal, colors, label_fn, n_tickers
     risk_levels = ['low', 'medium', 'high']
     comparison_samplers = [s for s in all_portfolios_dict if s != baseline]
     plot_colors = [colors[s] for s in comparison_samplers]
-    # Solid line = simplex-transformed ('_simplex'); bare dots = normalized -- distinct even when values are close.
+    # Solid line = simplex-transformed ('_simplex'); bare dots = normalized, distinct even when values are close.
     line_styles = ['-' if s.endswith('_simplex') else '.' for s in comparison_samplers]
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
     title = f'Portfolio Value vs. {label_fn(baseline)} Baseline, by Risk Level'
@@ -383,7 +383,7 @@ def display_sampler_table(df, value_cols, sampler_types, transform_method, filte
     """display_filterable_table, with a caller-supplied sampler ordering/
     relabeling: filter options follow sampler_types' own order instead of
     alphabetical, and any '<base>_simplex' entry is relabeled
-    '<base>_<transform_method>' for display -- the underlying data keeps
+    '<base>_<transform_method>' for display. The underlying data keeps
     '_simplex' everywhere else as a generic "simplex-transformed" dict-key
     tag, independent of which transform method is active.
 

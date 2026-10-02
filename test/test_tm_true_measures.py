@@ -964,7 +964,7 @@ class TestSimplexUniform(unittest.TestCase):
     def test_integration_exact_value(self):
         # E[sum(w)] = d/(d+1) (d of the d+1 Dirichlet(1,...,1) weights, each
         # with mean 1/(d+1)); verify a real QMC integration (not just
-        # sampling) reproduces it -- the actual point of making this a
+        # sampling) reproduces it: the actual point of making this a
         # TrueMeasure instead of a standalone transform.
         d = 3
         tm = SimplexUniform(DigitalNetB2(d, seed=11, replications=16), transform_method="root")
@@ -1813,7 +1813,7 @@ class TestGeometricBrownianMotion(unittest.TestCase):
     def test_legacy_positional_arguments(self):
         """A pre-existing positional call (..., decomp_type, lazy_load,
         lazy_decomp) must land on the same parameters as its keyword
-        equivalent -- monitoring_times was added keyword-only specifically
+        equivalent: monitoring_times was added keyword-only specifically
         so inserting it does not shift any positional argument.
         """
         positional = GeometricBrownianMotion(

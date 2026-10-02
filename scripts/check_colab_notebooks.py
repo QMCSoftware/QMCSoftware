@@ -323,7 +323,7 @@ def validate_strict_enabled_notebook(path: Path) -> list[str]:
             if hit and int(hit.group(1)) >= 20:
                 errors.append(
                     f"{notebook_path}: cell {idx + 1} uses 2**{hit.group(1)} without an "
-                    "`... if IN_COLAB else ...` guard -- likely to OOM/timeout in Colab; "
+                    "`... if IN_COLAB else ...` guard: likely to OOM/timeout in Colab; "
                     "guard the size or Colab-disable the notebook."
                 )
                 break
@@ -402,7 +402,7 @@ def validate_manifest(manifest: dict, allowed_missing: set[str] | None = None) -
         errors.append(
             "Manifest is missing notebook classifications for: "
             + ", ".join(sorted(missing))
-            + " -- run `make harden_colab_notebook` to classify them"
+            + "; run `make harden_colab_notebook` to classify them"
         )
 
     extra = declared - discovered

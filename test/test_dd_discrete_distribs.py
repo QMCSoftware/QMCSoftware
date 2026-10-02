@@ -317,7 +317,7 @@ class TestDigitalNetB2(unittest.TestCase):
         self.assertLess(abs(rho), 0.5)
 
     def test_ordering_gray_vs_radical_inverse_canonical_small_case(self):
-        # These are tiny, canonical “ordering sanity checks” (stable and intentional).
+        # These are tiny, canonical "ordering sanity checks" (stable and intentional).
         # We keep them small to avoid brittle large golden arrays.
         dnb2_gray = DigitalNetB2(dimension=2, randomize=False, order="GRAY", seed=7)
         x_gray = dnb2_gray.gen_samples(n_min=2, n_max=4, warn=False)

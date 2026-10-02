@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 # Load by file path: a package import would run test/booktests/__init__.py
-# first, which needs psutil/testbook/nbformat/matplotlib -- not installed in
+# first, which needs psutil/testbook/nbformat/matplotlib; not installed in
 # the minimal "Core Unit Tests" env, and not needed by generate_test.py itself.
 _GENERATE_TEST_PATH = Path(__file__).resolve().parent / "booktests" / "generate_test.py"
 _spec = importlib.util.spec_from_file_location("_generate_test_under_test", _GENERATE_TEST_PATH)
