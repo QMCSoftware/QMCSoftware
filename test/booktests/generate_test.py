@@ -135,7 +135,7 @@ def generate_missing_tests(demos_dir="../../demos", output_dir=None):
 
 
 def remove_orphaned_tests(output_dir):
-    """Delete a generated tb_*.py whose notebook no longer exists.
+    """Delete a generated scratch tb_*tmp*.py whose notebook no longer exists.
 
     Leftover from a scratch notebook copy (e.g. _RUN_tmp3.ipynb) that was
     generated against, then deleted: without this, the dangling tb_*.py
@@ -144,7 +144,9 @@ def remove_orphaned_tests(output_dir):
     """
     for test_file_path in Path(output_dir).glob("tb_*.py"):
         match = re.search(r"@testbook\('([^']+)'", test_file_path.read_text())
-        if match and not (output_dir / match.group(1)).resolve().exists():
+        if not match or "tmp" not in Path(match.group(1)).stem.lower():
+            continue
+        if not (output_dir / match.group(1)).resolve().exists():
             print(f"Removing orphaned test (notebook no longer exists): {test_file_path}")
             test_file_path.unlink()
 

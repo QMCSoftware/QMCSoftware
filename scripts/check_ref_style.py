@@ -84,8 +84,10 @@ _GENERATED_DIRS = (REPO_ROOT / "docs" / "demos", REPO_ROOT / "docs" / "paper")
 
 # A docstring/markdown/notebook line that *is* a References-type heading.
 _DOCSTRING_HEADER = re.compile(r"^\*{0,2}References:?\*{0,2}\s*$")
-_MD_HEADING = re.compile(r"^#{1,6}\s.*\bReferences\b", re.IGNORECASE)
-_MD_BOLD_HEADING = re.compile(r"^\*\*[^*]*\bReferences\b[^*]*\*\*\s*$", re.IGNORECASE)
+_MD_HEADING = re.compile(r"^#{1,6}\s.*\b(?:References|Bibliography)\b", re.IGNORECASE)
+_MD_BOLD_HEADING = re.compile(
+    r"^\*\*[^*]*\b(?:References|Bibliography)\b[^*]*\*\*\s*$", re.IGNORECASE
+)
 # Any other canonical Google docstring section that would end a References
 # block (kept in sync with check_docstring.py's GOOGLE_SECTIONS).
 _NEXT_DOCSTRING_SECTION = re.compile(
@@ -284,6 +286,27 @@ def _iter_notebook_files(root):
 # indexing (`s(1)[0]`, `w[0]`, `data['x'][-1]`) in a doctest/example line
 # doesn't get mistaken for citing reference [0].
 _CITATION = re.compile(r"(?<![\w)\]'\"])\[(\d+)\]")
+_CODE_FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
+_INLINE_CODE = re.compile(r"(`+).*?\1")
+
+
+def _mask_markdown_code(scan_lines):
+    """Blank fenced code and inline code spans before scanning citations."""
+    masked = []
+    fence = None
+    for loc, line in scan_lines:
+        match = _CODE_FENCE.match(line)
+        if fence is not None:
+            if match and match.group(1)[0] == fence[0] and len(match.group(1)) >= len(fence):
+                fence = None
+            masked.append((loc, ""))
+            continue
+        if match:
+            fence = match.group(1)
+            masked.append((loc, ""))
+            continue
+        masked.append((loc, _INLINE_CODE.sub("", line)))
+    return masked
 
 
 def _citation_key_findings(scan_lines, definitions):
@@ -378,7 +401,7 @@ def check_markdown_file(path):
     definitions = [pair for s in sections for pair in _bracket_entries(s)]
     definition_linenos = {lineno for lineno, _ in definitions}
     scan_lines = [(i + 1, l) for i, l in enumerate(lines) if (i + 1) not in definition_linenos]
-    findings.extend(_citation_key_findings(scan_lines, definitions))
+    findings.extend(_citation_key_findings(_mask_markdown_code(scan_lines), definitions))
     return findings
 
 
@@ -416,9 +439,13 @@ def check_notebook_file(path):
     }
     scan_lines = []
     for idx, cell in _notebook_markdown_cells(notebook):
+        cell_lines = []
         for j, line in enumerate(cell.get("source", [])):
             if (idx, j + 1) not in definition_locs:
-                scan_lines.append((f"cell {idx}, line {j + 1}", line))
+                cell_lines.append((f"cell {idx}, line {j + 1}", line))
+        # Markdown fences cannot span notebook cells, so reset fence state
+        # for each cell instead of masking all cells as one synthetic file.
+        scan_lines.extend(_mask_markdown_code(cell_lines))
     findings.extend(_citation_key_findings(scan_lines, definitions))
     return findings
 
@@ -603,7 +630,10 @@ def main(argv):
         print(f"clean  (0 of {n_files} files)")
     else:
         prefix = "ERROR" if (strict and total) else "WARNING"
-        print(f"{prefix}: {len(per_file)} file(s) with issues  ({len(per_file)} of {n_files} files)")
+        print(
+            f"{prefix}: {len(per_file)} file(s) with issues  "
+            f"({len(per_file)} of {n_files} files)"
+        )
     return 1 if (strict and total) else 0
 
 
