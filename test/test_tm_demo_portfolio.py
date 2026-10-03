@@ -22,6 +22,8 @@ Classes:
 Example:
     python3 -m pytest test/test_tm_demo_portfolio.py
 """
+from unittest import TestCase
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -37,7 +39,7 @@ def _stock_df(prices, dates):
     return df
 
 
-class TestListingChangeDates:
+class TestListingChangeDates(TestCase):
     """No replication: every case is a single deterministic call."""
 
     def test_same_window_no_changes(self):
@@ -63,7 +65,7 @@ class TestListingChangeDates:
         assert bu.listing_change_dates([a, b]) == [dates[0], dates[3], dates[5]]
 
 
-class TestStopLossDates:
+class TestStopLossDates(TestCase):
     """No replication: every case is a single deterministic call."""
 
     def test_no_trigger_without_conditions(self):
@@ -106,7 +108,7 @@ class TestStopLossDates:
         assert triggers == {0: dates[1]}
 
 
-class TestComputePortfolioValueReps:
+class TestComputePortfolioValueReps(TestCase):
     """No replication: every case uses a single deterministic weights row."""
 
     def test_buy_and_hold_matches_old_formula(self):
@@ -220,7 +222,7 @@ class TestComputePortfolioValueReps:
             bu.compute_portfolio_value_reps([a], np.array([[0.5, 0.5]]), 100)
 
 
-class TestComputeAllPortfolios:
+class TestComputeAllPortfolios(TestCase):
     def test_forwards_sampler_and_risk_level(self):
         """One DataFrame per (sampler, risk level), each a real backtest."""
         dates = pd.bdate_range("2020-01-01", periods=4)
@@ -238,7 +240,7 @@ class TestComputeAllPortfolios:
                 assert out[sampler][risk].iloc[0, 0] == pytest.approx(100.0)
 
 
-class TestSharpeReps:
+class TestSharpeReps(TestCase):
     """No replication (R=1), one portfolio (P=1), one ticker (D=1): the three
     risk tiers all select that same single portfolio, so low/medium/high
     Sharpe come out identical every time; only the Sharpe formula itself,
@@ -267,3 +269,24 @@ class TestSharpeReps:
         assert sr["low risk Sharpe"] == pytest.approx(11.0)
         assert sr["medium risk Sharpe"] == pytest.approx(11.0)
         assert sr["high risk Sharpe"] == pytest.approx(11.0)
+
+    def test_se_nan_with_one_replication(self):
+        """An SE needs at least two replications; R=1 (every other test here) gives NaN."""
+        dates = pd.bdate_range("2020-01-01", periods=2)
+        log_ret = pd.DataFrame({"A": [0.02, 0.00]}, index=dates)
+        weights = np.array([[[1.0]]])
+        sr = bu.sharpe_reps(weights, log_ret)
+        assert np.isnan(sr["medium risk Sharpe SE"])
+
+    def test_se_across_replications(self):
+        """Two tickers with equal variance but different mean return, one
+        replication all-in on each: the two replications' Sharpe ratios are
+        11.225 and 22.450, so the SE of their mean is their half-difference,
+        5.612, independent of risk tier since P=1 forces the same portfolio
+        into every tier."""
+        dates = pd.bdate_range("2020-01-01", periods=2)
+        log_ret = pd.DataFrame({"A": [0.02, 0.00], "B": [0.01, 0.03]}, index=dates)
+        weights = np.array([[[1.0, 0.0]], [[0.0, 1.0]]])
+        sr = bu.sharpe_reps(weights, log_ret)
+        assert sr["medium risk Sharpe"] == pytest.approx(16.837)
+        assert sr["medium risk Sharpe SE"] == pytest.approx(5.612)
