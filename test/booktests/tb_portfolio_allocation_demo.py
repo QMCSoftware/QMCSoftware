@@ -26,7 +26,7 @@ class NotebookTests(BaseNotebookTest):
             re.compile(r"dimensions = \[5, 10, 20[^\]]*\]"): "dimensions = [5, 10]",
             re.compile(r"range\(8,\s*\d+\)"): "range(8, 11)",
             "fixed_dimension = 50": "fixed_dimension = 10",
-            'tickers1, description1 = load_assets(f"data/df10_{start_date}_to_{end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
+            'tickers1, description1 = load_assets(f"data/df10_{cf.start_date}_to_{cf.end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
             # Shrinks Section 4's loops to just 4 tickers (independent of the tickers1 shrink above).
             "for n_tickers in (4, 10, 20, 40):": "for n_tickers in (4,):",
             re.compile(r"num_ports_section4 = 2\*\*\d+(  # or 2\*\*\d+)?"): "num_ports_section4 = 2**7",

@@ -11,6 +11,11 @@ import matplotlib.ticker as mticker
 import matplotlib.colors as mcolors
 import ipywidgets as widgets
 from IPython.display import display
+# Unused by name, but required: pandas.io.formats.style is lazily loaded, and
+# style_by_value below references pd.io.formats.style.Styler by its full path
+# before anything else may have triggered that load (e.g. when called directly
+# on a plain DataFrame, not chained after style_by_frequency's own `df.style`).
+from pandas.io.formats.style import Styler  # noqa: F401
 
 
 def nice_log_ticks(vmin, vmax, target_n=6):
