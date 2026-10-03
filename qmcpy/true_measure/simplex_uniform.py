@@ -134,7 +134,7 @@ class SimplexUniform(AbstractTrueMeasure):
 
         Args:
             x (np.ndarray): Points with shape `(..., d)`, each row in
-                $[0,1]^d$. Not validated against any sampler -- the caller is
+                $[0,1]^d$. Not validated against any sampler; the caller is
                 responsible for `x` being an appropriate input (e.g. a
                 uniform point set) for `transform_method`.
             transform_method (str): One of `_SimplexTransform`'s measure-
@@ -143,7 +143,7 @@ class SimplexUniform(AbstractTrueMeasure):
 
         Returns:
             np.ndarray: `d` of the `d+1` corner-simplex weights, shape
-                `(..., d)` -- append the implicit `(d+1)`-th weight for the
+                `(..., d)`; append the implicit `(d+1)`-th weight for the
                 full vector, as in the class docstring's last example.
 
             >>> x = DigitalNetB2(3, seed=7).gen_samples(4)

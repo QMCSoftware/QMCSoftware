@@ -11,7 +11,6 @@ import matplotlib.ticker as mticker
 import matplotlib.colors as mcolors
 import ipywidgets as widgets
 from IPython.display import display
-from pandas.io.formats.style import Styler
 
 
 def nice_log_ticks(vmin, vmax, target_n=6):
@@ -258,7 +257,8 @@ def plot_avg_portfolio_values(all_portfolios_dict, sr_dict, colors, label_fn, n_
     line_styles = ['-' if s.endswith('_simplex') else ':' for s in samplers]
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
     title = 'Average Portfolio Value by Risk Level'
-    bits = [f'{n_tickers} tickers' if n_tickers is not None else None, sample_type]
+    sample_type_display = 'In-Sample' if sample_type == 'in-sample' else sample_type
+    bits = [f'{n_tickers} Tickers' if n_tickers is not None else None, sample_type_display]
     if any(bits):
         title += f" ({', '.join(b for b in bits if b)})"
     fig.suptitle(title, fontsize=16, fontweight='bold')
@@ -321,7 +321,8 @@ def plot_diff_vs_iid(all_portfolios_dict, principal, colors, label_fn, n_tickers
     line_styles = ['-' if s.endswith('_simplex') else '.' for s in comparison_samplers]
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
     title = f'Portfolio Value vs. {label_fn(baseline)} Baseline, by Risk Level'
-    bits = [f'{n_tickers} tickers' if n_tickers is not None else None, sample_type]
+    sample_type_display = 'In-Sample' if sample_type == 'in-sample' else sample_type
+    bits = [f'{n_tickers} Tickers' if n_tickers is not None else None, sample_type_display]
     if any(bits):
         title += f" ({', '.join(b for b in bits if b)})"
     fig.suptitle(title, fontsize=16, fontweight='bold')
@@ -413,7 +414,7 @@ def plot_runtime(df, sampler_types, colors, markers, label_fn, runtime_type='Run
         matplotlib.figure.Figure: The rendered figure.
     """
     fig, axes = plt.subplots(1, 2, figsize=(14, 5), sharey=True)
-    fig.suptitle('CPU time' if runtime_type == 'Runtime_CPU' else 'Real (wall-clock) time', fontsize=16, fontweight='bold')
+    fig.suptitle('CPU Time' if runtime_type == 'Runtime_CPU' else 'Real (Wall-Clock) Time', fontsize=16, fontweight='bold')
 
     dim_final = {}
     port_final = {}
