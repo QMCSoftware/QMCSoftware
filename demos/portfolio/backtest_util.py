@@ -121,8 +121,8 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
             unchanged.
         rebalance_on_universe_change (bool): If True, also rebalance the day a
             ticker's listed status changes, instead of waiting for the next
-            rebalance_freq date. Default False: no effect on the backtests
-            above, since no current ticker has an internal gap.
+            rebalance_freq date. Default False: no effect on this demo's
+            backtests, since no current ticker has an internal gap.
         stop_loss_drop_pct (float, optional): Sell a ticker (see
             stop_loss_dates) the first day its price falls more than this
             fraction below its own running peak; proceeds are redistributed to
@@ -210,7 +210,9 @@ def sharpe_reps(weights, log_ret, log_rf=None):
 
     Returns:
         dict: Per-risk-level selected weights ('low'/'medium'/'high', shape
-            (R, D) each) and their mean Sharpe ratios.
+            (R, D) each), their mean Sharpe ratios, and the standard error
+            (SE) of that mean across the R replications (NaN if R == 1,
+            since an SE needs at least two replications to estimate).
     """
 
     R, P, D = weights.shape
@@ -246,6 +248,9 @@ def sharpe_reps(weights, log_ret, log_rf=None):
     medium_risk_max_sharpe = sharpe_arr[rows, medium_risk_idx]
     high_risk_max_sharpe = sharpe_arr[rows, high_risk_idx]
 
+    def se(arr):
+        return np.round(arr.std(ddof=1) / np.sqrt(R), 3) if R > 1 else np.nan
+
     return {
         "number of tickers": D,
         "number of portfolios": P,
@@ -258,6 +263,10 @@ def sharpe_reps(weights, log_ret, log_rf=None):
         "low risk Sharpe": np.round(np.mean(low_risk_max_sharpe), 3),
         "medium risk Sharpe": np.round(np.mean(medium_risk_max_sharpe), 3),
         "high risk Sharpe": np.round(np.mean(high_risk_max_sharpe), 3),
+
+        "low risk Sharpe SE": se(low_risk_max_sharpe),
+        "medium risk Sharpe SE": se(medium_risk_max_sharpe),
+        "high risk Sharpe SE": se(high_risk_max_sharpe),
     }
 
 
