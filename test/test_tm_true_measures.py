@@ -28,6 +28,7 @@ from scipy.sparse import issparse
 import unittest
 import warnings
 from qmcpy.true_measure.uniform_triangle import UniformTriangle, _UniformTriangleAdapter
+from qmcpy.true_measure.simplex_transform import _SimplexTransform
 
 
 def dense_covariance(covariance):
