@@ -167,18 +167,40 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
         value = pd.Series(index=all_dates, dtype=float)
         balances = np.zeros(D)  # per-ticker dollar sub-balance; 0 until first listed
         exited = np.zeros(D, dtype=bool)  # permanently sold via a stop-loss
+        cash = 0.0  # proceeds with nowhere to go (every ticker exited or unlisted)
+        last_close = None
         for k, t0 in enumerate(rebalance_dates):
             t1 = rebalance_dates[k + 1] if k + 1 < len(rebalance_dates) else None
             period_dates = [d for d in all_dates if d >= t0 and (t1 is None or d < t1)]
             if not period_dates:
                 continue
             listed_now = np.array([t0 in stock_dfs[i].index for i in range(D)])
+            if last_close is not None:
+                # Mark every held, still-listed ticker's balance to market from the
+                # previous period's last close to t0: balances[eligible_idx] below was set
+                # at that last close, and rel resets to 1 at t0, so without this the day's
+                # (or gap's) own price move is silently dropped, understating the portfolio.
+                for i in np.flatnonzero((balances != 0) & listed_now):
+                    price_i = stock_dfs[i]['Adj Close Price']
+                    price_prev = price_i.loc[:last_close]
+                    if len(price_prev):
+                        balances[i] *= price_i.loc[t0] / price_prev.iloc[-1]
             just_triggered = np.array([(i in exit_dates) and (exit_dates[i] <= t0) for i in range(D)]) & ~exited
             exited = exited | just_triggered
             eligible_idx = np.flatnonzero(listed_now & ~exited)
             frozen_idx = np.flatnonzero((~listed_now) & (~exited))
             frozen_total = balances[frozen_idx].sum()
-            tradeable_pool = balances[eligible_idx].sum() + balances[just_triggered].sum() + (principal if k == 0 else 0.0)
+            tradeable_pool = (balances[eligible_idx].sum() + balances[just_triggered].sum()
+                               + cash + (principal if k == 0 else 0.0))
+            cash = 0.0
+            if len(eligible_idx) == 0:
+                # Nothing to allocate to: hold the whole pool as cash instead of computing
+                # w @ rel on an empty w (0/0 = nan, silently vanishing the principal).
+                cash = tradeable_pool
+                value.loc[period_dates] = frozen_total + cash
+                balances[np.flatnonzero(exited)] = 0.0
+                last_close = period_dates[-1]
+                continue
             w = w_target[eligible_idx]
             w = w / w.sum()
             rel = np.zeros((len(eligible_idx), len(period_dates)))
@@ -189,6 +211,7 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
             value.loc[period_dates] = period_value
             balances[eligible_idx] = w * tradeable_pool * rel[:, -1]
             balances[np.flatnonzero(exited)] = 0.0
+            last_close = period_dates[-1]
             # frozen_idx (absent, not exited) is left untouched: frozen at its prior balance
         portfolios.append(value)
     return pd.concat(portfolios, axis=1)

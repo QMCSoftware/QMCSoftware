@@ -11,11 +11,11 @@ import matplotlib.ticker as mticker
 import matplotlib.colors as mcolors
 import ipywidgets as widgets
 from IPython.display import display
-# Unused by name, but required: pandas.io.formats.style is lazily loaded, and
-# style_by_value below references pd.io.formats.style.Styler by its full path
-# before anything else may have triggered that load (e.g. when called directly
-# on a plain DataFrame, not chained after style_by_frequency's own `df.style`).
-from pandas.io.formats.style import Styler  # noqa: F401
+# Needed eagerly, not just for the isinstance check below: pandas.io.formats.style is
+# otherwise lazily loaded, and style_by_value's isinstance check would AttributeError
+# before anything else triggered that load (e.g. when called directly on a plain
+# DataFrame, not chained after style_by_frequency's own `df.style`).
+from pandas.io.formats.style import Styler
 
 
 def nice_log_ticks(vmin, vmax, target_n=6):
@@ -632,7 +632,7 @@ def style_by_value(styled, cols, center=1.0, cmap='RdYlGn'):
     Returns:
         pandas.io.formats.style.Styler
     """
-    is_styler = isinstance(styled, pd.io.formats.style.Styler)
+    is_styler = isinstance(styled, Styler)
     df = styled.data if is_styler else styled
     spread = max((df[list(cols)] - center).abs().max().max(), 1e-9)
     cmap_obj = plt.get_cmap(cmap)
