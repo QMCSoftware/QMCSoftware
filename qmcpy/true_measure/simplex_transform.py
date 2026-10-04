@@ -275,7 +275,12 @@ class _SimplexTransform:
         def _origami(flat):
             y = flat.copy()
             for n in (b ** k for k in range(depth, -1, -1)):
-                cell = np.floor(n * y)
+                # Clamp to n-1: a coordinate exactly at the cube's upper boundary
+                # (y=1.0) otherwise floors into an out-of-range n-th cell with
+                # frac=0 instead of the last valid cell (n-1) with frac=1, which
+                # leaves cell unsorted across coordinates and can turn the later
+                # gap-differencing (SimplexUniform._transform) negative.
+                cell = np.minimum(np.floor(n * y), n - 1)
                 frac = n * y - cell
                 frac.sort(axis=-1)
                 y = (cell + frac) / n
