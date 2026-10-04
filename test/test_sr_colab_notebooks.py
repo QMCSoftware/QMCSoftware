@@ -54,6 +54,12 @@ def code_cell(source: str, cell_id: str = "code") -> dict:
 
 class TestColabNotebooks(unittest.TestCase):
 
+    def test_scratch_notebooks_are_not_discovered(self):
+        for name in ("sc_diag.ipynb", ".tmp_test.ipynb", "._tmp_test.ipynb"):
+            self.assertFalse(check.is_discoverable_notebook(Path("demos/portfolio") / name))
+        self.assertFalse(check.is_discoverable_notebook(Path("demos/.ipynb_checkpoints/demo.ipynb")))
+        self.assertTrue(check.is_discoverable_notebook(Path("demos/portfolio/portfolio_allocation_demo.ipynb")))
+
     def _tmp_path(self) -> Path:
         """Fresh temp directory, removed after the test (pytest ``tmp_path``)."""
         path = Path(tempfile.mkdtemp())
