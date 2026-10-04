@@ -35,6 +35,7 @@
   "demos/ray_tracing.ipynb",
   "demos/sample_scatter_plots.ipynb",
   "demos/scipywrapper_dependence_custom/scipywrapper_demo.ipynb",
+  "demos/simplex_uniform.ipynb",
   "demos/some_true_measures.ipynb",
   "demos/statistics_for_TrueMeasure.ipynb",
   "demos/talk_paper_demos/JOSS2026/joss2026.ipynb",
