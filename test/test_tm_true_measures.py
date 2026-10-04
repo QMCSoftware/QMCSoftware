@@ -1393,7 +1393,7 @@ class TestSimplexTransform(unittest.TestCase):
             * np.arange(dim, 0, -1)
             / ((dim + 1) ** 2 * (dim + 2))
         )
-        for name in ("sort", "root", "shift"):
+        for name in ("sort", "root", "shift", "origami"):
             with self.subTest(transform=name):
                 result = getattr(transformer, name)(points)
                 z_scores = np.abs(result.mean(axis=0) - expected) / np.sqrt(

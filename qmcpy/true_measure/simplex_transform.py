@@ -61,7 +61,7 @@ class _SimplexTransform:
         points = np.asarray(points)
         if points.ndim == 0 or not np.issubdtype(points.dtype, np.number):
             raise ParameterError(
-                "points must be a numeric array with shape (..., dimension)"
+                "points must be a real numeric array with shape (..., dimension)"
             )
         if points.ndim == 1:
             points = points.reshape(1, -1)
