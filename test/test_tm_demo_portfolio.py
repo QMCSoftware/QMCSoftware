@@ -138,7 +138,9 @@ class TestComputePortfolioValueReps(TestCase):
         v = bu.compute_portfolio_value_reps(
             [dfs["A"], dfs["B"]], np.array([[0.5, 0.5]]), 100, rebalance_freq="D"
         ).iloc[:, 0]
-        assert v.tolist() == [100.0, 100.0, 100.0]
+        # A rises 10 -> 10 -> 11 (its own +10% move on day 3) while its 50% balance
+        # remains invested; B is absent again by day 3 and sits frozen at 50.
+        assert v.tolist() == pytest.approx([100.0, 100.0, 105.0])
 
     def test_absent_ticker_freezes_not_liquidates(self):
         """Extends BLOCKER 13: a ticker that goes permanently absent (bankruptcy or a
@@ -197,8 +199,27 @@ class TestComputePortfolioValueReps(TestCase):
         v = bu.compute_portfolio_value_reps(
             [a, b], weights, 100, rebalance_freq="D", stop_loss_drop_pct=0.1
         ).iloc[:, 0]
+        # b sells at its 50-at-the-time value (half the 100 principal at 50% off):
+        # 50 (a, unchanged) + 25 (b, sold at half) = 75. An absolute check, not just
+        # relative to itself: a relative-only check would also pass if both sides
+        # were wrong in the same way (e.g. the pre-fix bug that dropped this same
+        # day's price move for every ticker, a and b alike).
+        assert v.loc[dates[2]] == pytest.approx(75.0)
         # By the end, b's recovery should not be reflected: everything should be in a.
         assert v.iloc[-1] == pytest.approx(v.loc[dates[2]])
+
+    def test_all_tickers_exit_holds_cash(self):
+        """If every eligible ticker stops out on the same rebalance date, the pooled
+        proceeds are held as cash (not discarded via a 0/0 = nan from an empty w)."""
+        dates = pd.bdate_range("2020-01-01", periods=4)
+        a = _stock_df([100.0, 50.0, 50.0, 50.0], dates)
+        b = _stock_df([100.0, 50.0, 50.0, 50.0], dates)
+        weights = np.array([[0.5, 0.5]])
+
+        v = bu.compute_portfolio_value_reps(
+            [a, b], weights, 100, rebalance_freq="D", stop_loss_drop_pct=0.1
+        ).iloc[:, 0]
+        assert v.tolist() == pytest.approx([100.0, 50.0, 50.0, 50.0])
 
     def test_combined_floor_and_drop_pct(self):
         """stop_loss_price_floor and stop_loss_drop_pct can both be supplied; whichever
