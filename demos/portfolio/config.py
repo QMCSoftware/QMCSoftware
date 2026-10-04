@@ -17,3 +17,5 @@ test_start_date = '2022-01-01'     # OOS start: evaluate those weights on [test_
 # QMC point-set constructions compared throughout; each is also used via its
 # simplex-transformed '<name>_simplex' variant (see portfolio_allocation_demo.ipynb).
 base_sampler_types = ['iid', 'lattice', 'sobol', 'halton', 'faure', 'korobov', 'kronecker']
+
+trading_days_per_year = 252  # used to annualize daily returns/volatility/risk-free rates

@@ -415,3 +415,17 @@ class TestSharpeReps(TestCase):
             np.testing.assert_allclose(result[tier], weights[:, 0])
             assert result[f"{tier} risk Sharpe"] == np.round(scores.mean(), 3)
             assert result[f"{tier} risk Sharpe SE"] == np.round(scores.std(ddof=1) / np.sqrt(2), 3)
+
+    def test_empty_tier_is_nan(self):
+        """A volatility tie can leave a tier with no candidate; argmax over an
+        all -inf row used to default to index 0 and mislabel it as that tier's
+        pick instead of reporting the tier as genuinely empty."""
+        simple = np.array([[.01, .01], [.02, .03], [.03, .05]])
+        dates = pd.bdate_range("2020-01-01", periods=3)
+        log_ret = pd.DataFrame(np.log1p(simple), index=dates, columns=["A", "B"])
+        weights = np.array([[[1., 0.], [1., 0.], [0., 1.]]])
+        result = bu.sharpe_reps(weights, log_ret)
+        self.assertTrue(np.isnan(result["medium risk Sharpe"]))
+        self.assertTrue(np.all(np.isnan(result["medium"])))
+        self.assertFalse(np.isnan(result["low risk Sharpe"]))
+        self.assertFalse(np.isnan(result["high risk Sharpe"]))

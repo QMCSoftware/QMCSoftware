@@ -110,7 +110,7 @@ def evaluate_sampler_sharpe_reps(sampler_type, log_ret, n_ports, replications, l
 
     for ports in n_ports:
         weights = gen_weights_reps(sampler_type, n_tickers, ports, replications, transform=transform)
-        sr = bu.sharpe_reps(weights, log_ret, log_rf)
+        sr = bu.sharpe_reps(weights, log_ret, log_rf, trading_days_per_year=cf.trading_days_per_year)
 
         rows.append({
             'sampler': sampler_type,
@@ -245,7 +245,14 @@ def generate_sampler_results(n_tickers, num_ports, replications, log_ret, sample
     """
     results = {}
     timing = {}
-    for base_type, sampler_class in sampler_classes.items():
+    # Only the base samplers actually requested (deduplicated, order-preserving): sampler_types
+    # may be a reduced subset for a CI booktest, and computing the rest would waste runtime
+    # generating/scoring samplers the caller deliberately excluded.
+    requested_base_types = dict.fromkeys(
+        st[:-len('_simplex')] if st.endswith('_simplex') else st for st in sampler_types
+    )
+    for base_type in requested_base_types:
+        sampler_class = sampler_classes[base_type]
         t0 = time.perf_counter()
         cube_points = sampler_class(
             dimension=n_tickers, replications=replications, seed=42
@@ -254,7 +261,7 @@ def generate_sampler_results(n_tickers, num_ports, replications, log_ret, sample
         weights = gen_weights_reps(
             sampler, n_tickers, num_ports, replications, cube_points=cube_points, transform=transform
         )
-        results[sampler] = bu.sharpe_reps(weights, log_ret)
+        results[sampler] = bu.sharpe_reps(weights, log_ret, trading_days_per_year=cf.trading_days_per_year)
         timing[base_type] = time.perf_counter() - t0
     ordered = {sampler: results[sampler] for sampler in sampler_types}
     return (ordered, timing) if return_timing else ordered

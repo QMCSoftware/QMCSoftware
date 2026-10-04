@@ -12,6 +12,8 @@ defining its own copies. Handles several edge cases beyond plain buy-and-
 hold: a late listing, a bankruptcy/permanent delisting, a temporary trading
 halt, and a stop-loss.
 """
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -95,8 +97,12 @@ def stop_loss_dates(stock_dfs, stop_loss_drop_pct=None, stop_loss_price_floor=No
     """
     triggers = {}
     D = len(stock_dfs)
-    floors = ([stop_loss_price_floor] * D if (stop_loss_price_floor is None or np.isscalar(stop_loss_price_floor))
-              else stop_loss_price_floor)
+    if stop_loss_price_floor is None or np.isscalar(stop_loss_price_floor):
+        floors = [stop_loss_price_floor] * D
+    else:
+        floors = list(stop_loss_price_floor)
+        if len(floors) != D:
+            raise ValueError(f"stop_loss_price_floor has {len(floors)} entries, expected one per ticker ({D})")
     for i, df in enumerate(stock_dfs):
         price = df['Adj Close Price']
         fire_dates = []
@@ -236,7 +242,7 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
     return pd.concat(portfolios, axis=1)
 
 
-def sharpe_reps(weights, log_ret, log_rf=None):
+def sharpe_reps(weights, log_ret, log_rf=None, trading_days_per_year=252):
     """Select portfolios by annualized constant-weight simple-return Sharpe.
 
     Log-return inputs are converted to simple returns before computing moments.
@@ -253,6 +259,9 @@ def sharpe_reps(weights, log_ret, log_rf=None):
             return rather than a single rate blended across the whole
             window. If None, the raw Sharpe ratio (no risk-free rate) is
             used.
+        trading_days_per_year (int): Annualization factor. Defaults to 252
+            (not imported from config.py, so this module stays independently
+            unit-testable); demo callers pass config.trading_days_per_year.
 
     Returns:
         dict: Per-risk-level selected weights ('low'/'medium'/'high', shape
@@ -268,12 +277,12 @@ def sharpe_reps(weights, log_ret, log_rf=None):
         excess_ret = simple_ret
     else:
         # Convert the annualized log rate to a daily simple return in matching units.
-        daily_rf = np.expm1(log_rf.reindex(log_ret.index).ffill() / 252)
+        daily_rf = np.expm1(log_rf.reindex(log_ret.index).ffill() / trading_days_per_year)
         excess_ret = simple_ret.sub(daily_rf, axis=0)
 
-    ret_arr = np.sum(weights * excess_ret.mean().values * 252, axis=2)
+    ret_arr = np.sum(weights * excess_ret.mean().values * trading_days_per_year, axis=2)
 
-    vol_arr = np.sqrt(np.sum(weights @ (excess_ret.cov().values * 252) * weights, axis=2))
+    vol_arr = np.sqrt(np.sum(weights @ (excess_ret.cov().values * trading_days_per_year) * weights, axis=2))
 
     sharpe_arr = ret_arr / vol_arr
 
@@ -292,26 +301,52 @@ def sharpe_reps(weights, log_ret, log_rf=None):
     medium_risk_max_sharpe = sharpe_arr[rows, medium_risk_idx]
     high_risk_max_sharpe = sharpe_arr[rows, high_risk_idx]
 
+    # A tier can be empty for a given replication (e.g. tied volatilities collapse a
+    # quantile boundary): argmax over an all -inf row still returns index 0, silently
+    # mislabeling that candidate's weight/Sharpe as the tier's optimum. NaN those
+    # replications out instead; nanmean/nanstd below then score from the remaining,
+    # genuinely-populated replications rather than letting one bad draw poison the mean.
+    # P == 1 is excluded: with a single candidate, medium/high are *always* structurally
+    # empty (strict > against a quantile that equals the only value), by construction,
+    # not from a tie among several candidates; every tier trivially holds that candidate.
+    if P == 1:
+        low_empty = medium_empty = high_empty = np.zeros(R, dtype=bool)
+    else:
+        low_empty, medium_empty, high_empty = (~low_mask.any(axis=1), ~medium_mask.any(axis=1), ~high_mask.any(axis=1))
+    low_risk_max_sharpe = np.where(low_empty, np.nan, low_risk_max_sharpe)
+    medium_risk_max_sharpe = np.where(medium_empty, np.nan, medium_risk_max_sharpe)
+    high_risk_max_sharpe = np.where(high_empty, np.nan, high_risk_max_sharpe)
+    low_weights = np.where(low_empty[:, None], np.nan, weights[rows, low_risk_idx])
+    medium_weights = np.where(medium_empty[:, None], np.nan, weights[rows, medium_risk_idx])
+    high_weights = np.where(high_empty[:, None], np.nan, weights[rows, high_risk_idx])
+
     def se(arr):
-        return np.round(arr.std(ddof=1) / np.sqrt(R), 3) if R > 1 else np.nan
+        return np.round(np.nanstd(arr, ddof=1) / np.sqrt(R), 3) if R > 1 else np.nan
 
-    return {
-        "number of tickers": D,
-        "number of portfolios": P,
-        "replications": R,
+    with warnings.catch_warnings():
+        # Expected, not a caller error: a tier that's empty in every replication (R == 1
+        # and that tier's mask never fires) means nanmean/nanstd reduce an all-NaN slice,
+        # which numpy warns on even though NaN is exactly the documented, intended result.
+        warnings.filterwarnings("ignore", message="Mean of empty slice")
+        warnings.filterwarnings("ignore", message="Degrees of freedom <= 0 for slice")
+        result = {
+            "number of tickers": D,
+            "number of portfolios": P,
+            "replications": R,
 
-        "low": weights[rows, low_risk_idx],
-        "medium": weights[rows, medium_risk_idx],
-        "high": weights[rows, high_risk_idx],
+            "low": low_weights,
+            "medium": medium_weights,
+            "high": high_weights,
 
-        "low risk Sharpe": np.round(np.mean(low_risk_max_sharpe), 3),
-        "medium risk Sharpe": np.round(np.mean(medium_risk_max_sharpe), 3),
-        "high risk Sharpe": np.round(np.mean(high_risk_max_sharpe), 3),
+            "low risk Sharpe": np.round(np.nanmean(low_risk_max_sharpe), 3),
+            "medium risk Sharpe": np.round(np.nanmean(medium_risk_max_sharpe), 3),
+            "high risk Sharpe": np.round(np.nanmean(high_risk_max_sharpe), 3),
 
-        "low risk Sharpe SE": se(low_risk_max_sharpe),
-        "medium risk Sharpe SE": se(medium_risk_max_sharpe),
-        "high risk Sharpe SE": se(high_risk_max_sharpe),
-    }
+            "low risk Sharpe SE": se(low_risk_max_sharpe),
+            "medium risk Sharpe SE": se(medium_risk_max_sharpe),
+            "high risk Sharpe SE": se(high_risk_max_sharpe),
+        }
+    return result
 
 
 def compute_all_portfolios(stocks, sr_dict, risk_levels, principal, rebalance_freq=None,

@@ -47,7 +47,7 @@ def _strip_docstring(src):
     return ''.join(lines)
 
 
-def show_source(obj, style='monokai', max_lines=None, show_docstring=True):
+def show_source(obj, style='monokai', max_lines=None, show_docstring=False):
     """Display a function/class's source with syntax highlighting.
 
     A plain print(inspect.getsource(obj)) renders as uncolored text.
