@@ -32,6 +32,14 @@ class SimplexUniform(AbstractTrueMeasure):
         1986, Sec. I.4.1 (sampling the simplex via uniform spacings). [Online].
         Available: http://luc.devroye.org/rnbookindex.html
 
+        [2] T. Pillards and R. Cools, "Transforming low-discrepancy sequences from
+        a cube to a simplex," *Journal of Computational and Applied Mathematics*,
+        vol. 174, no. 1, pp. 29-42, 2005.
+
+        [3] T. Pillards, "Quasi-Monte Carlo integration over a simplex and the
+        entire space," Ph.D. thesis, KU Leuven, 2006. [Online]. Available:
+        https://www.cs.kuleuven.be/publicaties/doctoraten/tw/TW2006_05.pdf
+
     Examples:
         >>> s = SimplexUniform(DigitalNetB2(3, seed=7))
         >>> w = s(4)
@@ -90,7 +98,7 @@ class SimplexUniform(AbstractTrueMeasure):
                 Its dimension must be <= 170: the density d! exceeds float64's
                 range above that, raising ParameterError at construction.
             transform_method (str): One of _SimplexTransform's measure-preserving
-                methods: 'root', 'sort', 'shift', 'origami', or 'mirror'.
+                methods [2, 3]: 'root', 'sort', 'shift', 'origami', or 'mirror'.
                 'mirror' folds a symmetric point set (e.g. a lattice) onto
                 itself, degrading its low-discrepancy structure, and only
                 supports dimension <= 3 (raised by _SimplexTransform itself);
@@ -169,7 +177,7 @@ class SimplexUniform(AbstractTrueMeasure):
                 responsible for `x` being an appropriate input (e.g. a
                 uniform point set) for `transform_method`.
             transform_method (str): One of `_SimplexTransform`'s measure-
-                preserving methods: 'root', 'sort', 'shift', 'origami', or
+                preserving methods [2, 3]: 'root', 'sort', 'shift', 'origami', or
                 'mirror' (same constraints as `__init__`'s own Args).
 
         Returns:
