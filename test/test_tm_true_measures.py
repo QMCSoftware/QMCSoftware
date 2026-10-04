@@ -14,8 +14,8 @@ from qmcpy import (
     Lattice,
     Lebesgue,
     MaternGP,
-    SimplexUniform,
     SciPyWrapper,
+    SimplexUniform,
     StudentT,
     Uniform,
     ZeroInflatedExpUniform,
@@ -1437,6 +1437,37 @@ class TestSimplexUniform(unittest.TestCase):
             tm4 = SimplexUniform(DigitalNetB2(4, seed=7), transform_method="mirror")
         with self.assertRaises(NotImplementedError):
             tm4(8)
+
+    def test_origami_boundary_point_stays_nonnegative(self):
+        # A coordinate exactly at the cube's upper boundary used to floor into an
+        # out-of-range grid cell, leaving the result unsorted and the later gap
+        # difference negative.
+        w = SimplexUniform.transform_points(np.array([[1.0, 0.0]]), "origami")
+        np.testing.assert_allclose(w, [[0.5, 0.0]])
+        self.assertTrue(np.all(w >= 0))
+        continuous = SimplexUniform.transform_points(np.array([[1.0 - 1e-9, 0.0]]), "origami")
+        np.testing.assert_allclose(w, continuous, atol=1e-6)
+
+    def test_moments_match_dirichlet_theory(self):
+        d = 3
+        tm = SimplexUniform(DigitalNetB2(d, seed=7))
+        theo_mean = 1 / (d + 1)
+        theo_var = d / ((d + 1) ** 2 * (d + 2))
+        theo_cov = -1 / ((d + 1) ** 2 * (d + 2))
+        np.testing.assert_allclose(tm.mean, theo_mean)
+        np.testing.assert_allclose(tm.variance, theo_var)
+        np.testing.assert_allclose(tm.standard_deviation, theo_var ** 0.5)
+        expected_cov = np.full((d, d), theo_cov)
+        np.fill_diagonal(expected_cov, theo_var)
+        np.testing.assert_allclose(dense_covariance(tm.covariance), expected_cov)
+        for name in ("mean", "variance", "standard_deviation", "covariance"):
+            self.assertIn(name, tm.parameters)
+        with self.assertRaises(ValueError):
+            tm._mean[0] = 99
+        spawned = tm.spawn(s=1, dimensions=[5])[0]
+        d2 = 5
+        np.testing.assert_allclose(spawned.mean, 1 / (d2 + 1))
+        np.testing.assert_allclose(spawned.variance, d2 / ((d2 + 1) ** 2 * (d2 + 2)))
 
     def test_invalid_transform_method(self):
         # 'drop' rejects rather than mapping 1:1, so it does not fit the
