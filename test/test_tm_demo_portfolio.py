@@ -22,52 +22,64 @@ Classes:
 Example:
     python3 -m pytest test/test_tm_demo_portfolio.py
 """
+import sys
+from pathlib import Path
 from unittest import TestCase
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
 
 bu = pytest.importorskip("demos.portfolio.backtest_util")
 
 
-@pytest.mark.parametrize("sample_type", ["in-sample", "OOS"])
-def test_backtest_windows_and_benchmark(monkeypatch, sample_type):
-    """F4: common-history valuation and dated benchmark; no future OOS fitting."""
-    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "demos/portfolio"))
-    import sampler_util as su
-    dates = pd.bdate_range("2020-01-01", periods=8)
-    tickers = list("ABCD")
-    prices = pd.concat([
-        pd.DataFrame({"Ticker": ticker, "Date": dates[2:] if ticker == "D" else dates,
-                      "Adj Close Price": 100.}) for ticker in tickers
-    ])
-    returns = pd.DataFrame(.01, index=dates[3:], columns=tickers)
-    monkeypatch.setattr(su.cf, "start_date", str(dates[0].date()))
-    monkeypatch.setattr(su.cf, "end_date", str(dates[-1].date()))
-    monkeypatch.setattr(su.cf, "train_end_date", str(dates[4].date()))
-    monkeypatch.setattr(su.cf, "test_start_date", str(dates[5].date()))
-    monkeypatch.setattr(su.pd, "read_csv", lambda *args, **kwargs: prices.copy())
-    fitted = []
+class TestBacktestWindowsAndBenchmark(TestCase):
+    def setUp(self):
+        path = str(Path(__file__).resolve().parents[1] / "demos/portfolio")
+        sys.path.insert(0, path)
+        self.addCleanup(sys.path.remove, path)
+        import sampler_util
+        self.su = sampler_util
 
-    def fixed_selection(n_tickers, num_ports, replications, log_ret, sampler_types, **kwargs):
-        fitted.append(log_ret)
-        return {"sobol_simplex": {tier: np.full((1, 4), .25)
-                                 for tier in ("low", "medium", "high")}}, {}
+    def test_common_history_and_dated_benchmark(self):
+        """F4: common-history valuation and dated benchmark; no future OOS fitting."""
+        su = self.su
+        dates = pd.bdate_range("2020-01-01", periods=8)
+        tickers = list("ABCD")
+        prices = pd.concat([
+            pd.DataFrame({"Ticker": ticker, "Date": dates[2:] if ticker == "D" else dates,
+                          "Adj Close Price": 100.}) for ticker in tickers
+        ])
+        returns = pd.DataFrame(.01, index=dates[3:], columns=tickers)
 
-    monkeypatch.setattr(su, "generate_sampler_results", fixed_selection)
-    portfolios, _, _ = su.run_backtest_case(
-        4, sample_type, {4: (tickers, returns)}, ["sobol_simplex"], num_ports=16)
-    values = portfolios["sobol_simplex"]["low"]
-    expected_start = dates[2] if sample_type == "in-sample" else dates[5]
-    assert values.index.min() == expected_start
-    assert fitted[0].index.equals(returns.index if sample_type == "in-sample" else dates[3:5])
-    benchmark = su.sp500_benchmark(sample_type, 10000, pd.Series(100., index=dates), values.index)
-    assert benchmark.index.equals(values.index)
-    np.testing.assert_allclose(values.iloc[:, 0], benchmark)
-    with pytest.raises(ValueError, match="cover every valuation date"):
-        su.sp500_benchmark(sample_type, 10000, pd.Series(100., index=dates[:-1]), values.index)
+        for sample_type in ("in-sample", "OOS"):
+            with self.subTest(sample_type=sample_type):
+                fitted = []
+
+                def fixed_selection(n_tickers, num_ports, replications, log_ret, sampler_types, **kwargs):
+                    fitted.append(log_ret)
+                    return {"sobol_simplex": {tier: np.full((1, 4), .25)
+                                             for tier in ("low", "medium", "high")}}, {}
+
+                with patch.object(su.cf, "start_date", str(dates[0].date())), \
+                     patch.object(su.cf, "end_date", str(dates[-1].date())), \
+                     patch.object(su.cf, "train_end_date", str(dates[4].date())), \
+                     patch.object(su.cf, "test_start_date", str(dates[5].date())), \
+                     patch.object(su.pd, "read_csv", lambda *args, **kwargs: prices.copy()), \
+                     patch.object(su, "generate_sampler_results", fixed_selection):
+                    portfolios, _, _ = su.run_backtest_case(
+                        4, sample_type, {4: (tickers, returns)}, ["sobol_simplex"], num_ports=16)
+                    values = portfolios["sobol_simplex"]["low"]
+                    expected_start = dates[2] if sample_type == "in-sample" else dates[5]
+                    self.assertEqual(values.index.min(), expected_start)
+                    expected_fitted_index = returns.index if sample_type == "in-sample" else dates[3:5]
+                    self.assertTrue(fitted[0].index.equals(expected_fitted_index))
+                    benchmark = su.sp500_benchmark(sample_type, 10000, pd.Series(100., index=dates), values.index)
+                    self.assertTrue(benchmark.index.equals(values.index))
+                    np.testing.assert_allclose(values.iloc[:, 0], benchmark)
+                    with self.assertRaisesRegex(ValueError, "cover every valuation date"):
+                        su.sp500_benchmark(sample_type, 10000, pd.Series(100., index=dates[:-1]), values.index)
 
 
 def _stock_df(prices, dates):
@@ -347,7 +359,7 @@ class TestSharpeReps(TestCase):
     not the risk-tier selection, is under test here."""
 
     def test_no_rf_uses_raw_return(self):
-        """Without a risk-free rate, excess_ret is log_ret itself."""
+        """Without a risk-free rate, score the converted simple returns."""
         dates = pd.bdate_range("2020-01-01", periods=2)
         log_ret = pd.DataFrame({"A": [0.02, 0.00]}, index=dates)
         weights = np.array([[[1.0]]])
@@ -377,11 +389,8 @@ class TestSharpeReps(TestCase):
         assert np.isnan(sr["medium risk Sharpe SE"])
 
     def test_se_across_replications(self):
-        """Two tickers with equal variance but different mean return, one
-        replication all-in on each: the two replications' Sharpe ratios are
-        11.225 and 22.450, so the SE of their mean is their half-difference,
-        5.612, independent of risk tier since P=1 forces the same portfolio
-        into every tier."""
+        """One all-in portfolio per replication: verify the mean and SE using
+        independently computed simple-return scores, across every risk tier."""
         dates = pd.bdate_range("2020-01-01", periods=2)
         log_ret = pd.DataFrame({"A": [0.02, 0.00], "B": [0.01, 0.03]}, index=dates)
         weights = np.array([[[1.0, 0.0]], [[0.0, 1.0]]])
