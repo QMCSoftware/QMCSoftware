@@ -102,6 +102,7 @@ test = [
     "ipywidgets >= 8.1.7, < 9",
     "nbconvert >= 7.2.9",
     "pytest-xdist >= 3.8.0",
+    "pygments >= 2.0.0",
     ]
 # Minimal set for `make unittests_core` (test/test_*.py only). Omits the
 # notebook/booktest stack (parsl, testbook, ...) whose 3.10 floor would

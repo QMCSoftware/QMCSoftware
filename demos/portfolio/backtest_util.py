@@ -1,10 +1,11 @@
 """Core backtest computation for the portfolio allocation demo.
 
 Covers point-in-time universe construction and periodic/event-driven
-rebalancing, independent of the notebook's plotting and sampler-comparison
-code (see pa_util.py for that). Extracted so these functions can be unit
-tested directly (test/test_tm_demo_portfolio.py), rather than only through
-the slow, whole-notebook booktest (test/booktests/tb_portfolio_allocation_demo.py).
+rebalancing, independent of the notebook's plotting (see pa_util.py) and
+sampler-comparison (see sampler_util.py) code. Extracted so these functions
+can be unit tested directly (test/test_tm_demo_portfolio.py), rather than
+only through the slow, whole-notebook booktest
+(test/booktests/tb_portfolio_allocation_demo.py).
 
 portfolio_allocation_demo.ipynb imports from this module rather than
 defining its own copies. Handles several edge cases beyond plain buy-and-
@@ -13,6 +14,19 @@ halt, and a stop-loss.
 """
 import numpy as np
 import pandas as pd
+
+
+def load_assets(path):
+    """Return ticker symbols and company labels in their saved order.
+
+    Args:
+        path (str): CSV path with 'Ticker' and 'Company' columns.
+
+    Returns:
+        tuple[list[str], list[str]]: Ticker symbols and company labels.
+    """
+    assets = pd.read_csv(path, usecols=["Ticker", "Company"]).drop_duplicates()
+    return assets["Ticker"].tolist(), assets["Company"].tolist()
 
 
 def setup_stock_dfs(df, tickers):
@@ -116,9 +130,11 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
             'QS') to periodically rebalance at: only listed, non-exited tickers'
             weights are renormalized and redistributed; an absent ticker's
             dollar balance freezes at its last traded price instead of being
-            redistributed, and resumes compounding if it returns. None
-            (default): the original single-period buy-and-hold behavior,
-            unchanged.
+            redistributed, and resumes compounding if it returns. If eligible
+            target weights sum to zero, the available pool stays in cash. None
+            (default): buy and hold, reserving each late-listed ticker's initial
+            allocation as cash until listing and freezing missing quotes at the
+            last traded value.
         rebalance_on_universe_change (bool): If True, also rebalance the day a
             ticker's listed status changes, instead of waiting for the next
             rebalance_freq date. Default False: no effect on this demo's
@@ -126,7 +142,9 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
         stop_loss_drop_pct (float, optional): Sell a ticker (see
             stop_loss_dates) the first day its price falls more than this
             fraction below its own running peak; proceeds are redistributed to
-            the remaining tickers, and the sold ticker never re-enters. None
+            the remaining tickers in proportion to their target weights, or held
+            as cash if their total target weight is zero. The sold ticker never
+            re-enters. None
             (default): disabled.
         stop_loss_price_floor (float or sequence[float], optional): Same as
             stop_loss_drop_pct, triggered by an absolute price instead of a
@@ -140,17 +158,18 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
     if len(stock_dfs) != D:
         raise ValueError(f"expected {D} stock series, got {len(stock_dfs)}")
 
-    if rebalance_freq is None and stop_loss_drop_pct is None and stop_loss_price_floor is None:
+    all_dates = sorted(set().union(*(df.index for df in stock_dfs)))
+    if (rebalance_freq is None and not rebalance_on_universe_change
+            and stop_loss_drop_pct is None and stop_loss_price_floor is None):
         portfolios = []
         for r in range(R):
             positions = [
-                stock_df['Norm Return'] * alloc * principal
+                stock_df['Norm Return'].reindex(all_dates).ffill().fillna(1.0) * alloc * principal
                 for stock_df, alloc in zip(stock_dfs, weights_reps[r])
             ]
             portfolios.append(pd.concat(positions, axis=1).sum(axis=1))
         return pd.concat(portfolios, axis=1)
 
-    all_dates = sorted(set().union(*(df.index for df in stock_dfs)))
     exit_dates = stop_loss_dates(stock_dfs, stop_loss_drop_pct, stop_loss_price_floor)
     triggers = {all_dates[0]}
     if rebalance_on_universe_change:
@@ -167,7 +186,7 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
         value = pd.Series(index=all_dates, dtype=float)
         balances = np.zeros(D)  # per-ticker dollar sub-balance; 0 until first listed
         exited = np.zeros(D, dtype=bool)  # permanently sold via a stop-loss
-        cash = 0.0  # proceeds with nowhere to go (every ticker exited or unlisted)
+        cash = 0.0  # available pool with no eligible positive target weight
         last_close = None
         for k, t0 in enumerate(rebalance_dates):
             t1 = rebalance_dates[k + 1] if k + 1 < len(rebalance_dates) else None
@@ -193,15 +212,15 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
             tradeable_pool = (balances[eligible_idx].sum() + balances[just_triggered].sum()
                                + cash + (principal if k == 0 else 0.0))
             cash = 0.0
-            if len(eligible_idx) == 0:
-                # Nothing to allocate to: hold the whole pool as cash instead of computing
-                # w @ rel on an empty w (0/0 = nan, silently vanishing the principal).
+            w = w_target[eligible_idx]
+            if w.sum() == 0:
+                # No eligible target mass (including an empty universe): hold cash.
                 cash = tradeable_pool
                 value.loc[period_dates] = frozen_total + cash
+                balances[eligible_idx] = 0.0
                 balances[np.flatnonzero(exited)] = 0.0
                 last_close = period_dates[-1]
                 continue
-            w = w_target[eligible_idx]
             w = w / w.sum()
             rel = np.zeros((len(eligible_idx), len(period_dates)))
             for j, i in enumerate(eligible_idx):
@@ -218,7 +237,11 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
 
 
 def sharpe_reps(weights, log_ret, log_rf=None):
-    """Compute Sharpe ratios for portfolios at three risk levels.
+    """Select portfolios by annualized constant-weight simple-return Sharpe.
+
+    Log-return inputs are converted to simple returns before computing moments.
+    The score describes daily constant weights; quarterly and buy-and-hold
+    strategies have drifting weights and must be evaluated from realized returns.
 
     Args:
         weights (ndarray): Shape (R, P, D) portfolio weights.
@@ -240,19 +263,17 @@ def sharpe_reps(weights, log_ret, log_rf=None):
 
     R, P, D = weights.shape
 
+    simple_ret = np.expm1(log_ret)
     if log_rf is None:
-        excess_ret = log_ret
+        excess_ret = simple_ret
     else:
-        # log_rf is an annualized rate; divide by 252 to a daily-equivalent before
-        # subtracting from log_ret's own daily returns, then re-annualize below.
-        excess_ret = log_ret.sub(log_rf.reindex(log_ret.index).ffill() / 252, axis=0)
+        # Convert the annualized log rate to a daily simple return in matching units.
+        daily_rf = np.expm1(log_rf.reindex(log_ret.index).ffill() / 252)
+        excess_ret = simple_ret.sub(daily_rf, axis=0)
 
     ret_arr = np.sum(weights * excess_ret.mean().values * 252, axis=2)
 
-    # V is the risky portfolio's own volatility (not the excess return's): standard
-    # Sharpe-ratio practice, since a short-term risk-free rate's own variance and its
-    # covariance with risky returns are treated as negligible by comparison.
-    vol_arr = np.sqrt(np.sum(weights @ (log_ret.cov().values * 252) * weights, axis=2))
+    vol_arr = np.sqrt(np.sum(weights @ (excess_ret.cov().values * 252) * weights, axis=2))
 
     sharpe_arr = ret_arr / vol_arr
 

@@ -27,8 +27,47 @@ from unittest import TestCase
 import numpy as np
 import pandas as pd
 import pytest
+from pathlib import Path
 
 bu = pytest.importorskip("demos.portfolio.backtest_util")
+
+
+@pytest.mark.parametrize("sample_type", ["in-sample", "OOS"])
+def test_backtest_windows_and_benchmark(monkeypatch, sample_type):
+    """F4: common-history valuation and dated benchmark; no future OOS fitting."""
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "demos/portfolio"))
+    import sampler_util as su
+    dates = pd.bdate_range("2020-01-01", periods=8)
+    tickers = list("ABCD")
+    prices = pd.concat([
+        pd.DataFrame({"Ticker": ticker, "Date": dates[2:] if ticker == "D" else dates,
+                      "Adj Close Price": 100.}) for ticker in tickers
+    ])
+    returns = pd.DataFrame(.01, index=dates[3:], columns=tickers)
+    monkeypatch.setattr(su.cf, "start_date", str(dates[0].date()))
+    monkeypatch.setattr(su.cf, "end_date", str(dates[-1].date()))
+    monkeypatch.setattr(su.cf, "train_end_date", str(dates[4].date()))
+    monkeypatch.setattr(su.cf, "test_start_date", str(dates[5].date()))
+    monkeypatch.setattr(su.pd, "read_csv", lambda *args, **kwargs: prices.copy())
+    fitted = []
+
+    def fixed_selection(n_tickers, num_ports, replications, log_ret, sampler_types, **kwargs):
+        fitted.append(log_ret)
+        return {"sobol_simplex": {tier: np.full((1, 4), .25)
+                                 for tier in ("low", "medium", "high")}}, {}
+
+    monkeypatch.setattr(su, "generate_sampler_results", fixed_selection)
+    portfolios, _, _ = su.run_backtest_case(
+        4, sample_type, {4: (tickers, returns)}, ["sobol_simplex"], num_ports=16)
+    values = portfolios["sobol_simplex"]["low"]
+    expected_start = dates[2] if sample_type == "in-sample" else dates[5]
+    assert values.index.min() == expected_start
+    assert fitted[0].index.equals(returns.index if sample_type == "in-sample" else dates[3:5])
+    benchmark = su.sp500_benchmark(sample_type, 10000, pd.Series(100., index=dates), values.index)
+    assert benchmark.index.equals(values.index)
+    np.testing.assert_allclose(values.iloc[:, 0], benchmark)
+    with pytest.raises(ValueError, match="cover every valuation date"):
+        su.sp500_benchmark(sample_type, 10000, pd.Series(100., index=dates[:-1]), values.index)
 
 
 def _stock_df(prices, dates):
@@ -111,10 +150,8 @@ class TestStopLossDates(TestCase):
 class TestComputePortfolioValueReps(TestCase):
     """No replication: every case uses a single deterministic weights row."""
 
-    def test_buy_and_hold_matches_old_formula(self):
-        """rebalance_freq=None reproduces the pre-fix formula exactly, including its
-        phantom-capital bug: a late listing contributes zero the whole time instead
-        of being added once listed (preserved for backward compatibility)."""
+    def test_buy_and_hold_conserves_cash_and_missing_holdings(self):
+        """F5: reserve cash before listing and retain a holding after quotes end."""
         toy = pd.DataFrame({
             "Ticker": ["A", "A", "A", "B"],
             "Date": pd.to_datetime(["2020-01-01", "2020-01-02", "2020-01-03", "2020-01-02"]),
@@ -124,7 +161,21 @@ class TestComputePortfolioValueReps(TestCase):
         v = bu.compute_portfolio_value_reps(
             [dfs["A"], dfs["B"]], np.array([[0.5, 0.5]]), 100
         ).iloc[:, 0]
-        assert v.tolist() == [50.0, 100.0, 55.00000000000001]
+        np.testing.assert_allclose(v, [100.0, 100.0, 105.0])
+
+    def test_buy_and_hold_flat_late_listing_conserves_principal(self):
+        dates = pd.bdate_range("2020-01-01", periods=4)
+        a = _stock_df([100.] * 4, dates)
+        b = _stock_df([100.] * 2, dates[2:])
+        v = bu.compute_portfolio_value_reps([a, b], np.array([[.5, .5], [0., 1.]]), 100)
+        np.testing.assert_allclose(v, 100.)
+
+    def test_buy_and_hold_halt_resumes_same_holding(self):
+        dates = pd.bdate_range("2020-01-01", periods=4)
+        a = _stock_df([100.] * 4, dates)
+        b = _stock_df([100., 120., 150.], dates[[0, 1, 3]])
+        v = bu.compute_portfolio_value_reps([a, b], np.array([[.5, .5]]), 100)
+        np.testing.assert_allclose(v.iloc[:, 0], [100., 110., 110., 125.])
 
     def test_rebalancing_fixes_phantom_capital(self):
         """BLOCKER 13: with rebalance_freq set, a late listing is added at its fair
@@ -142,7 +193,7 @@ class TestComputePortfolioValueReps(TestCase):
         # remains invested; B is absent again by day 3 and sits frozen at 50.
         assert v.tolist() == pytest.approx([100.0, 100.0, 105.0])
 
-    def test_absent_ticker_freezes_not_liquidates(self):
+    def test_absent_ticker_freezes_balance(self):
         """Extends BLOCKER 13: a ticker that goes permanently absent (bankruptcy or a
         data feed simply stopping) has its dollar balance frozen, not redistributed
         to the other tickers, and no rebalance_freq=None-style cliff appears either."""
@@ -158,7 +209,7 @@ class TestComputePortfolioValueReps(TestCase):
 
         jump_none = v_none.loc[li_next] - v_none.loc[li]
         jump_fixed = v_fixed.loc[li_next] - v_fixed.loc[li]
-        assert jump_none < -3_000, "no rebalancing should write Y's value off as an instant cliff"
+        assert jump_none == pytest.approx(5000 * (1.0003 ** 100 - 1.0003 ** 99))
         assert abs(jump_fixed) < 10, "freezing Y's balance should leave no cliff at all"
 
     def test_universe_change_reacts_same_day(self):
@@ -221,6 +272,34 @@ class TestComputePortfolioValueReps(TestCase):
         ).iloc[:, 0]
         assert v.tolist() == pytest.approx([100.0, 50.0, 50.0, 50.0])
 
+    def test_zero_weight_survivor_holds_cash(self):
+        """F1: a listed survivor with zero target weight cannot absorb proceeds."""
+        dates = pd.bdate_range("2020-01-01", periods=3)
+        a = _stock_df([100.0, 50.0, 100.0], dates)
+        b = _stock_df([100.0, 100.0, 200.0], dates)
+        weights = np.array([[1.0, 0.0], [0.5, 0.5]])
+        with np.errstate(divide="raise", invalid="raise"):
+            v = bu.compute_portfolio_value_reps(
+                [a, b], weights, 100, rebalance_freq="D",
+                stop_loss_drop_pct=0.1,
+            )
+        assert np.isfinite(v.to_numpy()).all()
+        # The first replication holds cash; the second reinvests in B, which doubles.
+        np.testing.assert_allclose(v.to_numpy(), [[100, 100], [50, 75], [50, 150]])
+
+    def test_zero_weight_waits_for_listing(self):
+        """F1: hold cash until the positive-weight stock becomes available."""
+        dates = pd.bdate_range("2020-01-01", periods=3)
+        a = _stock_df([100.0, 200.0, 300.0], dates)
+        b = _stock_df([100.0, 110.0], dates[1:])
+        weights = np.array([[0.0, 1.0]])
+        for policy in ({"rebalance_freq": "D"},
+                       {"rebalance_freq": "QS", "rebalance_on_universe_change": True}):
+            with np.errstate(divide="raise", invalid="raise"):
+                v = bu.compute_portfolio_value_reps([a, b], weights, 100, **policy)
+            assert np.isfinite(v.to_numpy()).all()
+            np.testing.assert_allclose(v.iloc[:, 0], [100, 100, 110])
+
     def test_combined_floor_and_drop_pct(self):
         """stop_loss_price_floor and stop_loss_drop_pct can both be supplied; whichever
         condition fires first for a ticker determines its sale date."""
@@ -278,18 +357,16 @@ class TestSharpeReps(TestCase):
         assert sr["high risk Sharpe"] == pytest.approx(11.225)
 
     def test_rf_uses_daily_equivalent(self):
-        """Regression test: log_rf is annualized and must be divided by 252
-        before subtracting from log_ret's own daily returns. For this data,
-        the pre-fix formula (subtracting the annualized rate directly) gave
-        a Sharpe ratio of -45.349 instead of the correct 11.0."""
+        """Convert annual log rates to daily simple returns before subtraction."""
         dates = pd.bdate_range("2020-01-01", periods=2)
         log_ret = pd.DataFrame({"A": [0.02, 0.00]}, index=dates)
         log_rf = pd.Series([0.0504, 0.0504], index=dates)
         weights = np.array([[[1.0]]])
         sr = bu.sharpe_reps(weights, log_ret, log_rf)
-        assert sr["low risk Sharpe"] == pytest.approx(11.0)
-        assert sr["medium risk Sharpe"] == pytest.approx(11.0)
-        assert sr["high risk Sharpe"] == pytest.approx(11.0)
+        excess = np.expm1(log_ret["A"]) - np.expm1(log_rf / 252)
+        expected = np.round(excess.mean() / excess.std(ddof=1) * np.sqrt(252), 3)
+        for tier in ("low", "medium", "high"):
+            assert sr[f"{tier} risk Sharpe"] == pytest.approx(expected)
 
     def test_se_nan_with_one_replication(self):
         """An SE needs at least two replications; R=1 (every other test here) gives NaN."""
@@ -309,5 +386,23 @@ class TestSharpeReps(TestCase):
         log_ret = pd.DataFrame({"A": [0.02, 0.00], "B": [0.01, 0.03]}, index=dates)
         weights = np.array([[[1.0, 0.0]], [[0.0, 1.0]]])
         sr = bu.sharpe_reps(weights, log_ret)
-        assert sr["medium risk Sharpe"] == pytest.approx(16.837)
-        assert sr["medium risk Sharpe SE"] == pytest.approx(5.612)
+        simple = np.expm1(log_ret)
+        scores = simple.mean() / simple.std(ddof=1) * np.sqrt(252)
+        assert sr["medium risk Sharpe"] == pytest.approx(np.round(scores.mean(), 3))
+        assert sr["medium risk Sharpe SE"] == pytest.approx(np.round(scores.std(ddof=1) / np.sqrt(2), 3))
+
+    def test_simple_return_score_with_varying_risk_free_rate(self):
+        """F7: use exact weighted simple returns and excess-return volatility."""
+        simple = np.array([[1., -.5], [-.2, .1], [.1, -.05], [.03, .02]])
+        dates = pd.bdate_range("2020-01-01", periods=4)
+        logs = pd.DataFrame(np.log1p(simple), index=dates)
+        daily_rf = np.array([.01, .02, .005, .015])
+        rf = pd.Series(252 * np.log1p(daily_rf), index=dates)
+        weights = np.array([[[.5, .5]], [[.25, .75]]])
+        excess = simple @ weights[:, 0].T - daily_rf[:, None]
+        scores = excess.mean(axis=0) / excess.std(axis=0, ddof=1) * np.sqrt(252)
+        result = bu.sharpe_reps(weights, logs, rf)
+        for tier in ("low", "medium", "high"):
+            np.testing.assert_allclose(result[tier], weights[:, 0])
+            assert result[f"{tier} risk Sharpe"] == np.round(scores.mean(), 3)
+            assert result[f"{tier} risk Sharpe SE"] == np.round(scores.std(ddof=1) / np.sqrt(2), 3)

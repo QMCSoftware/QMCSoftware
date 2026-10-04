@@ -787,7 +787,7 @@ format:
 	@$(MAKE) rm_trailing_whitespace FORMAT_PATH="$(FORMAT_PATH)"
 	@echo
 	@echo "> strip_notebook_execution_metadata"
-	@$(MAKE) strip_notebook_execution_metadata FORMAT_PATH="$(FORMAT_PATH)"
+	@$(MAKE) strip_notebook_execution_metadata
 	@echo
 	@echo "> harden_colab_notebook"
 	@$(MAKE) harden_colab_notebook

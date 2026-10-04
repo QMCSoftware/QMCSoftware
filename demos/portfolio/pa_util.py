@@ -2,20 +2,84 @@
 demo's notebooks.
 """
 
+import ast
 import itertools
 import inspect
+import textwrap
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib.colors as mcolors
 import ipywidgets as widgets
-from IPython.display import display
+from IPython.display import display, HTML
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
 # Needed eagerly, not just for the isinstance check below: pandas.io.formats.style is
 # otherwise lazily loaded, and style_by_value's isinstance check would AttributeError
 # before anything else triggered that load (e.g. when called directly on a plain
 # DataFrame, not chained after style_by_frequency's own `df.style`).
 from pandas.io.formats.style import Styler
+
+
+def _strip_docstring(src):
+    """Remove a function/class's own docstring statement from its source text.
+
+    Args:
+        src (str): Source text, e.g. from inspect.getsource; may be indented
+            (a method's source keeps its class-body indentation).
+
+    Returns:
+        str: src with the docstring line(s) removed, or src unchanged if it
+            has none.
+    """
+    tree = ast.parse(textwrap.dedent(src))
+    body = tree.body[0].body
+    has_docstring = (body and isinstance(body[0], ast.Expr)
+                      and isinstance(body[0].value, ast.Constant)
+                      and isinstance(body[0].value.value, str))
+    if not has_docstring:
+        return src
+    doc_node = body[0]
+    lines = src.splitlines(keepends=True)
+    del lines[doc_node.lineno - 1:doc_node.end_lineno]
+    return ''.join(lines)
+
+
+def show_source(obj, style='monokai', max_lines=None, show_docstring=True):
+    """Display a function/class's source with syntax highlighting.
+
+    A plain print(inspect.getsource(obj)) renders as uncolored text.
+    noclasses=True bakes each token's color into its own inline style=
+    attribute instead of CSS classes resolved against a separate <style>
+    block, so the highlighting survives notebook frontends that sanitize
+    (strip) <style> tags from HTML outputs.
+
+    Args:
+        obj (callable or type): Function or class to display the source of.
+        style (str): Pygments style name, e.g. 'monokai', 'dracula',
+            'github-dark', 'one-dark', 'native'.
+        max_lines (int, optional): Show only the first this many lines
+            (applied after dropping the docstring, if show_docstring is
+            False), with a trailing comment noting how many were omitted.
+            None (default): show every line.
+        show_docstring (bool): If False, omit the docstring; the
+            def/class line and signature are always kept.
+
+    Returns:
+        IPython.display.HTML: Rendered source; display it or return it as
+            a cell's last expression.
+    """
+    src = inspect.getsource(obj)
+    if not show_docstring:
+        src = _strip_docstring(src)
+    lines = src.splitlines()
+    if max_lines is not None and len(lines) > max_lines:
+        omitted = len(lines) - max_lines
+        lines = lines[:max_lines] + [f"# ... ({omitted} more line{'s' if omitted != 1 else ''})"]
+    formatter = HtmlFormatter(style=style, noclasses=True)
+    return HTML(highlight('\n'.join(lines), PythonLexer(), formatter))
 
 
 def nice_log_ticks(vmin, vmax, target_n=6):

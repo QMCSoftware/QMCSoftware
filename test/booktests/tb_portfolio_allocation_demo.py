@@ -22,15 +22,19 @@ class NotebookTests(BaseNotebookTest):
 
         replacements = {
             "n_ports = [2**13, 2**14, 2**15]": "n_ports = [2**7, 2**8]",
-            # Regex (not literal): these sweep bounds keep getting retuned, which dead-ended literal keys twice; anchoring on the stable prefix survives future retuning.
-            re.compile(r"dimensions = \[5, 10, 20[^\]]*\]"): "dimensions = [5, 10]",
-            re.compile(r"range\(8,\s*\d+\)"): "range(8, 11)",
-            "fixed_dimension = 50": "fixed_dimension = 10",
-            'tickers1, description1 = load_assets(f"data/df10_{cf.start_date}_to_{cf.end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
+            # measure_runtime's sweep sizes and run_backtest_case's replication counts moved
+            # from notebook-cell locals into sampler_util.py function bodies (now parameters
+            # with matching defaults), so they're no longer in the notebook's own cell text to
+            # patch directly; override them at the (still-in-notebook) call sites instead.
+            "df_runtime = su.measure_runtime(sampler_types, transform=TRANSFORM_METH)":
+                "df_runtime = su.measure_runtime(sampler_types, transform=TRANSFORM_METH, "
+                "dimensions=[5, 10], num_samples=[2**m for m in range(8, 11)], fixed_dimension=10)",
+            'tickers1, description1 = bu.load_assets(f"data/df10_{cf.start_date}_to_{cf.end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
             # Shrinks Section 4's loops to just 4 tickers (independent of the tickers1 shrink above).
             "for n_tickers in (4, 10, 20, 40):": "for n_tickers in (4,):",
             re.compile(r"num_ports_section4 = 2\*\*\d+(  # or 2\*\*\d+)?"): "num_ports_section4 = 2**7",
-            "replications = 50": "replications = 5",
+            "su.run_backtest_case(n_tickers, 'OOS', section4_data, sampler_types, num_ports=num_ports_section4, principal=principal, transform=TRANSFORM_METH)":
+                "su.run_backtest_case(n_tickers, 'OOS', section4_data, sampler_types, num_ports=num_ports_section4, principal=principal, transform=TRANSFORM_METH, oos_replications=5)",
         }
 
         self.run_notebook(notebook_path, replacements)
