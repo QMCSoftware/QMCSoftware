@@ -38,6 +38,7 @@ from scripts.check_colab_notebooks import (
     validate_enabled_notebook,
     validate_manifest,
     manifest_sets,
+    source_install_ref,
     validate_strict_enabled_notebook,
     wants_source_install,
 )
@@ -192,6 +193,12 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
     ]
 
     if needs_repo_clone:
+        # A source install's branch/commit may not be the manifest's own git_ref
+        # (used for the Colab badge, not necessarily the branch holding
+        # branch-only code): an explicit colab-install-from-source-ref marker
+        # overrides it so the clone actually has the module being installed.
+        clone_ref = source_install_ref(cells) if source_install else None
+        clone_branch_flag = f" --branch {clone_ref}" if clone_ref else ""
         lines.extend(
             [
                 "  import sys\n",
@@ -199,7 +206,7 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
                 '  repo_root = "/content/QMCSoftware"\n',
                 f'  notebook_dir = f"{{repo_root}}/{notebook_dir_rel}"\n',
                 "  if not os.path.isdir(repo_root):\n",
-                f"    !git clone -q --depth 1 https://github.com/{manifest['repo']} {{repo_root}}\n",
+                f"    !git clone -q --depth 1{clone_branch_flag} https://github.com/{manifest['repo']} {{repo_root}}\n",
             ]
         )
 

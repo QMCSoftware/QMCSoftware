@@ -1374,6 +1374,8 @@ class TestSimplexTransform(unittest.TestCase):
             ("wrong dimension", np.array([[0.1, 0.2, 0.3]])),
             ("outside unit cube", np.array([[1.1, 0.2]])),
             ("nonfinite value", np.array([[np.nan, 0.2]])),
+            ("complex value", np.array([[0.1 + 0.2j, 0.2]])),
+            ("complex dtype with real values", np.array([[0.1, 0.2]], dtype=complex)),
         ):
             with self.subTest(case=case), self.assertRaises(ParameterError):
                 transformer.root(points)

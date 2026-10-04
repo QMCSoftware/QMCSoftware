@@ -130,7 +130,10 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
             axis. A stock's index may start late (a listing), end early (a
             delisting or bankruptcy), or have an internal gap (a trading halt).
         weights_reps (ndarray): Shape (R, D) portfolio weights, one row per
-            replication.
+            replication. A row may be all-NaN (e.g. a sharpe_reps tier with
+            no eligible candidate for that replication), propagated as a
+            NaN value rather than a fabricated $0; a row that is only
+            partially NaN raises ValueError.
         principal (float): Dollar amount invested.
         rebalance_freq (str, optional): A pandas date_range frequency alias (e.g.
             'QS') to periodically rebalance at: only listed, non-exited tickers'
@@ -164,6 +167,14 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
     if len(stock_dfs) != D:
         raise ValueError(f"expected {D} stock series, got {len(stock_dfs)}")
 
+    nan_counts = np.isnan(weights_reps).sum(axis=1)
+    if np.any((nan_counts > 0) & (nan_counts < D)):
+        raise ValueError(
+            "weights_reps has a replication with some but not all weights NaN; "
+            "a replication must be either fully specified or fully NaN (e.g. a "
+            "sharpe_reps tier with no eligible candidate for that replication)"
+        )
+
     all_dates = sorted(set().union(*(df.index for df in stock_dfs)))
     if (rebalance_freq is None and not rebalance_on_universe_change
             and stop_loss_drop_pct is None and stop_loss_price_floor is None):
@@ -173,7 +184,10 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
                 stock_df['Norm Return'].reindex(all_dates).ffill().fillna(1.0) * alloc * principal
                 for stock_df, alloc in zip(stock_dfs, weights_reps[r])
             ]
-            portfolios.append(pd.concat(positions, axis=1).sum(axis=1))
+            # min_count=1 preserves a fully-NaN replication (validated above) as NaN;
+            # pandas' default sum-of-all-NaN is 0, which would otherwise fabricate a
+            # $0 portfolio for a replication where no tier candidate was eligible.
+            portfolios.append(pd.concat(positions, axis=1).sum(axis=1, min_count=1))
         return pd.concat(portfolios, axis=1)
 
     exit_dates = stop_loss_dates(stock_dfs, stop_loss_drop_pct, stop_loss_price_floor)
@@ -265,9 +279,12 @@ def sharpe_reps(weights, log_ret, log_rf=None, trading_days_per_year=252):
 
     Returns:
         dict: Per-risk-level selected weights ('low'/'medium'/'high', shape
-            (R, D) each), their mean Sharpe ratios, and the standard error
-            (SE) of that mean across the R replications (NaN if R == 1,
-            since an SE needs at least two replications to estimate).
+            (R, D) each, NaN rows where that replication had no eligible
+            candidate), their mean Sharpe ratios, the standard error (SE) of
+            that mean, and the number of replications the mean/SE were
+            computed from ('<level> risk valid replications'): fewer than R
+            whenever that tier was empty for some replications, and NaN SE
+            below 2 valid replications.
     """
 
     R, P, D = weights.shape
@@ -320,8 +337,16 @@ def sharpe_reps(weights, log_ret, log_rf=None, trading_days_per_year=252):
     medium_weights = np.where(medium_empty[:, None], np.nan, weights[rows, medium_risk_idx])
     high_weights = np.where(high_empty[:, None], np.nan, weights[rows, high_risk_idx])
 
+    def n_valid(arr):
+        return int(np.count_nonzero(~np.isnan(arr)))
+
     def se(arr):
-        return np.round(np.nanstd(arr, ddof=1) / np.sqrt(R), 3) if R > 1 else np.nan
+        # Divide by the number of replications actually contributing a finite score to
+        # this tier (m), not R: when a tier is empty (NaN) for some replications, nanstd
+        # already excludes them from the spread, so the denominator must match or the SE
+        # is understated by a factor of sqrt(m/R). Undefined (NaN), not 0, below m=2.
+        m = n_valid(arr)
+        return np.round(np.nanstd(arr, ddof=1) / np.sqrt(m), 3) if m > 1 else np.nan
 
     with warnings.catch_warnings():
         # Expected, not a caller error: a tier that's empty in every replication (R == 1
@@ -345,6 +370,10 @@ def sharpe_reps(weights, log_ret, log_rf=None, trading_days_per_year=252):
             "low risk Sharpe SE": se(low_risk_max_sharpe),
             "medium risk Sharpe SE": se(medium_risk_max_sharpe),
             "high risk Sharpe SE": se(high_risk_max_sharpe),
+
+            "low risk valid replications": n_valid(low_risk_max_sharpe),
+            "medium risk valid replications": n_valid(medium_risk_max_sharpe),
+            "high risk valid replications": n_valid(high_risk_max_sharpe),
         }
     return result
 

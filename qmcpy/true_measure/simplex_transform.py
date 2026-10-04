@@ -59,7 +59,8 @@ class _SimplexTransform:
     def _validate_points(self, points: np.ndarray) -> np.ndarray:
         """Return finite cube points with a checked final coordinate axis."""
         points = np.asarray(points)
-        if points.ndim == 0 or not np.issubdtype(points.dtype, np.number):
+        if (points.ndim == 0 or not np.issubdtype(points.dtype, np.number)
+                or np.iscomplexobj(points)):
             raise ParameterError(
                 "points must be a real numeric array with shape (..., dimension)"
             )

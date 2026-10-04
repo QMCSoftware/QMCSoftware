@@ -187,6 +187,10 @@ class TestColabNotebooks(unittest.TestCase):
         ]
         self.assertFalse(check.wants_source_install(plain_cells))
         self.assertTrue(check.wants_source_install(marked_cells))
+        self.assertTrue(check.wants_source_install([
+            markdown_cell("<!-- # colab-install-from-source -->\n"),
+            code_cell("from qmcpy import SimplexUniform\n"),
+        ]))
 
         tmp_path = self._tmp_path()
         self._setattr(harden, "REPO_ROOT", tmp_path)
@@ -200,6 +204,11 @@ class TestColabNotebooks(unittest.TestCase):
         marked_source = "".join(
             harden.bootstrap_cell_source(notebook_path, manifest, marked_cells)
         )
+        markdown_source = "".join(harden.bootstrap_cell_source(
+            notebook_path, manifest,
+            [markdown_cell("<!-- # colab-install-from-source -->\n"), *plain_cells],
+        ))
+        self.assertIn("!pip install -q -e {repo_root}", markdown_source)
 
         self.assertIn("!pip install -q qmcpy", plain_source)
         self.assertNotIn("-e {repo_root}", plain_source)
@@ -208,7 +217,39 @@ class TestColabNotebooks(unittest.TestCase):
         self.assertNotIn("!pip install -q qmcpy\n", marked_source)
         self.assertIn("!git clone", marked_source)  # editable install needs the clone
         self.assertTrue(check.installs_qmcpy(marked_source))
+        self.assertNotIn("--branch", marked_source)  # no ref marker: manifest's own default ref
         compile(smoke.rewrite_shell_magics(marked_source), "<bootstrap>", "exec")
+
+    def test_source_install_ref_pins_branch(self):
+        """A source-only API (e.g. unmerged PR code) needs the clone itself
+        pinned to that branch, not just an editable install from whatever the
+        manifest's own git_ref (used for the Colab badge) happens to be."""
+        self.assertIsNone(check.source_install_ref([code_cell("import qmcpy as qp\n")]))
+
+        code_marked = [code_cell(
+            "# colab-install-from-source: SimplexUniform is branch-only.\n"
+            "# colab-install-from-source-ref: asset_allocation\n"
+            "from qmcpy import SimplexUniform\n"
+        )]
+        self.assertEqual(check.source_install_ref(code_marked), "asset_allocation")
+
+        markdown_marked = [
+            markdown_cell("<!-- # colab-install-from-source-ref: asset_allocation -->\n"),
+            code_cell("from qmcpy import SimplexUniform\n"),
+        ]
+        self.assertEqual(check.source_install_ref(markdown_marked), "asset_allocation")
+
+        tmp_path = self._tmp_path()
+        self._setattr(harden, "REPO_ROOT", tmp_path)
+        notebook_path = tmp_path / "demos" / "example.ipynb"
+        notebook_path.parent.mkdir()
+        manifest = {"repo": "QMCSoftware/QMCSoftware"}
+
+        pinned_source = "".join(
+            harden.bootstrap_cell_source(notebook_path, manifest, markdown_marked)
+        )
+        self.assertIn("!git clone -q --depth 1 --branch asset_allocation ", pinned_source)
+        compile(smoke.rewrite_shell_magics(pinned_source), "<bootstrap>", "exec")
 
     def test_extra_pip_packages_preserves_later_explicit_installs(self):
         cells = [

@@ -18,7 +18,7 @@ class SimplexUniform(AbstractTrueMeasure):
     w_i \ge 0, \sum_{i=1}^d w_i \le 1\}$, named for its shape: the corner of
     the unit cube $[0,1]^d$ cut off by the hyperplane $\sum_i w_i = 1$.
 
-    Returns $d$ of $d+1$ nonnegative weights summing to 1; append $w_{d+1} =
+    Returns $d$ nonnegative coordinates summing to at most 1; append $w_{d+1} =
     1 - \sum_i w_i$ for the full probability-simplex vector, which is
     $\mathrm{Dirichlet}(1,\dots,1)$-distributed ($d+1$ ones) [1].
 

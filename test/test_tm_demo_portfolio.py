@@ -25,7 +25,7 @@ Example:
 import sys
 from pathlib import Path
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
@@ -35,12 +35,35 @@ bu = pytest.importorskip("demos.portfolio.backtest_util")
 
 
 class TestBacktestWindowsAndBenchmark(TestCase):
+    """run_backtest_case's start-date selection and sp500_benchmark's date
+    matching, across both in-sample and OOS sample types."""
+
     def setUp(self):
+        """Import sampler_util the same way the notebook does (sys.path, not
+        a package import), so patch.object on its module-level names works."""
         path = str(Path(__file__).resolve().parents[1] / "demos/portfolio")
         sys.path.insert(0, path)
         self.addCleanup(sys.path.remove, path)
         import sampler_util
         self.su = sampler_util
+
+    def test_generates_only_requested_samplers_once(self):
+        """A reduced search must never instantiate an excluded sampler."""
+        su = self.su
+        cube = np.random.default_rng(42).random((2, 8, 3))
+        samplers = {name: Mock(return_value=Mock(gen_samples=Mock(return_value=cube)))
+                    for name in ("sobol", "iid", "faure")}
+        log_ret = pd.DataFrame([[.01, .02, -.01], [-.02, .01, .03], [.03, -.01, .02]])
+        requested = ["sobol_simplex", "iid_simplex", "sobol_simplex"]
+        with patch.object(su, "sampler_classes", samplers):
+            results, timing = su.generate_sampler_results(
+                3, 8, 2, log_ret, requested, return_timing=True)
+        assert list(results) == ["sobol_simplex", "iid_simplex"]
+        assert list(timing) == ["sobol", "iid"]
+        for name in ("sobol", "iid"):
+            samplers[name].assert_called_once_with(dimension=3, replications=2, seed=42)
+            samplers[name].return_value.gen_samples.assert_called_once_with(8)
+        samplers["faure"].assert_not_called()
 
     def test_common_history_and_dated_benchmark(self):
         """F4: common-history valuation and dated benchmark; no future OOS fitting."""
@@ -157,6 +180,17 @@ class TestStopLossDates(TestCase):
         b = _stock_df([10.0, 5.0, 1.0], dates)
         triggers = bu.stop_loss_dates([a, b], stop_loss_price_floor=[6.0, None])
         assert triggers == {0: dates[1]}
+
+    def test_floor_sequence_length_and_generator(self):
+        """A sequence stop_loss_price_floor must have exactly one entry per
+        ticker; any sequence type works, since it's only ever indexed once
+        per ticker, never re-checked for length a second time."""
+        dates = pd.bdate_range("2020-01-01", periods=2)
+        stocks = [_stock_df([10., 5.], dates)] * 2
+        for floors in ([6.], [6., None, 6.]):
+            with self.subTest(floors=floors), self.assertRaisesRegex(ValueError, "one per ticker"):
+                bu.stop_loss_dates(stocks, stop_loss_price_floor=floors)
+        assert bu.stop_loss_dates(stocks, stop_loss_price_floor=iter([6., None])) == {0: dates[1]}
 
 
 class TestComputePortfolioValueReps(TestCase):
@@ -333,6 +367,52 @@ class TestComputePortfolioValueReps(TestCase):
         with pytest.raises(ValueError):
             bu.compute_portfolio_value_reps([a], np.array([[0.5, 0.5]]), 100)
 
+    def test_missing_selection_stays_nan_not_zero(self):
+        """A replication with no eligible candidate (all-NaN weight row, as
+        sharpe_reps now returns for an empty tier) must value as NaN, not a
+        fabricated $0: pandas' default sum() treats an all-NaN row as 0."""
+        dates = pd.bdate_range("2020-01-01", periods=2)
+        a = _stock_df([100.0, 100.0], dates)
+        b = _stock_df([100.0, 100.0], dates)
+        weights = np.array([[np.nan, np.nan], [0.5, 0.5]])
+        v = bu.compute_portfolio_value_reps([a, b], weights, 100)
+        self.assertTrue(v.iloc[:, 0].isna().all())
+        np.testing.assert_allclose(v.iloc[:, 1], 100.0)
+
+    def test_partially_nan_weight_row_raises(self):
+        """A weight row with some but not all entries NaN is malformed input,
+        not a valid 'missing selection' (which is all-NaN), so it must raise
+        rather than silently propagating a partial sum."""
+        dates = pd.bdate_range("2020-01-01", periods=2)
+        a = _stock_df([100.0, 100.0], dates)
+        b = _stock_df([100.0, 100.0], dates)
+        with pytest.raises(ValueError):
+            bu.compute_portfolio_value_reps([a, b], np.array([[np.nan, 0.5]]), 100)
+
+    def test_empty_tier_survives_to_valuation(self):
+        """End-to-end selection-to-valuation regression (not just sharpe_reps'
+        own output): a tier missing for some replications must not turn into
+        an apparent total loss once those weights are valued over time."""
+        simple = np.array([[.01, .01], [.02, .03], [.03, .05]])
+        fit_dates = pd.bdate_range("2020-01-01", periods=3)
+        log_ret = pd.DataFrame(np.log1p(simple), index=fit_dates, columns=["A", "B"])
+        weights = np.array([
+            [[1., 0.], [1., 0.], [0., 1.]],    # medium empty
+            [[1., 0.], [1., 0.], [0., 1.]],    # medium empty
+            [[1., 0.], [.5, .5], [0., 1.]],    # medium populated
+            [[1., 0.], [.25, .75], [0., 1.]],  # medium populated
+        ])
+        sr = bu.sharpe_reps(weights, log_ret)
+
+        val_dates = pd.bdate_range("2022-01-01", periods=2)
+        a = _stock_df([100.0, 100.0], val_dates)
+        b = _stock_df([100.0, 100.0], val_dates)
+        values = bu.compute_portfolio_value_reps([a, b], sr["medium"], principal=100)
+        self.assertTrue(values.iloc[:, :2].isna().all().all())
+        np.testing.assert_allclose(values.iloc[:, 2:], 100.0)
+        # The fabricated-zero bug would have pulled this mean down to 50.
+        np.testing.assert_allclose(values.mean(axis=1), 100.0)
+
 
 class TestComputeAllPortfolios(TestCase):
     def test_forwards_sampler_and_risk_level(self):
@@ -429,3 +509,35 @@ class TestSharpeReps(TestCase):
         self.assertTrue(np.all(np.isnan(result["medium"])))
         self.assertFalse(np.isnan(result["low risk Sharpe"]))
         self.assertFalse(np.isnan(result["high risk Sharpe"]))
+
+    def test_se_uses_valid_replication_count(self):
+        """A tier empty in some but not all replications must divide its SE by
+        sqrt(valid count), not sqrt(R): nanstd already excludes the empty
+        replications from the spread, so dividing by sqrt(R) understates the SE."""
+        simple = np.array([[.01, .01], [.02, .03], [.03, .05]])
+        dates = pd.bdate_range("2020-01-01", periods=3)
+        log_ret = pd.DataFrame(np.log1p(simple), index=dates, columns=["A", "B"])
+        weights = np.array([
+            [[1., 0.], [1., 0.], [0., 1.]],    # medium empty
+            [[1., 0.], [1., 0.], [0., 1.]],    # medium empty
+            [[1., 0.], [.5, .5], [0., 1.]],    # medium populated
+            [[1., 0.], [.25, .75], [0., 1.]],  # medium populated
+        ])
+        result = bu.sharpe_reps(weights, log_ret)
+        self.assertEqual(result["medium risk valid replications"], 2)
+        self.assertEqual(result["medium risk Sharpe SE"], 0.756)
+        self.assertEqual(result["low risk valid replications"], 4)
+
+    def test_se_nan_below_two_valid_replications(self):
+        """A tier populated in only one replication cannot estimate a spread."""
+        simple = np.array([[.01, .01], [.02, .03], [.03, .05]])
+        dates = pd.bdate_range("2020-01-01", periods=3)
+        log_ret = pd.DataFrame(np.log1p(simple), index=dates, columns=["A", "B"])
+        weights = np.array([
+            [[1., 0.], [1., 0.], [0., 1.]],   # medium empty
+            [[1., 0.], [1., 0.], [0., 1.]],   # medium empty
+            [[1., 0.], [.5, .5], [0., 1.]],   # medium populated (only one)
+        ])
+        result = bu.sharpe_reps(weights, log_ret)
+        self.assertEqual(result["medium risk valid replications"], 1)
+        self.assertTrue(np.isnan(result["medium risk Sharpe SE"]))
