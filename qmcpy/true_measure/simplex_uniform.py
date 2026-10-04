@@ -40,6 +40,23 @@ class SimplexUniform(AbstractTrueMeasure):
         >>> bool(np.all(w >= 0) and np.all(w.sum(axis=-1) <= 1))
         True
 
+        Each coordinate's moments follow the symmetric Dirichlet$(1,\dots,1)$
+        marginal/pairwise formulas $E[W_i] = \frac{1}{d+1}$,
+        $\mathrm{Var}(W_i) = \frac{d}{(d+1)^2(d+2)}$,
+        $\mathrm{Cov}(W_i,W_j) = -\frac{1}{(d+1)^2(d+2)}$ ($i \ne j$). Unlike
+        `Kumaraswamy`'s independent coordinates, this covariance is dense, not
+        diagonal: the $d+1$ weights share a fixed budget summing to 1.
+
+        >>> s2 = SimplexUniform(DigitalNetB2(2, seed=7))
+        >>> s2  # doctest: +NORMALIZE_WHITESPACE
+        SimplexUniform (AbstractTrueMeasure)
+            transform_method root
+            mean            [0.333 0.333]
+            variance        [0.056 0.056]
+            standard_deviation [0.236 0.236]
+            covariance      [[ 0.056 -0.028]
+                             [-0.028  0.056]]
+
         Every `transform_method` is measure-preserving (weight means over
         500,000 samples matched the exact Dirichlet mean $1/(d+1)$), so the
         choice is a QMC-efficiency question, not a correctness one:
@@ -95,7 +112,7 @@ class SimplexUniform(AbstractTrueMeasure):
                 UserWarning,
             )
         self.transform_method = transform_method
-        self.parameters = ["transform_method"]
+        self.parameters = ["transform_method", "mean", "variance", "standard_deviation", "covariance"]
         self.domain = np.array([[0, 1]])
         self._parse_sampler(sampler)
         self._simplex = _SimplexTransform(dimension=self.d)
@@ -107,6 +124,20 @@ class SimplexUniform(AbstractTrueMeasure):
                 f"for dimension {self.d} (float64 overflows above d=170)."
             )
         self.range = np.tile(np.array([0, 1]), (self.d, 1))
+        # The d returned weights are the first d coordinates of a symmetric
+        # Dirichlet(1,...,1) vector with d+1 parts: E[W_i] = 1/(d+1),
+        # Var(W_i) = d/((d+1)^2 (d+2)), Cov(W_i,W_j) = -1/((d+1)^2 (d+2)) for i != j.
+        d = self.d
+        var_val = d / ((d + 1) ** 2 * (d + 2))
+        cov_val = -1.0 / ((d + 1) ** 2 * (d + 2))
+        covariance = np.full((d, d), cov_val)
+        np.fill_diagonal(covariance, var_val)
+        self._set_moments(
+            mean=np.full(d, 1.0 / (d + 1)),
+            variance=np.full(d, var_val),
+            standard_deviation=np.full(d, math.sqrt(var_val)),
+            covariance=covariance,
+        )
         super(SimplexUniform, self).__init__()
 
     def _transform(self, x):
