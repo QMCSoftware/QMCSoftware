@@ -331,12 +331,6 @@ def _citation_key_findings(scan_lines, definitions):
 
     cited = {}
     for loc, line in scan_lines:
-        if _MARKERS[1][1].match(line.strip()):
-            # A `[N] ...`-shaped line is a bibliography entry even if the
-            # section header it belongs to wasn't recognized as a
-            # References-type heading (e.g. "### Bibliography"): still not
-            # a citation of itself.
-            continue
         for m in _CITATION.finditer(line):
             cited.setdefault(int(m.group(1)), loc)
 

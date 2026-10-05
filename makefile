@@ -831,6 +831,20 @@ format:
 	@# `**References: **`. Wrapping/whitespace-only tools like docformatter are
 	@# safe to add later if wanted; a full reflow pass is not.
 
+# Read-only counterparts for the mechanical steps in make format.
+check_format:
+	@echo "$(RULE)"
+	@echo "make check_format: verifying formatting without editing the tree"
+	@echo "$(RULE)"
+	@$(PYTHON) scripts/flatten_qmcpy_imports.py --check
+	@$(PYTHON) scripts/unwrap_markdown.py --check "$(MARKDOWN_UNWRAP_PATH)"
+	@$(PYTHON) scripts/remove_trailing_whitespace.py --check "$(FORMAT_PATH)"
+	@$(PYTHON) scripts/strip_notebook_execution_metadata.py --check "$(FORMAT_PATH)"
+	@$(MAKE) check_colab_notebooks
+	@$(MAKE) check_asserts_changed
+	@$(MAKE) check_docstring_arg_types_changed
+	@$(MAKE) check_docstring_indent_changed STRICT=--strict
+
 # `make check` only reads: it never edits the tree. Every step ends with one
 # summary line:
 #     <tool>: clean         (0/N files)   : nothing to fix
@@ -905,25 +919,23 @@ strip_notebook_execution_metadata:
 # e.g. check_ref_style's citation-key matching currently flags findings in
 # dozens of pre-existing files nobody's touching, so making that strict
 # repo-wide would block every future push regardless of what changed. This
-# instead runs `make check` for broad visibility, then re-runs just the two
-# checks that catch the most common recurring mistakes (a notebook saved
+# instead runs read-only formatting checks and the two strict checks that
+# catch the most common recurring mistakes (a notebook saved
 # without being fully re-run; a citation added without updating
 # References, or vice versa), scoped to files changed relative to develop,
 # in STRICT mode: a check that can only fail because of something this
-# branch actually introduced. Static checks run first (seconds) so a doc
-# mistake fails fast before paying for the slower test suite below.
+# branch actually introduced. It then runs `make check` for broad visibility.
+# Static checks run first (seconds) so a doc mistake fails fast before paying
+# for the slower test suite below.
 prepush:
-	@time $(MAKE) format
-	@git diff --quiet -- . || { \
-		echo "make prepush: formatting changed tracked files; review and commit them, then rerun"; \
-		exit 1; \
-	}
-	@time $(MAKE) check
-	@time $(MAKE) tests_fast
+	@time $(MAKE) check_format
 	@echo
 	@echo "$(RULE)"
 	@echo "make prepush: enforcing on files changed relative to develop"
 	@echo "$(RULE)"
-	@echo
+	@time $(MAKE) check_notebook_execution_changed STRICT=--strict
+	@time $(MAKE) check_ref_style_changed STRICT=--strict
+	@time $(MAKE) check
+	@time $(MAKE) tests_fast
 	@echo
 	@echo "make prepush: done, nothing blocking found. Safe to push."

@@ -81,11 +81,12 @@ jobs:
         # that plus this commit instead of every branch in the repo. The bare
         # name doesn't resolve from a remote-tracking ref alone (verified:
         # `git rev-parse develop` fails with only origin/develop present), so
-        # create a local develop branch explicitly after fetching it.
+        # ensure a local branch exists without recreating one checked out by a
+        # push workflow.
         run: |
           git fetch --no-tags --prune --no-recurse-submodules --depth=10000 origin ${{ github.sha }}
           git fetch --no-tags --prune --no-recurse-submodules --depth=10000 origin develop
-          git branch develop refs/remotes/origin/develop
+          git show-ref --verify --quiet refs/heads/develop || git branch develop refs/remotes/origin/develop
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"

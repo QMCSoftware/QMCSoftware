@@ -33,6 +33,18 @@ class TestCheckRefStyle(unittest.TestCase):
 
             self.assertEqual(check_markdown_file(path), [])
 
+    def test_citation_at_start_of_prose_line_is_used(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "example.md"
+            path.write_text(
+                "[1] describes the method.\n\n"
+                "## References\n\n"
+                "[1] A. Author, Example, 2024.\n",
+                encoding="utf-8",
+            )
+
+            self.assertEqual(check_markdown_file(path), [])
+
     def test_notebook_code_spans_and_fences_are_ignored(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "example.ipynb"

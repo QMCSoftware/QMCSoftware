@@ -53,6 +53,14 @@ def check_notebook_file(path):
     for idx, cell in enumerate(notebook.get("cells", [])):
         if cell.get("cell_type") != "code":
             continue
+        for output in cell.get("outputs", []):
+            if output.get("output_type") == "error":
+                ename = output.get("ename", "Error")
+                evalue = output.get("evalue", "")
+                findings.append((
+                    f"cell {idx}", "cell-has-error-output",
+                    f"saved output includes {ename}: {evalue[:80]}",
+                ))
         # This generated setup cell is intentionally left unexecuted when a
         # notebook is saved locally; it only runs when the notebook opens in
         # Colab, so it is not part of the local execution-count sequence.
@@ -77,14 +85,6 @@ def check_notebook_file(path):
                 f"execution_count is {actual!r}, expected {expected} "
                 "(notebook was not run top-to-bottom in one pass before saving)",
             ))
-        for output in cell.get("outputs", []):
-            if output.get("output_type") == "error":
-                ename = output.get("ename", "Error")
-                evalue = output.get("evalue", "")
-                findings.append((
-                    f"cell {idx}", "cell-has-error-output",
-                    f"saved output includes {ename}: {evalue[:80]}",
-                ))
     return findings
 
 
