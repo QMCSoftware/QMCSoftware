@@ -197,7 +197,7 @@ def wants_source_install(cells: list[dict]) -> bool:
 
 
 def source_install_ref(cells: list[dict]) -> str | None:
-    """Pin the source install's git clone to a specific branch/commit instead
+    """Pin the source install's git clone to a branch, tag, or full commit hash instead
     of the manifest's git_ref, for code that only exists on an unmerged PR
     branch: a `# colab-install-from-source-ref: <ref>` marker in any cell's
     source (code or, wrapped in an HTML comment, markdown). None (the

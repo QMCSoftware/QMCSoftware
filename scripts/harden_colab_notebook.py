@@ -16,6 +16,7 @@ import argparse
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from scripts.check_colab_notebooks import (
@@ -198,7 +199,12 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
         # branch-only code): an explicit colab-install-from-source-ref marker
         # overrides it so the clone actually has the module being installed.
         clone_ref = source_install_ref(cells) if source_install else None
-        clone_branch_flag = f" --branch {clone_ref}" if clone_ref else ""
+        commit_ref = bool(
+            re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", clone_ref or "")
+        )
+        clone_branch_flag = (
+            f" --branch {clone_ref}" if clone_ref and not commit_ref else ""
+        )
         lines.extend(
             [
                 "  import sys\n",
@@ -209,6 +215,10 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
                 f"    !git clone -q --depth 1{clone_branch_flag} https://github.com/{manifest['repo']} {{repo_root}}\n",
             ]
         )
+        if commit_ref:
+            lines.append(
+                f"  !git -C {{repo_root}} fetch -q --depth 1 origin {clone_ref} && git -C {{repo_root}} checkout -q --detach FETCH_HEAD\n"
+            )
 
     if source_install:
         # Branch-only code (not yet released to PyPI): install from the clone

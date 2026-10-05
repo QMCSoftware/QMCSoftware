@@ -19,6 +19,7 @@ class TestGenerateBooktests(unittest.TestCase):
             demos = Path(tmp) / "demos" / "portfolio"
             demos.mkdir(parents=True)
             (demos / "_RUN_tmp.ipynb").write_text("{}")
+            (demos / "sc_diagnosis.ipynb").write_text("{}")
             (demos / "real_demo.ipynb").write_text("{}")
             out_dir = Path(tmp) / "booktests"
             out_dir.mkdir()
@@ -29,6 +30,7 @@ class TestGenerateBooktests(unittest.TestCase):
 
             self.assertEqual([Path(p).name for p in generated], ["tb_real_demo.py"])
             self.assertFalse((out_dir / "tb__RUN_tmp.py").exists())
+            self.assertFalse((out_dir / "tb_sc_diagnosis.py").exists())
 
 
 if __name__ == "__main__":

@@ -470,7 +470,7 @@ check_booktests:
 		if echo "$$nb" | grep -q "Parslfest_2025"; then \
 			continue; \
 		fi; \
-		if echo "$$base" | grep -q "tmp"; then \
+		if echo "$$base" | grep -q "tmp" || echo "$$base" | grep -q "^sc_"; then \
 			continue; \
 		fi; \
 		if ! ls test/booktests/tb_"$$test_base".py > /dev/null 2>&1; then \

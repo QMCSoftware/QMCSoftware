@@ -154,6 +154,13 @@ class SimplexUniform(AbstractTrueMeasure):
         # (x_0 := 0) give the first d of d+1 weights, a Jacobian-1 map that leaves density unchanged.
         return np.diff(t, axis=-1, prepend=0)
 
+    def _map_effective_range(self, input_range):
+        bounds = self._broadcast_box(input_range, self.d)
+        full_cube = self._broadcast_box(self.domain, self.d)
+        if bounds is None or not np.array_equal(bounds, full_cube):
+            return None
+        return self.range
+
     @staticmethod
     def transform_points(x: np.ndarray, transform_method: str = "root") -> np.ndarray:
         r"""Map pre-generated points through a simplex transform directly,

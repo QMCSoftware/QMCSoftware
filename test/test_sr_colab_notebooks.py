@@ -251,6 +251,30 @@ class TestColabNotebooks(unittest.TestCase):
         self.assertIn("!git clone -q --depth 1 --branch asset_allocation ", pinned_source)
         compile(smoke.rewrite_shell_magics(pinned_source), "<bootstrap>", "exec")
 
+    def test_source_install_ref_pins_commit(self):
+        commit = "a" * 40
+        cells = [
+            code_cell(
+                "# colab-install-from-source: pinned version.\n"
+                f"# colab-install-from-source-ref: {commit}\n"
+                "import qmcpy\n"
+            )
+        ]
+        tmp_path = self._tmp_path()
+        self._setattr(harden, "REPO_ROOT", tmp_path)
+        notebook_path = tmp_path / "demos" / "example.ipynb"
+        notebook_path.parent.mkdir()
+
+        source = "".join(
+            harden.bootstrap_cell_source(
+                notebook_path, {"repo": "QMCSoftware/QMCSoftware"}, cells
+            )
+        )
+        self.assertNotIn(f"--branch {commit}", source)
+        self.assertIn(f"fetch -q --depth 1 origin {commit}", source)
+        self.assertIn("checkout -q --detach FETCH_HEAD", source)
+        compile(smoke.rewrite_shell_magics(source), "<bootstrap>", "exec")
+
     def test_extra_pip_packages_preserves_later_explicit_installs(self):
         cells = [
             code_cell("import qmcpy as qp\n"),

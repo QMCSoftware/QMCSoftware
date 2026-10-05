@@ -1414,6 +1414,20 @@ class TestSimplexUniform(unittest.TestCase):
         self.assertTrue(np.all(x >= -1e-12))
         self.assertTrue(np.all(x.sum(axis=-1) <= 1 + 1e-12))
 
+    def test_effective_range_supports_composition(self):
+        simplex = SimplexUniform(DigitalNetB2(3, seed=7))
+        np.testing.assert_array_equal(
+            simplex.effective_range, np.tile([0.0, 1.0], (3, 1))
+        )
+        composed = Uniform(simplex, lower_bound=0.25, upper_bound=0.75)
+        samples = composed(8)
+        self.assertTrue(np.all((samples >= 0.25) & (samples <= 0.75)))
+
+        restricted = SimplexUniform(
+            Uniform(DigitalNetB2(3, seed=7), lower_bound=0.25, upper_bound=0.75)
+        )
+        self.assertIsNone(restricted.effective_range)
+
     def test_default_transform_method(self):
         self.assertEqual(SimplexUniform(DigitalNetB2(3, seed=7)).transform_method, "root")
 
