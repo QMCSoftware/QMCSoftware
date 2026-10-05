@@ -61,8 +61,11 @@ def gen_weights_reps(sampler_type, n_tickers, n_ports, replications=1, seed=42,
         n_ports (int): Number of portfolios per replication.
         replications (int): Number of replications.
         seed (int): Random seed for reproducibility.
-        cube_points (ndarray, optional): Shape (replications, n_ports, n_tickers).
-            Reuses these cube points instead of drawing new ones.
+        cube_points (ndarray, optional): Shape (replications, n_ports,
+            n_tickers - 1): a sampler built at n_tickers - 1 dimensions,
+            since the simplex transform only consumes that many coordinates
+            (the n_tickers-th weight is implicit, see Returns). Reuses these
+            cube points instead of drawing new ones.
         transform (str): One of SimplexUniform's transform_method names
             ('root', 'sort', 'shift', 'origami').
 
@@ -76,13 +79,15 @@ def gen_weights_reps(sampler_type, n_tickers, n_ports, replications=1, seed=42,
             "optionally suffixed with '_simplex'"
         )
 
+    n_dim = n_tickers - 1
     if cube_points is None:
-        sampler = sampler_classes[base_type](dimension=n_tickers, replications=replications, seed=seed)
+        sampler = sampler_classes[base_type](dimension=n_dim, replications=replications, seed=seed)
         cube_points = sampler.gen_samples(n_ports)
 
     # SimplexUniform.transform_points maps pre-generated cube points directly, so a shared
     # cube_points array (e.g. from generate_sampler_results) can feed it without re-sampling.
-    n_dim = n_tickers - 1
+    # Sliced (not just asserted) because a correctly-built sampler already has exactly n_dim
+    # columns; this only guards a caller that over-provisions cube_points by mistake.
     simplex_points = cube_points[..., :n_dim]
     weights_d = qp.SimplexUniform.transform_points(simplex_points, transform_method=transform)
     return np.concatenate([weights_d, 1 - weights_d.sum(axis=-1, keepdims=True)], axis=-1)
@@ -254,8 +259,13 @@ def generate_sampler_results(n_tickers, num_ports, replications, log_ret, sample
     for base_type in requested_base_types:
         sampler_class = sampler_classes[base_type]
         t0 = time.perf_counter()
+        # dimension=n_tickers - 1: the simplex transform only consumes that many
+        # coordinates (see gen_weights_reps). Building at n_tickers and discarding the
+        # last coordinate would both waste work and, for dimension-dependent
+        # constructions (Faure's prime base, Korobov/Kronecker's generating vector),
+        # silently benchmark/score a different sequence than a correctly-sized sampler.
         cube_points = sampler_class(
-            dimension=n_tickers, replications=replications, seed=42
+            dimension=n_tickers - 1, replications=replications, seed=42
         ).gen_samples(num_ports)
         sampler = f'{base_type}_simplex'
         weights = gen_weights_reps(
