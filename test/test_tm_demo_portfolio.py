@@ -50,7 +50,9 @@ class TestBacktestWindowsAndBenchmark(TestCase):
     def test_generates_only_requested_samplers_once(self):
         """A reduced search must never instantiate an excluded sampler."""
         su = self.su
-        cube = np.random.default_rng(42).random((2, 8, 3))
+        # dimension 2 = n_tickers - 1: the simplex transform only consumes n_tickers - 1
+        # coordinates (the n_tickers-th weight is implicit).
+        cube = np.random.default_rng(42).random((2, 8, 2))
         samplers = {name: Mock(return_value=Mock(gen_samples=Mock(return_value=cube)))
                     for name in ("sobol", "iid", "faure")}
         log_ret = pd.DataFrame([[.01, .02, -.01], [-.02, .01, .03], [.03, -.01, .02]])
@@ -61,9 +63,25 @@ class TestBacktestWindowsAndBenchmark(TestCase):
         assert list(results) == ["sobol_simplex", "iid_simplex"]
         assert list(timing) == ["sobol", "iid"]
         for name in ("sobol", "iid"):
-            samplers[name].assert_called_once_with(dimension=3, replications=2, seed=42)
+            samplers[name].assert_called_once_with(dimension=2, replications=2, seed=42)
             samplers[name].return_value.gen_samples.assert_called_once_with(8)
         samplers["faure"].assert_not_called()
+
+    def test_gen_weights_reps_builds_sampler_at_n_tickers_minus_one(self):
+        """The simplex transform consumes only n_tickers - 1 coordinates (the
+        n_tickers-th weight is implicit); building the sampler at n_tickers and
+        discarding a coordinate would waste work and, for a dimension-dependent
+        construction (Faure's prime base, Korobov/Kronecker's generating
+        vector), silently score a different sequence than a correctly-sized
+        sampler would produce."""
+        su = self.su
+        cube = np.random.default_rng(0).random((1, 5, 2))
+        mock_cls = Mock(return_value=Mock(gen_samples=Mock(return_value=cube)))
+        with patch.object(su, "sampler_classes", {"sobol": mock_cls}):
+            weights = su.gen_weights_reps("sobol", 3, 5)
+        mock_cls.assert_called_once_with(dimension=2, replications=1, seed=42)
+        mock_cls.return_value.gen_samples.assert_called_once_with(5)
+        assert weights.shape == (1, 5, 3)
 
     def test_common_history_and_dated_benchmark(self):
         """F4: common-history valuation and dated benchmark; no future OOS fitting."""
