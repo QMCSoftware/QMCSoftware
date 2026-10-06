@@ -47,6 +47,13 @@ class Mixture(AbstractTrueMeasure):
         >>> mixture = Mixture(DigitalNetB2(2, seed=7), components, [0.3, 0.7])
         >>> mixture(4).shape
         (4, 1)
+        >>> mixture_rep = Mixture(
+        ...     DigitalNetB2(2, seed=7, replications=2),
+        ...     components,
+        ...     [0.3, 0.7],
+        ... )
+        >>> mixture_rep(4).shape
+        (2, 4, 1)
     """
 
     def __init__(
