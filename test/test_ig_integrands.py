@@ -1,7 +1,6 @@
 from qmcpy import (
     BayesianLRCoeffs,
     BoxIntegral,
-    BrownianMotion,
     CustomFun,
     DigitalNetB2,
     FinancialOption,
@@ -9,12 +8,12 @@ from qmcpy import (
     Gaussian,
     Genz,
     Hartmann6d,
+    ImportanceSampling,
     Ishigami,
     Keister,
     Kumaraswamy,
     Linear0,
     Multimodal2d,
-    SciPyWrapper,
     Sin1d,
     Uniform,
 )
@@ -23,16 +22,54 @@ import numpy as np
 import sys
 import types
 import unittest
-import scipy.stats
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
 class TestIntegrand(unittest.TestCase):
     """General tests for Integrand"""
 
+    def test_chained_true_measure_uses_full_recursive_transform(self):
+        inner = Uniform(DigitalNetB2(1, seed=7), 0.25, 0.75)
+        m = Kumaraswamy(inner)
+        square = Mock(side_effect=lambda t: t[..., 0] ** 2)
+        integrand = CustomFun(m, g=square)
+        points = np.array([[0.1], [0.25], [0.5], [0.75], [0.9]])
+
+        result = integrand.f(points)
+        recursive_points = m._jacobian_transform_r(
+            points,
+            return_weights=False,
+        )
+        expected_points = m._transform(inner._transform(points))
+        evaluated_points = square.call_args.args[0]
+
+        np.testing.assert_allclose(evaluated_points, recursive_points)
+        np.testing.assert_allclose(recursive_points, expected_points)
+        np.testing.assert_allclose(result, expected_points[..., 0] ** 2)
+
     def test_abstract_methods(self):
         n = 2**3
         d = 2
+        gaussian_proposal = Gaussian(DigitalNetB2(d, seed=7))
+        gaussian_importance_sampler = ImportanceSampling(
+            target=Gaussian(
+                gaussian_proposal.discrete_distrib,
+                mean=0,
+                covariance=1 / 2,
+            ),
+            proposal=gaussian_proposal,
+        )
+        composed_gaussian_proposal = Gaussian(
+            Kumaraswamy(DigitalNetB2(d, seed=7))
+        )
+        composed_gaussian_importance_sampler = ImportanceSampling(
+            target=Gaussian(
+                composed_gaussian_proposal.discrete_distrib,
+                mean=0,
+                covariance=1 / 2,
+            ),
+            proposal=composed_gaussian_proposal,
+        )
         integrands = [
             FinancialOption(
                 DigitalNetB2(d, seed=7),
@@ -72,10 +109,7 @@ class TestIntegrand(unittest.TestCase):
             CustomFun(
                 Uniform(
                     Kumaraswamy(
-                        SciPyWrapper(
-                            DigitalNetB2(d, seed=7),
-                            [scipy.stats.triang(c=0.1), scipy.stats.uniform()],
-                        )
+                        Kumaraswamy(DigitalNetB2(d, seed=7))
                     )
                 ),
                 lambda x: x.prod(1),
@@ -90,8 +124,8 @@ class TestIntegrand(unittest.TestCase):
             ),
             FinancialOption(DigitalNetB2(d, seed=7), option="EUROPEAN", call_put="put"),
             Keister(DigitalNetB2(d, seed=7)),
-            Keister(Gaussian(DigitalNetB2(d, seed=7))),
-            Keister(BrownianMotion(Kumaraswamy(DigitalNetB2(d, seed=7)))),
+            Keister(gaussian_importance_sampler),
+            Keister(composed_gaussian_importance_sampler),
             Linear0(DigitalNetB2(d, seed=7)),
         ]
         spawned_integrands = [integrand.spawn(levels=0)[0] for integrand in integrands]
