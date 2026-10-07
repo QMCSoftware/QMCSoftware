@@ -4,6 +4,7 @@ from ..discrete_distribution.abstract_discrete_distribution import (
 from ..true_measure.abstract_true_measure import AbstractTrueMeasure
 from typing import Union
 from .gaussian import Gaussian
+from .abstract_true_measure import _clip_unit_interval
 from ..discrete_distribution import DigitalNetB2
 from ..util import ParameterError, ParameterWarning
 import warnings
