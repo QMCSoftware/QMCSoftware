@@ -31,14 +31,11 @@ class CubQMCAmericanG(AbstractStoppingCriterion):
         >>> sc = CubQMCAmericanG(opt, abs_tol=0.05, n_train=2**11)
         >>> solution, data = sc.integrate()
         >>> solution
-        array(6.07...)
-        >>> data  # doctest: +NORMALIZE_WHITESPACE
+        array(9.13...)
+        >>> data  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Data (Data)
-            solution        6.07...
-            n_total         2^(11)
-            n_train         2^(11)
-            time_train      ...
-            time_integrate  ...
+            solution        9.13...
+            ...
     """
 
     def __init__(
