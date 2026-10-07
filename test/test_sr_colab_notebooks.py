@@ -196,7 +196,10 @@ class TestColabNotebooks(unittest.TestCase):
         self._setattr(harden, "REPO_ROOT", tmp_path)
         notebook_path = tmp_path / "demos" / "example.ipynb"
         notebook_path.parent.mkdir()
-        manifest = {"repo": "QMCSoftware/QMCSoftware"}
+        manifest = {
+            "repo": "QMCSoftware/QMCSoftware",
+            "git_ref": "develop",
+        }
 
         plain_source = "".join(
             harden.bootstrap_cell_source(notebook_path, manifest, plain_cells)
@@ -217,7 +220,7 @@ class TestColabNotebooks(unittest.TestCase):
         self.assertNotIn("!pip install -q qmcpy\n", marked_source)
         self.assertIn("!git clone", marked_source)  # editable install needs the clone
         self.assertTrue(check.installs_qmcpy(marked_source))
-        self.assertNotIn("--branch", marked_source)  # no ref marker: manifest's own default ref
+        self.assertIn("--branch develop", marked_source)
         compile(smoke.rewrite_shell_magics(marked_source), "<bootstrap>", "exec")
 
     def test_source_install_ref_pins_branch(self):
@@ -243,7 +246,10 @@ class TestColabNotebooks(unittest.TestCase):
         self._setattr(harden, "REPO_ROOT", tmp_path)
         notebook_path = tmp_path / "demos" / "example.ipynb"
         notebook_path.parent.mkdir()
-        manifest = {"repo": "QMCSoftware/QMCSoftware"}
+        manifest = {
+            "repo": "QMCSoftware/QMCSoftware",
+            "git_ref": "develop",
+        }
 
         pinned_source = "".join(
             harden.bootstrap_cell_source(notebook_path, manifest, markdown_marked)

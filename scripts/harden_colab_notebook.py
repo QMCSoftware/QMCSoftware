@@ -194,11 +194,10 @@ def bootstrap_cell_source(notebook_path: Path, manifest: dict, cells: list[dict]
     ]
 
     if needs_repo_clone:
-        # A source install's branch/commit may not be the manifest's own git_ref
-        # (used for the Colab badge, not necessarily the branch holding
-        # branch-only code): an explicit colab-install-from-source-ref marker
-        # overrides it so the clone actually has the module being installed.
+        # Clone the same stable ref as the Colab badge unless a source install
+        # explicitly requests branch-only code from another branch or commit.
         clone_ref = source_install_ref(cells) if source_install else None
+        clone_ref = clone_ref or manifest["git_ref"]
         commit_ref = bool(
             re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", clone_ref or "")
         )

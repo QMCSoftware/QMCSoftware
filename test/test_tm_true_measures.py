@@ -1494,12 +1494,20 @@ class TestSimplexUniform(unittest.TestCase):
     def test_uniform_on_simplex(self):
         # Appending 1-sum(w) makes w the first d of d+1 Dirichlet(1,...,1)
         # weights, each with mean 1/(d+1) (exchangeable, so every coordinate
-        # shares the same mean, unlike the old ordered-simplex output).
+        # shares the same mean, unlike the old ordered-simplex output). Check
+        # every dimension-general method end to end; mirror is limited to d<=3.
         d = 4
-        tm = SimplexUniform(DigitalNetB2(d, seed=7, replications=16))
-        x = tm(2**10)
         theory = 1 / (d + 1)
-        np.testing.assert_allclose(x.mean(axis=(0, 1)), np.full(d, theory), atol=0.02)
+        for method in ("root", "sort", "shift", "origami"):
+            with self.subTest(transform_method=method):
+                tm = SimplexUniform(
+                    DigitalNetB2(d, seed=7, replications=16),
+                    transform_method=method,
+                )
+                x = tm(2**10)
+                np.testing.assert_allclose(
+                    x.mean(axis=(0, 1)), np.full(d, theory), atol=0.02
+                )
 
     def test_second_moment_weights(self):
         # Catches a wrong joint shape (e.g. right marginals, wrong covariance)

@@ -386,7 +386,7 @@ check_colab_notebooks:  # faster
 check_colab_notebooks_smoke:  # slower; executes bootstrap + a few cells of every enabled notebook
 	$(PYTHON) -m scripts.smoke_test_colab_notebooks --cells-after-bootstrap $(SMOKE_CODE_CELLS)
 
-harden_colab_notebook:  # Add Colab button if necessary
+harden_colab_notebook:  # Add Colab setup using the manifest git_ref by default
 	@if [ -n "$(NOTEBOOK)" ]; then \
 		if [ -n "$(FORCE)" ]; then \
 			$(PYTHON) -m scripts.harden_colab_notebook --notebook "$(NOTEBOOK)" --force; \
