@@ -313,8 +313,6 @@ class FinancialOption(AbstractIntegrand):
             decomp_type=self.decomp_type,
         )
         self.call_put = str(call_put).upper()
-        if not (self.call_put in ["CALL", "PUT"]):
-            raise AssertionError("invalid call_put = %s" % self.call_put)
         self.option = str(option).upper()
         if self.option == "AMERICAN":
             if self.call_put == "CALL":

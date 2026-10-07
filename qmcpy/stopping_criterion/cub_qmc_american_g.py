@@ -30,9 +30,15 @@ class CubQMCAmericanG(AbstractStoppingCriterion):
         >>> opt = FinancialOption(Sobol(10, seed=7), option="AMERICAN", call_put="PUT")
         >>> sc = CubQMCAmericanG(opt, abs_tol=0.05, n_train=2**11)
         >>> solution, data = sc.integrate()
+        >>> solution
+        array(6.07...)
         >>> data  # doctest: +NORMALIZE_WHITESPACE
         Data (Data)
-            solution        ...
+            solution        6.07...
+            n_total         2^(11)
+            n_train         2^(11)
+            time_train      ...
+            time_integrate  ...
     """
 
     def __init__(
@@ -102,6 +108,7 @@ class CubQMCAmericanG(AbstractStoppingCriterion):
                     **self.inner_kwargs
                 )
             else:
+                self.stopping_criterion_custom.integrand = self.integrand
                 return self.stopping_criterion_custom
 
         distrib = self.discrete_distrib

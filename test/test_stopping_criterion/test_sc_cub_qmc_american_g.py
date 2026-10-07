@@ -68,6 +68,19 @@ class TestCubQMCAmericanG(unittest.TestCase):
         # Differences across training sizes should be small
         self.assertLess(max(prices) - min(prices), 0.2)
 
+    def test_replicated_lattice_american_put(self):
+        opt = FinancialOption(Lattice(self.d, seed=7, replications=16), option="AMERICAN", call_put="PUT", **self.opt_params)
+        sc = CubQMCAmericanG(opt, abs_tol=0.1, n_train=2**11)
+        solution, data = sc.integrate()
+        self.assertTrue(5.5 < solution < 6.5)
+
+    def test_custom_stopping_criterion(self):
+        from qmcpy import CubQMCRepStudentT
+        opt = FinancialOption(Sobol(self.d, seed=7, replications=16), option="AMERICAN", call_put="PUT", **self.opt_params)
+        sc = CubQMCAmericanG(opt, abs_tol=0.1, n_train=2**11, stopping_criterion=CubQMCRepStudentT)
+        solution, data = sc.integrate()
+        self.assertTrue(5.5 < solution < 6.5)
+
 
 if __name__ == "__main__":
     unittest.main()
