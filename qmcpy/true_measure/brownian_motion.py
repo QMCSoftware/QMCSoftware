@@ -1,7 +1,7 @@
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
 )
-from ..true_measure.abstract_true_measure import AbstractTrueMeasure
+from ..true_measure.abstract_true_measure import AbstractTrueMeasure, _clip_unit_interval
 from typing import Union
 from .gaussian import Gaussian
 from .abstract_true_measure import _clip_unit_interval
@@ -288,7 +288,7 @@ class BrownianMotion(Gaussian):
 
     def _transform(self, x):
         if self.decomp_type == "BROWNIANBRIDGE":
-            z = ndtri(x)
+            z = ndtri(_clip_unit_interval(x))
             w = self._bridge_transform(z)
             paths = self.drift_time_vec_plus_init + np.sqrt(self.diffusion) * w
             return paths[..., self._output_order]

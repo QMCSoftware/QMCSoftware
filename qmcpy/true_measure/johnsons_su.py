@@ -100,7 +100,7 @@ class JohnsonsSU(AbstractTrueMeasure):
             raise AssertionError
 
     def _transform(self, x):
-        return self._lam * np.sinh((ndtri(x) - self._gamma) / self._delta) + self._xi
+        return self._lam * np.sinh((ndtri(_clip_unit_interval(x)) - self._gamma) / self._delta) + self._xi
 
     def _map_effective_range(self, input_range):
         bounds = self._broadcast_box(input_range, self.d)
@@ -108,7 +108,7 @@ class JohnsonsSU(AbstractTrueMeasure):
             return None
         with np.errstate(over="ignore"):
             mapped = self._lam * np.sinh(
-                (norm.ppf(bounds.T) - self._gamma) / self._delta
+                (ndtri(bounds.T) - self._gamma) / self._delta
             ) + self._xi
         return mapped.T
 
