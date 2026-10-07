@@ -12,7 +12,7 @@
 8. Save figures as .png in `images` --DONE
 9. Use same colors for same samplers across all visualizations --DONE
 10. Use white background for all visualizations --DONE
-11. Implement a more optimal simplex transformation for low-discrepancy sequences --TODO
+11. Implement a more optimal simplex transformation for low-discrepancy sequences --DONE. See `SimplexUniform`/`simplex_transform.py`.
 12. Clean up demo --TODO
 14. Improve documentation --TODO
 15. Implement multiple randomized backtests --TODO
