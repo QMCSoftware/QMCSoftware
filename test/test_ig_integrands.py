@@ -355,7 +355,7 @@ class TestBayesianLRCoeffs(unittest.TestCase):
         self.assertTrue((low <= high).all())
 
     def test_bound_fun_denominator_spans_zero(self):
-        # den_bounds_low <= 0 <= den_bounds_high  → (-inf, +inf) bounds
+        # den_bounds_low <= 0 <= den_bounds_high  -> (-inf, +inf) bounds
         bound_low = np.array([[0.1, 0.2, 0.3], [-0.1, -0.2, -0.3]])
         bound_high = np.array([[0.2, 0.3, 0.4], [0.1, 0.2, 0.3]])
         low, high = self.ig.bound_fun(bound_low, bound_high)
@@ -367,7 +367,7 @@ class TestBayesianLRCoeffs(unittest.TestCase):
         self.assertEqual(dep.shape, (2, 3))
 
     def test_invalid_dimension(self):
-        # Dimension 2 but feature_array has 2 features → expects d=3
+        # Dimension 2 but feature_array has 2 features -> expects d=3
         self.assertRaises(
             ParameterError,
             BayesianLRCoeffs,
