@@ -8,5 +8,4 @@ The canonical daily log returns (`log_returns40_2014-01-01_to_2026-09-30.csv.gz`
 |---|---|
 | [`df40_2014-01-01_to_2026-09-30.csv.gz`](df40_2014-01-01_to_2026-09-30.csv.gz) | Canonical daily adjusted prices and trading volumes for all 40 assets; smaller universes are sliced from this file. |
 | `log_returns40_2014-01-01_to_2026-09-30.csv.gz` (gitignored) | Daily log returns derived from the canonical price file; smaller universes are sliced from this cache. |
-| [`rf_annual_2014-01-01_to_2026-09-30.csv.gz`](rf_annual_2014-01-01_to_2026-09-30.csv.gz) | Annualized log risk-free rates derived from 13-week U.S. Treasury bill data. |
-| [`sp500_2014-01-01_to_2026-09-30.csv.gz`](sp500_2014-01-01_to_2026-09-30.csv.gz) | S&P 500 total return (^SP500TR) closing price, used as a passive buy-and-hold benchmark. |
+| [`market_2014-01-01_to_2026-09-30.csv.gz`](market_2014-01-01_to_2026-09-30.csv.gz) | Daily `sp500_price` (S&P 500 total return, ^SP500TR closing price, the passive buy-and-hold benchmark) and `rf_annual` (annualized log risk-free rate derived from 13-week U.S. Treasury bill data), joined on `Date`; a date missing from one series is empty in its column. |
