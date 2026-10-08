@@ -43,10 +43,25 @@ class SimplexUniform(AbstractTrueMeasure):
     Examples:
         >>> s = SimplexUniform(DigitalNetB2(3, seed=7))
         >>> w = s(4)
-        >>> w.shape
-        (4, 3)
+        >>> w
+        array([[0.49677051, 0.28841988, 0.09289854],
+               [0.08172615, 0.3489796 , 0.36260659],
+               [0.11491863, 0.01307957, 0.17307836],
+               [0.34855887, 0.4160591 , 0.17501823]])
         >>> bool(np.all(w >= 0) and np.all(w.sum(axis=-1) <= 1))
         True
+
+        `replications=None` omits a replication axis, while explicit values
+        retain it, including `replications=1`:
+
+        >>> for replications in (None, 1, 2):
+        ...     measure = SimplexUniform(
+        ...         DigitalNetB2(2, seed=7, replications=replications)
+        ...     )
+        ...     print(f"{replications}: {np.round(measure(1), 3).tolist()}")
+        None: [[0.69, 0.266]]
+        1: [[[0.69, 0.266]]]
+        2: [[[0.518, 0.316]], [[0.04, 0.471]]]
 
         Each coordinate's moments follow the symmetric Dirichlet$(1,\dots,1)$
         marginal/pairwise formulas $E[W_i] = \frac{1}{d+1}$,
@@ -70,22 +85,28 @@ class SimplexUniform(AbstractTrueMeasure):
         choice is a QMC-efficiency question, not a correctness one:
 
         >>> s = SimplexUniform(DigitalNetB2(3, seed=7), transform_method='shift')
-        >>> s(4).shape
-        (4, 3)
+        >>> s(4)
+        array([[0.21089174, 0.3556335 , 0.23307505],
+               [0.06324979, 0.11575659, 0.32026034],
+               [0.80289593, 0.08582128, 0.00909724],
+               [0.15195339, 0.25510833, 0.4225583 ]])
 
         Append the implicit $(d+1)$-th weight for the full probability-simplex
         vector (sums to exactly 1):
 
         >>> w = s(1)[0]
         >>> v = np.append(w, 1 - w.sum())
-        >>> v.shape
-        (4,)
+        >>> v
+        array([0.21089174, 0.3556335 , 0.23307505, 0.2003997 ])
         >>> bool(np.isclose(v.sum(), 1) and np.all(v >= 0))
         True
     """
 
-    def __init__(self, sampler: Union[AbstractDiscreteDistribution, AbstractTrueMeasure],
-                 transform_method: str = "root") -> None:
+    def __init__(
+        self,
+        sampler: Union[AbstractDiscreteDistribution, AbstractTrueMeasure],
+        transform_method: str = "root",
+    ) -> None:
         """Initialize a SimplexUniform true measure.
 
         Args:

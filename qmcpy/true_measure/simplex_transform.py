@@ -165,13 +165,19 @@ class _SimplexTransform:
             >>> np.round(transformer.root(np.array([0.5, 0.99])), 3)
             array([[0.497, 0.995]])
 
-            Leading batch axes (the "..." in ``shape (..., d)``) pass through
-            unchanged, e.g. a (replications, portfolios, dimension) array as
-            used elsewhere in this package:
+            `_SimplexTransform` has no `replications` parameter; leading batch
+            axes (the "..." in ``shape (..., d)``) pass through unchanged. For
+            example, this input contains two replications with two points each:
 
             >>> batch = np.array([[[0.5, 0.01], [0.5, 0.99]], [[0.3, 0.7], [0.8, 0.4]]])
-            >>> transformer.root(batch).shape
+            >>> batch.shape
             (2, 2, 2)
+            >>> np.round(transformer.root(batch), 3)
+            array([[[0.05 , 0.1  ],
+                    [0.497, 0.995]],
+            <BLANKLINE>
+                   [[0.251, 0.837],
+                    [0.506, 0.632]]])
         """
         points = self._validate_points(points)
         d = points.shape[-1]
