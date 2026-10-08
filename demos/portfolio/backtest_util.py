@@ -137,10 +137,11 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
         principal (float): Dollar amount invested.
         rebalance_freq (str, optional): A pandas date_range frequency alias (e.g.
             'QS') to periodically rebalance at: only listed, non-exited tickers'
-            weights are renormalized and redistributed; an absent ticker's
-            dollar balance freezes at its last traded price instead of being
-            redistributed, and resumes compounding if it returns. If eligible
-            target weights sum to zero, the available pool stays in cash. None
+            weights are renormalized and redistributed; a late-listed ticker's
+            allocation remains in cash until a rebalance on or after listing,
+            while an absent holding freezes at its last traded price and resumes
+            compounding if it returns. If eligible target weights sum to zero,
+            the available pool stays in cash. None
             (default): buy and hold, reserving each late-listed ticker's initial
             allocation as cash until listing and freezing missing quotes at the
             last traded value.
@@ -205,6 +206,7 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
         w_target = weights_reps[r]
         value = pd.Series(index=all_dates, dtype=float)
         balances = np.zeros(D)  # per-ticker dollar sub-balance; 0 until first listed
+        reserved_cash = np.zeros(D)  # initial allocations awaiting a late listing
         exited = np.zeros(D, dtype=bool)  # permanently sold via a stop-loss
         cash = 0.0  # available pool with no eligible positive target weight
         last_close = None
@@ -228,9 +230,15 @@ def compute_portfolio_value_reps(stock_dfs, weights_reps, principal, rebalance_f
             exited = exited | just_triggered
             eligible_idx = np.flatnonzero(listed_now & ~exited)
             frozen_idx = np.flatnonzero((~listed_now) & (~exited))
-            frozen_total = balances[frozen_idx].sum()
+            initial_pool = principal if k == 0 else 0.0
+            if k == 0:
+                reserved_cash[frozen_idx] = principal * w_target[frozen_idx]
+                initial_pool -= reserved_cash.sum()
+            released_cash = reserved_cash[listed_now].sum()
+            reserved_cash[listed_now] = 0.0
+            frozen_total = balances[frozen_idx].sum() + reserved_cash.sum()
             tradeable_pool = (balances[eligible_idx].sum() + balances[just_triggered].sum()
-                               + cash + (principal if k == 0 else 0.0))
+                               + released_cash + cash + initial_pool)
             cash = 0.0
             w = w_target[eligible_idx]
             if w.sum() == 0:

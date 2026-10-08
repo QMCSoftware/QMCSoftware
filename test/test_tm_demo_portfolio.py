@@ -257,6 +257,18 @@ class TestComputePortfolioValueReps(TestCase):
         # remains invested; B is absent again by day 3 and sits frozen at 50.
         assert v.tolist() == pytest.approx([100.0, 100.0, 105.0])
 
+    def test_rebalancing_reserves_late_listing_cash(self):
+        """A late ticker's target allocation earns no pre-listing return."""
+        dates = pd.bdate_range("2020-01-01", periods=4)
+        a = _stock_df([100.0, 200.0, 200.0, 200.0], dates)
+        b = _stock_df([100.0, 100.0], dates[2:])
+
+        v = bu.compute_portfolio_value_reps(
+            [a, b], np.array([[0.5, 0.5]]), 100, rebalance_freq="QS"
+        ).iloc[:, 0]
+
+        np.testing.assert_allclose(v, [100.0, 150.0, 150.0, 150.0])
+
     def test_absent_ticker_freezes_balance(self):
         """Extends BLOCKER 13: a ticker that goes permanently absent (bankruptcy or a
         data feed simply stopping) has its dollar balance frozen, not redistributed

@@ -1,12 +1,14 @@
 import unittest
-from testbook import testbook
-from __init__ import TB_TIMEOUT, BaseNotebookTest
+
+from __init__ import BaseNotebookTest
+
 
 class NotebookTests(BaseNotebookTest):
 
-    @testbook('../../demos/simplex_uniform.ipynb', execute=True, timeout=TB_TIMEOUT)
-    def test_simplex_uniform_notebook(self, tb):
-        pass
+    def test_simplex_uniform_notebook(self):
+        notebook_path, _ = self.locate_notebook("../../demos/simplex_uniform.ipynb")
+        self.run_notebook(notebook_path)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
