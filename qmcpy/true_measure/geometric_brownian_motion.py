@@ -49,6 +49,21 @@ class GeometricBrownianMotion(BrownianMotion):
                              [0.128 0.284 0.472 0.496]
                              [0.135 0.299 0.496 0.734]]
             decomp_type     PCA
+
+        With independent replications:
+
+        >>> import numpy as np
+        >>> gbm_rep = GeometricBrownianMotion(
+        ...     DigitalNetB2(4, seed=7, replications=2),
+        ...     t_final=2, drift=0.1, diffusion=0.2,
+        ... )
+        >>> samples = gbm_rep.gen_samples(2)
+        >>> np.round(samples, 7)
+        array([[[0.838504 , 0.9545957, 0.5976363, 0.8312648],
+                [2.2537872, 2.1510529, 2.1562198, 1.0852202]],
+        <BLANKLINE>
+               [[1.114793 , 1.2802987, 1.4345325, 1.6948846],
+                [0.8508346, 0.5581897, 0.6470017, 0.3524434]]])
     """
 
     def __init__(

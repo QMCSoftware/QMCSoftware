@@ -1,8 +1,14 @@
+from typing import Union
+
 import numpy as np
+from numpy.typing import ArrayLike
 import scipy.stats as stats
 
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
 from ..util import ParameterError, DimensionError
-from .abstract_true_measure import _clip_unit_interval
+from .abstract_true_measure import AbstractTrueMeasure, _clip_unit_interval
 from .scipy_wrapper import SciPyWrapper
 
 
@@ -102,10 +108,56 @@ class _StudentTAdapter:
 
 
 class StudentT(SciPyWrapper):
-    """Convenience true measure: multivariate Student t.
+    r"""Convenience true measure for the multivariate Student-t distribution.
+
+    Examples:
+        >>> import numpy as np
+        >>> from qmcpy import DigitalNetB2
+        >>> loc = [0.0, 1.0]
+        >>> shape = [[1.0, 0.5], [0.5, 2.0]]
+        >>> tm = StudentT(DigitalNetB2(2, seed=7), loc=loc, shape=shape, df=5)
+        >>> samples = tm(4)
+        >>> np.round(samples, 7)
+        array([[ 0.6293485,  3.2700668],
+               [-1.0863208,  0.2084137],
+               [ 3.1125303, -2.0269935],
+               [-0.1868368,  1.0935007]])
+
+        With independent replications:
+
+        >>> tm_rep = StudentT(
+        ...     DigitalNetB2(2, seed=7, replications=2),
+        ...     loc=loc, shape=shape, df=5,
+        ... )
+        >>> samples = tm_rep(4)
+        >>> np.round(samples, 7)
+        array([[[ 0.3270016,  1.8219425],
+                [-1.9190214, -1.3361324],
+                [ 1.1907619,  0.9067712],
+                [-0.5899924,  2.0635549]],
+        <BLANKLINE>
+               [[-1.6585584, -0.8484825],
+                [ 0.8225726,  2.2218676],
+                [-0.1963811,  3.1094635],
+                [ 0.7207602, -1.2048368]]])
     """
 
-    def __init__(self, sampler, loc, shape, df) -> None:
+    def __init__(
+        self,
+        sampler: Union[AbstractDiscreteDistribution, AbstractTrueMeasure],
+        loc: ArrayLike,
+        shape: ArrayLike,
+        df: float,
+    ) -> None:
+        """Initialize a multivariate Student-t true measure.
+
+        Args:
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]):
+                A discrete distribution or transform whose range is the unit cube.
+            loc (ArrayLike): Location vector of length d.
+            shape (ArrayLike): d x d Student-t shape matrix, not the covariance.
+            df (float): Positive degrees of freedom.
+        """
         super().__init__(
             sampler=sampler,
             scipy_distribs=_StudentTAdapter(loc=loc, shape=shape, df=df),

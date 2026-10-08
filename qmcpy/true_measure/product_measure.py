@@ -65,6 +65,11 @@ class ProductMeasure(AbstractTrueMeasure):
         ... ]
         >>> pm = ProductMeasure(sampler=DigitalNetB2(2, seed=9), marginals=marginals)
         >>> x = pm(4)
+        >>> x
+        array([[ 0.49605566, 11.90238239],
+               [ 1.29093964, 10.57488775],
+               [ 0.5234475 , 10.12042865],
+               [ 1.69735923, 11.4179262 ]])
         >>> x.shape
         (4, 2)
         >>> bool(((0 <= x[:, 0]) & (x[:, 0] <= 2)).all())
@@ -73,11 +78,22 @@ class ProductMeasure(AbstractTrueMeasure):
         The outer sampler controls replications:
 
         >>> pm = ProductMeasure(
-        ...     sampler=DigitalNetB2(2, seed=9, replications=3),
+        ...     sampler=DigitalNetB2(2, seed=9, replications=2),
         ...     marginals=marginals,
         ... )
-        >>> pm(4).shape
-        (3, 4, 2)
+        >>> samples_rep = pm(4)
+        >>> samples_rep
+        array([[[ 0.09644228, 11.81353135],
+                [ 1.17271359, 10.64225438],
+                [ 0.87618015, 10.1624369 ],
+                [ 1.83123508, 11.36615236]],
+        <BLANKLINE>
+               [[ 1.93279561, 10.99589555],
+                [ 0.84293979, 11.34305481],
+                [ 1.10521228, 11.79565435],
+                [ 0.14035646, 10.38503186]]])
+        >>> samples_rep.shape
+        (2, 4, 2)
 
         The ``DummySampler`` marginal samplers are only construction placeholders
         required by the current ``AbstractTrueMeasure`` interface.
@@ -96,8 +112,12 @@ class ProductMeasure(AbstractTrueMeasure):
         ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
         ... ]
         >>> pm = ProductMeasure(sampler=DigitalNetB2(3, seed=12), marginals=marginals)
-        >>> pm(4).shape
-        (4, 3)
+        >>> samples = pm(4)
+        >>> np.round(samples, 7)
+        array([[ 0.5319441, -0.9284974, 11.2310759],
+               [-2.5369147,  0.8059224, 10.0226133],
+               [ 0.7515686,  0.3897032, 10.8030274],
+               [-0.1112242, -0.6523398, 11.9511263]])
     """
 
     def __init__(self, sampler: AbstractDiscreteDistribution, marginals: Union[list, tuple]) -> None:
@@ -105,21 +125,21 @@ class ProductMeasure(AbstractTrueMeasure):
         marginals.
 
         Args:
-            sampler (AbstractDiscreteDistribution): Sampler for the whole product measure. Its dimension must equal the sum of the marginal dimensions.
-            marginals (Union[list, tuple]): Nonempty sequence of independent `AbstractTrueMeasure` instances to place side by side. A marginal may itself be multidimensional.
+            sampler (AbstractDiscreteDistribution): The sampler for the whole
+                product measure. Its dimension must equal the sum of the
+                marginal dimensions.
+            marginals (Union[list, tuple]): Independent true
+                measures to place side by side. A marginal may itself be
+                multidimensional.
 
-        Raises:
-            ParameterError: If `sampler` is not an `AbstractDiscreteDistribution`, or if `marginals` is empty or contains a non-`AbstractTrueMeasure` value.
-            DimensionError: If a marginal is not dimension-preserving or the sampler dimension differs from the sum of the marginal dimensions.
-
-        Note:
-            The product measure is driven by one total-dimensional QMC point
-            set. It does not generate separate QMC samples from each marginal.
-            Instead, one sample u in [0,1]^d is split into blocks:
+        Notes:
+            Why one sampler? The product measure should be driven by one
+            total-dimensional QMC point set. We do not generate separate QMC
+            samples from each marginal. Instead, one sample $u \in [0,1]^d$
+            is split into blocks:
 
                 u = (u_marginal_1, u_marginal_2, ..., u_marginal_k).
 
-            This preserves the intended total-dimensional QMC construction.
             This preserves the intended total-dimensional QMC construction.
         """
         if not isinstance(marginals, (list, tuple)) or len(marginals) == 0:
@@ -147,11 +167,12 @@ class ProductMeasure(AbstractTrueMeasure):
         self.marginals = list(marginals)
         for marginal in self.marginals:
             target_dim = getattr(marginal, "target_dim", marginal.d)
-            if target_dim != marginal.d:
+            if target_dim != marginal.d or marginal.discrete_distrib.d != marginal.d:
                 raise DimensionError(
                     "ProductMeasure marginals must be dimension-preserving "
                     "block transforms. Marginal target dimension "
-                    f"{target_dim} does not match sampler dimension {marginal.d}."
+                    f"{target_dim} does not match sampler dimension "
+                    f"{marginal.discrete_distrib.d}."
                 )
 
         self.marginal_dimensions = np.array(
