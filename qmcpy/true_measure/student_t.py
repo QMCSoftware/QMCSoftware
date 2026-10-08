@@ -3,6 +3,7 @@ from typing import Union
 import numpy as np
 from numpy.typing import ArrayLike
 import scipy.stats as stats
+from scipy.special import stdtrit
 
 from ..discrete_distribution.abstract_discrete_distribution import (
     AbstractDiscreteDistribution,
@@ -61,7 +62,7 @@ class _StudentTAdapter:
         x = np.empty_like(uu)
 
         scale0 = np.sqrt(self.shape[0, 0])
-        x[:, 0] = stats.t.ppf(uu[:, 0], df=self.df, loc=self.loc[0], scale=scale0)
+        x[:, 0] = self.loc[0] + scale0 * stdtrit(self.df, uu[:, 0])
 
         for i in range(1, self.dim):
             A = slice(0, i)
@@ -89,12 +90,7 @@ class _StudentTAdapter:
             shape_cond = (self.df + d_A) / (self.df + i) * schur
             shape_cond = np.maximum(shape_cond, np.finfo(float).tiny)
 
-            x[:, i] = stats.t.ppf(
-                uu[:, i],
-                df=df_cond,
-                loc=mu_cond,
-                scale=np.sqrt(shape_cond),
-            )
+            x[:, i] = mu_cond + np.sqrt(shape_cond) * stdtrit(df_cond, uu[:, i])
 
         return x.reshape(*orig_shape, self.dim)
 
