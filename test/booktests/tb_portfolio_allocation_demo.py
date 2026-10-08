@@ -29,8 +29,7 @@ class NotebookTests(BaseNotebookTest):
             "df_runtime = su.measure_runtime(sampler_types, transform=TRANSFORM_METH)":
                 "df_runtime = su.measure_runtime(sampler_types, transform=TRANSFORM_METH, "
                 "dimensions=[5, 10], num_samples=[2**m for m in range(8, 11)], fixed_dimension=10)",
-            'tickers1, description1 = bu.load_assets(f"data/df10_{cf.start_date}_to_{cf.end_date}.csv.gz")': 'tickers1, description1 = ["AAPL", "ABNB"], ["Apple", "Airbnb"]',
-            # Shrinks Section 4's loops to just 4 tickers (independent of the tickers1 shrink above).
+            # Shrink Section 4's loops to the smallest ticker universe.
             "for n_tickers in (4, 10, 20, 40):": "for n_tickers in (4,):",
             re.compile(r"num_ports_section4 = 2\*\*\d+(  # or 2\*\*\d+)?"): "num_ports_section4 = 2**7",
             "su.run_backtest_case(n_tickers, 'OOS', section4_data, sampler_types, num_ports=num_ports_section4, principal=principal, transform=TRANSFORM_METH)":

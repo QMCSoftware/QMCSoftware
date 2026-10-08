@@ -307,8 +307,11 @@ def run_backtest_case(n_tickers, sample_type, section4_data, sampler_types, num_
     """
     tickers_n, lr_n = section4_data[n_tickers]
     lr_n = lr_n.iloc[:, :len(tickers_n)]  # keep lr_n's columns matching tickers_n's length
-    suffix = '' if n_tickers == 4 else str(n_tickers)
-    df = pd.read_csv(f"data/df{suffix}_{cf.start_date}_to_{cf.end_date}.csv.gz", parse_dates=['Date'])
+    df = pd.read_csv(
+        f"data/df40_{cf.start_date}_to_{cf.end_date}.csv.gz",
+        parse_dates=['Date'],
+    )
+    df = df[df['Ticker'].isin(tickers_n)]
 
     if sample_type == 'in-sample':
         replications = in_sample_replications

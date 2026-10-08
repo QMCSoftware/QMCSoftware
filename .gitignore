@@ -33,6 +33,7 @@ qmcpy.egg-info/
 *.pkl
 *.gz
 !demos/portfolio/data/*.csv.gz
+demos/portfolio/data/log_returns*.csv.gz
 .DS_Store
 .idea/
 demos/.jupyter

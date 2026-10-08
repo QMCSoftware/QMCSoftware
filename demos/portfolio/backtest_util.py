@@ -13,6 +13,7 @@ hold: a late listing, a bankruptcy/permanent delisting, a temporary trading
 halt, and a stop-loss.
 """
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,36 @@ def load_assets(path):
     """
     assets = pd.read_csv(path, usecols=["Ticker", "Company"]).drop_duplicates()
     return assets["Ticker"].tolist(), assets["Company"].tolist()
+
+
+def log_returns(df):
+    """Return daily log returns, dropping any date with a missing price.
+
+    Args:
+        df (pd.DataFrame): Price data with 'Ticker', 'Date', and
+            'Adj Close Price' columns.
+
+    Returns:
+        pd.DataFrame: Log returns indexed by Date, one column per ticker.
+    """
+    stocks = df.pivot(index="Date", columns="Ticker", values="Adj Close Price")
+    return np.log(stocks / stocks.shift(1)).dropna()
+
+
+def load_log_returns(path, price_path):
+    """Read cached log returns, first rebuilding the cache from prices if missing.
+
+    Args:
+        path (str): Log-return CSV path (gzip-compressed if it ends in .gz).
+        price_path (str): Price CSV path, as accepted by log_returns.
+
+    Returns:
+        pd.DataFrame: Log returns indexed by Date, one column per ticker.
+    """
+    if not Path(path).exists():
+        prices = pd.read_csv(price_path, parse_dates=["Date"])
+        log_returns(prices).to_csv(path, compression={"method": "infer", "mtime": 0})
+    return pd.read_csv(path, index_col=0, parse_dates=True)
 
 
 def setup_stock_dfs(df, tickers):

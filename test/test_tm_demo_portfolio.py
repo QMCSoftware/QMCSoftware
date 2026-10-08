@@ -10,6 +10,8 @@ from the slow, whole-notebook check in
 test/booktests/tb_portfolio_allocation_demo.py.
 
 Classes:
+    TestLoadLogReturns: log returns from prices, and the cache rebuilt from
+        them when missing; no randomization.
     TestListingChangeDates: universe-membership-change detection; no randomization.
     TestStopLossDates: drawdown/floor trigger detection; no randomization.
     TestComputePortfolioValueReps: the backtest itself, from plain buy-and-
@@ -23,6 +25,7 @@ Example:
     python3 -m pytest test/test_tm_demo_portfolio.py
 """
 import sys
+import tempfile
 from pathlib import Path
 from unittest import TestCase
 from unittest.mock import Mock, patch
@@ -129,6 +132,41 @@ def _stock_df(prices, dates):
     df = pd.DataFrame({"Adj Close Price": list(prices)}, index=pd.DatetimeIndex(dates))
     df["Norm Return"] = df["Adj Close Price"] / df["Adj Close Price"].iloc[0]
     return df
+
+
+class TestLoadLogReturns(TestCase):
+    """Log-return cache rebuilt from prices; no randomization."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.dir = Path(tmp.name)
+        self.prices = pd.DataFrame({
+            "Ticker": ["A"] * 4 + ["B"] * 4,
+            "Date": pd.to_datetime(["2020-01-02", "2020-01-03", "2020-01-06", "2020-01-07"] * 2),
+            "Adj Close Price": [10.0, 11.0, 12.1, 13.31, 20.0, np.nan, 25.0, 30.0],
+        })
+        self.price_path = self.dir / "df.csv.gz"
+        self.prices.to_csv(self.price_path, index=False)
+
+    def test_drops_dates_with_missing_price(self):
+        """A missing price drops its own date and the next, whose return needs it."""
+        lr = bu.log_returns(self.prices)
+        assert list(lr.index) == [pd.Timestamp("2020-01-07")]
+        np.testing.assert_allclose(lr.iloc[0], np.log([13.31 / 12.1, 30.0 / 25.0]))
+
+    def test_rebuilds_missing_cache(self):
+        path = self.dir / "log_returns.csv.gz"
+        lr = bu.load_log_returns(path, self.price_path)
+        assert path.exists()
+        assert list(lr.columns) == ["A", "B"]
+        assert len(lr) == 1
+
+    def test_reads_cache_without_prices(self):
+        path = self.dir / "log_returns.csv.gz"
+        bu.log_returns(self.prices).to_csv(path)
+        lr = bu.load_log_returns(path, self.dir / "missing.csv.gz")
+        np.testing.assert_allclose(lr.to_numpy(), bu.log_returns(self.prices).to_numpy())
 
 
 class TestListingChangeDates(TestCase):
