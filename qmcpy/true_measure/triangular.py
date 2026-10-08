@@ -1,6 +1,12 @@
+from typing import Union
+
 import numpy as np
 
+from ..discrete_distribution.abstract_discrete_distribution import (
+    AbstractDiscreteDistribution,
+)
 from ..util import ParameterError
+from .abstract_true_measure import AbstractTrueMeasure
 from .scipy_wrapper import SciPyWrapper
 
 
@@ -76,13 +82,15 @@ class Triangular(SciPyWrapper):
     r"""Convenience TrueMeasure wrapper around TriangularDistribution.
 
     Examples:
+        >>> import numpy as np
         >>> from qmcpy import DigitalNetB2
         >>> tm = Triangular(DigitalNetB2(2, seed=7), c=0.25, loc=1.5, scale=3)
-        >>> tm(4)
-        array([[3.12921885, 3.74233664],
-               [2.10644452, 2.53789087],
-               [4.20108067, 1.77806228],
-               [2.53774981, 2.77421122]])
+        >>> samples = tm(4)
+        >>> np.round(samples, 7)
+        array([[3.1292189, 3.7423366],
+               [2.1064445, 2.5378909],
+               [4.2010807, 1.7780623],
+               [2.5377498, 2.7742112]])
 
         With independent replications:
 
@@ -90,19 +98,35 @@ class Triangular(SciPyWrapper):
         ...     DigitalNetB2(2, seed=7, replications=2),
         ...     c=0.25, loc=1.5, scale=3,
         ... )
-        >>> tm_rep(4)
-        array([[[2.90169471, 3.06638646],
-                [1.85665708, 2.18758568],
-                [3.51548593, 2.35181967],
-                [2.31147618, 3.46328307]],
+        >>> samples = tm_rep(4)
+        >>> np.round(samples, 7)
+        array([[[2.9016947, 3.0663865],
+                [1.8566571, 2.1875857],
+                [3.5154859, 2.3518197],
+                [2.3114762, 3.4632831]],
         <BLANKLINE>
-               [[1.92173993, 2.26740964],
-                [3.27010728, 3.13515076],
-                [2.53166297, 3.86775554],
-                [3.19663402, 1.81763309]]])
+               [[1.9217399, 2.2674096],
+                [3.2701073, 3.1351508],
+                [2.531663 , 3.8677555],
+                [3.196634 , 1.8176331]]])
     """
 
-    def __init__(self, sampler, c=0.5, loc=0.0, scale=1.0) -> None:
+    def __init__(
+        self,
+        sampler: Union[AbstractDiscreteDistribution, AbstractTrueMeasure],
+        c: float = 0.5,
+        loc: float = 0.0,
+        scale: float = 1.0,
+    ) -> None:
+        """Initialize a triangular true measure.
+
+        Args:
+            sampler (Union[AbstractDiscreteDistribution, AbstractTrueMeasure]):
+                A discrete distribution or transform whose range is the unit cube.
+            c (float): Relative mode position, strictly between zero and one.
+            loc (float): Lower endpoint of the support.
+            scale (float): Positive support width; the upper endpoint is loc + scale.
+        """
         super().__init__(
             sampler=sampler,
             scipy_distribs=TriangularDistribution(c=c, loc=loc, scale=scale),

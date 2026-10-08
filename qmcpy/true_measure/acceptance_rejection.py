@@ -264,15 +264,15 @@ class AcceptanceRejectionReal(AbstractTrueMeasure):
         ...     inv_cdfs=[lambda u: norm.ppf(u, loc=0, scale=2)],
         ...     H_func=H, upper_bound=2., density_integral=1.)
         >>> samples = measure.gen_samples(n=8)
-        >>> samples
-        array([[-0.35495561],
-               [ 0.34341656],
-               [-1.24707311],
-               [ 0.72861103],
-               [-0.29214263],
-               [ 0.26832508],
-               [ 1.07918794],
-               [-0.6006637 ]])
+        >>> np.round(samples, 7)
+        array([[-0.3549556],
+               [ 0.3434166],
+               [-1.2470731],
+               [ 0.728611 ],
+               [-0.2921426],
+               [ 0.2683251],
+               [ 1.0791879],
+               [-0.6006637]])
         >>> samples.shape
         (8, 1)
         >>> measure

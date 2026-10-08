@@ -39,6 +39,7 @@ class Mixture(AbstractTrueMeasure):
     weight outside bounded component supports.
 
     Examples:
+        >>> import numpy as np
         >>> from qmcpy import DigitalNetB2, Gaussian, Mixture
         >>> components = [
         ...     Gaussian(DigitalNetB2(1, seed=11), mean=-2),
@@ -46,11 +47,11 @@ class Mixture(AbstractTrueMeasure):
         ... ]
         >>> mixture = Mixture(DigitalNetB2(2, seed=7), components, [0.3, 0.7])
         >>> samples = mixture(4)
-        >>> samples
-        array([[ 3.37191467],
-               [-2.17726898],
-               [ 0.17979422],
-               [ 2.14783478]])
+        >>> np.round(samples, 7)
+        array([[ 3.3719147],
+               [-2.177269 ],
+               [ 0.1797942],
+               [ 2.1478348]])
         >>> samples.shape
         (4, 1)
 
@@ -62,16 +63,16 @@ class Mixture(AbstractTrueMeasure):
         ...     [0.3, 0.7],
         ... )
         >>> samples_rep = mixture_rep(4)
-        >>> samples_rep
-        array([[[ 2.51155526],
-                [-2.80599867],
-                [ 1.5220528 ],
-                [-1.00235993]],
+        >>> np.round(samples_rep, 7)
+        array([[[ 2.5115553],
+                [-2.8059987],
+                [ 1.5220528],
+                [-1.0023599]],
         <BLANKLINE>
-               [[-2.63853874],
-                [ 2.59484853],
-                [ 3.56135749],
-                [ 0.30291552]]])
+               [[-2.6385387],
+                [ 2.5948485],
+                [ 3.5613575],
+                [ 0.3029155]]])
         >>> samples_rep.shape
         (2, 4, 1)
     """

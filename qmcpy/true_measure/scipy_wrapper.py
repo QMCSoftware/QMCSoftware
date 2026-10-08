@@ -139,30 +139,33 @@ class SciPyWrapper(AbstractTrueMeasure):
     Examples:
         A single frozen distribution is broadcast across coordinates:
 
+        >>> import numpy as np
         >>> import scipy.stats as stats
         >>> uniform = stats.uniform(loc=1, scale=2)
         >>> tm_uniform = SciPyWrapper(DigitalNetB2(2, seed=7), uniform)
-        >>> tm_uniform(4)
-        array([[2.44324713, 2.82991   ],
-               [1.32691107, 1.85929712],
-               [2.97352511, 1.06872767],
-               [1.8591331 , 2.11752684]])
+        >>> samples = tm_uniform(4)
+        >>> np.round(samples, 7)
+        array([[2.4432471, 2.82991  ],
+               [1.3269111, 1.8592971],
+               [2.9735251, 1.0687277],
+               [1.8591331, 2.1175268]])
 
         With independent replications:
 
         >>> tm_rep = SciPyWrapper(
         ...     DigitalNetB2(2, seed=7, replications=2), uniform,
         ... )
-        >>> tm_rep(4)
-        array([[[2.24308746, 2.3910377 ],
-                [1.11307046, 1.42024362],
-                [2.71280949, 1.63268779],
-                [1.58084844, 2.68154608]],
+        >>> samples = tm_rep(4)
+        >>> np.round(samples, 7)
+        array([[[2.2430875, 2.3910377],
+                [1.1130705, 1.4202436],
+                [2.7128095, 1.6326878],
+                [1.5808484, 2.6815461]],
         <BLANKLINE>
-               [[1.15810184, 1.52312305],
-                [2.55181152, 2.44805528],
-                [1.85204424, 2.88156057],
-                [2.49666285, 1.08968069]]])
+               [[1.1581018, 1.523123 ],
+                [2.5518115, 2.4480553],
+                [1.8520442, 2.8815606],
+                [2.4966629, 1.0896807]]])
 
         Independent marginals from ``scipy.stats``:
 
@@ -173,9 +176,9 @@ class SciPyWrapper(AbstractTrueMeasure):
         ...         stats.norm(loc=0, scale=1),
         ...         stats.gamma(a=5, loc=0, scale=2)])
         >>> x = tm(2)
-        >>> x
-        array([[ 2.26535046,  0.84019439, 11.45809996],
-               [ 1.37949875, -0.53952315,  9.33392306]])
+        >>> np.round(x, 7)
+        array([[ 2.2653505,  0.8401944, 11.4581   ],
+               [ 1.3794988, -0.5395231,  9.3339231]])
         >>> x.shape
         (2, 3)
 
@@ -185,9 +188,10 @@ class SciPyWrapper(AbstractTrueMeasure):
         ...     mean=[0.0, 0.0],
         ...     cov=[[1.0, 0.8], [0.8, 1.0]])
         >>> tm_joint = SciPyWrapper(DigitalNetB2(2, seed=7), mvn)
-        >>> tm_joint(2)
-        array([[ 0.5876714 ,  1.29328592],
-               [-0.98035468, -0.89064513]])
+        >>> samples = tm_joint(2)
+        >>> np.round(samples, 7)
+        array([[ 0.5876714,  1.2932859],
+               [-0.9803547, -0.8906451]])
 
         2D Student t distribution (independent marginals):
 
@@ -200,11 +204,11 @@ class SciPyWrapper(AbstractTrueMeasure):
         ...     ],
         ... )
         >>> xs = true_measure(4)
-        >>> xs
-        array([[-0.19713367,  0.05608707],
-               [ 0.06774654,  3.13429171],
-               [-0.94408523,  1.53837924],
-               [ 1.2039354 , -1.9919283 ]])
+        >>> np.round(xs, 7)
+        array([[-0.1971337,  0.0560871],
+               [ 0.0677465,  3.1342917],
+               [-0.9440852,  1.5383792],
+               [ 1.2039354, -1.9919283]])
         >>> xs.shape
         (4, 2)
     """

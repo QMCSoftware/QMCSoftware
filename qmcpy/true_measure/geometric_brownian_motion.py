@@ -52,16 +52,18 @@ class GeometricBrownianMotion(BrownianMotion):
 
         With independent replications:
 
+        >>> import numpy as np
         >>> gbm_rep = GeometricBrownianMotion(
         ...     DigitalNetB2(4, seed=7, replications=2),
         ...     t_final=2, drift=0.1, diffusion=0.2,
         ... )
-        >>> gbm_rep.gen_samples(2)
-        array([[[0.83850396, 0.95459569, 0.59763625, 0.83126481],
-                [2.25378718, 2.15105287, 2.15621976, 1.08522021]],
+        >>> samples = gbm_rep.gen_samples(2)
+        >>> np.round(samples, 7)
+        array([[[0.838504 , 0.9545957, 0.5976363, 0.8312648],
+                [2.2537872, 2.1510529, 2.1562198, 1.0852202]],
         <BLANKLINE>
-               [[1.11479296, 1.28029867, 1.43453253, 1.69488457],
-                [0.8508346 , 0.5581897 , 0.64700175, 0.35244343]]])
+               [[1.114793 , 1.2802987, 1.4345325, 1.6948846],
+                [0.8508346, 0.5581897, 0.6470017, 0.3524434]]])
     """
 
     def __init__(

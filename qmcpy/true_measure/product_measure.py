@@ -112,11 +112,12 @@ class ProductMeasure(AbstractTrueMeasure):
         ...     Uniform(DummySampler(1), lower_bound=10, upper_bound=12),
         ... ]
         >>> pm = ProductMeasure(sampler=DigitalNetB2(3, seed=12), marginals=marginals)
-        >>> pm(4)
-        array([[ 0.53194411, -0.92849742, 11.23107593],
-               [-2.53691467,  0.80592238, 10.02261332],
-               [ 0.7515686 ,  0.38970321, 10.80302743],
-               [-0.11122416, -0.65233978, 11.95112627]])
+        >>> samples = pm(4)
+        >>> np.round(samples, 7)
+        array([[ 0.5319441, -0.9284974, 11.2310759],
+               [-2.5369147,  0.8059224, 10.0226133],
+               [ 0.7515686,  0.3897032, 10.8030274],
+               [-0.1112242, -0.6523398, 11.9511263]])
     """
 
     def __init__(self, sampler: AbstractDiscreteDistribution, marginals: Union[list, tuple]) -> None:
