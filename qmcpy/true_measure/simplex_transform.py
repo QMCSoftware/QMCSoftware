@@ -111,6 +111,12 @@ class _SimplexTransform:
         When we sort the coordinates of a point in $I^d$ (such that $x_i \le x_{i+1}$),
         we obtain a point in the simplex $T_d$.
 
+        Sort is not injective: cube points whose coordinates differ only by a
+        permutation have the same image. Following [1], the transformed point
+        collection is therefore a multiset. Every occurrence is retained so that
+        it keeps its original weight (usually $1/N$ in an equal-weight QMC rule);
+        removing repeated images would change the quadrature rule.
+
         Args:
             points (np.ndarray): Points in the unit cube, shape (..., d)
 
@@ -125,6 +131,9 @@ class _SimplexTransform:
             >>> result
             array([[0.3, 0.7],
                    [0.4, 0.8]])
+            >>> transformer.sort(np.array([[0.3, 0.7], [0.7, 0.3]]))
+            array([[0.3, 0.7],
+                   [0.3, 0.7]])
         """
         points = self._validate_points(points)
         return np.sort(points, axis=-1)

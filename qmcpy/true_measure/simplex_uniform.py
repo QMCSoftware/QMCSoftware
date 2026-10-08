@@ -98,14 +98,24 @@ class SimplexUniform(AbstractTrueMeasure):
                 Its dimension must be <= 170: the density d! exceeds float64's
                 range above that, raising ParameterError at construction.
             transform_method (str): One of _SimplexTransform's measure-preserving
-                methods [2, 3]: 'root', 'sort', 'shift', 'origami', or 'mirror'.
-                'mirror' folds a symmetric point set (e.g. a lattice) onto
-                itself, degrading its low-discrepancy structure, and only
-                supports dimension <= 3 (raised by _SimplexTransform itself);
-                a warning is issued when it is selected. ('drop' is excluded
-                entirely: it rejects rather than maps points 1:1, so it does
-                not fit the _transform/_weight contract at all; see
-                AcceptanceRejection for that pattern instead.)
+                methods [2, 3]:
+
+                - 'root' (default)
+                - 'sort', which maps coordinate permutations to the same point
+                - 'shift'
+                - 'origami', which is not injective
+                - 'mirror', which is not injective, folds a symmetric point set
+                  (e.g. a lattice) onto itself, and only supports dimension <= 3;
+                  selecting it issues a warning
+
+                For the non-injective methods, all occurrences of a repeated
+                image are retained as a multiset so that each keeps its original
+                QMC weight. Removing repeated images would change the quadrature
+                rule.
+
+                - 'drop' is excluded: it rejects points rather than mapping them
+                  one-to-one, so it does not fit the _transform/_weight contract;
+                  see AcceptanceRejection for that pattern instead.
         """
         if transform_method not in ("root", "sort", "shift", "origami", "mirror"):
             raise ParameterError(
@@ -185,7 +195,8 @@ class SimplexUniform(AbstractTrueMeasure):
                 uniform point set) for `transform_method`.
             transform_method (str): One of `_SimplexTransform`'s measure-
                 preserving methods [2, 3]: 'root', 'sort', 'shift', 'origami', or
-                'mirror' (same constraints as `__init__`'s own Args).
+                'mirror' (same constraints and multiset semantics as
+                `__init__`'s own Args).
 
         Returns:
             np.ndarray: `d` of the `d+1` corner-simplex weights, shape
