@@ -2,15 +2,7 @@
 
 from functools import partial
 
-from qmcpy import (
-    Faure,
-    Halton,
-    Hammersley,
-    KorobovLattice,
-    Kronecker,
-    Lattice,
-    Sobol,
-)
+from qmcpy import Faure, Halton, Hammersley, KorobovLattice, Kronecker, Lattice, Sobol
 
 
 ld_sequences = {
