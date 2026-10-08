@@ -29,6 +29,8 @@ class AcceptanceRejection(AbstractTrueMeasure):
     number of driver points is always a power of 2 (required for the
     (t,m,s)-net property of Theorem 1).
 
+    Independent sampler replications are not currently supported.
+
     Examples:
         >>> import numpy as np
         >>> from qmcpy import DigitalNetB2
@@ -37,6 +39,15 @@ class AcceptanceRejection(AbstractTrueMeasure):
         >>> sampler = DigitalNetB2(dimension=2, seed=7)
         >>> measure = AcceptanceRejection(sampler, psi, upper_bound=2., density_integral=1.)
         >>> samples = measure.gen_samples(n=8)
+        >>> samples
+        array([[0.98676255],
+               [0.56816656],
+               [0.83330484],
+               [0.26646599],
+               [0.64218506],
+               [0.87606951],
+               [0.44193255],
+               [0.78724815]])
         >>> samples.shape
         (8, 1)
         >>> measure
@@ -238,6 +249,8 @@ class AcceptanceRejectionReal(AbstractTrueMeasure):
         This is exact when H factors as a product of independent marginals
         (e.g. a product of univariate distributions).
 
+        Independent sampler replications are not currently supported.
+
     Examples:
         >>> import numpy as np
         >>> from scipy.stats import norm
@@ -251,6 +264,15 @@ class AcceptanceRejectionReal(AbstractTrueMeasure):
         ...     inv_cdfs=[lambda u: norm.ppf(u, loc=0, scale=2)],
         ...     H_func=H, upper_bound=2., density_integral=1.)
         >>> samples = measure.gen_samples(n=8)
+        >>> samples
+        array([[-0.35495561],
+               [ 0.34341656],
+               [-1.24707311],
+               [ 0.72861103],
+               [-0.29214263],
+               [ 0.26832508],
+               [ 1.07918794],
+               [-0.6006637 ]])
         >>> samples.shape
         (8, 1)
         >>> measure

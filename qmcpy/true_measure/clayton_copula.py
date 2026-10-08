@@ -42,6 +42,11 @@ class ClaytonCopula(AbstractCopula):
         >>> marginals = [stats.expon(), stats.gamma(a=3)]
         >>> tm = ClaytonCopula(sampler, marginals=marginals, theta=2.0)
         >>> x = tm(4)
+        >>> x
+        array([[1.27878099, 6.19235755],
+               [0.1784756 , 1.47427383],
+               [4.3247056 , 1.99236058],
+               [0.56135877, 2.79488974]])
         >>> x.shape
         (4, 2)
         >>> bool(np.isfinite(x).all())
@@ -51,6 +56,9 @@ class ClaytonCopula(AbstractCopula):
             marginals       [<...rv_continuous_frozen object at ...>
                              <...rv_continuous_frozen object at ...>]
             theta           2^(1)
+
+        With independent replications:
+
         >>> rep_marginals = [stats.expon(), stats.gamma(a=3), stats.beta(a=2, b=5)]
         >>> rep_tm = ClaytonCopula(
         ...     DigitalNetB2(3, seed=7, replications=2),
@@ -58,10 +66,23 @@ class ClaytonCopula(AbstractCopula):
         ...     theta=2.0,
         ... )
         >>> samples = rep_tm(4)
+        >>> samples
+        array([[[0.28306975, 1.40315024, 0.21010627],
+                [1.14422396, 4.0630041 , 0.35120877],
+                [0.6566196 , 4.03531924, 0.19094042],
+                [2.46997766, 3.26095778, 0.48983463]],
+        <BLANKLINE>
+               [[0.59560116, 4.34794594, 0.31224501],
+                [0.76864525, 1.52554877, 0.15994297],
+                [0.26414972, 1.54261583, 0.09805588],
+                [1.39819349, 4.02090114, 0.49544139]]])
         >>> samples.shape
         (2, 4, 3)
         >>> bool(np.isfinite(samples).all())
         True
+
+        Additional dimension and parameter checks:
+
         >>> ClaytonCopula(DigitalNetB2(3, seed=7), marginals=[stats.uniform()] * 3, theta=2.0)(4).shape
         (4, 3)
         >>> ClaytonCopula(DigitalNetB2(2, seed=7), marginals=marginals, theta=1e-8)(4).shape

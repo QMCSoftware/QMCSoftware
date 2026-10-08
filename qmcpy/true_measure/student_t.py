@@ -102,7 +102,35 @@ class _StudentTAdapter:
 
 
 class StudentT(SciPyWrapper):
-    """Convenience true measure: multivariate Student t.
+    r"""Convenience true measure for the multivariate Student-t distribution.
+
+    Examples:
+        >>> from qmcpy import DigitalNetB2
+        >>> loc = [0.0, 1.0]
+        >>> shape = [[1.0, 0.5], [0.5, 2.0]]
+        >>> tm = StudentT(DigitalNetB2(2, seed=7), loc=loc, shape=shape, df=5)
+        >>> tm(4)
+        array([[ 0.62934854,  3.27006679],
+               [-1.0863208 ,  0.20841366],
+               [ 3.11253027, -2.02699353],
+               [-0.18683681,  1.09350067]])
+
+        With independent replications:
+
+        >>> tm_rep = StudentT(
+        ...     DigitalNetB2(2, seed=7, replications=2),
+        ...     loc=loc, shape=shape, df=5,
+        ... )
+        >>> tm_rep(4)
+        array([[[ 0.32700157,  1.82194247],
+                [-1.91902139, -1.33613244],
+                [ 1.19076188,  0.90677121],
+                [-0.58999244,  2.06355495]],
+        <BLANKLINE>
+               [[-1.65855839, -0.84848253],
+                [ 0.82257258,  2.22186761],
+                [-0.19638115,  3.10946352],
+                [ 0.72076018, -1.20483685]]])
     """
 
     def __init__(self, sampler, loc, shape, df) -> None:

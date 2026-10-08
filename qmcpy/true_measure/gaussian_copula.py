@@ -42,6 +42,11 @@ class GaussianCopula(AbstractCopula):
         >>> corr = [[1.0, 0.6], [0.6, 1.0]]
         >>> tm = GaussianCopula(sampler, marginals=marginals, correlation=corr)
         >>> x = tm(4)
+        >>> x
+        array([[ 0.37256723, 11.52245643],
+               [ 0.12360117,  3.32328002],
+               [ 0.68743563,  4.95495207],
+               [ 0.23476159,  5.38633152]])
         >>> x.shape
         (4, 2)
         >>> bool(np.isfinite(x).all())
@@ -52,6 +57,9 @@ class GaussianCopula(AbstractCopula):
                              <...rv_continuous_frozen object at ...>]
             correlation     [[1.  0.6]
                              [0.6 1. ]]
+
+        With independent replications:
+
         >>> rep_marginals = [stats.beta(a=2, b=5), stats.gamma(a=3, scale=2), stats.expon()]
         >>> rep_corr = [[1.0, 0.6, 0.3],
         ...             [0.6, 1.0, 0.2],
@@ -62,10 +70,23 @@ class GaussianCopula(AbstractCopula):
         ...     correlation=rep_corr,
         ... )
         >>> samples = rep_tm(4)
+        >>> samples
+        array([[[0.15971299, 2.46635908, 1.07281495],
+                [0.35032507, 7.60289127, 0.67826303],
+                [0.25649082, 7.69838174, 0.09803341],
+                [0.52887537, 6.72867594, 2.02860906]],
+        <BLANKLINE>
+               [[0.24274538, 8.30353301, 0.69426762],
+                [0.28032768, 2.14803462, 0.41130387],
+                [0.15365929, 2.99658011, 0.05053357],
+                [0.3913078 , 7.60745112, 1.71433655]]])
         >>> samples.shape
         (2, 4, 3)
         >>> bool(np.isfinite(samples).all())
         True
+
+        Additional dimension and parameter checks:
+
         >>> GaussianCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]])(4).shape
         (4, 1)
 

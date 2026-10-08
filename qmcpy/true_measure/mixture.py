@@ -45,14 +45,34 @@ class Mixture(AbstractTrueMeasure):
         ...     Gaussian(DigitalNetB2(1, seed=13), mean=2),
         ... ]
         >>> mixture = Mixture(DigitalNetB2(2, seed=7), components, [0.3, 0.7])
-        >>> mixture(4).shape
+        >>> samples = mixture(4)
+        >>> samples
+        array([[ 3.37191467],
+               [-2.17726898],
+               [ 0.17979422],
+               [ 2.14783478]])
+        >>> samples.shape
         (4, 1)
+
+        With independent replications:
+
         >>> mixture_rep = Mixture(
         ...     DigitalNetB2(2, seed=7, replications=2),
         ...     components,
         ...     [0.3, 0.7],
         ... )
-        >>> mixture_rep(4).shape
+        >>> samples_rep = mixture_rep(4)
+        >>> samples_rep
+        array([[[ 2.51155526],
+                [-2.80599867],
+                [ 1.5220528 ],
+                [-1.00235993]],
+        <BLANKLINE>
+               [[-2.63853874],
+                [ 2.59484853],
+                [ 3.56135749],
+                [ 0.30291552]]])
+        >>> samples_rep.shape
         (2, 4, 1)
     """
 

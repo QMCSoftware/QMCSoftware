@@ -38,10 +38,42 @@ class ImportanceSampling(AbstractTrueMeasure):
         ...     4,
         ...     return_weights=True,
         ... )
+        >>> samples
+        array([[0.36792768],
+               [0.80988935],
+               [0.10181667],
+               [0.54475037]])
+        >>> weights
+        array([2., 0., 0., 2.])
         >>> samples.shape, weights.shape
         ((4, 1), (4,))
         >>> bool(np.isfinite(samples).all() and np.isfinite(weights).all())
         True
+
+        These are proposal samples; importance weights are zero outside the
+        target interval. With independent replications:
+
+        >>> proposal_rep = Uniform(DigitalNetB2(1, seed=7, replications=2))
+        >>> target_rep = Uniform(
+        ...     proposal_rep.discrete_distrib, lower_bound=0.25, upper_bound=0.75,
+        ... )
+        >>> importance_sampling_rep = ImportanceSampling(target_rep, proposal_rep)
+        >>> samples_rep, weights_rep = importance_sampling_rep.gen_samples(
+        ...     4, return_weights=True,
+        ... )
+        >>> samples_rep
+        array([[[0.72162356],
+                [0.16345554],
+                [0.98676255],
+                [0.42956655]],
+        <BLANKLINE>
+               [[0.914955  ],
+                [0.42964856],
+                [0.55876342],
+                [0.03436384]]])
+        >>> weights_rep
+        array([[2., 0., 0., 2.],
+               [0., 2., 2., 0.]])
     """
 
     _is_importance_sampling = True
