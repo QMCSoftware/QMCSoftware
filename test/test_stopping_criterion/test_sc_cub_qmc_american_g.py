@@ -1,11 +1,11 @@
 import unittest
 from qmcpy import (
+    CubQMCAmericanG,
     FinancialOption,
-    Sobol,
-    Lattice,
     Halton,
     IIDStdUniform,
-    CubQMCAmericanG,
+    Lattice,
+    Sobol,
 )
 from qmcpy.util import ParameterError
 
@@ -64,7 +64,7 @@ class TestCubQMCAmericanG(unittest.TestCase):
             sc = CubQMCAmericanG(opt, abs_tol=0.05, n_train=n_tr)
             sol, _ = sc.integrate()
             prices.append(sol)
-        
+
         # Differences across training sizes should be small
         self.assertLess(max(prices) - min(prices), 0.2)
 
