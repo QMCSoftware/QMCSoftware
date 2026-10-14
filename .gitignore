@@ -32,6 +32,8 @@ qmcpy.egg-info/
 *.npy
 *.pkl
 *.gz
+!demos/portfolio/data/*.csv.gz
+demos/portfolio/data/log_returns*.csv.gz
 .DS_Store
 .idea/
 demos/.jupyter
@@ -138,3 +140,4 @@ _ags/*
 .vscode/settings.json
 /sc_*
 sc_*
+
