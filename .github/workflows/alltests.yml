@@ -21,6 +21,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  quality-gates:
+    name: Notebook and reference quality gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check changed notebooks and references
+        shell: bash
+        env:
+          QUALITY_BASE: ${{ github.event.pull_request.base.sha || (github.ref_name == 'develop' && github.event.before) || '' }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$QUALITY_BASE" || "$QUALITY_BASE" =~ ^0+$ ]]; then
+            QUALITY_BASE=$(git merge-base HEAD origin/develop)
+          elif ! git cat-file -e "$QUALITY_BASE^{commit}"; then
+            git fetch --no-tags origin "$QUALITY_BASE"
+          fi
+          make check_notebook_execution_changed STRICT=--strict NOTEBOOK_EXECUTION_DIFF_BASE="$QUALITY_BASE"
+          make check_ref_style_changed STRICT=--strict REFERENCES_STYLE_DIFF_BASE="$QUALITY_BASE"
+
   #============================================================
   # Feature branches: Linux only
   # Protected branches / PRs into develop or master: full 3-OS sweep

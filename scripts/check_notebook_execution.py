@@ -48,9 +48,13 @@ def _is_generated_bootstrap(cell):
 def check_notebook_file(path):
     """Return a list of (location, category, detail) findings for one notebook."""
     notebook = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(notebook, dict) or not isinstance(notebook.get("cells"), list):
+        raise ValueError("notebook must contain a list of cells")
     findings = []
     expected = 0
-    for idx, cell in enumerate(notebook.get("cells", [])):
+    for idx, cell in enumerate(notebook["cells"]):
+        if not isinstance(cell, dict):
+            raise ValueError(f"cell {idx} must be an object")
         if cell.get("cell_type") != "code":
             continue
         for output in cell.get("outputs", []):
@@ -124,7 +128,7 @@ def main(argv):
     for f in nb_files:
         try:
             findings = check_notebook_file(f)
-        except (OSError, json.JSONDecodeError, UnicodeDecodeError) as exc:
+        except (OSError, ValueError) as exc:
             findings = [("file", "invalid-notebook", str(exc))]
         if findings:
             per_file[f] = findings

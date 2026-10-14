@@ -1,9 +1,12 @@
+import json
 import os
 from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
+import textwrap
 import unittest
 
 
@@ -81,6 +84,80 @@ class TestQualityGates(unittest.TestCase):
             )
 
         self.assertEqual(result.returncode, 17)
+
+    @unittest.skipIf(
+        os.name == "nt" or not shutil.which("bash") or not shutil.which("make"),
+        "POSIX quality gates",
+    )
+    def test_ci_hook_gates(self):
+        workflow = (REPO_ROOT / ".github/workflows/alltests.yml").read_text()
+        step = workflow.split("- name: Check changed notebooks and references\n", 1)[1]
+        script = textwrap.dedent(step.split("        run: |\n", 1)[1].split("\n  #", 1)[0])
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / "scripts").mkdir()
+            (repo / "demos").mkdir()
+            (repo / "demos" / "legacy.ipynb").write_text(json.dumps({"cells": [{
+                "cell_type": "code", "source": ["1 + 1"], "outputs": [],
+                "execution_count": 5,
+            }]}), encoding="utf-8")
+            for name in ("check_notebook_execution.py", "check_ref_style.py"):
+                shutil.copyfile(REPO_ROOT / "scripts" / name, repo / "scripts" / name)
+            # Use the real gate and validators; stub unrelated checks.
+            (repo / "makefile").write_text(
+                (REPO_ROOT / "makefile").read_text() + "\ncheck_format check tests_fast:\n\t@true\n",
+                encoding="utf-8",
+            )
+
+            def git(*args):
+                return subprocess.run(
+                    ["git", *args], cwd=repo, check=True, capture_output=True, text=True,
+                ).stdout.strip()
+
+            git("init", "-q", "-b", "develop")
+            git("config", "user.name", "Test")
+            git("config", "user.email", "test@example.invalid")
+            git("add", ".")
+            git("commit", "-qm", "base")
+            base = git("rev-parse", "HEAD")
+            git("update-ref", "refs/remotes/origin/develop", base)
+            env = dict(os.environ, PYTHON=sys.executable, QUALITY_BASE=base, PYTHONDONTWRITEBYTECODE="1")
+            notebook = repo / "demos" / "example.ipynb"
+            reference = repo / "example.md"
+            for category, count, citation in (
+                (None, 1, False),
+                ("execution-count-not-sequential", 2, False),
+                ("undefined-citation", 1, True),
+            ):
+                with self.subTest(category=category):
+                    notebook.write_text(json.dumps({"cells": [{
+                        "cell_type": "code", "source": ["1 + 1"], "outputs": [],
+                        "execution_count": count,
+                    }]}), encoding="utf-8")
+                    reference.write_text("See [1].\n" if citation else "Example.\n", encoding="utf-8")
+                    git("add", ".")
+                    git("commit", "-qm", "example")
+                    commands = [
+                        (["bash", "-c", script], base),  # push to develop
+                        (["bash", "-c", script], ""),
+                        (["bash", "-c", script], "0" * 40),
+                        (["sh", str(REPO_ROOT / ".githooks/pre-push")], base),
+                    ]
+                    for index, (command, comparison) in enumerate(commands):
+                        if index == 1:
+                            git("branch", "-f", "feature", "HEAD")
+                            git("checkout", "-q", "feature")
+                            git("branch", "-f", "develop", base)
+                        result = subprocess.run(
+                            command, cwd=repo, env=dict(env, QUALITY_BASE=comparison),
+                            capture_output=True, text=True,
+                        )
+                        self.assertEqual(result.returncode == 0, category is None, result.stdout + result.stderr)
+                        if category:
+                            self.assertIn(category, result.stdout)
+                    self.assertEqual(git("status", "--porcelain"), "")
+                    git("branch", "-f", "develop", "HEAD")
+                    git("checkout", "-q", "develop")
 
 
 if __name__ == "__main__":

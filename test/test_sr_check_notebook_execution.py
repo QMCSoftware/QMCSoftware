@@ -14,6 +14,26 @@ class TestCheckNotebookExecution(unittest.TestCase):
     def _write_notebook(path, cells):
         path.write_text(json.dumps({"cells": cells}), encoding="utf-8")
 
+    def _assert_invalid_shape(self, notebook):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "bad.ipynb"
+            path.write_text(json.dumps(notebook), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                check_notebook_file(path)
+            with redirect_stdout(StringIO()) as report:
+                status = main([str(path), "--strict"])
+        self.assertEqual(status, 1)
+        self.assertIn("invalid-notebook", report.getvalue())
+
+    def test_notebook_must_be_object(self):
+        self._assert_invalid_shape([])
+
+    def test_cells_must_be_list(self):
+        self._assert_invalid_shape({"cells": None})
+
+    def test_cell_must_be_object(self):
+        self._assert_invalid_shape({"cells": [None]})
+
     def test_sequential_and_nonsequential_counts(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "demo.ipynb"
