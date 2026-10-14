@@ -24,6 +24,7 @@
   "demos/makefile_dev_tools.ipynb",
   "demos/mixed_distributions.ipynb",
   "demos/nei_demo.ipynb",
+  "demos/performance_optimizations_demo.ipynb",
   "demos/plot_proj_function.ipynb",
   "demos/portfolio/data_portfolio_allocation.ipynb",
   "demos/portfolio/portfolio_allocation_demo.ipynb",

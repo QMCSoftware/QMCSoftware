@@ -73,6 +73,7 @@ nav:
         - Getting Financial Data: demos/portfolio/data_portfolio_allocation.ipynb
         - Portfolio Allocation Demo: demos/portfolio/portfolio_allocation_demo.ipynb
       - Control Variates: demos/control_variates.ipynb
+      - Performance Optimizations: demos/performance_optimizations_demo.ipynb
       - Sensitivity Analysis for the Iris Dataset: demos/iris.ipynb
       - Ray Tracing: demos/ray_tracing.ipynb
       - True Measures and Importance Sampling:
