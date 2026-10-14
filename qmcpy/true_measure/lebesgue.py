@@ -31,10 +31,44 @@ class Lebesgue(AbstractTrueMeasure):
         ...     4,
         ...     return_weights=True,
         ... )
+        >>> samples
+        array([[1.73585536],
+               [2.6197787 ],
+               [1.20363334],
+               [2.08950073]])
+        >>> weights
+        array([2., 2., 2., 2.])
         >>> samples.shape, weights.shape
         ((4, 1), (4,))
         >>> bool(np.all(weights == 2))
         True
+
+        The samples follow the proposal. The weights equal the interval length,
+        converting its uniform probability density to Lebesgue weight one.
+        With independent replications:
+
+        >>> proposal_rep = Uniform(
+        ...     DigitalNetB2(1, seed=7, replications=2),
+        ...     lower_bound=1, upper_bound=3,
+        ... )
+        >>> target_rep = Lebesgue(proposal_rep)
+        >>> importance_sampling_rep = ImportanceSampling(target_rep, proposal_rep)
+        >>> samples_rep, weights_rep = importance_sampling_rep.gen_samples(
+        ...     4, return_weights=True,
+        ... )
+        >>> samples_rep
+        array([[[2.44324713],
+                [1.32691107],
+                [2.97352511],
+                [1.8591331 ]],
+        <BLANKLINE>
+               [[2.82991   ],
+                [1.85929712],
+                [2.11752684],
+                [1.06872767]]])
+        >>> weights_rep
+        array([[2., 2., 2., 2.],
+               [2., 2., 2., 2.]])
     """
 
     def __init__(self, sampler: AbstractTrueMeasure) -> None:
