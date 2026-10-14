@@ -380,8 +380,7 @@ class SimplexUniform(AbstractTrueMeasure):
         the thesis's arbitrary-dimensional $I^d\to K_d\to T_d$
         construction [3], Sec. 4.3.6, including for $d=2$. Both preserve the
         uniform measure, but the original maps $(0.8,0.4)$ to $(0.5,0.7)$ and
-        this map gives $(0.6,0.8)$. The thesis recovers the original map using
-        $P_{K_2\to T_2}(a_1,a_2)=(a_1,1-a_2)$.
+        this map gives $(0.6,0.8)$. 
 
         For the construction in [3], sorting the input ascending, then for
         $k = 1, \dots, d-1$ subtracting $(d-k)/(d-k+1)$ times the gap between
