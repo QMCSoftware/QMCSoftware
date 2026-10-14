@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Check that demo notebooks were executed cleanly from a fresh kernel: every
-code cell's ``execution_count`` forms the sequence 1, 2, 3, ... with no gaps,
-duplicates, or out-of-order numbers, and no cell's outputs contain an error.
+"""Check saved demo notebooks for sequential execution counts and error outputs.
+Nonempty code cells' ``execution_count`` values should form the sequence
+1, 2, 3, ... with no gaps, duplicates, or out-of-order numbers.
 
-A non-sequential execution_count means the saved notebook was NOT run
-top-to-bottom in one pass before saving: a cell was added, deleted, or
-re-run out of order after an earlier partial run, so the saved outputs may
-no longer reflect the saved source. This is cheap to introduce while
+A non-sequential execution_count indicates the notebook was not saved after
+a fresh top-to-bottom run: a cell may have been added, deleted, or re-run
+out of order, so the saved outputs may no longer reflect the saved source.
+Sequential counts alone cannot prove the source was not edited afterward.
+Such discrepancies are cheap to introduce while
 iterating (edit one cell, forget to rerun everything below it) and easy to
 miss on casual review, since the notebook still looks fine until someone
 actually checks the numbers.
@@ -41,7 +42,8 @@ def _is_generated_bootstrap(cell):
     return (
         source.startswith(BOOTSTRAP_CELL_MARKER)
         and "import google.colab" in source
-        and "!pip install -q qmcpy" in source
+        and ("!pip install -q qmcpy" in source
+             or "!pip install -q -e {repo_root}" in source)
     )
 
 
@@ -57,10 +59,23 @@ def check_notebook_file(path):
             raise ValueError(f"cell {idx} must be an object")
         if cell.get("cell_type") != "code":
             continue
-        for output in cell.get("outputs", []):
+        source = cell.get("source")
+        if "source" in cell and not (
+            isinstance(source, str)
+            or isinstance(source, list) and all(isinstance(line, str) for line in source)
+        ):
+            raise ValueError(f"cell {idx} source must be a string or list of strings")
+        outputs = cell.get("outputs", [])
+        if not isinstance(outputs, list):
+            raise ValueError(f"cell {idx} outputs must be a list")
+        for output in outputs:
+            if not isinstance(output, dict):
+                raise ValueError(f"cell {idx} output must be an object")
             if output.get("output_type") == "error":
                 ename = output.get("ename", "Error")
                 evalue = output.get("evalue", "")
+                if not isinstance(ename, str) or not isinstance(evalue, str):
+                    raise ValueError(f"cell {idx} error name and value must be strings")
                 findings.append((
                     f"cell {idx}", "cell-has-error-output",
                     f"saved output includes {ename}: {evalue[:80]}",
@@ -76,7 +91,6 @@ def check_notebook_file(path):
         # A missing "source" key (as opposed to a present-but-empty one) is
         # not a real notebook shape, just a minimal test fixture, so it is
         # not treated as empty here.
-        source = cell.get("source")
         if source is not None:
             source_text = source if isinstance(source, str) else "".join(source)
             if not source_text.strip():
@@ -87,7 +101,7 @@ def check_notebook_file(path):
             findings.append((
                 f"cell {idx}", "execution-count-not-sequential",
                 f"execution_count is {actual!r}, expected {expected} "
-                "(notebook was not run top-to-bottom in one pass before saving)",
+                "(saved execution counts are not sequential)",
             ))
     return findings
 
@@ -118,7 +132,8 @@ def main(argv):
         try:
             changed = _changed_files(diff_ref)
         except RuntimeError as exc:
-            print(f"--diff {diff_ref}: skipped ({exc})", file=sys.stderr)
+            print(f"ERROR: --diff {diff_ref}: {exc}", file=sys.stderr)
+            return 1
         else:
             nb_files = [f for f in nb_files if f.resolve() in changed]
 
