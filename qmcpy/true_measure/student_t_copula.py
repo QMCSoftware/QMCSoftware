@@ -39,6 +39,11 @@ class StudentTCopula(AbstractCopula):
         >>> corr = [[1.0, 0.6], [0.6, 1.0]]
         >>> tm = StudentTCopula(sampler, marginals=marginals, correlation=corr, df=4)
         >>> x = tm(4)
+        >>> np.round(x, 7)
+        array([[ 0.5876714, 10.8302249],
+               [-0.9803547,  3.2911481],
+               [ 2.2191739,  2.6062193],
+               [-0.1774778,  5.3428499]])
         >>> x.shape
         (4, 2)
         >>> bool(np.isfinite(x).all())
@@ -50,6 +55,9 @@ class StudentTCopula(AbstractCopula):
             correlation     [[1.  0.6]
                              [0.6 1. ]]
             df              2^(2)
+
+        With independent replications:
+
         >>> rep_marginals = [stats.norm(), stats.gamma(a=3, scale=2), stats.expon()]
         >>> rep_corr = [[1.0, 0.6, 0.3],
         ...             [0.6, 1.0, 0.2],
@@ -61,10 +69,23 @@ class StudentTCopula(AbstractCopula):
         ...     df=4,
         ... )
         >>> samples = rep_tm(4)
+        >>> np.round(samples, 7)
+        array([[[-0.6854412,  2.6237724,  1.0317968],
+                [ 0.4719788,  7.4570223,  0.7007026],
+                [-0.0466438,  7.4224254,  0.1363591],
+                [ 1.3748644,  6.8829946,  2.0658656]],
+        <BLANKLINE>
+               [[-0.1287723,  7.9890351,  0.6921005],
+                [ 0.0912656,  2.288113 ,  0.3891462],
+                [-0.7318128,  3.0819922,  0.0810316],
+                [ 0.683825 ,  7.5546539,  1.5543189]]])
         >>> samples.shape
         (2, 4, 3)
         >>> bool(np.isfinite(samples).all())
         True
+
+        Additional dimension and parameter checks:
+
         >>> StudentTCopula(DigitalNetB2(1, seed=7), marginals=[stats.norm()], correlation=[[1.0]], df=4)(4).shape
         (4, 1)
         >>> StudentTCopula(DigitalNetB2(2, seed=7), marginals=marginals, correlation=corr, df=1)(4).shape
