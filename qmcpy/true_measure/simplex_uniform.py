@@ -39,7 +39,7 @@ class SimplexUniform(AbstractTrueMeasure):
 
     References:
         [1] L. Devroye, "Non-Uniform Random Variate Generation," Springer-Verlag,
-        1986, Sec. I.4.1 (sampling the simplex via uniform spacings). [Online].
+        1986, Sec. V.2.1 (uniform spacings). [Online].
         Available: http://luc.devroye.org/rnbookindex.html
 
         [2] T. Pillards and R. Cools, "Transforming low-discrepancy sequences from
@@ -373,7 +373,7 @@ class SimplexUniform(AbstractTrueMeasure):
 
     @staticmethod
     def shift(points: np.ndarray) -> np.ndarray:
-        r"""Map $I^d$ through $K_d$ to $T_d$ with generalized Shift.
+        r"""Map $I^d$ through $K_d$ to $T_d$ with the Shift in [3].
 
         The original Shift is a two-dimensional piecewise-linear map; [2],
         Sec. 2.6, reports no higher-dimensional extension. This method uses
@@ -383,7 +383,7 @@ class SimplexUniform(AbstractTrueMeasure):
         this map gives $(0.6,0.8)$. The thesis recovers the original map using
         $P_{K_2\to T_2}(a_1,a_2)=(a_1,1-a_2)$.
 
-        For the generalized construction, sorting the input ascending, then for
+        For the construction in [3], sorting the input ascending, then for
         $k = 1, \dots, d-1$ subtracting $(d-k)/(d-k+1)$ times the gap between
         sorted coordinates $k-1$ and $k$ from every sorted coordinate at or
         after position $k$ maps the cube onto $K_d$; undoing the sort and
@@ -439,8 +439,9 @@ class SimplexUniform(AbstractTrueMeasure):
 
                 - 'root' (default)
                 - 'sort', which maps coordinate permutations to the same point
-                - 'shift', the generalized construction through $K_d$ from
-                  [3], not the original two-dimensional formula from [2]
+                - 'shift', the arbitrary-dimensional construction through
+                  $K_d$ in [3], not the original two-dimensional formula from
+                  [2]
                 - 'origami', which is not injective and uses the defaults
                   `base=2` and `depth=1`
                 - 'mirror', which is not injective, folds a symmetric point set
