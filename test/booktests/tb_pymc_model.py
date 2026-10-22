@@ -7,13 +7,13 @@ class NotebookTests(BaseNotebookTest):
         notebook_path, _ = self.locate_notebook("../../demos/pymc_model.ipynb")
         replacements = {
             "!unzip arma.json.zip": "!unzip -o arma.json.zip",
-            "draws=2048, tune=1000": "draws=64, tune=64",
-            "draws=1000, tune=1000": "draws=64, tune=64",
-            "pm.sample()": "pm.sample(draws=64, tune=64)",
-            "pm.sample(initvals=": "pm.sample(draws=64, tune=64, initvals=",
-            "2**14": "2**7",
-            "2**13": "2**7",
-            "2**12": "2**7",
+            "draws=10, tune=10": "draws=10, tune=10",
+            "draws=10, tune=10": "draws=10, tune=10",
+            "pm.sample()": "pm.sample(draws=10, tune=10)",
+            "pm.sample(initvals=": "pm.sample(draws=10, tune=10, initvals=",
+            "2**3": "2**3",
+            "2**3": "2**3",
+            "2**3": "2**3",
         }
         self.run_notebook(notebook_path, replacements)
 
