@@ -206,9 +206,7 @@ class TestKroneckerDiscrepancy(unittest.TestCase):
                 atol=1e-12,
             )
 
-    @unittest.expectedFailure
     def test_shifted_squared_discrepancy_matches_pairwise_definition(self):
-        # Known bug: the implementation keeps the random shift, the definition does not.
         n, d = 32, 3
         dd = Kronecker(d, seed=7)
         npt.assert_allclose(
@@ -230,7 +228,7 @@ class TestKroneckerDiscrepancy(unittest.TestCase):
     def test_periodic_discrepancy_shape(self):
         n = 16
         discrep = Kronecker(3, seed=7, randomize=False).periodic_discrepancy(n)
-        self.assertEqual(discrep.shape[-1], n)
+        self.assertEqual(discrep.shape, (n,))
 
     def test_unshifted_squared_discrepancy_is_nonnegative(self):
         for d in [1, 2, 3, 5]:
@@ -240,10 +238,7 @@ class TestKroneckerDiscrepancy(unittest.TestCase):
             )
             self.assertTrue((squared >= 0).all())
 
-    @unittest.expectedFailure
     def test_squared_discrepancy_is_nonnegative_when_shifted(self):
-        # Known bug: the kernel is evaluated at x_{|a-b|}, which retains the random
-        # shift, so the quadratic form loses positive semi-definiteness.
         for d in [1, 3, 5]:
             dd = Kronecker(d, seed=7)
             squared = dd._square_periodic_discrepancies(
@@ -251,10 +246,7 @@ class TestKroneckerDiscrepancy(unittest.TestCase):
             )
             self.assertTrue((squared >= 0).all())
 
-    @unittest.expectedFailure
     def test_squared_discrepancy_is_invariant_to_the_random_shift(self):
-        # Known bug: x_a - x_b = (a-b)*alpha mod 1 cancels the shift, so the
-        # discrepancy must not depend on the seed, but it currently does.
         n, d = 32, 3
         gamma = np.ones(d)
         k_tilde = (self._default_k_tilde, 1)
@@ -266,9 +258,7 @@ class TestKroneckerDiscrepancy(unittest.TestCase):
                 shifted._square_periodic_discrepancies(n, k_tilde, gamma), expected
             )
 
-    @unittest.expectedFailure
     def test_periodic_discrepancy_is_finite_when_shifted(self):
-        # Known bug: negative squared discrepancies make the square root NaN.
         discrep = Kronecker(3, seed=7).periodic_discrepancy(32)
         self.assertTrue(np.isfinite(discrep).all())
 
@@ -282,21 +272,25 @@ class TestKroneckerDiscrepancy(unittest.TestCase):
         )
 
     def test_squared_discrepancy_matches_direct_double_sum(self):
-        # Refactor guard only: this expectation is an algebraic restatement of the
-        # implementation's cumulative sums, so it cannot detect a wrong formula.
-        # Note: passes today because it bakes in the buggy shifted-kernel formula
-        # from #612; it will need rewriting once that fix lands (see PR #556/#633).
         dd = Kronecker(2, seed=7)
         n = 8
         gamma = np.ones(dd.d)
-        terms = self._default_k_tilde(dd.gen_samples(n), gamma)
+        points = dd.gen_samples(n)
         expected = np.array(
             [
-                sum(terms[abs(a - b)] for a in range(m) for b in range(m)) / m**2 - 1
+                sum(
+                    self._default_k_tilde((points[first] - points[second]) % 1, gamma)
+                    for first in range(m)
+                    for second in range(m)
+                ) / m**2 - 1
                 for m in range(1, n + 1)
             ]
         )
-        npt.assert_allclose(dd._square_periodic_discrepancies(n, (self._default_k_tilde, 1), gamma), expected)
+        npt.assert_allclose(
+            dd._square_periodic_discrepancies(n, (self._default_k_tilde, 1), gamma),
+            expected,
+            atol=1e-12,
+        )
 
 
 if __name__ == "__main__":
