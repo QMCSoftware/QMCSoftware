@@ -6,6 +6,7 @@ class NotebookTests(BaseNotebookTest):
     def test_pymc_model_notebook(self):
         notebook_path, _ = self.locate_notebook("../../demos/pymc_model.ipynb")
         replacements = {
+            "!unzip arma.json.zip": "!unzip -o arma.json.zip",
             "draws=2048, tune=1000": "draws=64, tune=64",
             "draws=1000, tune=1000": "draws=64, tune=64",
             "pm.sample()": "pm.sample(draws=64, tune=64)",
