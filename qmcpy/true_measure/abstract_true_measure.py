@@ -18,6 +18,8 @@ class AbstractTrueMeasure(object):
     transform/weight/moment logic this base class exposes.
     """
 
+    domain: np.ndarray
+
     def __init__(self) -> None:
         prefix = "A concrete implementation of TrueMeasure must have "
         if not hasattr(self, "domain"):
